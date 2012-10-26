@@ -16,7 +16,7 @@
 
 package cz.clovekvtisni.coordinator.server.web.format;
 
-import cz.clovekvtisni.coordinator.server.util.ValueTool;
+import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.context.MessageSource;
 import org.springframework.format.Formatter;
 

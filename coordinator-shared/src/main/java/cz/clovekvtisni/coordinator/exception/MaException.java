@@ -10,7 +10,7 @@ public class MaException extends RuntimeException {
 
     private static final long serialVersionUID = 8989830268218888101L;
 
-    private String code;
+    private ErrorCode code;
 
     private String[] params;
 
@@ -19,18 +19,18 @@ public class MaException extends RuntimeException {
     protected MaException() {
     }
 
-    protected MaException(String code, String... params) {
+    protected MaException(ErrorCode code, String... params) {
         this.code = code;
         this.params = params;
     }
 
-    protected MaException(Throwable cause, String code, String... params) {
+    protected MaException(Throwable cause, ErrorCode code, String... params) {
         super(cause);
         this.code = code;
         this.params = params;
     }
 
-    public String getCode() {
+    public ErrorCode getCode() {
         return code;
     }
 
@@ -43,11 +43,11 @@ public class MaException extends RuntimeException {
         if (localizedMessage != null) {
             return localizedMessage;
         }
-        String msg = code;
+        String msg = code.toString();
         if (params != null && params.length > 0) {
             msg += ": ";
             for (int i = 0; i < params.length; i++) {
-                if (i > 1) msg += ", ";
+                if (i > 0) msg += ", ";
                 msg += params[i];
             }
         }
@@ -55,11 +55,11 @@ public class MaException extends RuntimeException {
     }
 
     public static MaException internal(String description) {
-        return new MaException("error.internal.ext", description);
+        return new MaException(ErrorCode.INTERNAL, description);
     }
 
     public static MaException internal(String description, Throwable throwable) {
-        return new MaException(throwable, "error.internal.ext", description);
+        return new MaException(throwable, ErrorCode.INTERNAL, description);
     }
 
     public void setLocalizedMessage(String localizedMessage) {

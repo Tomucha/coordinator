@@ -1,7 +1,7 @@
 package cz.clovekvtisni.coordinator.server.web;
 
 import cz.clovekvtisni.coordinator.exception.MaException;
-import cz.clovekvtisni.coordinator.server.util.SignatureTool;
+import cz.clovekvtisni.coordinator.util.SignatureTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.ModelAndView;

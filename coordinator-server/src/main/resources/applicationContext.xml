@@ -41,7 +41,7 @@
 
     <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource" p:basenames-ref="messageSourceLocations" p:defaultEncoding="UTF-8" />
 
-    <bean id="jsonObjectMapper" class="cz.clovekvtisni.coordinator.server.util.JsonObjectMapper" />
+    <bean id="jsonObjectMapper" class="cz.clovekvtisni.coordinator.util.JsonObjectMapper" />
 
     <bean id="validationMessageInterpolator" class="cz.clovekvtisni.coordinator.server.validation.CustomMessageInterpolator"/>
 
@@ -71,5 +71,7 @@
             </set>
         </property>
     </bean>
+
+    <bean class="com.googlecode.objectify.spring.ObjectifyFactoryBean" p:basePackage="cz.clovekvtisni.coordinator.server.domain" />
 
 </beans>

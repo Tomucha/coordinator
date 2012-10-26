@@ -12,7 +12,12 @@
     </definition>
 
 
-    <definition name=".gwt.mainTemplate" template="/WEB-INF/jsp/layouts/ajax.jsp">
+    <definition name=".ajax.mainTemplate" template="/WEB-INF/jsp/layouts/ajax.jsp">
+        <put-attribute name="content" value="/WEB-INF/jsp/empty.jsp"/>
+    </definition>
+
+    <definition name=".errors.mainTemplate" template="/WEB-INF/jsp/layouts/errors.jsp">
+        <put-attribute name="content" value="/WEB-INF/jsp/empty.jsp"/>
     </definition>
 
 

@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.server.util;
+package cz.clovekvtisni.coordinator.util;
 
 import java.util.Collection;
 
