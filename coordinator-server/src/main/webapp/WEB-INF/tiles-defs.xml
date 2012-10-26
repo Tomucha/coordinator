@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+        "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+
+    <definition name=".mainTemplate" template="/WEB-INF/jsp/layouts/default.jsp">
+        <put-attribute name="extraStyle" value="" type="string"/>
+        <put-attribute name="extraClass" value="" type="string" />
+        <put-attribute name="content" value="/WEB-INF/jsp/empty.jsp"/>
+    </definition>
+
+
+    <definition name=".gwt.mainTemplate" template="/WEB-INF/jsp/layouts/ajax.jsp">
+    </definition>
+
+
+</tiles-definitions>
