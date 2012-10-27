@@ -3,7 +3,6 @@ package cz.clovekvtisni.coordinator.server.aspect;
 import cz.clovekvtisni.coordinator.server.validation.NoValidate;
 import cz.clovekvtisni.coordinator.server.validation.Validate;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.hibernate.validator.engine.MethodConstraintViolationImpl;
@@ -34,7 +33,7 @@ public class ValidationAspect implements Ordered {
         this.validatorFactory = validatorFactory;
     }
 
-    @Around("this(cz.clovekvtisni.coordinator.server.service.Service)")
+//    @Around("this(cz.clovekvtisni.coordinator.server.service.Service)")
     public Object validateMethodInvocation(ProceedingJoinPoint joinPoint) throws Throwable {
         return doParameterValidation(joinPoint);
     }

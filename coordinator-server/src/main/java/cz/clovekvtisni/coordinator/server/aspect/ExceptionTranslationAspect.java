@@ -13,7 +13,6 @@ import org.springframework.context.NoSuchMessageException;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
-import javax.validation.ValidationException;
 import java.util.Arrays;
 
 @Component
@@ -33,6 +32,7 @@ public class ExceptionTranslationAspect implements Ordered {
         processException(ex);
     }
 
+/*
     protected Throwable translateException(Throwable throwable) {
         if (throwable instanceof MaException) {
             logger.debug("exception occurred", throwable);
@@ -44,9 +44,12 @@ public class ExceptionTranslationAspect implements Ordered {
         logger.debug("exception occurred", throwable);
         return MaException.internal(throwable.toString());
     }
+*/
 
     protected void processException(Throwable throwable) throws Throwable {
+/*
         throwable = translateException(throwable);
+*/
         if (throwable instanceof MaException) {
             logger.debug("translate exception ", throwable);
             MaException ex = (MaException) throwable;

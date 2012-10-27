@@ -38,12 +38,21 @@ public class ApplicationInitFilter implements Filter {
     @Autowired
     private LocaleResolver localeResolver;
 
+    private static boolean appInitialized = false;
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest hRequest = (HttpServletRequest) request;
         HttpServletResponse hResponse = (HttpServletResponse) response;
 
         appContext.setLocale(localeResolver.resolveLocale(hRequest));
+
+        synchronized (this.getClass()) {
+            if (!appInitialized) {
+                systemService.initApplication();
+                appInitialized = true;
+            }
+        }
 
         Long loggedUserId = findLoggedUserId(hRequest);
 
@@ -123,7 +132,6 @@ public class ApplicationInitFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        systemService.initApplication();
     }
 
     @Override
