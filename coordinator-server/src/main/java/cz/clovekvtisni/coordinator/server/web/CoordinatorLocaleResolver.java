@@ -12,7 +12,7 @@ import java.util.Locale;
  * Date: 10/26/12
  * Time: 3:52 PM
  */
-public class LocaleResolver extends AbstractLocaleResolver {
+public class CoordinatorLocaleResolver extends AbstractLocaleResolver {
     @Override
     public Locale resolveLocale(HttpServletRequest request) {
         return Locale.getDefault();

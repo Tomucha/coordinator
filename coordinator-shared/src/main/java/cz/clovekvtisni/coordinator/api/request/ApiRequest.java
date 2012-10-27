@@ -31,7 +31,7 @@ public class ApiRequest {
         this.token = deviceId + ";" + System.currentTimeMillis() + ";" + c;
         this.sessionId = sessionId;
         this.data = data;
-        this.signature = SignatureTool.sign(SignatureTool.computeHash(data), secret);
+        this.signature = SignatureTool.signApi(SignatureTool.computeHash(data), secret);
     }
 
     public String getSignature() {

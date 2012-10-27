@@ -18,5 +18,14 @@ public class ValueTool {
         return value == null || value.isEmpty();
     }
 
+    public static String normalizeEmail(String email) {
+        if (email != null) {
+            email = email.trim().toLowerCase();
+        }
+        return email;
+    }
 
+    public static String normalizeLogin(String login) {
+        return login == null ? null : login.toLowerCase();
+    }
 }

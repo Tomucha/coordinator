@@ -23,4 +23,8 @@ public class MaPermissionDeniedException extends MaException {
     public static MaPermissionDeniedException wrongCredentials() {
         return new MaPermissionDeniedException(ErrorCode.WRONG_CREDENTIALS);
     }
+
+    public static MaPermissionDeniedException permissionDenied() {
+        return new MaPermissionDeniedException(ErrorCode.PERMISSION_DENIED);
+    }
 }

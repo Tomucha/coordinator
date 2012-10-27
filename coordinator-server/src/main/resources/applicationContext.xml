@@ -32,7 +32,7 @@
         </property>
     </bean>
 
-    <bean id="localeResolver" class="cz.clovekvtisni.coordinator.server.web.LocaleResolver" />
+    <bean id="localeResolver" class="cz.clovekvtisni.coordinator.server.web.CoordinatorLocaleResolver" />
 
     <util:list id="messageSourceLocations">
         <value>classpath:messages</value>
@@ -73,5 +73,11 @@
     </bean>
 
     <bean class="com.googlecode.objectify.spring.ObjectifyFactoryBean" p:basePackage="cz.clovekvtisni.coordinator.server.domain" />
+
+    <bean id="applicationInitFilter" class="cz.clovekvtisni.coordinator.server.web.filter.ApplicationInitFilter" />
+
+    <bean id="appContext" class="cz.clovekvtisni.coordinator.server.security.AppContextSimpleBeanImpl" scope="request">
+        <aop:scoped-proxy />
+    </bean>
 
 </beans>

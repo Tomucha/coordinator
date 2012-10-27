@@ -17,7 +17,7 @@ public class SignatureTool {
 
     private static Logger logger = Logger.getLogger(SignatureTool.class.getName());
 	
-	private static final String SECRET_SEED = "98765efghnjkáěě)";
+	private static final String SECRET_SEED = "lj543sew;@'\\;dsa';42";
 
 	public static String asHex (byte[] buf) {
         StringBuilder strbuf = new StringBuilder(buf.length * 2);
@@ -60,12 +60,8 @@ public class SignatureTool {
 		return md5Digest(whatToSignForSecondTime).substring(8,18).toUpperCase();
 	}
 
-    public static String sign(String requestHash) {
-        return sign(requestHash, SECRET_SEED);
-    }
-
-    public static String sign(String requestHash, String secret) {
-        String whatToSign = requestHash + ";" + "android" + ";" + secret;
+    public static String signApi(String requestHash, String secret) {
+        String whatToSign = requestHash + ";" + "api" + ";" + secret;
         String digest = md5Digest(whatToSign);
         String whatToSignForSecondTime = digest.substring(5,19);
         return md5Digest(whatToSignForSecondTime).substring(8,18).toUpperCase();

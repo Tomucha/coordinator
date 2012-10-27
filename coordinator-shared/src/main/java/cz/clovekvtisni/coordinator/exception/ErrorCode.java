@@ -7,5 +7,5 @@ package cz.clovekvtisni.coordinator.exception;
 * Time: 1:11 AM
 */
 public enum ErrorCode {
-    INTERNAL, WRONG_SIGNATURE, WRONG_CREDENTIALS, PARSE_JSON
+    INTERNAL, WRONG_SIGNATURE, WRONG_CREDENTIALS, PERMISSION_DENIED, PARSE_JSON
 }

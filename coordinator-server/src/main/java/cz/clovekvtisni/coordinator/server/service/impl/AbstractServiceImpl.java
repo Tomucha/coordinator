@@ -6,7 +6,6 @@ import com.google.appengine.api.taskqueue.TransientFailureException;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyOpts;
-import com.googlecode.objectify.ObjectifyService;
 import cz.clovekvtisni.coordinator.server.service.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,7 @@ public class AbstractServiceImpl implements Service {
                 TransactionOptions to = TransactionOptions.Builder.withXG(true);
                 ObjectifyOpts opts = new ObjectifyOpts().setTransactionOptions(to);
                 opts.setBeginTransaction(true);
-                final Objectify ofy = ObjectifyService.begin(opts);
+                final Objectify ofy = objectifyFactory.begin(opts);
                 try {
                     if (!ofy.getTxn().isActive()) throw new IllegalStateException("Internal ofy error");
                     final T toReturn = withResultCallback.runInTransaction(ofy);

@@ -1,5 +1,7 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
+import com.googlecode.objectify.Key;
+
 import java.io.Serializable;
 
 /**
@@ -8,8 +10,10 @@ import java.io.Serializable;
  * Date: 10/26/12
  * Time: 11:17 PM
  */
-public interface CoordinatorEntity extends Serializable {
+public interface CoordinatorEntity<E extends CoordinatorEntity<E>> extends Serializable {
 
     Long getId();
+
+    Key<E> getKey();
 
 }

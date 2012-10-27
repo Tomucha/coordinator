@@ -105,7 +105,7 @@ public abstract class AbstractApiController {
     */
             }
 
-            String signatureComputed = SignatureTool.sign(SignatureTool.computeHash(params), getSecret());
+            String signatureComputed = SignatureTool.signApi(SignatureTool.computeHash(params), getSecret());
             if (signature == null || !signature.equalsIgnoreCase(signatureComputed)) {
                 logger.info("wrong signature '{}', correct '{}'", signature, signatureComputed);
                 throw MaPermissionDeniedException.wrongSignature(signature, "json");

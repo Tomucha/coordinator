@@ -10,14 +10,20 @@
 
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/classes/logging.properties" />
+
+        <property name="default.admin.email" value="admin@m-atelier.cz" />
+        <property name="default.admin.login" value="admin" />
+        <property name="default.admin.password" value="admin" />
     </system-properties>
 
     <sessions-enabled>true</sessions-enabled>
 
     <threadsafe>true</threadsafe>
 
-    <admin-console>
-        <page name="Appstats" url="/appstats" />
-    </admin-console>
-
+    <static-files>
+        <include path="/css/**" expiration="2d" />
+        <include path="/js/**" expiration="2d" />
+        <include path="/images/**" expiration="2d" />
+    </static-files>
+    
 </appengine-web-app>

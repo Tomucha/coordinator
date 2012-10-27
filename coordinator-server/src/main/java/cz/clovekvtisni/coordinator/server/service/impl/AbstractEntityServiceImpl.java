@@ -1,6 +1,6 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
-import com.googlecode.objectify.Objectify;
+import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,5 +14,8 @@ public class AbstractEntityServiceImpl extends AbstractServiceImpl {
 
     @Autowired
     protected SystemService systemService;
+
+    @Autowired
+    protected AppContext appContext;
 
 }

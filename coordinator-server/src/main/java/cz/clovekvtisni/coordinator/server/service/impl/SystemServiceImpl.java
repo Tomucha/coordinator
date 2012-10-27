@@ -4,7 +4,13 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorEntity;
 import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.filter.UserFilter;
+import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.SystemService;
+import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.util.RunnableWithResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +21,21 @@ import org.springframework.stereotype.Service;
  */
 @Service("systemService")
 public class SystemServiceImpl extends AbstractServiceImpl implements SystemService {
+
+    private UserService userService;
+
+    private SecurityTool securityTool;
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setSecurityTool(SecurityTool securityTool) {
+        this.securityTool = securityTool;
+    }
+
     @Override
     public void saveUniqueIndexOwner(Objectify ofy, UniqueIndexEntity.Property property, String value, Key<? extends CoordinatorEntity> ownerKey) {
         assertCrossGroupTransaction(ofy);
@@ -46,5 +67,25 @@ public class SystemServiceImpl extends AbstractServiceImpl implements SystemServ
         UniqueIndexEntity index =  ofy.find(k);
         if (index == null) return null;
         return (Key<T>) index.getEntityKey();
+    }
+
+    @Override
+    public void initApplication() {
+        securityTool.runWithDisabledSecurity(new RunnableWithResult<Void>() {
+            @Override
+            public Void run() {
+                UserFilter filter = new UserFilter();
+                filter.setLogin("admin");
+                UserEntity userEntity = userService.findByFilter(filter, 1, null).singleResult();
+                if (userEntity == null) {
+                    userEntity = new UserEntity();
+                    userEntity.setLogin(System.getProperty("default.admin.login", "admin"));
+                    userEntity.setPassword(System.getProperty("default.admin.password", "admin"));
+                    userEntity.setEmail(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
+                    userService.createUser(userEntity);
+                }
+                return null;
+            }
+        });
     }
 }

@@ -1,9 +1,12 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.Cached;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Indexed;
 import com.googlecode.objectify.annotation.Unindexed;
 import cz.clovekvtisni.coordinator.domain.User;
+import cz.clovekvtisni.coordinator.util.ValueTool;
 
 import javax.persistence.Id;
 
@@ -14,8 +17,9 @@ import javax.persistence.Id;
  * Time: 11:07 PM
  */
 @Unindexed
+@Cached
 @Entity(name = "User")
-public class UserEntity implements CoordinatorEntity {
+public class UserEntity implements CoordinatorEntity<UserEntity> {
 
     @Id
     private Long id;
@@ -31,8 +35,20 @@ public class UserEntity implements CoordinatorEntity {
 
     private String email;
 
+    public UserEntity() {
+    }
+
+    public UserEntity(Long id) {
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public Key<UserEntity> getKey() {
+        return Key.create(UserEntity.class, id);
     }
 
     public void setId(Long id) {
@@ -115,4 +131,18 @@ public class UserEntity implements CoordinatorEntity {
         return user;
     }
 
+    public String getFullName() {
+        StringBuilder sb = new StringBuilder();
+        if (firstName != null) {
+            sb.append(firstName);
+        }
+        if (!ValueTool.isEmpty(lastName)) {
+            if (sb.length() > 0) {
+                sb.append(' ');
+            }
+            sb.append(lastName);
+        }
+        String fullName = sb.toString();
+        return ValueTool.isEmpty(fullName) ? login : fullName;
+    }
 }

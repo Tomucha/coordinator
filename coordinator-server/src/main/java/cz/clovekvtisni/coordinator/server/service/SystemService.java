@@ -18,4 +18,6 @@ public interface SystemService extends Service {
     void deleteUniqueIndexOwner(Objectify ofy, UniqueIndexEntity.Property property, String value);
 
     <T> Key<T> findUniqueValueOwner(Objectify ofy, UniqueIndexEntity.Property property, String value);
+
+    void initApplication();
 }
