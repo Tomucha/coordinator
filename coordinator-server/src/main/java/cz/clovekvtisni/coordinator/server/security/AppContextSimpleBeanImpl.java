@@ -1,6 +1,8 @@
 package cz.clovekvtisni.coordinator.server.security;
 
+import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Locale;
 

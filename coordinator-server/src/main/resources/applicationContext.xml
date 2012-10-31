@@ -80,4 +80,8 @@
         <aop:scoped-proxy />
     </bean>
 
+    <bean id="coordinatorConfig" class="cz.clovekvtisni.coordinator.server.util.CoordinatorConfigFactoryBean">
+        <property name="configFilePath" value="coordinator_config.xml"/>
+    </bean>
+
 </beans>

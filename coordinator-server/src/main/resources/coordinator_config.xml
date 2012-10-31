@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coordinator>
+    <role_list>
+        <role id="role1" name="Název1" extends_role_id="">popis role 1</role>
+        <role id="role2" name="Název2" extends_role_id="">popis role 2</role>
+    </role_list>
+
+    <skill_list>
+        <skill id="skill1" name="Název1" must_verify="true">popis skillu 1</skill>
+    </skill_list>
+</coordinator>

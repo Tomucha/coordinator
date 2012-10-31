@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
+import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -28,11 +29,16 @@ public class LoginController extends AbstractController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private CoordinatorConfig coordinatorConfig;
+
     @RequestMapping(method = RequestMethod.GET)
     public String show(Model model, @RequestParam(value = "retUrl", required = false) String retUrl) {
 
         LoginForm form = new LoginForm();
         form.retUrl = retUrl;
+
+        System.out.println("coordinatorConfig: " + coordinatorConfig);
 
         model.addAttribute("user", form);
         return "login/form";

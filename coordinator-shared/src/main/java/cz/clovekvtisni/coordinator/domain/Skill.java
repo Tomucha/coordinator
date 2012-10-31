@@ -1,16 +1,28 @@
 package cz.clovekvtisni.coordinator.domain;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.Text;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jka
  * Date: 31.10.12
  */
+@Root
 public class Skill extends AbstractStaticEntity {
 
+    @Attribute(name = "id")
+    protected String id;
+
+    @Attribute
     private String name;
 
+    @Text
     private String description;
 
+    @Attribute(name = "must_verify")
     private boolean mustVerify;
 
     public String getName() {
