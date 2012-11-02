@@ -196,7 +196,7 @@ public class UserEntity implements CoordinatorEntity<UserEntity> {
         id = user.getId();
         email = user.getEmail();
         if (user.getNewPassword() != null) {
-            password = user.getNewPassword(); // TODO hash it!
+            password = user.getNewPassword();
         }
         // TODO
     }

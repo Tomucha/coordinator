@@ -31,9 +31,9 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     private static final String PASSWORD_SEED = "e{\"DFGP:2354\":asdlghH%$~23'5;'";
 
     @Override
-    public User login(String login, String password) {
+    public User login(String email, String password) {
         Objectify ofy = noTransactionalObjectify();
-        Key<UserEntity> userKey = systemService.findUniqueValueOwner(ofy, UniqueIndexEntity.Property.LOGIN, ValueTool.normalizeLogin(login));
+        Key<UserEntity> userKey = systemService.findUniqueValueOwner(ofy, UniqueIndexEntity.Property.EMAIL, ValueTool.normalizeEmail(email));
         if (userKey == null) {
             throw MaPermissionDeniedException.wrongCredentials();
         }
@@ -59,8 +59,8 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     @Override
     public ResultList<User> findByFilter(UserFilter filter, int limit, String bookmark) {
         Query<UserEntity> query = noTransactionalObjectify().query(UserEntity.class);
-        if (!ValueTool.isEmpty(filter.getLogin())) {
-            query.filter("login =", filter.getLogin().toLowerCase());
+        if (!ValueTool.isEmpty(filter.getEmail())) {
+            query.filter("email =", filter.getEmail().toLowerCase());
         }
 
         //TODO: ordering (support in AbstractFilter)

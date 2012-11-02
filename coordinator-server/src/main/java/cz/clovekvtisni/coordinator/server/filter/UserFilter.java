@@ -8,20 +8,20 @@ package cz.clovekvtisni.coordinator.server.filter;
  */
 public class UserFilter extends AbstractFilter {
 
-    private String login;
+    private String email;
 
-    public String getLogin() {
-        return login;
+    public String getEmail() {
+        return email;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Override
     public String toString() {
         return "UserFilter{" +
-                "login='" + login + '\'' +
+                "email='" + email + '\'' +
                 '}';
     }
 }

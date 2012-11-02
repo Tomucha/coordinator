@@ -5,7 +5,6 @@ import com.googlecode.objectify.Objectify;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorEntity;
 import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.SystemService;
@@ -76,7 +75,7 @@ public class SystemServiceImpl extends AbstractServiceImpl implements SystemServ
             @Override
             public Void run() {
                 UserFilter filter = new UserFilter();
-                filter.setLogin("admin");
+                filter.setEmail("admin@m-atelier.cz");
                 User user = userService.findByFilter(filter, 1, null).singleResult();
                 if (user == null) {
                     user = new User();
