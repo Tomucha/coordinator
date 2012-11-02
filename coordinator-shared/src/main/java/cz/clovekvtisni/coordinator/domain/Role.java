@@ -4,6 +4,7 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Text;
+import org.simpleframework.xml.core.Commit;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,34 +20,26 @@ public class Role extends AbstractStaticEntity {
     @Attribute
     private String name;
 
-    @Text
+    @Text(required = false)
     private String description;
 
-    @Attribute(name = "extends_role_id")
+    @Attribute(name = "extends_role_id", required = false)
     private String extendsRoleId;
+
+    public String getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getExtendsRoleId() {
         return extendsRoleId;
-    }
-
-    public void setExtendsRoleId(String extendsRoleId) {
-        this.extendsRoleId = extendsRoleId;
     }
 
     @Override

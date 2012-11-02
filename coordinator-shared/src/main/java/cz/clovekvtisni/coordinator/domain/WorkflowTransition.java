@@ -1,5 +1,10 @@
 package cz.clovekvtisni.coordinator.domain;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.Text;
+
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -7,65 +12,59 @@ import java.util.List;
  * User: jka
  * Date: 31.10.12
  */
+@Root(name = "transition")
 public class WorkflowTransition extends AbstractStaticEntity {
 
+    @Attribute
+    private String id;
+
+    @Attribute
     private String name;
 
+    @Text(required = false)
     private String description;
 
+    @Attribute(name = "from_state_id", required = false)
     private String fromStateId;
 
+    @Attribute(name = "to_state_id", required = false)
     private String toStateId;
 
-    private List<String> allowedForRole;
+    @Attribute(name = "allowed_for_role", required = false, empty = "")
+    private String[] allowedForRole;
+
+    public String getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getFromStateId() {
         return fromStateId;
-    }
-
-    public void setFromStateId(String fromStateId) {
-        this.fromStateId = fromStateId;
     }
 
     public String getToStateId() {
         return toStateId;
     }
 
-    public void setToStateId(String toStateId) {
-        this.toStateId = toStateId;
-    }
-
-    public List<String> getAllowedForRole() {
+    public String[] getAllowedForRole() {
         return allowedForRole;
-    }
-
-    public void setAllowedForRole(List<String> allowedForRole) {
-        this.allowedForRole = allowedForRole;
     }
 
     @Override
     public String toString() {
         return "WorkflowTransition{" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
                 ", fromStateId='" + fromStateId + '\'' +
                 ", toStateId='" + toStateId + '\'' +
-                ", allowedForRole=" + allowedForRole +
+                ", allowedForRole=" + Arrays.asList(allowedForRole) +
                 '}';
     }
 }

@@ -1,80 +1,92 @@
 package cz.clovekvtisni.coordinator.domain;
 
+import org.simpleframework.xml.*;
+import org.simpleframework.xml.core.Commit;
+
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
  * User: jka
  * Date: 31.10.12
  */
+@Root(name = "state")
 public class WorkflowState extends AbstractStaticEntity {
+
+    @Attribute
+    private String id;
 
     private String workflowId;
 
+    @Attribute
     private String name;
 
+    @Element(required = false)
     private String description;
 
+    @Attribute(name = "requires_assignment", required = false)
     private boolean requiresAssignment;
 
-    private List<String> visibleForRole;
+    @Attribute(name = "visible_for_role", required = false, empty = "")
+    private String[] visibleForRole;
 
-    private List<String> editableForRole;
+    @Attribute(name = "editable_for_role", required = false, empty = "")
+    private String[] editableForRole;
+
+    @ElementList(type = WorkflowTransition.class, name = "transition", inline = true, required = false)
+    private List<WorkflowTransition> transitions;
+
+    public String getId() {
+        return id;
+    }
 
     public String getWorkflowId() {
         return workflowId;
-    }
-
-    public void setWorkflowId(String workflowId) {
-        this.workflowId = workflowId;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public boolean isRequiresAssignment() {
         return requiresAssignment;
     }
 
-    public void setRequiresAssignment(boolean requiresAssignment) {
-        this.requiresAssignment = requiresAssignment;
-    }
-
-    public List<String> getVisibleForRole() {
+    public String[] getVisibleForRole() {
         return visibleForRole;
     }
 
-    public void setVisibleForRole(List<String> visibleForRole) {
-        this.visibleForRole = visibleForRole;
-    }
-
-    public List<String> getEditableForRole() {
+    public String[] getEditableForRole() {
         return editableForRole;
     }
 
-    public void setEditableForRole(List<String> editableForRole) {
-        this.editableForRole = editableForRole;
+    public List<WorkflowTransition> getTransitions() {
+        return transitions;
+    }
+
+    /**
+     * Called by parent domain object thru deserialization.
+     * @param workflowId parent workflow id
+     */
+    void setWorkflowId(String workflowId) {
+        this.workflowId = workflowId;
     }
 
     @Override
     public String toString() {
         return "WorkflowState{" +
-                "workflowId='" + workflowId + '\'' +
+                "id='" + id + '\'' +
+                ", workflowId='" + workflowId + '\'' +
                 ", name='" + name + '\'' +
                 ", requiresAssignment=" + requiresAssignment +
+                ", visibleForRole=" + Arrays.asList(visibleForRole) +
+                ", editableForRole=" + Arrays.asList(editableForRole) +
                 '}';
     }
 }

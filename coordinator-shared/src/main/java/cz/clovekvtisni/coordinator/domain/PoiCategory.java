@@ -1,5 +1,8 @@
 package cz.clovekvtisni.coordinator.domain;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Text;
+
 import java.util.List;
 
 /**
@@ -9,60 +12,54 @@ import java.util.List;
  */
 public class PoiCategory extends AbstractStaticEntity {
 
+    @Attribute
+    private String id;
+
+    @Attribute
     private String name;
 
+    @Text(required = false)
     private String description;
 
+    @Attribute
     private String icon;
 
+    @Attribute(name = "workflow_id", required = false)
     private String workflowId;
 
+    @Attribute(required = false)
     private boolean important;
+
+    public String getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getIcon() {
         return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
     }
 
     public String getWorkflowId() {
         return workflowId;
     }
 
-    public void setWorkflowId(String workflowId) {
-        this.workflowId = workflowId;
-    }
-
     public boolean isImportant() {
         return important;
-    }
-
-    public void setImportant(boolean important) {
-        this.important = important;
     }
 
     @Override
     public String toString() {
         return "PoiCategory{" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", icon='" + icon + '\'' +
                 ", workflowId='" + workflowId + '\'' +
                 ", important=" + important +
                 '}';

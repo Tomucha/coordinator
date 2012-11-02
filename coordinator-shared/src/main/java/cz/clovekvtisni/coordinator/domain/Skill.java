@@ -19,40 +19,33 @@ public class Skill extends AbstractStaticEntity {
     @Attribute
     private String name;
 
-    @Text
+    @Text(required = false)
     private String description;
 
-    @Attribute(name = "must_verify")
+    @Attribute(name = "must_verify", required = false)
     private boolean mustVerify;
+
+    public String getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public boolean isMustVerify() {
         return mustVerify;
-    }
-
-    public void setMustVerify(boolean mustVerify) {
-        this.mustVerify = mustVerify;
     }
 
     @Override
     public String toString() {
         return "Skill{" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
                 ", mustVerify=" + mustVerify +
                 '}';
     }
