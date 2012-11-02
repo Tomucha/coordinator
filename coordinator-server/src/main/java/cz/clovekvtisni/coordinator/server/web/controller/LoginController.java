@@ -1,6 +1,5 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
-import cz.clovekvtisni.coordinator.domain.Workflow;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.service.UserService;
@@ -35,13 +34,10 @@ public class LoginController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String show(Model model, @RequestParam(value = "retUrl", required = false) String retUrl) {
-
         LoginForm form = new LoginForm();
         form.retUrl = retUrl;
-
-        System.out.println("coordinatorConfig: " + coordinatorConfig);
-
         model.addAttribute("user", form);
+
         return "login/form";
     }
 
@@ -53,7 +49,7 @@ public class LoginController extends AbstractController {
 
         String retUrl;
         try {
-            userService.login(loginForm.login, loginForm.password);
+            userService.login(loginForm.email, loginForm.password);
 
             retUrl = loginForm.retUrl;
             if (ValueTool.isEmpty(retUrl)) {
@@ -71,19 +67,19 @@ public class LoginController extends AbstractController {
     public static class LoginForm {
 
         @NotEmpty
-        private String login;
+        private String email;
 
         @NotEmpty
         private String password;
 
         private String retUrl;
 
-        public String getLogin() {
-            return login;
+        public String getEmail() {
+            return email;
         }
 
-        public void setLogin(String login) {
-            this.login = login;
+        public void setEmail(String email) {
+            this.email = email;
         }
 
         public String getPassword() {

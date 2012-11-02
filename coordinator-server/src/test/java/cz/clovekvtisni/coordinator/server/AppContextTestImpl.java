@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server;
 
+import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 
@@ -13,17 +14,17 @@ import java.util.Locale;
  */
 public class AppContextTestImpl implements AppContext {
 
-    private static final ThreadLocal<UserEntity> userEntityHolder = new ThreadLocal<UserEntity>();
+    private static final ThreadLocal<User> userEntityHolder = new ThreadLocal<User>();
 
     private static final ThreadLocal<Locale> localeHolder = new ThreadLocal<Locale>();
 
     @Override
-    public void setLoggedUser(UserEntity loggedUser) {
+    public void setLoggedUser(User loggedUser) {
         userEntityHolder.set(loggedUser);
     }
 
     @Override
-    public UserEntity getLoggedUser() {
+    public User getLoggedUser() {
         return userEntityHolder.get();
     }
 

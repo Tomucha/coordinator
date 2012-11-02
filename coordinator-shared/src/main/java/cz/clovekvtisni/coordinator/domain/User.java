@@ -1,16 +1,19 @@
 package cz.clovekvtisni.coordinator.domain;
 
+import cz.clovekvtisni.coordinator.util.ValueTool;
+
+import java.util.Date;
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * User: tomas
  * Date: 10/27/12
  * Time: 12:16 AM
  */
-public class User {
+public class User extends IdentifiableEntity {
 
-    private Long id;
-
-    private String login;
+    private List<String> authKey;
 
     private String firstName;
 
@@ -18,21 +21,27 @@ public class User {
 
     private String email;
 
-    public Long getId() {
-        return id;
-    }
+    private String phone;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private String organizationId;
 
-    public String getLogin() {
-        return login;
-    }
+    private Date birthday;
 
-    public void setLogin(String login) {
-        this.login = login;
-    }
+    private String addressLine;
+
+    private String city;
+
+    private String zip;
+
+    private String country;
+
+    private Date dateSuspended;
+
+    private String reasonSuspended;
+
+    private List<String> roleIdList;
+
+    private String newPassword;
 
     public String getFirstName() {
         return firstName;
@@ -58,31 +67,114 @@ public class User {
         this.email = email;
     }
 
-    @SuppressWarnings("RedundantIfStatement")
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        User user = (User) o;
-
-        if (id != null ? !id.equals(user.id) : user.id != null) return false;
-
-        return true;
+    public List<String> getAuthKey() {
+        return authKey;
     }
 
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+    public void setAuthKey(List<String> authKey) {
+        this.authKey = authKey;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", login='" + login + '\'' +
-                '}';
+    public String getPhone() {
+        return phone;
     }
 
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getAddressLine() {
+        return addressLine;
+    }
+
+    public void setAddressLine(String addressLine) {
+        this.addressLine = addressLine;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getZip() {
+        return zip;
+    }
+
+    public void setZip(String zip) {
+        this.zip = zip;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public Date getDateSuspended() {
+        return dateSuspended;
+    }
+
+    public void setDateSuspended(Date dateSuspended) {
+        this.dateSuspended = dateSuspended;
+    }
+
+    public String getReasonSuspended() {
+        return reasonSuspended;
+    }
+
+    public void setReasonSuspended(String reasonSuspended) {
+        this.reasonSuspended = reasonSuspended;
+    }
+
+    public List<String> getRoleIdList() {
+        return roleIdList;
+    }
+
+    public void setRoleIdList(List<String> roleIdList) {
+        this.roleIdList = roleIdList;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public String getFullName() {
+        StringBuilder sb = new StringBuilder();
+        if (firstName != null) {
+            sb.append(firstName);
+        }
+        if (!ValueTool.isEmpty(lastName)) {
+            if (sb.length() > 0) {
+                sb.append(' ');
+            }
+            sb.append(lastName);
+        }
+        String fullName = sb.toString();
+        return ValueTool.isEmpty(fullName) ? email : fullName;
+    }
 }

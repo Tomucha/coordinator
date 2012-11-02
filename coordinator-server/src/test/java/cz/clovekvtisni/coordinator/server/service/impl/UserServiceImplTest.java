@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
+import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.server.LocalDatastoreTest;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
@@ -26,11 +27,11 @@ public class UserServiceImplTest extends LocalDatastoreTest {
     public void testFindByFilter() throws Exception {
         assertNotNull(userService);
 
-        UserEntity byId = userService.findById(1l);
+        User byId = userService.findById(1l);
 
         UserFilter filter = new UserFilter();
         filter.setLogin("admin");
-        ResultList<UserEntity> resultList = userService.findByFilter(filter, 2, null);
+        ResultList<User> resultList = userService.findByFilter(filter, 2, null);
         assertNotNull(resultList.getResult());
         assertEquals(1, resultList.getResultSize());
     }

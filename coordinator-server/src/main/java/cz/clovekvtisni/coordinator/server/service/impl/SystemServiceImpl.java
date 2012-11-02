@@ -2,6 +2,7 @@ package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
+import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorEntity;
 import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
@@ -76,13 +77,12 @@ public class SystemServiceImpl extends AbstractServiceImpl implements SystemServ
             public Void run() {
                 UserFilter filter = new UserFilter();
                 filter.setLogin("admin");
-                UserEntity userEntity = userService.findByFilter(filter, 1, null).singleResult();
-                if (userEntity == null) {
-                    userEntity = new UserEntity();
-                    userEntity.setLogin(System.getProperty("default.admin.login", "admin"));
-                    userEntity.setPassword(System.getProperty("default.admin.password", "admin"));
-                    userEntity.setEmail(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
-                    userService.createUser(userEntity);
+                User user = userService.findByFilter(filter, 1, null).singleResult();
+                if (user == null) {
+                    user = new User();
+                    user.setNewPassword(System.getProperty("default.admin.password", "admin"));
+                    user.setEmail(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
+                    userService.createUser(user);
                 }
                 return null;
             }

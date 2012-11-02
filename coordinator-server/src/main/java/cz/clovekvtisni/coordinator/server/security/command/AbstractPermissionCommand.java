@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.security.command;
 
 
+import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
@@ -17,7 +18,7 @@ public abstract class AbstractPermissionCommand<E extends CoordinatorEntity> imp
     @Autowired
     private AppContext appContext;
 
-    protected UserEntity loggedUser() {
+    protected User loggedUser() {
         return appContext.getLoggedUser();
     }
 

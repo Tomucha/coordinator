@@ -10,9 +10,7 @@
 
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/classes/logging.properties" />
-
         <property name="default.admin.email" value="admin@m-atelier.cz" />
-        <property name="default.admin.login" value="admin" />
         <property name="default.admin.password" value="admin" />
     </system-properties>
 

@@ -15,7 +15,7 @@ public class UniqueIndexEntity {
 
     public static enum Property {
    		// PORADI SE NESMI MENIT A NESMI SE ODTUD MAZAT! ordinal se pouziva v databazi
-   		LOGIN
+   		LOGIN,EMAIL
    	}
 
     @Id

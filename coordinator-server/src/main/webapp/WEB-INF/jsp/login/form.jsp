@@ -9,14 +9,14 @@
 
     <sf:errors />
 
-    <tags:input field="login" modelAttribute="user">
-        <sf:input path="login" />
+    <tags:input field="email" modelAttribute="user">
+        <sf:input path="email" />
     </tags:input>
 
     <tags:input field="password" modelAttribute="user">
         <sf:password path="password" />
     </tags:input>
 
-    <input type="submit" value="login" />
+    <input type="submit" value="email" />
 
 </sf:form>

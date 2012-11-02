@@ -1,7 +1,7 @@
 package cz.clovekvtisni.coordinator.server.service;
 
+import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
-import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.security.Anonymous;
 import cz.clovekvtisni.coordinator.server.security.CheckPermission;
@@ -16,21 +16,21 @@ import cz.clovekvtisni.coordinator.server.security.FilterResult;
 public interface UserService extends Service {
 
     @Anonymous
-    UserEntity login(String login, String password) throws MaPermissionDeniedException;
+    User login(String login, String password) throws MaPermissionDeniedException;
 
     @FilterResult("#helper.canRead(#entity)")
-    UserEntity findById(Long id);
+    User findById(Long id);
 
     @FilterResult("#helper.canRead(#entity)")
-    ResultList<UserEntity> findByFilter(UserFilter filter, int limit, String bookmark);
+    ResultList<User> findByFilter(UserFilter filter, int limit, String bookmark);
 
     @CheckPermission("#helper.canCreate(#entity)")
-    UserEntity createUser(UserEntity user);
+    User createUser(User user);
 
     @CheckPermission("#helper.canUpdate(#entity)")
-    UserEntity updateUser(UserEntity user);
+    User updateUser(User user);
 
-    @CheckPermission("#helper.canDelete(new cz.clovekvtisni.coordinator.server.domain.UserEntity(#p0))")
+    @CheckPermission("#helper.canDelete(new cz.clovekvtisni.coordinator.server.domain.User(#p0))")
     void deleteUser(Long id);
 
     @CheckPermission("@appContext.loggedUser != null")

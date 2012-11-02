@@ -3,6 +3,7 @@ package cz.clovekvtisni.coordinator.server.web.controller.api.v1;
 import cz.clovekvtisni.coordinator.api.request.LoginRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse;
 import cz.clovekvtisni.coordinator.api.response.LoginResponseData;
+import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.service.UserService;
@@ -31,10 +32,10 @@ public class UserApiController extends AbstractApiController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody ApiResponse login(HttpServletRequest request) {
         LoginRequestParams params = parseParams(request, LoginRequestParams.class);
-        UserEntity userEntity = userService.login(params.getLogin(), params.getPassword());
-        if (userEntity == null) {
+        User user = userService.login(params.getLogin(), params.getPassword());
+        if (user == null) {
             throw MaPermissionDeniedException.wrongCredentials();
         }
-        return okResult(new LoginResponseData(userEntity.buildUser()));
+        return okResult(new LoginResponseData(user));
     }
 }

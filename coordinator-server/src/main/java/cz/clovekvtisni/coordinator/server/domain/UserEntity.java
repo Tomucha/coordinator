@@ -6,9 +6,10 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Indexed;
 import com.googlecode.objectify.annotation.Unindexed;
 import cz.clovekvtisni.coordinator.domain.User;
-import cz.clovekvtisni.coordinator.util.ValueTool;
 
 import javax.persistence.Id;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,51 +25,56 @@ public class UserEntity implements CoordinatorEntity<UserEntity> {
     @Id
     private Long id;
 
-    @Indexed
-    private String login;
-
-    private String password;
+    private List<String> authKey;
 
     private String firstName;
 
     private String lastName;
 
+    @Indexed
     private String email;
 
-    public UserEntity() {
-    }
+    private String password;
 
-    public UserEntity(Long id) {
-        this.id = id;
-    }
+    private String phone;
 
-    public Long getId() {
-        return id;
-    }
+    private String organizationId;
+
+    private Date birthday;
+
+    private String addressLine;
+
+    private String city;
+
+    private String zip;
+
+    private String country;
+
+    private Date dateSuspended;
+
+    private String reasonSuspended;
+
+    private List<String> roleIdList;
 
     @Override
     public Key<UserEntity> getKey() {
         return Key.create(UserEntity.class, id);
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
 
-    public String getLogin() {
-        return login;
+    public List<String> getAuthKey() {
+        return authKey;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setAuthKey(List<String> authKey) {
+        this.authKey = authKey;
     }
 
     public String getFirstName() {
@@ -95,54 +101,123 @@ public class UserEntity implements CoordinatorEntity<UserEntity> {
         this.email = email;
     }
 
-    @SuppressWarnings("RedundantIfStatement")
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        UserEntity that = (UserEntity) o;
-
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-
-        return true;
+    public String getPassword() {
+        return password;
     }
 
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    @Override
-    public String toString() {
-        return "UserEntity{" +
-                "login='" + login + '\'' +
-                ", id=" + id +
-                '}';
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getAddressLine() {
+        return addressLine;
+    }
+
+    public void setAddressLine(String addressLine) {
+        this.addressLine = addressLine;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getZip() {
+        return zip;
+    }
+
+    public void setZip(String zip) {
+        this.zip = zip;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public Date getDateSuspended() {
+        return dateSuspended;
+    }
+
+    public void setDateSuspended(Date dateSuspended) {
+        this.dateSuspended = dateSuspended;
+    }
+
+    public String getReasonSuspended() {
+        return reasonSuspended;
+    }
+
+    public void setReasonSuspended(String reasonSuspended) {
+        this.reasonSuspended = reasonSuspended;
+    }
+
+    public List<String> getRoleIdList() {
+        return roleIdList;
+    }
+
+    public void setRoleIdList(List<String> roleIdList) {
+        this.roleIdList = roleIdList;
+    }
+
+    public UserEntity() {
+    }
+
+    public UserEntity(User user) {
+        id = user.getId();
+        email = user.getEmail();
+        if (user.getNewPassword() != null) {
+            password = user.getNewPassword(); // TODO hash it!
+        }
+        // TODO
     }
 
     public User buildUser() {
         User user = new User();
         user.setId(id);
-        user.setLogin(login);
         user.setEmail(email);
         user.setFirstName(firstName);
         user.setLastName(lastName);
+        user.setAuthKey(authKey);
+        user.setAddressLine(addressLine);
+        user.setBirthday(birthday);
+        user.setCity(city);
+        user.setCountry(country);
+        user.setDateSuspended(dateSuspended);
+        user.setOrganizationId(organizationId);
+        user.setPhone(phone);
+        user.setReasonSuspended(reasonSuspended);
+        user.setRoleIdList(roleIdList);
+        user.setZip(zip);
         return user;
-    }
-
-    public String getFullName() {
-        StringBuilder sb = new StringBuilder();
-        if (firstName != null) {
-            sb.append(firstName);
-        }
-        if (!ValueTool.isEmpty(lastName)) {
-            if (sb.length() > 0) {
-                sb.append(' ');
-            }
-            sb.append(lastName);
-        }
-        String fullName = sb.toString();
-        return ValueTool.isEmpty(fullName) ? login : fullName;
     }
 }
