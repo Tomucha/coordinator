@@ -11,7 +11,7 @@ import javax.persistence.Id;
  * User: jka
  * Date: 5.11.12
  */
-public class EventEntity extends PersistentEntity<Event, EventEntity> {
+public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
 
     @Id
     private Long id;

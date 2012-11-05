@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.domain;
+package cz.clovekvtisni.coordinator.domain.config;
 
 import org.simpleframework.xml.*;
 import org.simpleframework.xml.core.Commit;

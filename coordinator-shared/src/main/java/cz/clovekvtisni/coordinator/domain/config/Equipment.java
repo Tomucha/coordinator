@@ -1,7 +1,7 @@
-package cz.clovekvtisni.coordinator.domain;
+package cz.clovekvtisni.coordinator.domain.config;
 
+import cz.clovekvtisni.coordinator.domain.config.AbstractStaticEntity;
 import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Text;
 
@@ -11,19 +11,16 @@ import org.simpleframework.xml.Text;
  * Date: 31.10.12
  */
 @Root
-public class Skill extends AbstractStaticEntity {
+public class Equipment extends AbstractStaticEntity {
 
-    @Attribute(name = "id")
-    protected String id;
+    @Attribute
+    private String id;
 
     @Attribute
     private String name;
 
     @Text(required = false)
     private String description;
-
-    @Attribute(name = "must_verify", required = false)
-    private boolean mustVerify;
 
     public String getId() {
         return id;
@@ -37,16 +34,11 @@ public class Skill extends AbstractStaticEntity {
         return description;
     }
 
-    public boolean isMustVerify() {
-        return mustVerify;
-    }
-
     @Override
     public String toString() {
-        return "Skill{" +
+        return "Equipment{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", mustVerify=" + mustVerify +
                 '}';
     }
 }

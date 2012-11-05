@@ -1,4 +1,6 @@
-package cz.clovekvtisni.coordinator.domain;
+package cz.clovekvtisni.coordinator.domain.config;
+
+import cz.clovekvtisni.coordinator.domain.Entity;
 
 /**
  * Created with IntelliJ IDEA.

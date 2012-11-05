@@ -18,7 +18,7 @@ import java.util.Date;
 @Unindexed
 @Cached
 @Entity(name = "UserSkills")
-public class UserSkillsEntity extends PersistentEntity<UserSkills, UserSkillsEntity> implements CoordinatorEntity<UserSkillsEntity> {
+public class UserSkillsEntity extends AbstractPersistentEntity<UserSkills, UserSkillsEntity> implements CoordinatorEntity<UserSkillsEntity> {
 
     @Id
     private Long id;

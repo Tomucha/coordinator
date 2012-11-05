@@ -12,7 +12,7 @@ import java.util.Date;
  * User: jka
  * Date: 5.11.12
  */
-public abstract class PersistentEntity<TARGET extends Entity, SELF extends CoordinatorEntity<SELF>> implements CoordinatorEntity<SELF> {
+public abstract class AbstractPersistentEntity<TARGET extends Entity, SELF extends CoordinatorEntity<SELF>> implements CoordinatorEntity<SELF> {
 
     private Date createdDate;
 
@@ -21,10 +21,6 @@ public abstract class PersistentEntity<TARGET extends Entity, SELF extends Coord
     private Date deletedDate;
 
     protected abstract TARGET createTargetEntity();
-
-    public Long getId();
-
-    public Key<SELF> getKey();
 
     public TARGET buildTargetEntity() {
         TARGET entity = createTargetEntity();

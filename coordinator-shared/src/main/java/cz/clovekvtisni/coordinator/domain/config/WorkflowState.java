@@ -1,11 +1,9 @@
-package cz.clovekvtisni.coordinator.domain;
+package cz.clovekvtisni.coordinator.domain.config;
 
 import org.simpleframework.xml.*;
-import org.simpleframework.xml.core.Commit;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.

@@ -1,10 +1,9 @@
-package cz.clovekvtisni.coordinator.domain;
+package cz.clovekvtisni.coordinator.domain.config;
 
+import cz.clovekvtisni.coordinator.domain.config.AbstractStaticEntity;
 import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Text;
-import org.simpleframework.xml.core.Commit;
 
 /**
  * Created with IntelliJ IDEA.

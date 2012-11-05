@@ -1,6 +1,6 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
-import cz.clovekvtisni.coordinator.domain.*;
+import cz.clovekvtisni.coordinator.domain.config.*;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.core.Validate;

@@ -18,7 +18,7 @@ import java.util.List;
 @Unindexed
 @Cached
 @Entity(name = "User")
-public class UserEntity extends PersistentEntity<User, UserEntity> {
+public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     @Id
     private Long id;
