@@ -7,5 +7,5 @@ import java.io.Serializable;
  * User: jka
  * Date: 2.11.12
  */
-public abstract class Entity implements Serializable {
+public interface Entity extends Serializable {
 }

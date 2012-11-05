@@ -17,7 +17,7 @@ import java.util.Date;
 @Unindexed
 @Cached
 @Entity(name = "UserEquipment")
-public class UserEquipmentEntity extends PersistentEntity<UserEquipment> implements CoordinatorEntity<UserEquipmentEntity> {
+public class UserEquipmentEntity extends PersistentEntity<UserEquipment, UserEquipmentEntity> implements CoordinatorEntity<UserEquipmentEntity> {
 
     @Id
     private Long id;
@@ -40,17 +40,6 @@ public class UserEquipmentEntity extends PersistentEntity<UserEquipment> impleme
         return new UserEquipment();
     }
 
-    /*
-    public UserEquipmentEntity(UserEquipment equipment) {
-        setId(equipment.getId());
-        setUserId(equipment.getUserId());
-        setEquipmentId(equipment.getEquipmentId());
-        setVerifiedById(equipment.getVerifiedById());
-        setVerifiedDate(equipment.getVerifiedDate());
-        setVerifiedTillDate(equipment.getVerifiedTillDate());
-    }
-    */
-
     @Override
     public Key<UserEquipmentEntity> getKey() {
         return Key.create(UserEquipmentEntity.class, id);
@@ -61,7 +50,6 @@ public class UserEquipmentEntity extends PersistentEntity<UserEquipment> impleme
         return id;
     }
 
-    @Override
     public void setId(Long id) {
         this.id = id;
     }
@@ -104,5 +92,17 @@ public class UserEquipmentEntity extends PersistentEntity<UserEquipment> impleme
 
     public void setVerifiedTillDate(Date verifiedTillDate) {
         this.verifiedTillDate = verifiedTillDate;
+    }
+
+    @Override
+    public String toString() {
+        return "UserEquipmentEntity{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", equipmentId='" + equipmentId + '\'' +
+                ", verifiedById=" + verifiedById +
+                ", verifiedDate=" + verifiedDate +
+                ", verifiedTillDate=" + verifiedTillDate +
+                '}';
     }
 }

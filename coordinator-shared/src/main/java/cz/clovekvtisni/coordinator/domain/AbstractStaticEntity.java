@@ -5,7 +5,7 @@ package cz.clovekvtisni.coordinator.domain;
  * User: jka
  * Date: 31.10.12
  */
-public abstract class AbstractStaticEntity {
+public abstract class AbstractStaticEntity implements Entity {
 
     public abstract String getId();
 

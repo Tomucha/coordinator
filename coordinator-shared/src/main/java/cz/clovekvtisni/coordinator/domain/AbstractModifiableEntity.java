@@ -5,7 +5,7 @@ package cz.clovekvtisni.coordinator.domain;
  * User: jka
  * Date: 2.11.12
  */
-public abstract class IdentifiableEntity extends Entity {
+public abstract class AbstractModifiableEntity implements Entity {
 
     protected Long id;
 
@@ -22,7 +22,7 @@ public abstract class IdentifiableEntity extends Entity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        IdentifiableEntity that = (IdentifiableEntity) o;
+        AbstractModifiableEntity that = (AbstractModifiableEntity) o;
 
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
 

@@ -7,7 +7,7 @@ import java.util.Date;
  * User: jka
  * Date: 2.11.12
  */
-public class UserEquipment extends IdentifiableEntity {
+public class UserEquipment extends AbstractModifiableEntity {
 
     private Long userId;
 

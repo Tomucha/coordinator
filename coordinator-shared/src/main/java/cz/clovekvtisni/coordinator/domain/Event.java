@@ -2,18 +2,20 @@ package cz.clovekvtisni.coordinator.domain;
 
 public class Event extends Entity {
 
-    private String id;
+    private Long id;
+
+    private String eventId;
 
     private String name;
 
     private String description;
 
     public String getId() {
-        return id;
+        return eventId;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.eventId = id;
     }
 
     public String getName() {
@@ -39,20 +41,21 @@ public class Event extends Entity {
 
         Event event = (Event) o;
 
-        if (id != null ? !id.equals(event.id) : event.id != null) return false;
+        if (eventId != null ? !eventId.equals(event.eventId) : event.eventId != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return eventId != null ? eventId.hashCode() : 0;
     }
 
     @Override
     public String toString() {
         return "Event{" +
-                "id='" + id + '\'' +
+                "id=" + id +
+                ", eventId='" + eventId + '\'' +
                 ", name='" + name + '\'' +
                 '}';
     }

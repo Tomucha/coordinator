@@ -18,7 +18,7 @@ import java.util.Date;
 @Unindexed
 @Cached
 @Entity(name = "UserSkills")
-public class UserSkillsEntity extends PersistentEntity<UserSkills> implements CoordinatorEntity<UserSkillsEntity> {
+public class UserSkillsEntity extends PersistentEntity<UserSkills, UserSkillsEntity> implements CoordinatorEntity<UserSkillsEntity> {
 
     @Id
     private Long id;
@@ -49,12 +49,10 @@ public class UserSkillsEntity extends PersistentEntity<UserSkills> implements Co
         return Key.create(UserSkillsEntity.class, id);
     }
 
-    @Override
     public Long getId() {
         return id;
     }
 
-    @Override
     public void setId(Long id) {
         this.id = id;
     }
@@ -105,5 +103,18 @@ public class UserSkillsEntity extends PersistentEntity<UserSkills> implements Co
 
     public void setValidTill(Date validTill) {
         this.validTill = validTill;
+    }
+
+    @Override
+    public String toString() {
+        return "UserSkillsEntity{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", skillId='" + skillId + '\'' +
+                ", verified=" + verified +
+                ", verifiedBy=" + verifiedBy +
+                ", dateVerified=" + dateVerified +
+                ", validTill=" + validTill +
+                '}';
     }
 }

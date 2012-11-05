@@ -18,7 +18,7 @@ import java.util.List;
 @Unindexed
 @Cached
 @Entity(name = "User")
-public class UserEntity extends PersistentEntity<User> implements CoordinatorEntity<UserEntity> {
+public class UserEntity extends PersistentEntity<User, UserEntity> {
 
     @Id
     private Long id;
@@ -201,5 +201,26 @@ public class UserEntity extends PersistentEntity<User> implements CoordinatorEnt
 
     public void setRoleIdList(List<String> roleIdList) {
         this.roleIdList = roleIdList;
+    }
+
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "id=" + id +
+                ", authKey=" + authKey +
+                ", email='" + email + '\'' +
+                ", organizationId='" + organizationId + '\'' +
+                ", city='" + city + '\'' +
+                ", zip='" + zip + '\'' +
+                ", country='" + country + '\'' +
+                ", dateSuspended=" + dateSuspended +
+                ", reasonSuspended='" + reasonSuspended + '\'' +
+                ", roleIdList=" + roleIdList +
+                ", addressLine='" + addressLine + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", phone='" + phone + '\'' +
+                ", birthday=" + birthday +
+                '}';
     }
 }

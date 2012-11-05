@@ -1,7 +1,8 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
+import com.googlecode.objectify.Key;
+import cz.clovekvtisni.coordinator.domain.AbstractModifiableEntity;
 import cz.clovekvtisni.coordinator.domain.Entity;
-import cz.clovekvtisni.coordinator.domain.IdentifiableEntity;
 import cz.clovekvtisni.coordinator.server.util.CloneTool;
 
 import java.util.Date;
@@ -11,7 +12,7 @@ import java.util.Date;
  * User: jka
  * Date: 5.11.12
  */
-public abstract class PersistentEntity<TARGET extends Entity> {
+public abstract class PersistentEntity<TARGET extends Entity, SELF extends CoordinatorEntity<SELF>> implements CoordinatorEntity<SELF> {
 
     private Date createdDate;
 
@@ -20,6 +21,10 @@ public abstract class PersistentEntity<TARGET extends Entity> {
     private Date deletedDate;
 
     protected abstract TARGET createTargetEntity();
+
+    public Long getId();
+
+    public Key<SELF> getKey();
 
     public TARGET buildTargetEntity() {
         TARGET entity = createTargetEntity();
@@ -60,16 +65,12 @@ public abstract class PersistentEntity<TARGET extends Entity> {
         return deletedDate != null;
     }
 
-    abstract public Long getId();
-
-    abstract public void setId(Long id);
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        IdentifiableEntity that = (IdentifiableEntity) o;
+        AbstractModifiableEntity that = (AbstractModifiableEntity) o;
 
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
 

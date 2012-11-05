@@ -11,7 +11,7 @@ import java.util.List;
  * Date: 10/27/12
  * Time: 12:16 AM
  */
-public class User extends IdentifiableEntity {
+public class User extends AbstractModifiableEntity {
 
     private List<String> authKey;
 
