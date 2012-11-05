@@ -17,6 +17,6 @@
         <sf:password path="password" />
     </tags:input>
 
-    <input type="submit" value="email" />
+    <input type="submit" value="login" />
 
 </sf:form>

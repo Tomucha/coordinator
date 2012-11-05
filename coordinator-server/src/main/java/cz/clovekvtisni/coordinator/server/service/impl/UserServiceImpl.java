@@ -115,7 +115,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 UserEntity toUpdate = ofy.find(UserEntity.class, user.getId());
 
                 systemService.deleteUniqueIndexOwner(ofy, UniqueIndexEntity.Property.EMAIL, toUpdate.getEmail());
-                systemService.saveUniqueIndexOwner(ofy, UniqueIndexEntity.Property.LOGIN, toUpdate.getEmail(), toUpdate.getKey());
+                systemService.saveUniqueIndexOwner(ofy, UniqueIndexEntity.Property.EMAIL, toUpdate.getEmail(), toUpdate.getKey());
 
                 toUpdate.setFirstName(user.getFirstName());
                 toUpdate.setLastName(user.getLastName());

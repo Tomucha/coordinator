@@ -6,6 +6,7 @@ import com.google.appengine.api.taskqueue.TransientFailureException;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyOpts;
+import com.googlecode.objectify.util.DatastoreIntrospector;
 import cz.clovekvtisni.coordinator.server.service.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +106,7 @@ public class AbstractServiceImpl implements Service {
     protected void assertCrossGroupTransaction(Objectify ofy) {
    		if (ofy.getTxn() == null) throw new IllegalStateException("No transaction");
    		if (!ofy.getTxn().isActive()) throw new IllegalStateException("Transaction is not active!");
+        if (!DatastoreIntrospector.SUPPORTS_XG) throw new IllegalStateException("XG transactions are not supported!");
            // TODO PHASE2: nevim jak overit, ze je cross group. Az na to prijdu, tak poradne otestovat, natuty to na tom assertu zacne padat.
    	}
 
