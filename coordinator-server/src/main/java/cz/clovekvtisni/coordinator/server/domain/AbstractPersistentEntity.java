@@ -12,7 +12,7 @@ import java.util.Date;
  * User: jka
  * Date: 5.11.12
  */
-public abstract class AbstractPersistentEntity<TARGET extends Entity, SELF extends CoordinatorEntity<SELF>> implements CoordinatorEntity<SELF> {
+public abstract class AbstractPersistentEntity<TARGET extends AbstractModifiableEntity, SELF extends CoordinatorEntity<SELF>> implements CoordinatorEntity<SELF> {
 
     private Date createdDate;
 

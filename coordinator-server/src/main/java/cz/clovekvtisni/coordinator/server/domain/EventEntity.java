@@ -1,7 +1,10 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.Cached;
+import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Indexed;
+import com.googlecode.objectify.annotation.Unindexed;
 import cz.clovekvtisni.coordinator.domain.Event;
 
 import javax.persistence.Id;
@@ -11,6 +14,9 @@ import javax.persistence.Id;
  * User: jka
  * Date: 5.11.12
  */
+@Unindexed
+@Cached
+@Entity(name = "Event")
 public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
 
     @Id
@@ -28,7 +34,7 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
 
     @Override
     public Key<EventEntity> getKey() {
-        return Key.create(EventEntity.class, eventId);
+        return Key.create(EventEntity.class, id);
     }
 
     @Override
