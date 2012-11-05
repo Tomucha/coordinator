@@ -29,7 +29,7 @@ public class UserServiceImplTest extends LocalDatastoreTest {
         User byId = userService.findById(1l);
 
         UserFilter filter = new UserFilter();
-        filter.setEmail("admin");
+        filter.setEmail("admin@test");
         ResultList<User> resultList = userService.findByFilter(filter, 2, null);
         assertNotNull(resultList.getResult());
         assertEquals(1, resultList.getResultSize());
