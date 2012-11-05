@@ -1,6 +1,9 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.annotation.Cached;
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Unindexed;
 import cz.clovekvtisni.coordinator.domain.UserEquipment;
 
 import javax.persistence.Id;
@@ -11,7 +14,10 @@ import java.util.Date;
  * User: jka
  * Date: 2.11.12
  */
-public class UserEquipmentEntity implements CoordinatorEntity<UserEquipmentEntity> {
+@Unindexed
+@Cached
+@Entity(name = "UserEquipment")
+public class UserEquipmentEntity extends PersistentEntity<UserEquipment> implements CoordinatorEntity<UserEquipmentEntity> {
 
     @Id
     private Long id;
@@ -26,15 +32,36 @@ public class UserEquipmentEntity implements CoordinatorEntity<UserEquipmentEntit
 
     private Date verifiedTillDate;
 
+    public UserEquipmentEntity() {
+    }
+
+    @Override
+    protected UserEquipment createTargetEntity() {
+        return new UserEquipment();
+    }
+
+    /*
+    public UserEquipmentEntity(UserEquipment equipment) {
+        setId(equipment.getId());
+        setUserId(equipment.getUserId());
+        setEquipmentId(equipment.getEquipmentId());
+        setVerifiedById(equipment.getVerifiedById());
+        setVerifiedDate(equipment.getVerifiedDate());
+        setVerifiedTillDate(equipment.getVerifiedTillDate());
+    }
+    */
+
     @Override
     public Key<UserEquipmentEntity> getKey() {
         return Key.create(UserEquipmentEntity.class, id);
     }
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }
@@ -77,22 +104,5 @@ public class UserEquipmentEntity implements CoordinatorEntity<UserEquipmentEntit
 
     public void setVerifiedTillDate(Date verifiedTillDate) {
         this.verifiedTillDate = verifiedTillDate;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        UserEquipmentEntity that = (UserEquipmentEntity) o;
-
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
     }
 }

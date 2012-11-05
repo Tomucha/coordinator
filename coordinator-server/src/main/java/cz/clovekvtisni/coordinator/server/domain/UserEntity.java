@@ -2,7 +2,8 @@ package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.*;
-import cz.clovekvtisni.coordinator.domain.User;
+import com.googlecode.objectify.annotation.Entity;
+import cz.clovekvtisni.coordinator.domain.*;
 
 import javax.persistence.Id;
 import java.util.Date;
@@ -17,7 +18,7 @@ import java.util.List;
 @Unindexed
 @Cached
 @Entity(name = "User")
-public class UserEntity implements CoordinatorEntity<UserEntity> {
+public class UserEntity extends PersistentEntity<User> implements CoordinatorEntity<UserEntity> {
 
     @Id
     private Long id;
@@ -52,6 +53,22 @@ public class UserEntity implements CoordinatorEntity<UserEntity> {
     private String reasonSuspended;
 
     private List<String> roleIdList;
+
+    public UserEntity() {
+    }
+
+    @Override
+    protected User createTargetEntity() {
+        return new User();
+    }
+
+    @Override
+    public void populateFrom(User entity) {
+        super.populateFrom(entity);
+        if (entity.getNewPassword() != null) {
+            setPassword(entity.getNewPassword());
+        }
+    }
 
     @Override
     public Key<UserEntity> getKey() {
@@ -184,37 +201,5 @@ public class UserEntity implements CoordinatorEntity<UserEntity> {
 
     public void setRoleIdList(List<String> roleIdList) {
         this.roleIdList = roleIdList;
-    }
-
-    public UserEntity() {
-    }
-
-    public UserEntity(User user) {
-        id = user.getId();
-        email = user.getEmail();
-        if (user.getNewPassword() != null) {
-            password = user.getNewPassword();
-        }
-        // TODO
-    }
-
-    public User buildUser() {
-        User user = new User();
-        user.setId(id);
-        user.setEmail(email);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setAuthKey(authKey);
-        user.setAddressLine(addressLine);
-        user.setBirthday(birthday);
-        user.setCity(city);
-        user.setCountry(country);
-        user.setDateSuspended(dateSuspended);
-        user.setOrganizationId(organizationId);
-        user.setPhone(phone);
-        user.setReasonSuspended(reasonSuspended);
-        user.setRoleIdList(roleIdList);
-        user.setZip(zip);
-        return user;
     }
 }

@@ -43,7 +43,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             throw MaPermissionDeniedException.wrongCredentials();
         }
 
-        User user = userEntity.buildUser();
+        User user = userEntity.buildTargetEntity();
         appContext.setLoggedUser(user);
 
         return user;
@@ -53,7 +53,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     public User findById(Long id) {
         UserEntity userEntity = noTransactionalObjectify().find(UserEntity.class, id);
 
-        return userEntity.buildUser();
+        return userEntity.buildTargetEntity();
     }
 
     @Override
@@ -74,7 +74,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         List<User> users = new ArrayList<User>();
         while (iterator.hasNext()) {
             UserEntity userEntity = iterator.next();
-            users.add(userEntity.buildUser());
+            users.add(userEntity.buildTargetEntity());
             if (--limit <= 0) {
                 return new ResultList<User>(users, iterator.getCursor().toWebSafeString());
             }
@@ -89,7 +89,8 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
     @Override
     public User createUser(User newUser) {
-        final UserEntity user = new UserEntity(newUser);
+        final UserEntity user = new UserEntity();
+        user.populateFrom(newUser);
         return transactionWithResult("creating " + user, new TransactionWithResultCallback<User>() {
             @Override
             public User runInTransaction(Objectify ofy) {
@@ -101,14 +102,15 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 ofy.put(user);
 
                 systemService.saveUniqueIndexOwner(ofy, UniqueIndexEntity.Property.EMAIL, user.getEmail(), user.getKey());
-                return user.buildUser();
+                return user.buildTargetEntity();
             }
         });
     }
 
     @Override
     public User updateUser(User updatedUser) {
-        final UserEntity user = new UserEntity(updatedUser);
+        final UserEntity user = new UserEntity();
+        user.populateFrom(updatedUser);
         return transactionWithResult("updating " + user, new TransactionWithResultCallback<User>() {
             @Override
             public User runInTransaction(Objectify ofy) {
@@ -121,7 +123,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 toUpdate.setLastName(user.getLastName());
                 toUpdate.setEmail(ValueTool.normalizeEmail(user.getEmail()));
                 ofy.put(toUpdate);
-                return toUpdate.buildUser();
+                return toUpdate.buildTargetEntity();
             }
         });
     }
