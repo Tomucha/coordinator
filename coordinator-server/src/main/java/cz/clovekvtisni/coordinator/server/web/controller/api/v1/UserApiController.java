@@ -1,12 +1,16 @@
 package cz.clovekvtisni.coordinator.server.web.controller.api.v1;
 
 import cz.clovekvtisni.coordinator.api.request.LoginRequestParams;
+import cz.clovekvtisni.coordinator.api.request.RegisterRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse;
 import cz.clovekvtisni.coordinator.api.response.LoginResponseData;
+import cz.clovekvtisni.coordinator.api.response.RegisterResponseData;
 import cz.clovekvtisni.coordinator.api.response.UserPropertiesResponseData;
 import cz.clovekvtisni.coordinator.domain.User;
+import cz.clovekvtisni.coordinator.domain.UserEquipment;
 import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.domain.config.Skill;
+import cz.clovekvtisni.coordinator.exception.MaParseException;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.service.EquipmentService;
@@ -57,5 +61,24 @@ public class UserApiController extends AbstractApiController {
         ResultList<Skill> skills = skillService.findByFilter(null);
 
         return okResult(new UserPropertiesResponseData(equipments.getResult(), skills.getResult()));
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public @ResponseBody ApiResponse register(HttpServletRequest request) {
+        RegisterRequestParams params = parseParams(request, RegisterRequestParams.class);
+        User newUser = params.getNewUser();
+        if (newUser == null) {
+            throw MaParseException.wrongRequestParams();
+        }
+        User user = userService.createUser(newUser);
+
+        if (params.getEquipments() != null) {
+            for (UserEquipment equipment : params.getEquipments()) {
+                equipment.setUserId(user.getId());
+                equipmentService.addUserEquipment(equipment);
+            }
+        }
+
+        return okResult(new RegisterResponseData(user));
     }
 }

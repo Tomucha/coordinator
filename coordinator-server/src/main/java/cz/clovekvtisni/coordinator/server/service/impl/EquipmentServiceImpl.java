@@ -1,10 +1,15 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
+import com.googlecode.objectify.Objectify;
+import cz.clovekvtisni.coordinator.domain.UserEquipment;
 import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
+import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
 import cz.clovekvtisni.coordinator.server.filter.EquipmentFilter;
 import cz.clovekvtisni.coordinator.server.service.EquipmentService;
 import cz.clovekvtisni.coordinator.server.service.ResultList;
+import cz.clovekvtisni.coordinator.server.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +21,13 @@ import java.util.List;
  * Date: 5.11.12
  */
 @Service("equipmentService")
-public class EquipmentServiceImpl implements EquipmentService {
+public class EquipmentServiceImpl extends AbstractEntityServiceImpl implements EquipmentService {
 
     @Autowired
     private CoordinatorConfig config;
+
+    @Autowired
+    private SystemService systemService;
 
     @Override
     public Equipment findById(String id) {
@@ -39,5 +47,22 @@ public class EquipmentServiceImpl implements EquipmentService {
         List<Equipment> equipmentList = config.getEquipmentList();
 
         return new ResultList<Equipment>(equipmentList, null);
+    }
+
+    @Override
+    public UserEquipment addUserEquipment(UserEquipment entity) {
+        final UserEquipmentEntity equipmentEntity = new UserEquipmentEntity();
+        equipmentEntity.populateFrom(entity);
+
+        return transactionWithResult("adding " + equipmentEntity, new TransactionWithResultCallback<UserEquipment>() {
+            @Override
+            public UserEquipment runInTransaction(Objectify ofy) {
+                equipmentEntity.setId(null);
+                ofy.put(equipmentEntity);
+                systemService.saveUniqueIndexOwner(ofy, UniqueIndexEntity.Property.USER_EQUIPMENT, "u" + equipmentEntity.getUniqueKey(), equipmentEntity.getKey());
+
+                return equipmentEntity.buildTargetEntity();
+            }
+        });
     }
 }

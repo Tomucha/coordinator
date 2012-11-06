@@ -45,6 +45,10 @@ public class UserEquipmentEntity extends AbstractPersistentEntity<UserEquipment,
         return Key.create(UserEquipmentEntity.class, id);
     }
 
+    public String getUniqueKey() {
+        return "u" + userId + "+e" + equipmentId;
+    }
+
     @Override
     public Long getId() {
         return id;

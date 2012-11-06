@@ -5,7 +5,7 @@ import com.googlecode.objectify.annotation.Cached;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Indexed;
 import com.googlecode.objectify.annotation.Unindexed;
-import cz.clovekvtisni.coordinator.domain.UserSkills;
+import cz.clovekvtisni.coordinator.domain.UserSkill;
 
 import javax.persistence.Id;
 import java.util.Date;
@@ -17,8 +17,8 @@ import java.util.Date;
  */
 @Unindexed
 @Cached
-@Entity(name = "UserSkills")
-public class UserSkillsEntity extends AbstractPersistentEntity<UserSkills, UserSkillsEntity> implements CoordinatorEntity<UserSkillsEntity> {
+@Entity(name = "UserSkill")
+public class UserSkillsEntity extends AbstractPersistentEntity<UserSkill, UserSkillsEntity> implements CoordinatorEntity<UserSkillsEntity> {
 
     @Id
     private Long id;
@@ -40,8 +40,8 @@ public class UserSkillsEntity extends AbstractPersistentEntity<UserSkills, UserS
     }
 
     @Override
-    protected UserSkills createTargetEntity() {
-        return new UserSkills();
+    protected UserSkill createTargetEntity() {
+        return new UserSkill();
     }
 
     @Override

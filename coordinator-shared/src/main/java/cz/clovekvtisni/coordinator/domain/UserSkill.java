@@ -2,7 +2,7 @@ package cz.clovekvtisni.coordinator.domain;
 
 import java.util.Date;
 
-public class UserSkills extends AbstractModifiableEntity {
+public class UserSkill extends AbstractModifiableEntity {
 
     private Long userId;
 
