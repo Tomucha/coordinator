@@ -5,5 +5,5 @@ package cz.clovekvtisni.coordinator.server.filter;
  * User: jka
  * Date: 5.11.12
  */
-public class OrganizationFilter implements Filter {
+public class EquipmentFilter implements Filter {
 }
