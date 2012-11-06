@@ -50,18 +50,16 @@ public class EquipmentServiceImpl extends AbstractEntityServiceImpl implements E
     }
 
     @Override
-    public UserEquipment addUserEquipment(UserEquipment entity) {
-        final UserEquipmentEntity equipmentEntity = new UserEquipmentEntity();
-        equipmentEntity.populateFrom(entity);
+    public UserEquipmentEntity addUserEquipment(final UserEquipmentEntity equipmentEntity) {
 
-        return transactionWithResult("adding " + equipmentEntity, new TransactionWithResultCallback<UserEquipment>() {
+        return transactionWithResult("adding " + equipmentEntity, new TransactionWithResultCallback<UserEquipmentEntity>() {
             @Override
-            public UserEquipment runInTransaction(Objectify ofy) {
+            public UserEquipmentEntity runInTransaction(Objectify ofy) {
                 equipmentEntity.setId(null);
                 ofy.put(equipmentEntity);
                 systemService.saveUniqueIndexOwner(ofy, UniqueIndexEntity.Property.USER_EQUIPMENT, "u" + equipmentEntity.getUniqueKey(), equipmentEntity.getKey());
 
-                return equipmentEntity.buildTargetEntity();
+                return equipmentEntity;
             }
         });
     }

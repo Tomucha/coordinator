@@ -1,10 +1,11 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
-import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserEquipment;
 import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.server.LocalDatastoreTest;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.service.EquipmentService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
@@ -31,18 +32,18 @@ public class EquipmentServiceImplTest extends LocalDatastoreTest {
     @Test
     public void testAddUserEquipment() throws Exception {
         Equipment testEquipment = config.getEquipmentList().get(0);
-        User user = findAdminUser();
+        UserEntity user = findAdminUser();
         UserEquipment equipment = new UserEquipment();
         equipment.setUserId(user.getId());
         equipment.setEquipmentId(testEquipment.getId());
 
-        UserEquipment res = equipmentService.addUserEquipment(equipment);
+        UserEquipmentEntity res = equipmentService.addUserEquipment(new UserEquipmentEntity().populateFrom(equipment));
         Assert.assertNotNull(res.getId());
         Assert.assertEquals(testEquipment.getId(), res.getEquipmentId());
         Assert.assertEquals(user.getId(), res.getUserId());
     }
 
-    private User findAdminUser() {
+    private UserEntity findAdminUser() {
         UserFilter filter = new UserFilter();
         filter.setEmail(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
         return userService.findByFilter(filter, 1, null).singleResult();

@@ -18,7 +18,7 @@ public abstract class AbstractPermissionCommand<E extends CoordinatorEntity> imp
     @Autowired
     private AppContext appContext;
 
-    protected User loggedUser() {
+    protected UserEntity loggedUser() {
         return appContext.getLoggedUser();
     }
 

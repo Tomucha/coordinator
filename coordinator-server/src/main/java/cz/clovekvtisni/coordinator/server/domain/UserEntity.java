@@ -63,11 +63,12 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     }
 
     @Override
-    public void populateFrom(User entity) {
+    public UserEntity populateFrom(User entity) {
         super.populateFrom(entity);
         if (entity.getNewPassword() != null) {
             setPassword(entity.getNewPassword());
         }
+        return this;
     }
 
     @Override

@@ -39,7 +39,7 @@ public class UserServiceImplTest extends LocalDatastoreTest {
         user.setRoleIdList(Arrays.asList(testRoleIdList));
         user.setNewPassword("aaa");
 
-        User res = userService.createUser(user);
+        UserEntity res = userService.createUser(new UserEntity().populateFrom(user));
         assertNotNull(res.getId());
         assertNotNull(res.getRoleIdList());
         assertArrayEquals(testRoleIdList, res.getRoleIdList().toArray());
@@ -49,11 +49,11 @@ public class UserServiceImplTest extends LocalDatastoreTest {
     public void testFindByFilter() throws Exception {
         assertNotNull(userService);
 
-        User byId = userService.findById(1l);
+        UserEntity byId = userService.findById(1l);
 
         UserFilter filter = new UserFilter();
-        filter.setEmail("admin@test");
-        ResultList<User> resultList = userService.findByFilter(filter, 2, null);
+        filter.setEmail(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
+        ResultList<UserEntity> resultList = userService.findByFilter(filter, 2, null);
         assertNotNull(resultList.getResult());
         assertEquals(1, resultList.getResultSize());
     }

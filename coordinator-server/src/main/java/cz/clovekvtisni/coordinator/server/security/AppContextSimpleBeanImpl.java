@@ -1,9 +1,6 @@
 package cz.clovekvtisni.coordinator.server.security;
 
-import cz.clovekvtisni.coordinator.domain.User;
-import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Locale;
 
@@ -15,17 +12,17 @@ import java.util.Locale;
  */
 public class AppContextSimpleBeanImpl implements AppContext {
 
-    private User loggedUser;
+    private UserEntity loggedUser;
 
     private Locale locale;
 
     @Override
-    public void setLoggedUser(User loggedUser) {
+    public void setLoggedUser(UserEntity loggedUser) {
         this.loggedUser = loggedUser;
     }
 
     @Override
-    public User getLoggedUser() {
+    public UserEntity getLoggedUser() {
         return loggedUser;
     }
 

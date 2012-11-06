@@ -13,6 +13,7 @@ import cz.clovekvtisni.coordinator.domain.config.Skill;
 import cz.clovekvtisni.coordinator.exception.MaParseException;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
 import cz.clovekvtisni.coordinator.server.service.EquipmentService;
 import cz.clovekvtisni.coordinator.server.service.ResultList;
 import cz.clovekvtisni.coordinator.server.service.SkillService;
@@ -48,11 +49,11 @@ public class UserApiController extends AbstractApiController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody ApiResponse login(HttpServletRequest request) {
         LoginRequestParams params = parseParams(request, LoginRequestParams.class);
-        User user = userService.login(params.getLogin(), params.getPassword());
+        UserEntity user = userService.login(params.getLogin(), params.getPassword());
         if (user == null) {
             throw MaPermissionDeniedException.wrongCredentials();
         }
-        return okResult(new LoginResponseData(user));
+        return okResult(new LoginResponseData(user.buildTargetEntity()));
     }
 
     @RequestMapping("/proplist")
@@ -70,15 +71,15 @@ public class UserApiController extends AbstractApiController {
         if (newUser == null) {
             throw MaParseException.wrongRequestParams();
         }
-        User user = userService.createUser(newUser);
+        UserEntity user = userService.createUser(new UserEntity().populateFrom(newUser));
 
         if (params.getEquipments() != null) {
             for (UserEquipment equipment : params.getEquipments()) {
                 equipment.setUserId(user.getId());
-                equipmentService.addUserEquipment(equipment);
+                equipmentService.addUserEquipment(new UserEquipmentEntity().populateFrom(equipment));
             }
         }
 
-        return okResult(new RegisterResponseData(user));
+        return okResult(new RegisterResponseData(user.buildTargetEntity()));
     }
 }

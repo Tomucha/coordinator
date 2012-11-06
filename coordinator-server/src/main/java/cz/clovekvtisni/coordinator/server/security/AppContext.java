@@ -12,9 +12,9 @@ import java.util.Locale;
  * Time: 12:03 AM
  */
 public interface AppContext {
-    void setLoggedUser(User loggedUser);
+    void setLoggedUser(UserEntity loggedUser);
 
-    User getLoggedUser();
+    UserEntity getLoggedUser();
 
     Locale getLocale();
 

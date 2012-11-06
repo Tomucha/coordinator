@@ -29,8 +29,9 @@ public abstract class AbstractPersistentEntity<TARGET extends AbstractModifiable
         return entity;
     }
 
-    public void populateFrom(TARGET entity) {
+    public SELF populateFrom(TARGET entity) {
         CloneTool.cloneProperties(entity, this);
+        return (SELF) this;
     }
 
     public Date getCreatedDate() {

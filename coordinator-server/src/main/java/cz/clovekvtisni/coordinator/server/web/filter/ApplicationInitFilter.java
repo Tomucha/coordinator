@@ -1,7 +1,7 @@
 package cz.clovekvtisni.coordinator.server.web.filter;
 
 
-import cz.clovekvtisni.coordinator.domain.User;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.service.SystemService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
@@ -88,7 +88,7 @@ public class ApplicationInitFilter implements Filter {
         if (session != null) {
             loggedUserId = (Long) session.getAttribute(SessionKeys.LOGGED_USER_ID);
             if (loggedUserId != null) {
-                User userEntity = userService.findById(loggedUserId);
+                UserEntity userEntity = userService.findById(loggedUserId);
                 if (userEntity == null) {
                     session.removeAttribute(SessionKeys.LOGGED_USER_ID);
                     loggedUserId = null;
