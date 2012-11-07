@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.domain.config;
 
 import org.simpleframework.xml.*;
+import org.simpleframework.xml.core.Commit;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +35,9 @@ public class WorkflowState extends AbstractStaticEntity {
     private String[] editableForRole;
 
     @ElementList(type = WorkflowTransition.class, name = "transition", inline = true, required = false)
-    private List<WorkflowTransition> transitions;
+    private transient List<WorkflowTransition> transitionsList;
+
+    private WorkflowTransition[] transitions;
 
     public String getId() {
         return id;
@@ -64,10 +67,18 @@ public class WorkflowState extends AbstractStaticEntity {
         return editableForRole;
     }
 
-    public List<WorkflowTransition> getTransitions() {
+    public WorkflowTransition[] getTransitions() {
         return transitions;
     }
 
+    @Commit
+    public void ensureValidity() {
+        if (transitionsList != null) {
+            transitions = transitionsList.toArray(new WorkflowTransition[0]);
+            transitionsList = null;
+        }
+
+    }
     /**
      * Called by parent domain object thru deserialization.
      * @param workflowId parent workflow id

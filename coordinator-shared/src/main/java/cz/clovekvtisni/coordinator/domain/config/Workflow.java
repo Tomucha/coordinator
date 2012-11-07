@@ -4,7 +4,10 @@ import org.simpleframework.xml.*;
 import org.simpleframework.xml.core.Commit;
 import org.simpleframework.xml.core.Validate;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,8 +30,9 @@ public class Workflow extends AbstractStaticEntity {
     private String[] canBeStartedBy;
 
     @ElementList(type = WorkflowState.class, name = "state", required = false, inline = true)
-    private List<WorkflowState> workflowStates;
+    private transient List<WorkflowState> workflowStatesList;
 
+    private WorkflowState[] states;
 
     public String getName() {
         return name;
@@ -46,14 +50,14 @@ public class Workflow extends AbstractStaticEntity {
         return id;
     }
 
-    public List<WorkflowState> getStates() {
-        return workflowStates;
+    public WorkflowState[] getStates() {
+        return states;
     }
 
     public Map<String, WorkflowState> getStateMap() {
-        if (workflowStates == null) return new HashMap<String, WorkflowState>();
-        Map<String, WorkflowState> map = new HashMap<String, WorkflowState>(workflowStates.size());
-        for (WorkflowState state : workflowStates) {
+        if (states == null) return new HashMap<String, WorkflowState>();
+        Map<String, WorkflowState> map = new HashMap<String, WorkflowState>(states.length);
+        for (WorkflowState state : states) {
             map.put(state.getId(), state);
         }
 
@@ -61,19 +65,21 @@ public class Workflow extends AbstractStaticEntity {
     }
 
     @Commit
-    public void ensureChildrenParent() {
-        if (workflowStates != null) {
-            for (WorkflowState state : workflowStates) {
+    public void ensureValidity() {
+        if (workflowStatesList != null) {
+            for (WorkflowState state : workflowStatesList) {
                 state.setWorkflowId(id);
             }
+            states = workflowStatesList.toArray(new WorkflowState[0]);
+            workflowStatesList = null;
         }
     }
 
     @Validate
     public void validate() {
-        if (workflowStates != null) {
+        if (states != null) {
             Map<String, WorkflowState> stateMap = getStateMap();
-            for (WorkflowState state : workflowStates) {
+            for (WorkflowState state : states) {
                 if (state.getTransitions() != null) {
                     for (WorkflowTransition transition : state.getTransitions()) {
                         if (
@@ -94,7 +100,7 @@ public class Workflow extends AbstractStaticEntity {
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", canBeStartedBy=" + (canBeStartedBy == null ? null : Arrays.asList(canBeStartedBy)) +
-                ", workflowStates=" + workflowStates +
+                ", states=" + states +
                 '}';
     }
 }
