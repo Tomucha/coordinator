@@ -4,14 +4,13 @@ import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.server.LocalDatastoreTest;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
-import cz.clovekvtisni.coordinator.server.service.ResultList;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.service.UserService;
-import org.junit.Before;
+import cz.clovekvtisni.coordinator.util.RunnableWithResult;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -34,12 +33,17 @@ public class UserServiceImplTest extends LocalDatastoreTest {
         String testEmail = "foo@bar.cz";
         String[] testRoleIdList = new String[] {"a","b"};
 
-        User user = new User();
+        final User user = new User();
         user.setEmail(testEmail);
         user.setRoleIdList(Arrays.asList(testRoleIdList));
         user.setNewPassword("aaa");
 
-        UserEntity res = userService.createUser(new UserEntity().populateFrom(user));
+        UserEntity res = securityTool.runWithDisabledSecurity(new RunnableWithResult<UserEntity>() {
+            @Override
+            public UserEntity run() {
+                return userService.createUser(new UserEntity().populateFrom(user));
+            }
+        });
         assertNotNull(res.getId());
         assertNotNull(res.getRoleIdList());
         assertArrayEquals(testRoleIdList, res.getRoleIdList().toArray());
@@ -52,7 +56,7 @@ public class UserServiceImplTest extends LocalDatastoreTest {
         UserEntity byId = userService.findById(1l);
 
         UserFilter filter = new UserFilter();
-        filter.setEmail(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
+        filter.setEmailVal(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
         ResultList<UserEntity> resultList = userService.findByFilter(filter, 2, null);
         assertNotNull(resultList.getResult());
         assertEquals(1, resultList.getResultSize());

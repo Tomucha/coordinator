@@ -15,7 +15,7 @@ import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
 import cz.clovekvtisni.coordinator.server.service.EquipmentService;
-import cz.clovekvtisni.coordinator.server.service.ResultList;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.service.SkillService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.web.controller.api.AbstractApiController;

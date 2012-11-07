@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server;
 
+import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.SystemService;
 import org.junit.After;
 import org.junit.Before;
@@ -23,6 +24,9 @@ public abstract class LocalDatastoreTest extends AbstractTest {
 
     @Autowired
     protected SystemService systemService;
+
+    @Autowired
+    protected SecurityTool securityTool;
 
     /**
      *

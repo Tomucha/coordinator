@@ -4,6 +4,7 @@ import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.filter.EventFilter;
 import cz.clovekvtisni.coordinator.server.security.CheckPermission;
 import cz.clovekvtisni.coordinator.server.security.FilterResult;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 
 /**
  * Created with IntelliJ IDEA.

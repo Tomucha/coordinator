@@ -4,7 +4,7 @@ import cz.clovekvtisni.coordinator.domain.config.Skill;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.filter.SkillFilter;
 import cz.clovekvtisni.coordinator.server.service.SkillService;
-import cz.clovekvtisni.coordinator.server.service.ResultList;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

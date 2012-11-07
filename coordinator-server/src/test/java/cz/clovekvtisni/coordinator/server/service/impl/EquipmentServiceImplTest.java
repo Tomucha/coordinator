@@ -9,6 +9,7 @@ import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.service.EquipmentService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.util.RunnableWithResult;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +34,16 @@ public class EquipmentServiceImplTest extends LocalDatastoreTest {
     public void testAddUserEquipment() throws Exception {
         Equipment testEquipment = config.getEquipmentList().get(0);
         UserEntity user = findAdminUser();
-        UserEquipment equipment = new UserEquipment();
+        final UserEquipment equipment = new UserEquipment();
         equipment.setUserId(user.getId());
         equipment.setEquipmentId(testEquipment.getId());
 
-        UserEquipmentEntity res = equipmentService.addUserEquipment(new UserEquipmentEntity().populateFrom(equipment));
+        UserEquipmentEntity res = securityTool.runWithDisabledSecurity(new RunnableWithResult<UserEquipmentEntity>() {
+            @Override
+            public UserEquipmentEntity run() {
+                return equipmentService.addUserEquipment(new UserEquipmentEntity().populateFrom(equipment));
+            }
+        });
         Assert.assertNotNull(res.getId());
         Assert.assertEquals(testEquipment.getId(), res.getEquipmentId());
         Assert.assertEquals(user.getId(), res.getUserId());
@@ -45,7 +51,7 @@ public class EquipmentServiceImplTest extends LocalDatastoreTest {
 
     private UserEntity findAdminUser() {
         UserFilter filter = new UserFilter();
-        filter.setEmail(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
+        filter.setEmailVal(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
         return userService.findByFilter(filter, 1, null).singleResult();
     }
 }

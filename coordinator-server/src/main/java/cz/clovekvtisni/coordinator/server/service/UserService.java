@@ -1,12 +1,12 @@
 package cz.clovekvtisni.coordinator.server.service;
 
-import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.security.Anonymous;
 import cz.clovekvtisni.coordinator.server.security.CheckPermission;
 import cz.clovekvtisni.coordinator.server.security.FilterResult;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 
 /**
  * Created by IntelliJ IDEA.

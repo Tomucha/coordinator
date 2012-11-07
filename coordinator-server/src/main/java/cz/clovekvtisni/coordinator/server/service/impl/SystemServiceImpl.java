@@ -75,7 +75,7 @@ public class SystemServiceImpl extends AbstractServiceImpl implements SystemServ
             @Override
             public Void run() {
                 UserFilter filter = new UserFilter();
-                filter.setEmail("admin@m-atelier.cz");
+                filter.setEmailVal(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
                 UserEntity user = userService.findByFilter(filter, 1, null).singleResult();
                 if (user == null) {
                     user = new UserEntity();

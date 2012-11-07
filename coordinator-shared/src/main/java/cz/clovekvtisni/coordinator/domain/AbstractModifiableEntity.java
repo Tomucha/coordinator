@@ -49,6 +49,10 @@ public abstract class AbstractModifiableEntity implements Entity {
         this.deletedDate = deletedDate;
     }
 
+    public boolean isDeleted() {
+        return deletedDate != null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

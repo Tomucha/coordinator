@@ -6,8 +6,10 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.filter.EventFilter;
+import cz.clovekvtisni.coordinator.server.filter.result.NoDeletedFilter;
 import cz.clovekvtisni.coordinator.server.service.EventService;
-import cz.clovekvtisni.coordinator.server.service.ResultList;
+import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +34,11 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
 
     @Override
     public ResultList<EventEntity> findByFilter(EventFilter filter, int limit, String bookmark) {
-        Query<EventEntity> query = noTransactionalObjectify().query(EventEntity.class);
+        MaObjectify ofy = noTransactionalObjectify();
+
+        return ofy.getResult(EventEntity.class, filter, bookmark, limit, new NoDeletedFilter());
+        /*
+        Query<EventEntity> query = ofy.query(EventEntity.class);
 
         // TODO filter
 
@@ -54,6 +60,7 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
         }
 
         return new ResultList<EventEntity>(events, null);
+        */
     }
 
     @Override

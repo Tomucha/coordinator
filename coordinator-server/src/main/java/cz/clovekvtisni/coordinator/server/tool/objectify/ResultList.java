@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.server.service;
+package cz.clovekvtisni.coordinator.server.tool.objectify;
 
 import cz.clovekvtisni.coordinator.util.ValueTool;
 

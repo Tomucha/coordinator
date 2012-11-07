@@ -25,9 +25,6 @@ public class EventServiceImplTest extends LocalDatastoreTest {
     @Autowired
     private EventService eventService;
 
-    @Autowired
-    private SecurityTool securityTool;
-
     @Test
     public void testCreate() throws Exception {
         assertNotNull(eventService);

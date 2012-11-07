@@ -8,6 +8,7 @@ import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyOpts;
 import com.googlecode.objectify.util.DatastoreIntrospector;
 import cz.clovekvtisni.coordinator.server.service.Service;
+import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,8 @@ public class AbstractServiceImpl implements Service {
         this.objectifyFactory = objectifyFactory;
     }
 
-    protected Objectify noTransactionalObjectify() {
-        return objectifyFactory.begin();
+    protected MaObjectify noTransactionalObjectify() {
+        return new MaObjectify(objectifyFactory.begin());
     }
 
     protected <T> T transactionWithResult(final String transactionName, TransactionWithResultCallback<T> withResultCallback) {

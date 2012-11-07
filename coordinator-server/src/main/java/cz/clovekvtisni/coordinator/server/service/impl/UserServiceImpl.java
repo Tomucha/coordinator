@@ -1,7 +1,6 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.google.appengine.api.datastore.Cursor;
-import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Query;
@@ -9,14 +8,13 @@ import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
-import cz.clovekvtisni.coordinator.server.service.ResultList;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
+import cz.clovekvtisni.coordinator.server.filter.result.NoDeletedFilter;
 import cz.clovekvtisni.coordinator.util.SignatureTool;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,29 +54,8 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
     @Override
     public ResultList<UserEntity> findByFilter(UserFilter filter, int limit, String bookmark) {
-        Query<UserEntity> query = noTransactionalObjectify().query(UserEntity.class);
-        if (!ValueTool.isEmpty(filter.getEmail())) {
-            query.filter("email =", filter.getEmail().toLowerCase());
-        }
-
-        //TODO: ordering (support in AbstractFilter)
-        query.order("id");
-
-        if (!ValueTool.isEmpty(bookmark)) {
-            query.startCursor(Cursor.fromWebSafeString(bookmark));
-        }
-
-        QueryResultIterator<UserEntity> iterator = query.iterator();
-        List<UserEntity> users = new ArrayList<UserEntity>();
-        while (iterator.hasNext()) {
-            UserEntity userEntity = iterator.next();
-            users.add(userEntity);
-            if (--limit <= 0) {
-                return new ResultList<UserEntity>(users, iterator.getCursor().toWebSafeString());
-            }
-        }
-
-        return new ResultList<UserEntity>(users, null);
+        filter.setOrder("id");
+        return noTransactionalObjectify().getResult(UserEntity.class, filter, bookmark, limit, new NoDeletedFilter());
     }
 
     private String passwordHash(Long userId, String password) {
