@@ -25,7 +25,8 @@ public interface UserService extends Service {
     @FilterResult("#helper.canRead(#entity)")
     ResultList<UserEntity> findByFilter(UserFilter filter, int limit, String bookmark);
 
-    UserEntity createUser(UserEntity user);
+    @CheckPermission("#helper.canCreate(#entity)")
+    UserEntity createUser(UserEntity entity);
 
     @CheckPermission("#helper.canUpdate(#entity)")
     UserEntity updateUser(UserEntity user);

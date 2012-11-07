@@ -86,19 +86,19 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     @Override
-    public UserEntity createUser(final UserEntity user) {
-        return transactionWithResult("creating " + user, new TransactionWithResultCallback<UserEntity>() {
+    public UserEntity createUser(final UserEntity entity) {
+        return transactionWithResult("creating " + entity, new TransactionWithResultCallback<UserEntity>() {
             @Override
             public UserEntity runInTransaction(Objectify ofy) {
-                user.setId(null);
-                user.setEmail(ValueTool.normalizeEmail(user.getEmail()));
-                ofy.put(user);
+                entity.setId(null);
+                entity.setEmail(ValueTool.normalizeEmail(entity.getEmail()));
+                ofy.put(entity);
 
-                user.setPassword(passwordHash(user.getId(), user.getPassword()));
-                ofy.put(user);
+                entity.setPassword(passwordHash(entity.getId(), entity.getPassword()));
+                ofy.put(entity);
 
-                systemService.saveUniqueIndexOwner(ofy, UniqueIndexEntity.Property.EMAIL, user.getEmail(), user.getKey());
-                return user;
+                systemService.saveUniqueIndexOwner(ofy, UniqueIndexEntity.Property.EMAIL, entity.getEmail(), entity.getKey());
+                return entity;
             }
         });
     }

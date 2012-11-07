@@ -1,7 +1,5 @@
 package cz.clovekvtisni.coordinator.server.service;
 
-import cz.clovekvtisni.coordinator.domain.UserEquipment;
-import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
 import cz.clovekvtisni.coordinator.server.filter.EquipmentFilter;
@@ -16,6 +14,6 @@ public interface EquipmentService extends Service {
     @FilterResult("#helper.canRead(#entity)")
     ResultList<Equipment> findByFilter(EquipmentFilter filter);
 
-    //@CheckPermission("#helper.canCreate(#entity)")
-    UserEquipmentEntity addUserEquipment(UserEquipmentEntity equipment);
+    @CheckPermission("#helper.canCreate(#entity)")
+    UserEquipmentEntity addUserEquipment(UserEquipmentEntity entity);
 }

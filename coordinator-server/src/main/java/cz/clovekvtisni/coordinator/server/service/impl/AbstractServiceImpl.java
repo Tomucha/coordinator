@@ -107,7 +107,6 @@ public class AbstractServiceImpl implements Service {
    		if (ofy.getTxn() == null) throw new IllegalStateException("No transaction");
    		if (!ofy.getTxn().isActive()) throw new IllegalStateException("Transaction is not active!");
         if (!DatastoreIntrospector.SUPPORTS_XG) throw new IllegalStateException("XG transactions are not supported!");
-           // TODO PHASE2: nevim jak overit, ze je cross group. Az na to prijdu, tak poradne otestovat, natuty to na tom assertu zacne padat.
+        // TODO PHASE2: nevim jak overit, ze je cross group. Az na to prijdu, tak poradne otestovat, natuty to na tom assertu zacne padat.
    	}
-
 }
