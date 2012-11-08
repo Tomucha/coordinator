@@ -1,6 +1,5 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
-import cz.clovekvtisni.coordinator.domain.UserEquipment;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.service.UserService;
@@ -39,13 +38,13 @@ public class LoginController extends AbstractController {
         form.retUrl = retUrl;
         model.addAttribute("user", form);
 
-        return "login/form";
+        return "public/login";
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public String login(@ModelAttribute("user") @Valid LoginForm loginForm, BindingResult errors) {
         if (errors.hasErrors()) {
-            return "login/form";
+            return "public/login";
         }
 
         String retUrl;
@@ -58,7 +57,7 @@ public class LoginController extends AbstractController {
             }
         } catch (MaPermissionDeniedException ex) {
             addFormError(errors, ex);
-            return "login/form";
+            return "public/login";
         }
 
         return "redirect:" + retUrl;

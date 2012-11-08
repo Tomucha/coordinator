@@ -15,11 +15,33 @@
     <body class="<tiles:getAsString name="extraClass"/>">
             <div id="page-header">
                 <c:if test="${!empty loggedUser}">
-                    <c:out value="${loggedUser.fullName}" /> <a href="${root}/logout">(<s:message code="logout"/>)</a>
+                    <c:out value="${loggedUser.email}" /> <a href="${root}/logout">(<s:message code="logout"/>)</a>
                 </c:if>
             </div>
             <div id="page-content">
-                <tiles:insertAttribute name="content" />
+
+                <div id="page-content-left">
+                    <h2><s:message code="title.activityFeed"/></h2>
+                    <div class="activityList">
+                        <table>
+                            <tr>
+                                <td>foo bar</td>
+                                <td>5 min</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="page-content-main">
+                    <div class="tabPanel">
+                        <a href=""><s:message code="tab.eventList"/></a>
+                        <a href=""><s:message code="tab.userList"/></a>
+                    </div>
+                    <div class="tabContent">
+                        <tiles:insertAttribute name="content" />
+                    </div>
+                </div>
+
             </div>
     </body>
 </html>
