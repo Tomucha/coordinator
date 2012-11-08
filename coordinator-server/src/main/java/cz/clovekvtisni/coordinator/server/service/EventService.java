@@ -25,7 +25,10 @@ public interface EventService extends Service {
     EventEntity findByEventId(String id, long flags);
 
     @FilterResult("#helper.canRead(#entity)")
-    ResultList<EventEntity> findByFilter(EventFilter filter, int limit, String bookmark);
+    ResultList<EventEntity> findByFilter(EventFilter filter, int limit, String bookmark, long flags);
+
+    @FilterResult("#helper.canRead(#entity)")
+    ResultList<EventEntity> findByOrganization(String organizationId, int limit, String bookmark, long flags);
 
     @CheckPermission("#helper.canCreate(#entity)")
     EventEntity createEvent(EventEntity event);
@@ -37,5 +40,5 @@ public interface EventService extends Service {
     void deleteEvent(EventEntity event);
 
     @FilterResult("#helper.canRead(#entity)")
-    ResultList<OrganizationInEventEntity> getOrganizatioInEventList(String organizationId, long flags);
+    ResultList<OrganizationInEventEntity> getOrganizationInEventList(String organizationId, int limit, String bookmark, long flags);
 }

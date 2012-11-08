@@ -15,7 +15,7 @@
     <body class="<tiles:getAsString name="extraClass"/>">
             <div id="page-header">
                 <c:if test="${!empty loggedUser}">
-                    <c:out value="${loggedUser.email}" /> <a href="${root}/logout">(<s:message code="logout"/>)</a>
+                    <c:out value="${loggedUser.email}" /> <a href="<s:url value="/logout"/>">(<s:message code="logout"/>)</a>
                 </c:if>
             </div>
             <div id="page-content">
@@ -34,8 +34,8 @@
 
                 <div id="page-content-main">
                     <div class="tabPanel">
-                        <a href=""><s:message code="tab.eventList"/></a>
-                        <a href=""><s:message code="tab.userList"/></a>
+                        <a href="<s:url value="/admin/event"/>"><s:message code="tab.eventList"/></a>
+                        <!--<a href=""><s:message code="tab.userList"/></a>-->
                     </div>
                     <div class="tabContent">
                         <tiles:insertAttribute name="content" />

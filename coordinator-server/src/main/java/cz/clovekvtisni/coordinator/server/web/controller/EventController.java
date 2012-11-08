@@ -2,7 +2,9 @@ package cz.clovekvtisni.coordinator.server.web.controller;
 
 import cz.clovekvtisni.coordinator.domain.Event;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.EventFilter;
+import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +25,8 @@ public class EventController extends AbstractController {
 
     @RequestMapping
     public String list(@RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
-        EventFilter filter = new EventFilter();
-        ResultList<EventEntity> events = eventService.findByFilter(filter, 30, bookmark);
+        UserEntity loggedUser = getLoggedUser();
+        ResultList<EventEntity> events = eventService.findByOrganization(loggedUser.getOrganizationId(), 30, bookmark, EventService.FLAG_FETCH_LOCATIONS);
 
         model.addAttribute("events", events);
 

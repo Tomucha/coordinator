@@ -15,7 +15,9 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,10 +40,23 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
     }
 
     @Override
-    public ResultList<EventEntity> findByFilter(EventFilter filter, int limit, String bookmark) {
+    public ResultList<EventEntity> findByFilter(EventFilter filter, int limit, String bookmark, long flags) {
         MaObjectify ofy = noTransactionalObjectify();
 
         return ofy.getResult(EventEntity.class, filter, bookmark, limit, new NoDeletedFilter());
+    }
+
+    @Override
+    public ResultList<EventEntity> findByOrganization(String organizationId, int limit, String bookmark, long flags) {
+        ResultList<OrganizationInEventEntity> inEventList = getOrganizationInEventList(organizationId, limit, bookmark, flags | FLAG_FETCH_EVENT);
+        List<EventEntity> events = new ArrayList<EventEntity>(inEventList.getResultSize());
+        for (OrganizationInEventEntity inEventEntity : inEventList) {
+            if (inEventEntity.getEventEntity() != null) {
+                events.add(inEventEntity.getEventEntity());
+            }
+        }
+
+        return new ResultList<EventEntity>(events, bookmark);
     }
 
     @Override
@@ -77,13 +92,13 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
     }
 
     @Override
-    public ResultList<OrganizationInEventEntity> getOrganizatioInEventList(String organizationId, long flags) {
+    public ResultList<OrganizationInEventEntity> getOrganizationInEventList(String organizationId, int limit, String bookmark, long flags) {
         MaObjectify ofy = noTransactionalObjectify();
 
         OrganizationInEventFilter filter = new OrganizationInEventFilter();
         filter.setOrganizationIdVal(organizationId);
 
-        ResultList<OrganizationInEventEntity> result = ofy.getResult(OrganizationInEventEntity.class, filter, null, 0, new NoDeletedFilter());
+        ResultList<OrganizationInEventEntity> result = ofy.getResult(OrganizationInEventEntity.class, filter, bookmark, limit, new NoDeletedFilter());
 
         if ((flags & EventService.FLAG_FETCH_EVENT) != 0) {
             Map<Key<EventEntity>, OrganizationInEventEntity> inEventMap = new HashMap<Key<EventEntity>, OrganizationInEventEntity>(result.getResult().size());
@@ -93,6 +108,7 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
             }
             Map<Key<EventEntity>, EventEntity> entityMap = ofy.get(inEventMap.keySet());
             for (Map.Entry<Key<EventEntity>, EventEntity> entry : entityMap.entrySet()) {
+                if (entry.getValue().isDeleted()) continue;
                 populateEvent(ofy, entry.getValue(), flags);
                 inEventMap.get(entry.getKey()).setEventEntity(entry.getValue());
             }

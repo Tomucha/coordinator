@@ -1,6 +1,8 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
+import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.exception.MaException;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.PermissionCheckResultModel;
 import cz.clovekvtisni.coordinator.server.security.SecurityTool;
@@ -61,5 +63,9 @@ public class AbstractController {
 
     protected Locale getLocale() {
         return appContext.getLocale();
+    }
+
+    protected UserEntity getLoggedUser() {
+        return appContext.getLoggedUser();
     }
 }
