@@ -8,6 +8,8 @@ import com.googlecode.objectify.annotation.Unindexed;
 import cz.clovekvtisni.coordinator.domain.Event;
 
 import javax.persistence.Id;
+import javax.persistence.Transient;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,6 +30,9 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
     private String name;
 
     private String description;
+
+    @Transient
+    private List<EventLocationEntity> eventLocationList;
 
     public EventEntity() {
     }
@@ -72,6 +77,14 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<EventLocationEntity> getEventLocationList() {
+        return eventLocationList;
+    }
+
+    public void setEventLocationList(List<EventLocationEntity> eventLocationList) {
+        this.eventLocationList = eventLocationList;
     }
 
     @Override

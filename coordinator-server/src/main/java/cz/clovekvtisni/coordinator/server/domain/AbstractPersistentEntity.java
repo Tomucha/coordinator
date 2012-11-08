@@ -78,4 +78,8 @@ public abstract class AbstractPersistentEntity<TARGET extends AbstractModifiable
     public int hashCode() {
         return getId() != null ? getId().hashCode() : 0;
     }
+
+    public boolean isNew() {
+        return getId() == null;
+    }
 }

@@ -3,10 +3,12 @@ package cz.clovekvtisni.coordinator.server.domain;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Cached;
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Indexed;
 import com.googlecode.objectify.annotation.Unindexed;
 import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import java.util.Date;
 import java.util.List;
 
@@ -23,8 +25,10 @@ public class OrganizationInEventEntity extends AbstractPersistentEntity<Organiza
     @Id
     private Long id;
 
+    @Indexed
     private String organizationId;
 
+    @Indexed
     private String eventId;
 
     private String name;
@@ -42,6 +46,9 @@ public class OrganizationInEventEntity extends AbstractPersistentEntity<Organiza
     private Date dateClosedRegistration;
 
     private Date dateClosed;
+
+    @Transient
+    private EventEntity eventEntity;
 
     public OrganizationInEventEntity() {
     }
@@ -142,6 +149,14 @@ public class OrganizationInEventEntity extends AbstractPersistentEntity<Organiza
 
     public void setDateClosed(Date dateClosed) {
         this.dateClosed = dateClosed;
+    }
+
+    public EventEntity getEventEntity() {
+        return eventEntity;
+    }
+
+    public void setEventEntity(EventEntity eventEntity) {
+        this.eventEntity = eventEntity;
     }
 
     @Override

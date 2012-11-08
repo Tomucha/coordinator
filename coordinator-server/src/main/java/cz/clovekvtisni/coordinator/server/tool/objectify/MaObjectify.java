@@ -43,6 +43,7 @@ public class MaObjectify extends ObjectifyWrapper {
             query.startCursor(Cursor.fromWebSafeString(bookmark));
         }
 
+        boolean limited = limit > 0;
         QueryResultIterator<T> iterator = query.iterator();
         List<T> entities = new ArrayList<T>();
         while (iterator.hasNext()) {
@@ -51,7 +52,7 @@ public class MaObjectify extends ObjectifyWrapper {
                 continue;
             }
             entities.add(entity);
-            if (--limit <= 0) {
+            if (limited && --limit <= 0) {
                 return new ResultList<T>(entities, iterator.getCursor().toWebSafeString());
             }
         }
