@@ -1,0 +1,14 @@
+package cz.clovekvtisni.coordinator.server.web.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping(value = "/admin/event")
+public class EventController extends AbstractController {
+
+    @RequestMapping
+    public String list() {
+        return "admin/event-list";
+    }
+}
