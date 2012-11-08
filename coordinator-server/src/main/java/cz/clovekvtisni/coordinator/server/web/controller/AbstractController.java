@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
+import cz.clovekvtisni.coordinator.domain.AbstractModifiableEntity;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.exception.MaException;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;

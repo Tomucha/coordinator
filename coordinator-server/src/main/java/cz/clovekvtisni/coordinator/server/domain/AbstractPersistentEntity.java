@@ -1,9 +1,7 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
-import com.googlecode.objectify.Key;
 import cz.clovekvtisni.coordinator.domain.AbstractModifiableEntity;
-import cz.clovekvtisni.coordinator.domain.Entity;
-import cz.clovekvtisni.coordinator.server.util.CloneTool;
+import cz.clovekvtisni.coordinator.util.CloneTool;
 
 import java.util.Date;
 
@@ -22,6 +20,13 @@ public abstract class AbstractPersistentEntity<TARGET extends AbstractModifiable
 
     protected abstract TARGET createTargetEntity();
 
+    public AbstractPersistentEntity() {
+    }
+
+    public AbstractPersistentEntity(SELF entity) {
+        CloneTool.cloneProperties(entity, this);
+    }
+
     public TARGET buildTargetEntity() {
         TARGET entity = createTargetEntity();
         CloneTool.cloneProperties(this, entity);
@@ -30,6 +35,11 @@ public abstract class AbstractPersistentEntity<TARGET extends AbstractModifiable
     }
 
     public SELF populateFrom(TARGET entity) {
+        CloneTool.cloneProperties(entity, this);
+        return (SELF) this;
+    }
+
+    public SELF populateFrom(SELF entity) {
         CloneTool.cloneProperties(entity, this);
         return (SELF) this;
     }

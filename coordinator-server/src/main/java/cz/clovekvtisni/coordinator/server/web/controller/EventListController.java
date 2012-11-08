@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @Controller
-@RequestMapping(value = "/admin/event")
-public class EventController extends AbstractController {
+@RequestMapping(value = "/admin/event/list")
+public class EventListController extends AbstractController {
 
     @Autowired
     private EventService eventService;

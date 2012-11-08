@@ -1,5 +1,7 @@
 package cz.clovekvtisni.coordinator.domain;
 
+import cz.clovekvtisni.coordinator.util.CloneTool;
+
 import java.util.Date;
 
 /**
