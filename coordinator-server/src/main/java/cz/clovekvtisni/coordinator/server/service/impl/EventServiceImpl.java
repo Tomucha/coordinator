@@ -15,10 +15,7 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -60,35 +57,89 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
     }
 
     @Override
-    public EventEntity createEvent(final EventEntity event) {
-        return transactionWithResult("creating " + event, new TransactionWithResultCallback<EventEntity>() {
+    public EventEntity createEvent(final EventEntity entity) {
+        return transactionWithResult("creating " + entity, new TransactionWithResultCallback<EventEntity>() {
             @Override
             public EventEntity runInTransaction(Objectify ofy) {
-                event.setId(null);
-                ofy.put(event);
+                entity.setId(null);
+                updateSystemFields(entity);
+                ofy.put(entity);
 
-                if (event.getEventLocationList() != null) {
-                    for (EventLocationEntity location : event.getEventLocationList()) {
+                if (entity.getEventLocationList() != null) {
+                    for (EventLocationEntity location : entity.getEventLocationList()) {
                         location.setId(null);
-                        location.setEventId(event.getEventId());
+                        location.setEventId(entity.getEventId());
+                        updateSystemFields(location);
                         Key<EventLocationEntity> inserted = ofy.put(location);
                         location.setId(inserted.getId());
                     }
                 }
 
-                return event;
+                return entity;
             }
         });
     }
 
     @Override
-    public EventEntity updateEvent(EventEntity event) {
-        return null;  // TODO
+    public EventEntity updateEvent(final EventEntity entity) {
+        return transactionWithResult("updating " + entity, new TransactionWithResultCallback<EventEntity>() {
+            @Override
+            public EventEntity runInTransaction(Objectify ofy) {
+                updateSystemFields(entity);
+                ofy.put(entity);
+
+                List<EventLocationEntity> locationList = entity.getEventLocationList();
+                if (locationList != null) {
+                    Map<Long, EventLocationEntity> savedLocationMap = new HashMap<Long, EventLocationEntity>();
+                    for (EventLocationEntity saved : getEventLocations((MaObjectify) ofy, entity.getEventId())) {
+                        savedLocationMap.put(saved.getId(), saved);
+                    }
+
+                    List<EventLocationEntity> newList = new ArrayList<EventLocationEntity>(locationList.size());
+                    for (EventLocationEntity location : locationList) {
+                        if (location.isNew()) {
+                            location.setId(null);
+                            location.setEventId(entity.getEventId());
+                            updateSystemFields(location);
+                            ofy.put(location);
+                            newList.add(location);
+
+                        } else if (location.isDeleted()) {
+                            ofy.delete(location);
+                            savedLocationMap.remove(location.getId());
+
+                        } else {
+                            updateSystemFields(location);
+                            ofy.put(location);
+                            savedLocationMap.remove(location.getId());
+                            newList.add(location);
+                        }
+                    }
+
+                    for (EventLocationEntity toDelete : savedLocationMap.values()) {
+                        ofy.delete(toDelete);
+                    }
+
+                    entity.setEventLocationList(newList);
+                }
+
+                return entity;
+            }
+        });
     }
 
     @Override
-    public void deleteEvent(EventEntity event) {
+    public void deleteEvent(EventEntity entity) {
         // TODO
+    }
+
+    private List<EventLocationEntity> getEventLocations(MaObjectify ofy, String eventId) {
+        EventLocationFilter filter = new EventLocationFilter();
+        filter.setEventIdVal(eventId);
+
+        ResultList<EventLocationEntity> locations = ofy.getResult(EventLocationEntity.class, filter, null, 0, new NoDeletedFilter<EventLocationEntity>());
+
+        return locations.getResult();
     }
 
     @Override
@@ -117,12 +168,12 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
         return result;
     }
 
-    private void populateEvent(MaObjectify ofy, EventEntity event, long flags) {
+    private void populateEvent(MaObjectify ofy, EventEntity entity, long flags) {
         if ((flags & EventService.FLAG_FETCH_LOCATIONS) != 0) {
             EventLocationFilter filter = new EventLocationFilter();
-            filter.setEventIdVal(event.getEventId());
+            filter.setEventIdVal(entity.getEventId());
             ResultList<EventLocationEntity> result = ofy.getResult(EventLocationEntity.class, filter, null, 0, new NoDeletedFilter());
-            event.setEventLocationList(result.getResult());
+            entity.setEventLocationList(result.getResult());
         }
     }
 }

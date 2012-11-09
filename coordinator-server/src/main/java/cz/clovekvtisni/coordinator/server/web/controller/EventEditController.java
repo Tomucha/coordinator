@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.security.CheckPermission;
 import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.web.model.EventForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,9 @@ public class EventEditController extends AbstractController {
     @Autowired
     private EventService eventService;
 
+    //TODO @CheckPermission("#helper.canDo(TODO)") - super admin only
     @RequestMapping(method = RequestMethod.GET)
-    public String showForm(@RequestParam(value = "id", required = false) String eventId, Model model) {
+    public String showForm(@RequestParam(value = "eventId", required = false) String eventId, Model model) {
         EventForm form = new EventForm();
 
         if (eventId != null) {
@@ -50,6 +52,6 @@ public class EventEditController extends AbstractController {
             eventService.updateEvent(event);
         }
 
-        return "redirect:/admin/event";
+        return "redirect:/admin/event/list";
     }
 }

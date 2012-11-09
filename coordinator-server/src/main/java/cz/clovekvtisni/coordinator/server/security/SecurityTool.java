@@ -216,7 +216,8 @@ public class SecurityTool implements BeanFactoryAware {
     }
 
     StandardEvaluationContext buildEvaluationContext(Object target, Method method, Object[] args) {
-        StandardEvaluationContext evaluationContext;PermissionExpressionRootObject rootObject = new PermissionExpressionRootObject(method, args, target);
+        StandardEvaluationContext evaluationContext;
+        PermissionExpressionRootObject rootObject = new PermissionExpressionRootObject(method, args, target);
         evaluationContext = new LazyParamAwareEvaluationContext(rootObject, method, args);
         evaluationContext.setBeanResolver(new BeanFactoryResolver(beanFactory));
         preparePermissionExpressionEvaluationContext(evaluationContext);

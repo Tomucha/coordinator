@@ -49,7 +49,7 @@ public class LoginController extends AbstractController {
 
             retUrl = loginForm.retUrl;
             if (ValueTool.isEmpty(retUrl)) {
-                retUrl = "/admin/event";
+                retUrl = "/admin/event/list";
             }
         } catch (MaPermissionDeniedException ex) {
             addFormError(errors, ex);

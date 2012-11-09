@@ -16,12 +16,34 @@
         <thead>
             <tr>
                 <th><s:message code="label.name"/></th>
+                <th><s:message code="label.locality"/></th>
+                <th><s:message code="label.radius"/></th>
+                <th><s:message code="label.action"/></th>
             </tr>
         </thead>
         <tbody>
             <c:forEach items="${model.events}" var="event">
                 <tr>
-                    <td><c:out value="${event.name}"/></td>
+                    <td>
+                        <c:out value="${event.name}"/>
+                    </td>
+                    <td>
+                        <c:if test="${!empty event.eventLocationList}">
+                            <c:forEach items="${event.eventLocationList}" var="location">
+                                <div><tags:gps longitude="${location.longitude}" latitude="${location.latitude}"/></div>
+                            </c:forEach>
+                        </c:if>
+                    </td>
+                    <td>
+                        <c:if test="${!empty event.eventLocationList}">
+                            <c:forEach items="${event.eventLocationList}" var="location">
+                                <div><c:out value="${location.radius}"/> km</div>
+                            </c:forEach>
+                        </c:if>
+                    </td>
+                    <td>
+                        <a href="/admin/event/edit?eventId=<c:out value="${event.id}"/>"><s:message code="button.edit"/></a>
+                    </td>
                 </tr>
             </c:forEach>
         </tbody>

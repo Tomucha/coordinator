@@ -34,7 +34,7 @@
 
                 <div id="page-content-main">
                     <div class="tabPanel">
-                        <a href="<s:url value="/admin/event"/>"><s:message code="tab.eventList"/></a>
+                        <a href="<s:url value="/admin/event/list"/>"><s:message code="tab.eventList"/></a>
                         <!--<a href=""><s:message code="tab.userList"/></a>-->
                     </div>
                     <div class="tabContent">

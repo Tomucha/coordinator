@@ -7,6 +7,8 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyOpts;
 import com.googlecode.objectify.util.DatastoreIntrospector;
+import cz.clovekvtisni.coordinator.domain.AbstractModifiableEntity;
+import cz.clovekvtisni.coordinator.server.domain.AbstractPersistentEntity;
 import cz.clovekvtisni.coordinator.server.service.Service;
 import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
 import org.slf4j.Logger;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ConcurrentModificationException;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -110,4 +113,11 @@ public class AbstractServiceImpl implements Service {
         if (!DatastoreIntrospector.SUPPORTS_XG) throw new IllegalStateException("XG transactions are not supported!");
         // TODO PHASE2: nevim jak overit, ze je cross group. Az na to prijdu, tak poradne otestovat, natuty to na tom assertu zacne padat.
    	}
+
+    protected void updateSystemFields(AbstractPersistentEntity entity) {
+        Date now = new Date();
+        if (entity.isNew())
+            entity.setCreatedDate(now);
+        entity.setModifiedDate(now);
+    }
 }
