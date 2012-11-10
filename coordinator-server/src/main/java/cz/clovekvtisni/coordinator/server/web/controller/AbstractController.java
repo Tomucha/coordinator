@@ -1,13 +1,13 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
-import cz.clovekvtisni.coordinator.domain.AbstractModifiableEntity;
-import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.exception.MaException;
+import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.PermissionCheckResultModel;
 import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.security.ServicePermissionCheckDescriptor;
+import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -17,6 +17,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -36,6 +39,9 @@ public class AbstractController {
     @Autowired
     protected SecurityTool securityTool;
 
+    @Autowired
+    protected PoiService poiService;
+
     @ModelAttribute
     public void loggedUser(Model model) {
         PermissionCheckResultModel checkResultModel = securityTool.checkServicePermissions(new ServicePermissionCheckDescriptor[]{
@@ -43,6 +49,11 @@ public class AbstractController {
         });
         model.addAttribute("loggedUser", appContext.getLoggedUser());
         model.addAttribute("canDoLogout", checkResultModel.isPermitted("logout"));
+    }
+
+    @ModelAttribute("now")
+    public Long now() {
+        return System.currentTimeMillis();
     }
 
     protected void addFormError(BindingResult errors, MaException exception) {

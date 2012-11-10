@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
+import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.security.CheckPermission;
 import cz.clovekvtisni.coordinator.server.service.EventService;
@@ -29,6 +30,8 @@ public class EventEditController extends AbstractController {
 
         if (eventId != null) {
             EventEntity event = eventService.findByEventId(eventId, 0);
+            if (event == null)
+                throw NotFoundException.idNotExist();
             form.populateFrom(event);
         }
 

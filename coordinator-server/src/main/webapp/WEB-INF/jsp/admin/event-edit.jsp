@@ -11,13 +11,18 @@
     <sf:form method="POST" action="${root}/admin/event/edit" modelAttribute="form">
         <div>
             <sf:hidden path="id"/>
-            <sf:label path="eventId"/>
+            <sf:label path="eventId"><s:message code="label.eventId"/></sf:label>
             <sf:input path="eventId"/>
         </div>
 
         <div>
-            <sf:label path="name"/>
+            <sf:label path="name"><s:message code="label.name"/></sf:label>
             <sf:input path="name"/>
+        </div>
+
+        <div>
+            <sf:label path="description"><s:message code="label.description"/></sf:label>
+            <sf:textarea path="description" cols="72" rows="7"/>
         </div>
 
         <div class="buttonPanel">

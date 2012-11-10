@@ -3,6 +3,7 @@ package cz.clovekvtisni.coordinator.server.domain;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Cached;
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Indexed;
 import com.googlecode.objectify.annotation.Unindexed;
 import cz.clovekvtisni.coordinator.domain.Poi;
 
@@ -24,10 +25,12 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
 
     private Long poiCategoryId;
 
+    @Indexed
     private Long workflowId;
 
     private Long workflowStateId;
 
+    @Indexed
     private Long[] userId;
 
     private Double latitude;

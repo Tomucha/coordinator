@@ -24,14 +24,18 @@
                     <h2><s:message code="title.activityFeed"/></h2>
                     <div class="activityList">
                         <table>
-                            <tr>
-                                <td>foo bar</td>
-                                <td>5 min</td>
-                            </tr>
+                            <c:forEach items="${lastPoiList}" var="poi">
+                                <tr>
+                                    <td>
+                                        <div>Popis POI.</div>
+                                        <div><tags:gps longitude="${poi.longitude}" latitude="${poi.latitude}"/></div>
+                                    </td>
+                                    <td><tags:humanago time="${poi.createdDate}" now="${now}"/></td>
+                                </tr>
+                            </c:forEach>
                         </table>
                     </div>
                 </div>
-
                 <div id="page-content-main">
                     <div class="tabPanel">
                         <a href="<s:url value="/admin/event/list"/>"><s:message code="tab.eventList"/></a>

@@ -22,7 +22,7 @@
             </tr>
         </thead>
         <tbody>
-            <c:forEach items="${model.events}" var="event">
+            <c:forEach items="${events}" var="event">
                 <tr>
                     <td>
                         <c:out value="${event.name}"/>
@@ -42,7 +42,7 @@
                         </c:if>
                     </td>
                     <td>
-                        <a href="/admin/event/edit?eventId=<c:out value="${event.id}"/>"><s:message code="button.edit"/></a>
+                        <a href="/admin/event/edit?eventId=<c:out value="${event.eventId}"/>"><s:message code="button.edit"/></a>
                     </td>
                 </tr>
             </c:forEach>

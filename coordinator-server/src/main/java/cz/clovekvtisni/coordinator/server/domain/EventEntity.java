@@ -6,6 +6,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Indexed;
 import com.googlecode.objectify.annotation.Unindexed;
 import cz.clovekvtisni.coordinator.domain.Event;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Id;
 import javax.persistence.Transient;
@@ -25,8 +26,10 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
     private Long id;
 
     @Indexed
+    @NotEmpty
     private String eventId;
 
+    @NotEmpty
     private String name;
 
     private String description;
