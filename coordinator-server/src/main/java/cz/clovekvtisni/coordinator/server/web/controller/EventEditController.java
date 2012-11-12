@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
+import cz.clovekvtisni.coordinator.exception.MaException;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.security.CheckPermission;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,18 +43,22 @@ public class EventEditController extends AbstractController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String edit(@Valid EventForm form, RedirectAttributes redirectAttributes, BindingResult bindingResult, Model model) {
+    public String edit(@ModelAttribute("form") @Valid EventForm form, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("form", form);
             return "admin/event-edit";
         }
 
         EventEntity event = new EventEntity().populateFrom(form);
 
-        if (event.isNew()) {
-            eventService.createEvent(event);
-        } else {
-            eventService.updateEvent(event);
+        try {
+            if (event.isNew()) {
+                eventService.createEvent(event);
+            } else {
+                eventService.updateEvent(event);
+            }
+        } catch (MaException e) {
+            addFormError(bindingResult, e);
+            return "admin/event-edit";
         }
 
         return "redirect:/admin/event/list";

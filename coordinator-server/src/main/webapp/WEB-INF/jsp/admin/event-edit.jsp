@@ -7,30 +7,38 @@
 %>
 <h2><s:message code="header.eventCreate"/></h2>
 
-<div class="eventForm">
-    <sf:form method="POST" action="${root}/admin/event/edit" modelAttribute="form">
-        <div>
-            <sf:hidden path="id"/>
-            <sf:label path="eventId"><s:message code="label.eventId"/></sf:label>
-            <sf:input path="eventId"/>
-        </div>
+<div class="mainPanel">
+    <div class="eventForm">
+        <sf:form method="POST" action="${root}/admin/event/edit" modelAttribute="form">
 
-        <div>
-            <sf:label path="name"><s:message code="label.name"/></sf:label>
-            <sf:input path="name"/>
-        </div>
+            <sf:errors />
 
-        <div>
-            <sf:label path="description"><s:message code="label.description"/></sf:label>
-            <sf:textarea path="description" cols="72" rows="7"/>
-        </div>
+            <div>
+                <sf:hidden path="id"/>
+                <tags:input field="eventId" modelAttribute="form" captionCode="label.eventId">
+                    <sf:input path="eventId" />
+                </tags:input>
+            </div>
 
-        <div class="buttonPanel">
-            <sf:button><s:message code="button.save"/></sf:button>
-        </div>
-    </sf:form>
+            <div>
+                <tags:input field="name" modelAttribute="form" captionCode="label.name">
+                    <sf:input path="name"/>
+                </tags:input>
+            </div>
+
+            <div>
+                <tags:input field="description" modelAttribute="form" captionCode="label.description">
+                    <sf:textarea path="description" cols="72" rows="7"/>
+                </tags:input>
+            </div>
+
+            <div class="buttonPanel">
+                <sf:button><s:message code="button.save"/></sf:button>
+            </div>
+        </sf:form>
+    </div>
 </div>
 
-<div class="mapPanel">
-    map
+<div class="eastPanel">
+    <div class="map">tady bude mapa</div>
 </div>

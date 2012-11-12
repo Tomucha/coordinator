@@ -1,5 +1,4 @@
 <%@ tag import="cz.clovekvtisni.coordinator.util.RenderTool" %><%@
-
         attribute name="time" required="true" type="java.util.Date" %><%@
         attribute name="now" required="true" type="java.lang.Long" %><%@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@

@@ -13,14 +13,18 @@
         <title>Coordinator</title>
     </head>
     <body class="<tiles:getAsString name="extraClass"/>">
-            <div id="page-header">
-                <c:if test="${!empty loggedUser}">
-                    <c:out value="${loggedUser.email}" /> <a href="<s:url value="/logout"/>">(<s:message code="logout"/>)</a>
-                </c:if>
+            <div class="pageHeader">
+                <h1>Coordinator - Člověk v tísni</h1>
+                <div class="controlPanel">
+                    <c:if test="${!empty loggedUser}">
+                        <c:out value="${loggedUser.email}" /> <a href="<s:url value="/logout"/>">(<s:message code="logout"/>)</a>
+                    </c:if>
+                </div>
             </div>
-            <div id="page-content">
 
-                <div id="page-content-left">
+            <div class="pageContent">
+
+                <div class="pageContentLeft">
                     <h2><s:message code="title.activityFeed"/></h2>
                     <div class="activityList">
                         <table>
@@ -36,10 +40,12 @@
                         </table>
                     </div>
                 </div>
-                <div id="page-content-main">
+
+                <div class="pageContentMain">
                     <div class="tabPanel">
                         <a href="<s:url value="/admin/event/list"/>"><s:message code="tab.eventList"/></a>
-                        <!--<a href=""><s:message code="tab.userList"/></a>-->
+                        <a href=""><s:message code="tab.userList"/></a>
+                        <a href=""><s:message code="tab.placeList"/></a>
                     </div>
                     <div class="tabContent">
                         <tiles:insertAttribute name="content" />
