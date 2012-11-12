@@ -9,6 +9,8 @@
 *.class
 
 # generated files
+coordinator-android/bin/
+coordinator-android/gen/
 bin/
 gen/
 out/
