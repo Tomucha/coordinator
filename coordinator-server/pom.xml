@@ -212,6 +212,13 @@
                         <jvmFlag>-Ddatastore.default_high_rep_job_policy_unapplied_job_pct=20</jvmFlag>
                     </jvmFlags>
                 </configuration>
+		<dependencies>
+   		 <dependency>
+      			<groupId>org.codehaus.plexus</groupId>
+     			 <artifactId>plexus-archiver</artifactId>
+      			<version>2.1.2</version>
+    		</dependency>
+		</dependencies>
             </plugin>
             <!--
                        Upload application to the appspot automatically, during
