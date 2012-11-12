@@ -2,6 +2,7 @@ package cz.clovekvtisni.coordinator.server.security.command;
 
 
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorEntity;
+import cz.clovekvtisni.coordinator.server.security.AppContext;
 
 /**
  * Created by IntelliJ IDEA.

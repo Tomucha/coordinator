@@ -17,7 +17,7 @@ public class UserSecurityPlugin extends SecurityPlugin {
     protected void register() {
         //TODO: realni prava
         PermissionCommand<UserEntity> permittedCommand = new PermittedCommand<UserEntity>();
-        PermissionCommand<UserEntity> userLoggedCommand = new UserLoggedCommand<UserEntity>();
+        PermissionCommand<UserEntity> userLoggedCommand = new UserLoggedCommand<UserEntity>(appContext);
 
         registerPermissionCommand(UserEntity.class, ReadPermission.class, permittedCommand);
         registerPermissionCommand(UserEntity.class, CreatePermission.class, userLoggedCommand);

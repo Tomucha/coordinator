@@ -2,6 +2,8 @@ package cz.clovekvtisni.coordinator.server.security.command;
 
 
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.security.AppContext;
 
 import java.util.Arrays;
 
@@ -13,10 +15,15 @@ import java.util.Arrays;
  */
 public class IsSuperadminCommand<E extends CoordinatorEntity> extends AbstractPermissionCommand<E> {
 
+    public IsSuperadminCommand(AppContext appContext) {
+        super(appContext);
+    }
+
     @Override
     public boolean isPermitted(E entity, String entityName) {
-        return loggedUser() != null &&
-                loggedUser().getRoleIdList() != null &&
-                Arrays.asList(loggedUser().getRoleIdList()).contains("SUPERADMIN");
+        UserEntity user = loggedUser();
+        return user != null &&
+                user.getRoleIdList() != null &&
+                Arrays.asList(user.getRoleIdList()).contains("SUPERADMIN");
     }
 }

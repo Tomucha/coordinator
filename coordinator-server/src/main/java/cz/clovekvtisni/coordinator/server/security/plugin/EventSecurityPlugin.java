@@ -17,7 +17,7 @@ public class EventSecurityPlugin extends SecurityPlugin {
     @Override
     protected void register() {
         PermissionCommand<EventEntity> permittedCommand = new PermittedCommand<EventEntity>();
-        PermissionCommand<EventEntity> isSuperadminCommand = new IsSuperadminCommand<EventEntity>();
+        PermissionCommand<EventEntity> isSuperadminCommand = new IsSuperadminCommand<EventEntity>(appContext);
 
         registerPermissionCommand(EventEntity.class, ReadPermission.class, permittedCommand);
         registerPermissionCommand("eventEntity", ReadPermission.class, permittedCommand);
