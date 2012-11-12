@@ -1,20 +1,18 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cached;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Unindexed;
 import cz.clovekvtisni.coordinator.domain.UserGroup;
 
-import javax.persistence.Id;
+import com.googlecode.objectify.annotation.Id;;
 
 /**
  * Created with IntelliJ IDEA.
  * User: jka
  * Date: 5.11.12
  */
-@Unindexed
-@Cached
+@Cache
 @Entity(name = "UserGroup")
 public class UserGroupEntity extends AbstractPersistentEntity<UserGroup, UserGroupEntity> {
 

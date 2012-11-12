@@ -1,7 +1,6 @@
 package cz.clovekvtisni.coordinator.domain;
 
 import java.util.Date;
-import java.util.List;
 
 public class OrganizationInEvent extends AbstractModifiableEntity {
 
@@ -15,9 +14,9 @@ public class OrganizationInEvent extends AbstractModifiableEntity {
 
     private String operationalInfo;
 
-    private List<String> registrationEquipment;
+    private String[] registrationEquipment;
 
-    private List<String> registrationSkills;
+    private String[] registrationSkills;
 
     private Date datePublish;
 
@@ -65,19 +64,19 @@ public class OrganizationInEvent extends AbstractModifiableEntity {
         this.operationalInfo = operationalInfo;
     }
 
-    public List<String> getRegistrationEquipment() {
+    public String[] getRegistrationEquipment() {
         return registrationEquipment;
     }
 
-    public void setRegistrationEquipment(List<String> registrationEquipment) {
+    public void setRegistrationEquipment(String[] registrationEquipment) {
         this.registrationEquipment = registrationEquipment;
     }
 
-    public List<String> getRegistrationSkills() {
+    public String[] getRegistrationSkills() {
         return registrationSkills;
     }
 
-    public void setRegistrationSkills(List<String> registrationSkills) {
+    public void setRegistrationSkills(String[] registrationSkills) {
         this.registrationSkills = registrationSkills;
     }
 

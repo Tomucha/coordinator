@@ -1,34 +1,31 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cached;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Indexed;
-import com.googlecode.objectify.annotation.Unindexed;
+import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 
-import javax.persistence.Id;
 import javax.persistence.Transient;
 import java.util.Date;
-import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
+ * Created with intelliJ IDEA.
  * User: jka
  * Date: 5.11.12
  */
-@Unindexed
-@Cached
+@Cache
 @Entity(name = "OrganizationInEvent")
 public class OrganizationInEventEntity extends AbstractPersistentEntity<OrganizationInEvent, OrganizationInEventEntity> {
 
     @Id
     private Long id;
 
-    @Indexed
+    @Index
     private String organizationId;
 
-    @Indexed
+    @Index
     private String eventId;
 
     private String name;
@@ -37,9 +34,9 @@ public class OrganizationInEventEntity extends AbstractPersistentEntity<Organiza
 
     private String operationalInfo;
 
-    private List<String> registrationEquipment;
+    private String[] registrationEquipment;
 
-    private List<String> registrationSkills;
+    private String[] registrationSkills;
 
     private Date datePublish;
 
@@ -111,19 +108,19 @@ public class OrganizationInEventEntity extends AbstractPersistentEntity<Organiza
         this.operationalInfo = operationalInfo;
     }
 
-    public List<String> getRegistrationEquipment() {
+    public String[] getRegistrationEquipment() {
         return registrationEquipment;
     }
 
-    public void setRegistrationEquipment(List<String> registrationEquipment) {
+    public void setRegistrationEquipment(String[] registrationEquipment) {
         this.registrationEquipment = registrationEquipment;
     }
 
-    public List<String> getRegistrationSkills() {
+    public String[] getRegistrationSkills() {
         return registrationSkills;
     }
 
-    public void setRegistrationSkills(List<String> registrationSkills) {
+    public void setRegistrationSkills(String[] registrationSkills) {
         this.registrationSkills = registrationSkills;
     }
 

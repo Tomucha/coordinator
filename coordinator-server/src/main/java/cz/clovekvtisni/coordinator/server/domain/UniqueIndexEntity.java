@@ -1,15 +1,12 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cached;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Indexed;
-import com.googlecode.objectify.annotation.Unindexed;
+import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 
-import javax.persistence.Id;
-
-@Unindexed
-@Cached
+@Cache
 @Entity(name = "UniqueIndex")
 public class UniqueIndexEntity {
 
@@ -21,12 +18,12 @@ public class UniqueIndexEntity {
     @Id
    	private String uniqueKey;
 
-   	@Indexed
+   	@Index
    	private Key<? extends CoordinatorEntity> entityKey;
 
 
 	public static Key<UniqueIndexEntity> createKey(Property property, String uniqueValue) {
-        return new Key<UniqueIndexEntity>(UniqueIndexEntity.class, property.ordinal()+"#"+uniqueValue);
+        return Key.create(UniqueIndexEntity.class, property.ordinal()+"#"+uniqueValue);
 	}
 
 	public UniqueIndexEntity() {

@@ -1,13 +1,13 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.*;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
-import cz.clovekvtisni.coordinator.domain.*;
+import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
+import cz.clovekvtisni.coordinator.domain.User;
 
-import javax.persistence.Id;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,21 +15,20 @@ import java.util.List;
  * Date: 10/26/12
  * Time: 11:07 PM
  */
-@Unindexed
-@Cached
+@Cache
 @Entity(name = "User")
 public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     @Id
     private Long id;
 
-    private List<String> authKey;
+    private String[] authKey;
 
     private String firstName;
 
     private String lastName;
 
-    @Indexed
+    @Index
     private String email;
 
     private String password;
@@ -52,7 +51,7 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     private String reasonSuspended;
 
-    private List<String> roleIdList;
+    private String[] roleIdList;
 
     public UserEntity() {
     }
@@ -84,11 +83,11 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
         this.id = id;
     }
 
-    public List<String> getAuthKey() {
+    public String[] getAuthKey() {
         return authKey;
     }
 
-    public void setAuthKey(List<String> authKey) {
+    public void setAuthKey(String[] authKey) {
         this.authKey = authKey;
     }
 
@@ -196,11 +195,11 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
         this.reasonSuspended = reasonSuspended;
     }
 
-    public List<String> getRoleIdList() {
+    public String[] getRoleIdList() {
         return roleIdList;
     }
 
-    public void setRoleIdList(List<String> roleIdList) {
+    public void setRoleIdList(String[] roleIdList) {
         this.roleIdList = roleIdList;
     }
 

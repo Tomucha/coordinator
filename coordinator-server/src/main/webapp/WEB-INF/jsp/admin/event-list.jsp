@@ -3,13 +3,16 @@
         taglib prefix="s" uri="http://www.springframework.org/tags" %><%@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
+        taglib prefix="can" uri="/WEB-INF/permissions.tld" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %>
 <h2><s:message code="header.eventList"/></h2>
 
 <div class="mainPanel">
     <div class="buttonPanel">
-        <a href="<s:url value="/admin/event/edit"/>"><s:message code="button.createEvent"/></a>
+        <c:if test="${can:create('eventEntity')}">
+            <a href="<s:url value="/admin/event/edit"/>"><s:message code="button.createEvent"/></a>
+        </c:if>
     </div>
 
     <div class="eventListTable">

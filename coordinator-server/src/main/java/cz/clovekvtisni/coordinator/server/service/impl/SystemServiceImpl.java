@@ -38,9 +38,8 @@ public class SystemServiceImpl extends AbstractServiceImpl implements SystemServ
 
     @Override
     public void saveUniqueIndexOwner(Objectify ofy, UniqueIndexEntity.Property property, String value, Key<? extends CoordinatorEntity> ownerKey) {
-        assertCrossGroupTransaction(ofy);
         Key<UniqueIndexEntity> k = UniqueIndexEntity.createKey(property, value);
-        UniqueIndexEntity saved = ofy.find(k);
+        UniqueIndexEntity saved = ofy.load().key(k).get();
         if (saved != null) {
             if (saved.getEntityKey().equals(ownerKey)) {
                 // nothing to to do, we already know this
@@ -50,21 +49,20 @@ public class SystemServiceImpl extends AbstractServiceImpl implements SystemServ
             }
         }
         UniqueIndexEntity index = new UniqueIndexEntity(k, ownerKey);
-        ofy.put(index);
+        ofy.save().entity(index).now();
     }
 
     @Override
     public void deleteUniqueIndexOwner(Objectify ofy, UniqueIndexEntity.Property property, String value) {
-        assertCrossGroupTransaction(ofy);
         Key<UniqueIndexEntity> k = UniqueIndexEntity.createKey(property, value);
-        ofy.delete(k);
+        ofy.delete().key(k).now();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> Key<T> findUniqueValueOwner(Objectify ofy, UniqueIndexEntity.Property property, String value) {
         Key<UniqueIndexEntity> k = UniqueIndexEntity.createKey(property, value);
-        UniqueIndexEntity index =  ofy.find(k);
+        UniqueIndexEntity index =  ofy.load().key(k).get();
         if (index == null) return null;
         return (Key<T>) index.getEntityKey();
     }
@@ -81,6 +79,7 @@ public class SystemServiceImpl extends AbstractServiceImpl implements SystemServ
                     user = new UserEntity();
                     user.setPassword(System.getProperty("default.admin.password", "admin"));
                     user.setEmail(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
+                    user.setRoleIdList(new String[] {"SUPERADMIN"});
                     userService.createUser(user);
                 }
                 return null;

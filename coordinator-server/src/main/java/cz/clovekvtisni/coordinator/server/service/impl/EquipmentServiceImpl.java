@@ -1,14 +1,15 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
-import com.googlecode.objectify.Objectify;
+import com.googlecode.objectify.Work;
 import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
 import cz.clovekvtisni.coordinator.server.filter.EquipmentFilter;
 import cz.clovekvtisni.coordinator.server.service.EquipmentService;
-import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.service.SystemService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,10 +51,12 @@ public class EquipmentServiceImpl extends AbstractEntityServiceImpl implements E
 
     @Override
     public UserEquipmentEntity addUserEquipment(final UserEquipmentEntity equipmentEntity) {
+        final MaObjectify ofy = ofy();
 
-        return transactionWithResult("adding " + equipmentEntity, new TransactionWithResultCallback<UserEquipmentEntity>() {
+        logger.debug("adding " + equipmentEntity);
+        return ofy.transact(new Work<UserEquipmentEntity>() {
             @Override
-            public UserEquipmentEntity runInTransaction(Objectify ofy) {
+            public UserEquipmentEntity run() {
                 equipmentEntity.setId(null);
                 ofy.put(equipmentEntity);
                 systemService.saveUniqueIndexOwner(ofy, UniqueIndexEntity.Property.USER_EQUIPMENT, "u" + equipmentEntity.getUniqueKey(), equipmentEntity.getKey());

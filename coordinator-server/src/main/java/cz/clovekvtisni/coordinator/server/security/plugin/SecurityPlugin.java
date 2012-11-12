@@ -2,6 +2,7 @@ package cz.clovekvtisni.coordinator.server.security.plugin;
 
 
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorEntity;
+import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.security.command.PermissionCommand;
 import cz.clovekvtisni.coordinator.server.security.permission.Permission;
@@ -20,6 +21,9 @@ public abstract class SecurityPlugin {
     protected String registrarInfo;
 
     protected abstract void register();
+
+    @Autowired
+    protected AppContext appContext;
 
     @Autowired
     public void setSecurityTool(SecurityTool securityTool) {
