@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+    	   http://www.springframework.org/schema/util
+	       http://www.springframework.org/schema/util/spring-util-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <context:annotation-config/>
+
+    <context:component-scan base-package="cz.clovekvtisni.coordinator">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.web.servlet.config.annotation.EnableWebMvc" />
+    </context:component-scan>
+
+    <aop:aspectj-autoproxy proxy-target-class="false"/>
+
+    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="customEditors">
+            <map>
+<!--
+                <entry key="ma.portal.shared.domain.EntitySystemUrl" value="ma.portal.shared.beans.propertyeditors.EntitySystemUrlEditor"/>
+-->
+            </map>
+        </property>
+    </bean>
+
+    <bean id="localeResolver" class="cz.clovekvtisni.coordinator.server.web.CoordinatorLocaleResolver" />
+
+    <util:list id="messageSourceLocations">
+        <value>classpath:messages</value>
+        <value>classpath:ValidationMessages</value>
+    </util:list>
+
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource" p:basenames-ref="messageSourceLocations" p:defaultEncoding="UTF-8" />
+
+    <bean id="jsonObjectMapper" class="cz.clovekvtisni.coordinator.util.JsonObjectMapper" />
+
+    <bean id="validationMessageInterpolator" class="cz.clovekvtisni.coordinator.server.validation.CustomMessageInterpolator"/>
+
+    <bean id="validatorTool" class="cz.clovekvtisni.coordinator.server.validation.ValidatorTool" />
+
+    <util:list id="validationMapsProject"/>
+
+    <util:list id="validationMaps">
+        <value>classpath:/validations/*.xml</value>
+    </util:list>
+
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"
+          p:messageInterpolator-ref="validationMessageInterpolator" p:mappingLocations-ref="validationMaps"/>
+
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="formatters">
+            <set>
+                <bean class="cz.clovekvtisni.coordinator.server.web.format.MaDateFormatter">
+                    <constructor-arg index="0" ref="messageSource" />
+                </bean>
+                <bean class="cz.clovekvtisni.coordinator.server.web.format.MaDateTimeAnnotationFactory" />
+            </set>
+        </property>
+        <property name="converters">
+            <set>
+                <bean class="cz.clovekvtisni.coordinator.server.web.format.MaStringToNumberConverterFactory" />
+            </set>
+        </property>
+    </bean>
+
+    <bean class="com.googlecode.objectify.spring.ObjectifyFactoryBean" p:basePackage="cz.clovekvtisni.coordinator.server.domain" />
+
+    <bean id="applicationInitFilter" class="cz.clovekvtisni.coordinator.server.web.filter.ApplicationInitFilter" />
+
+    <bean id="appContext" class="cz.clovekvtisni.coordinator.server.security.AppContextSimpleBeanImpl" scope="request">
+        <aop:scoped-proxy />
+    </bean>
+
+    <bean id="coordinatorConfig" class="cz.clovekvtisni.coordinator.server.util.CoordinatorConfigFactoryBean">
+        <property name="configFilePath" value="coordinator_config.xml"/>
+    </bean>
+
+</beans>

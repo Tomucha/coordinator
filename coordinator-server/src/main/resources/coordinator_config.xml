@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coordinator>
+    <role_list>
+        <role id="ANONYMOUS" name="Anonymous">Anonymous</role>
+        <role id="BACKEND" name="Backend" extends_role_id="ANONYMOUS">Backend</role>
+        <role id="ADMIN" name="Admin" extends_role_id="BACKEND">Admin</role>
+        <role id="SUPERADMIN" name="SuperAdmin" extends_role_id="ADMIN">Super admin</role>
+    </role_list>
+
+    <skill_list>
+        <skill id="skill1" name="Název1" must_verify="true">popis skillu 1</skill>
+        <skill id="skill2" name="Název2">popis skillu 2</skill>
+    </skill_list>
+
+    <equipment_list>
+        <equipment id="eq1" name="Název eq 1">popis equip</equipment>
+        <equipment id="eq2" name="Název eq 2"/>
+    </equipment_list>
+
+    <workflow_list>
+        <workflow id="workflow1" name="Název workflow1" can_be_started_by="ANONYMOUS, BACKEND">
+            <description>popis workflow</description>
+            <state id="state1" name="Název state 1" requires_assignment="true" visible_for_role="ANONYMOUS, BACKEND"
+                   editable_for_role="ANONYMOUS">
+                <description>popis state</description>
+                <transition id="transition1" name="Název transition 1" to_state_id="state1"
+                            allowed_for_role="ANONYMOUS, BACKEND">
+                    popis transition
+                </transition>
+            </state>
+        </workflow>
+    </workflow_list>
+
+    <organization_list>
+        <organization
+                id="org1"
+                name="Název org 1"
+                color_primary="#RRGGBB"
+                color_secondary="#RRGGBB"
+                allows_registration="true"
+                allows_pre_registration="true"
+                pre_registration_equipment="eq1, eq2"
+                pre_registration_skill="skill1"
+                >
+            popis organization
+        </organization>
+    </organization_list>
+
+    <poi_category_list>
+        <poi_category id="poi1" name="Název poi 1" icon="obrazek.png" important="true" workflow_id="workflow1">
+            popis poi
+        </poi_category>
+    </poi_category_list>
+
+</coordinator>
