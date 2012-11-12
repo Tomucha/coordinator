@@ -5,6 +5,8 @@
         <role id="BACKEND" name="Backend" extends_role_id="ANONYMOUS">Backend</role>
         <role id="ADMIN" name="Admin" extends_role_id="BACKEND">Admin</role>
         <role id="SUPERADMIN" name="SuperAdmin" extends_role_id="ADMIN">Super admin</role>
+
+        <role id="EDITOR" name="Editor" extends_role_id="BACKEND">Editor</role>
     </role_list>
 
     <skill_list>
