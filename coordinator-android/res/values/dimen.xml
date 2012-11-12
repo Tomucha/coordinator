@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Example, 48dp grid ala JellyBean-->
+    <dimen name="padding_small">4dp</dimen>
+    <dimen name="padding">8dp</dimen>
+    <dimen name="padding_big">16dp</dimen>
+    
+</resources>
