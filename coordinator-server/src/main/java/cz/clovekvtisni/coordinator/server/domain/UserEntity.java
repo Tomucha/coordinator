@@ -8,7 +8,6 @@ import com.googlecode.objectify.annotation.Index;
 import cz.clovekvtisni.coordinator.domain.User;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,7 +22,7 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     @Id
     private Long id;
 
-    private List<String> authKey;
+    private String[] authKey;
 
     private String firstName;
 
@@ -52,7 +51,7 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     private String reasonSuspended;
 
-    private List<String> roleIdList;
+    private String[] roleIdList;
 
     public UserEntity() {
     }
@@ -84,11 +83,11 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
         this.id = id;
     }
 
-    public List<String> getAuthKey() {
+    public String[] getAuthKey() {
         return authKey;
     }
 
-    public void setAuthKey(List<String> authKey) {
+    public void setAuthKey(String[] authKey) {
         this.authKey = authKey;
     }
 
@@ -196,11 +195,11 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
         this.reasonSuspended = reasonSuspended;
     }
 
-    public List<String> getRoleIdList() {
+    public String[] getRoleIdList() {
         return roleIdList;
     }
 
-    public void setRoleIdList(List<String> roleIdList) {
+    public void setRoleIdList(String[] roleIdList) {
         this.roleIdList = roleIdList;
     }
 

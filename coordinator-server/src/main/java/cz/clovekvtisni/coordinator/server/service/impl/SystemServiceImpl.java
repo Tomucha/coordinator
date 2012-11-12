@@ -79,6 +79,7 @@ public class SystemServiceImpl extends AbstractServiceImpl implements SystemServ
                     user = new UserEntity();
                     user.setPassword(System.getProperty("default.admin.password", "admin"));
                     user.setEmail(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
+
                     userService.createUser(user);
                 }
                 return null;
