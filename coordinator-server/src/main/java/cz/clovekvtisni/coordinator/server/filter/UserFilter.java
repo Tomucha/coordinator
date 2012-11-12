@@ -1,6 +1,8 @@
 package cz.clovekvtisni.coordinator.server.filter;
 
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
+import cz.clovekvtisni.coordinator.server.tool.objectify.NoDeletedFilter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -8,11 +10,16 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
  * Date: 10/26/12
  * Time: 11:22 PM
  */
-public class UserFilter extends Filter {
+public class UserFilter extends NoDeletedFilter<UserEntity> {
 
     private String emailVal;
 
     private Operator emailOp;
+
+    @Override
+    public Class<UserEntity> getEntityClass() {
+        return UserEntity.class;
+    }
 
     public String getEmailVal() {
         return emailVal;

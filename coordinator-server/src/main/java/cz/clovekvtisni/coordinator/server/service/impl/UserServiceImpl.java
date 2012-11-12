@@ -1,17 +1,16 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
-import com.google.appengine.api.datastore.Cursor;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
-import com.googlecode.objectify.Query;
+import com.googlecode.objectify.Work;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
-import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
-import cz.clovekvtisni.coordinator.server.filter.result.NoDeletedFilter;
+import cz.clovekvtisni.coordinator.server.tool.objectify.NoDeletedFilter;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.util.SignatureTool;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.stereotype.Service;
@@ -29,13 +28,13 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
     @Override
     public UserEntity login(String email, String password) {
-        Objectify ofy = noTransactionalObjectify();
+        Objectify ofy = ofy();
         Key<UserEntity> userKey = systemService.findUniqueValueOwner(ofy, UniqueIndexEntity.Property.EMAIL, ValueTool.normalizeEmail(email));
         if (userKey == null) {
             throw MaPermissionDeniedException.wrongCredentials();
         }
 
-        UserEntity userEntity = ofy.find(userKey);
+        UserEntity userEntity = ofy.load().key(userKey).get();
         if (userEntity == null || password == null || !passwordHash(userEntity.getId(), password).equals(userEntity.getPassword())) {
             throw MaPermissionDeniedException.wrongCredentials();
         }
@@ -47,7 +46,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
     @Override
     public UserEntity findById(Long id) {
-        UserEntity userEntity = noTransactionalObjectify().find(UserEntity.class, id);
+        UserEntity userEntity = ofy().load().key(Key.create(UserEntity.class, id)).get();
 
         return userEntity;
     }
@@ -55,7 +54,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     @Override
     public ResultList<UserEntity> findByFilter(UserFilter filter, int limit, String bookmark) {
         filter.setOrder("id");
-        return noTransactionalObjectify().getResult(UserEntity.class, filter, bookmark, limit, new NoDeletedFilter());
+        return ofy().findByFilter(filter, bookmark, limit);
     }
 
     private String passwordHash(Long userId, String password) {
@@ -64,15 +63,17 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
     @Override
     public UserEntity createUser(final UserEntity entity) {
-        return transactionWithResult("creating " + entity, new TransactionWithResultCallback<UserEntity>() {
+        final MaObjectify ofy = ofy();
+        return ofy.transact(new Work<UserEntity>() {
             @Override
-            public UserEntity runInTransaction(Objectify ofy) {
+            public UserEntity run() {
+                logger.debug("creating " + entity);
                 entity.setId(null);
                 entity.setEmail(ValueTool.normalizeEmail(entity.getEmail()));
-                ofy.put(entity);
+                ofy.save().entity(entity).now();
 
                 entity.setPassword(passwordHash(entity.getId(), entity.getPassword()));
-                ofy.put(entity);
+                ofy.save().entity(entity).now();
 
                 systemService.saveUniqueIndexOwner(ofy, UniqueIndexEntity.Property.EMAIL, entity.getEmail(), entity.getKey());
                 return entity;
@@ -82,10 +83,12 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
     @Override
     public UserEntity updateUser(final UserEntity user) {
-        return transactionWithResult("updating " + user, new TransactionWithResultCallback<UserEntity>() {
+        final MaObjectify ofy = ofy();
+        logger.debug("updating " + user);
+        return ofy.transact(new Work<UserEntity>() {
             @Override
-            public UserEntity runInTransaction(Objectify ofy) {
-                UserEntity toUpdate = ofy.find(UserEntity.class, user.getId());
+            public UserEntity run() {
+                UserEntity toUpdate = ofy.load().key(Key.create(UserEntity.class, user.getId())).get();
 
                 systemService.deleteUniqueIndexOwner(ofy, UniqueIndexEntity.Property.EMAIL, toUpdate.getEmail());
                 systemService.saveUniqueIndexOwner(ofy, UniqueIndexEntity.Property.EMAIL, toUpdate.getEmail(), toUpdate.getKey());
@@ -93,7 +96,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 toUpdate.setFirstName(user.getFirstName());
                 toUpdate.setLastName(user.getLastName());
                 toUpdate.setEmail(ValueTool.normalizeEmail(user.getEmail()));
-                ofy.put(toUpdate);
+                ofy.save().entity(toUpdate).now();
                 return toUpdate;
             }
         });
@@ -101,7 +104,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
     @Override
     public void deleteUser(Long id) {
-        noTransactionalObjectify().delete(UserEntity.class, id);
+        ofy().delete().key(Key.create(UserEntity.class, id)).now();
     }
 
     @Override

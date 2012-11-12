@@ -1,12 +1,9 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
-import cz.clovekvtisni.coordinator.server.domain.EventEntity;
-import cz.clovekvtisni.coordinator.server.domain.EventLocationEntity;
+import com.googlecode.objectify.Work;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
-import cz.clovekvtisni.coordinator.server.filter.result.NoDeletedFilter;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
@@ -24,23 +21,26 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
     @Override
     public PoiEntity findById(Long id, long flags) {
-        PoiEntity poi = noTransactionalObjectify().get(Key.create(PoiEntity.class, id));
+        PoiEntity poi = ofy().get(Key.create(PoiEntity.class, id));
 
         return poi;
     }
 
     @Override
     public ResultList<PoiEntity> findByFilter(PoiFilter filter, int limit, String bookmark, long flags) {
-        MaObjectify ofy = noTransactionalObjectify();
+        MaObjectify ofy = ofy();
 
-        return ofy.getResult(PoiEntity.class, filter, bookmark, limit, new NoDeletedFilter());
+        return ofy.findByFilter(filter, bookmark, limit);
     }
 
     @Override
     public PoiEntity createPoi(final PoiEntity entity) {
-        return transactionWithResult("creating " + entity, new TransactionWithResultCallback<PoiEntity>() {
+        final MaObjectify ofy = ofy();
+        logger.debug("creating " + entity);
+
+        return ofy.transact(new Work<PoiEntity>() {
             @Override
-            public PoiEntity runInTransaction(Objectify ofy) {
+            public PoiEntity run() {
                 entity.setId(null);
                 updateSystemFields(entity);
                 ofy.put(entity);
@@ -52,9 +52,11 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
     @Override
     public PoiEntity updatePoi(final PoiEntity entity) {
-        return transactionWithResult("creating " + entity, new TransactionWithResultCallback<PoiEntity>() {
+        final MaObjectify ofy = ofy();
+
+        return ofy.transact(new Work<PoiEntity>() {
             @Override
-            public PoiEntity runInTransaction(Objectify ofy) {
+            public PoiEntity run() {
                 updateSystemFields(entity);
                 ofy.put(entity);
 

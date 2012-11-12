@@ -1,12 +1,11 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cached;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Unindexed;
+import com.googlecode.objectify.annotation.Id;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 
-import javax.persistence.Id;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -15,8 +14,7 @@ import java.util.Date;
  * User: jka
  * Date: 5.11.12
  */
-@Unindexed
-@Cached
+@Cache
 @Entity(name = "UserInEvent")
 public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, UserInEventEntity> {
 

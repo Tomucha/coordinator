@@ -1,11 +1,12 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.*;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
-import cz.clovekvtisni.coordinator.domain.*;
+import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
+import cz.clovekvtisni.coordinator.domain.User;
 
-import javax.persistence.Id;
 import java.util.Date;
 import java.util.List;
 
@@ -15,8 +16,7 @@ import java.util.List;
  * Date: 10/26/12
  * Time: 11:07 PM
  */
-@Unindexed
-@Cached
+@Cache
 @Entity(name = "User")
 public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
@@ -29,7 +29,7 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     private String lastName;
 
-    @Indexed
+    @Index
     private String email;
 
     private String password;

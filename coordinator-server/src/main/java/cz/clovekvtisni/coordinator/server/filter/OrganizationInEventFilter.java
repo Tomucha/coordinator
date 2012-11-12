@@ -1,13 +1,16 @@
 package cz.clovekvtisni.coordinator.server.filter;
 
+import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
+import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
+import cz.clovekvtisni.coordinator.server.tool.objectify.NoDeletedFilter;
 
 /**
  * Created with IntelliJ IDEA.
  * User: jka
  * Date: 8.11.12
  */
-public class OrganizationInEventFilter extends Filter {
+public class OrganizationInEventFilter extends NoDeletedFilter<OrganizationInEventEntity> {
 
     private String organizationIdVal;
 
@@ -16,6 +19,11 @@ public class OrganizationInEventFilter extends Filter {
     private String eventIdVal;
 
     private Filter.Operator eventIdOp = Filter.Operator.EQ;
+
+    @Override
+    public Class<OrganizationInEventEntity> getEntityClass() {
+        return OrganizationInEventEntity.class;
+    }
 
     public String getOrganizationIdVal() {
         return organizationIdVal;

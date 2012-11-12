@@ -1,13 +1,12 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cached;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Indexed;
-import com.googlecode.objectify.annotation.Unindexed;
+import com.googlecode.objectify.annotation.Index;
 import cz.clovekvtisni.coordinator.domain.Poi;
 
-import javax.persistence.Id;
+import com.googlecode.objectify.annotation.Id;;
 import java.util.Arrays;
 
 /**
@@ -15,8 +14,7 @@ import java.util.Arrays;
  * User: jka
  * Date: 5.11.12
  */
-@Unindexed
-@Cached
+@Cache
 @Entity(name = "Poi")
 public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
 
@@ -25,12 +23,12 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
 
     private Long poiCategoryId;
 
-    @Indexed
+    @Index
     private Long workflowId;
 
     private Long workflowStateId;
 
-    @Indexed
+    @Index
     private Long[] userId;
 
     private Double latitude;

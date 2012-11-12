@@ -1,15 +1,10 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cached;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Indexed;
-import com.googlecode.objectify.annotation.Unindexed;
+import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.Event;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.persistence.Id;
-import javax.persistence.Transient;
 import java.util.List;
 
 /**
@@ -17,15 +12,14 @@ import java.util.List;
  * User: jka
  * Date: 5.11.12
  */
-@Unindexed
-@Cached
+@Cache
 @Entity(name = "Event")
 public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
 
     @Id
     private Long id;
 
-    @Indexed
+    @Index
     @NotEmpty
     private String eventId;
 
@@ -34,7 +28,7 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
 
     private String description;
 
-    @Transient
+    @Ignore
     private List<EventLocationEntity> eventLocationList;
 
     public EventEntity() {

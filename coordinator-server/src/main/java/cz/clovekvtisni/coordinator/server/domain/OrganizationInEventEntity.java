@@ -1,13 +1,12 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cached;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Indexed;
-import com.googlecode.objectify.annotation.Unindexed;
+import com.googlecode.objectify.annotation.Index;
 import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 
-import javax.persistence.Id;
+import com.googlecode.objectify.annotation.Id;;
 import javax.persistence.Transient;
 import java.util.Date;
 import java.util.List;
@@ -17,18 +16,17 @@ import java.util.List;
  * User: jka
  * Date: 5.11.12
  */
-@Unindexed
-@Cached
+@Cache
 @Entity(name = "OrganizationInEvent")
 public class OrganizationInEventEntity extends AbstractPersistentEntity<OrganizationInEvent, OrganizationInEventEntity> {
 
     @Id
     private Long id;
 
-    @Indexed
+    @Index
     private String organizationId;
 
-    @Indexed
+    @Index
     private String eventId;
 
     private String name;

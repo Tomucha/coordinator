@@ -31,7 +31,7 @@ public class EventListController extends AbstractController {
     public String list(@RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
         UserEntity loggedUser = getLoggedUser();
         // TODO - az bude mechanismus opravneni: ResultList<EventEntity> events = eventService.findByOrganization(loggedUser.getOrganizationId(), 30, bookmark, EventService.FLAG_FETCH_LOCATIONS);
-        ResultList<EventEntity> events = eventService.findByFilter(null, 100, null, 0l);
+        ResultList<EventEntity> events = eventService.findByFilter(new EventFilter(), 100, null, 0l);
 
         model.addAttribute("events", events.getResult());
 

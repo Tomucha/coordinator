@@ -1,28 +1,26 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cached;
+import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Indexed;
-import com.googlecode.objectify.annotation.Unindexed;
+import com.googlecode.objectify.annotation.Index;
 import cz.clovekvtisni.coordinator.domain.EventLocation;
 
-import javax.persistence.Id;
+import com.googlecode.objectify.annotation.Id;;
 
 /**
  * Created with IntelliJ IDEA.
  * User: jka
  * Date: 5.11.12
  */
-@Unindexed
-@Cached
+@Cache
 @Entity(name = "EventLocation")
 public class EventLocationEntity extends AbstractPersistentEntity<EventLocation, EventLocationEntity> {
 
     @Id
     private Long id;
 
-    @Indexed
+    @Index
     private String eventId;
 
     private Double latitude;
