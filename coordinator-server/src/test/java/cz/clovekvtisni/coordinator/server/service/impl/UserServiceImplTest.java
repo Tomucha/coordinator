@@ -4,17 +4,15 @@ import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.server.LocalDatastoreTest;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
-import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.util.RunnableWithResult;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,7 +44,7 @@ public class UserServiceImplTest extends LocalDatastoreTest {
         });
         assertNotNull(res.getId());
         assertNotNull(res.getRoleIdList());
-        assertArrayEquals(testRoleIdList, res.getRoleIdList().toArray());
+        assertArrayEquals(testRoleIdList, res.getRoleIdList());
     }
 
     @Test
