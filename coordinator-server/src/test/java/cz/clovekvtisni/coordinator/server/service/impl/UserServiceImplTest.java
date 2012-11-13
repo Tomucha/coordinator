@@ -51,11 +51,11 @@ public class UserServiceImplTest extends LocalDatastoreTest {
     public void testFindByFilter() throws Exception {
         assertNotNull(userService);
 
-        UserEntity byId = userService.findById(1l);
+        UserEntity byId = userService.findById(1l, 0l);
 
         UserFilter filter = new UserFilter();
         filter.setEmailVal(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
-        ResultList<UserEntity> resultList = userService.findByFilter(filter, 2, null);
+        ResultList<UserEntity> resultList = userService.findByFilter(filter, 2, null, 0l);
         assertNotNull(resultList.getResult());
         assertEquals(1, resultList.getResultSize());
     }

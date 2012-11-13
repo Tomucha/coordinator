@@ -88,7 +88,7 @@ public class ApplicationInitFilter implements Filter {
         if (session != null) {
             loggedUserId = (Long) session.getAttribute(SessionKeys.LOGGED_USER_ID);
             if (loggedUserId != null) {
-                UserEntity userEntity = userService.findById(loggedUserId);
+                UserEntity userEntity = userService.findById(loggedUserId, 0l);
                 if (userEntity == null) {
                     session.removeAttribute(SessionKeys.LOGGED_USER_ID);
                     loggedUserId = null;

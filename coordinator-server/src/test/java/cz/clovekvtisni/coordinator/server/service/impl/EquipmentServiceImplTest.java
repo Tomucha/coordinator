@@ -52,6 +52,6 @@ public class EquipmentServiceImplTest extends LocalDatastoreTest {
     private UserEntity findAdminUser() {
         UserFilter filter = new UserFilter();
         filter.setEmailVal(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
-        return userService.findByFilter(filter, 1, null).singleResult();
+        return userService.findByFilter(filter, 1, null,0l).singleResult();
     }
 }

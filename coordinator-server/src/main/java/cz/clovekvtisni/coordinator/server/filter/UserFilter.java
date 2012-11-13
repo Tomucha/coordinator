@@ -16,6 +16,10 @@ public class UserFilter extends NoDeletedFilter<UserEntity> {
 
     private Operator emailOp;
 
+    private String organizationIdVal;
+
+    private Operator organizationIdOp = Operator.EQ;
+
     @Override
     public Class<UserEntity> getEntityClass() {
         return UserEntity.class;
@@ -35,6 +39,22 @@ public class UserFilter extends NoDeletedFilter<UserEntity> {
 
     public void setEmailOp(Operator emailOp) {
         this.emailOp = emailOp;
+    }
+
+    public String getOrganizationIdVal() {
+        return organizationIdVal;
+    }
+
+    public void setOrganizationIdVal(String organizationIdVal) {
+        this.organizationIdVal = organizationIdVal;
+    }
+
+    public Operator getOrganizationIdOp() {
+        return organizationIdOp;
+    }
+
+    public void setOrganizationIdOp(Operator organizationIdOp) {
+        this.organizationIdOp = organizationIdOp;
     }
 
     @Override

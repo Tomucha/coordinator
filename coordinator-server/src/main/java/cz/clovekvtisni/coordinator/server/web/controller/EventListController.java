@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 @Controller
-@RequestMapping(value = "/admin/event/list")
+@RequestMapping("/admin/event/list")
 public class EventListController extends AbstractController {
 
     @Autowired

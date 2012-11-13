@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.security.plugin;
 
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.security.command.IsSuperadminCommand;
 import cz.clovekvtisni.coordinator.server.security.command.PermissionCommand;
 import cz.clovekvtisni.coordinator.server.security.command.PermittedCommand;
@@ -9,15 +10,19 @@ import cz.clovekvtisni.coordinator.server.security.permission.CreatePermission;
 import cz.clovekvtisni.coordinator.server.security.permission.DeletePermission;
 import cz.clovekvtisni.coordinator.server.security.permission.ReadPermission;
 import cz.clovekvtisni.coordinator.server.security.permission.UpdatePermission;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EventSecurityPlugin extends SecurityPlugin {
 
+    @Autowired
+    private AuthorizationTool authorizationTool;
+
     @Override
     protected void register() {
         PermissionCommand<EventEntity> permittedCommand = new PermittedCommand<EventEntity>();
-        PermissionCommand<EventEntity> isSuperadminCommand = new IsSuperadminCommand<EventEntity>(appContext);
+        PermissionCommand<EventEntity> isSuperadminCommand = new IsSuperadminCommand<EventEntity>(appContext, authorizationTool);
 
         registerPermissionCommand(EventEntity.class, ReadPermission.class, permittedCommand);
         registerPermissionCommand("eventEntity", ReadPermission.class, permittedCommand);

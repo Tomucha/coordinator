@@ -9,7 +9,6 @@ import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
-import cz.clovekvtisni.coordinator.server.tool.objectify.NoDeletedFilter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.util.SignatureTool;
 import cz.clovekvtisni.coordinator.util.ValueTool;
@@ -45,14 +44,14 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     @Override
-    public UserEntity findById(Long id) {
+    public UserEntity findById(Long id, long flags) {
         UserEntity userEntity = ofy().load().key(Key.create(UserEntity.class, id)).get();
 
         return userEntity;
     }
 
     @Override
-    public ResultList<UserEntity> findByFilter(UserFilter filter, int limit, String bookmark) {
+    public ResultList<UserEntity> findByFilter(UserFilter filter, int limit, String bookmark, long flags) {
         filter.setOrder("id");
         return ofy().findByFilter(filter, bookmark, limit);
     }

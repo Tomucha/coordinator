@@ -20,10 +20,10 @@ public interface UserService extends Service {
     UserEntity login(String login, String password) throws MaPermissionDeniedException;
 
     @FilterResult("#helper.canRead(#entity)")
-    UserEntity findById(Long id);
+    UserEntity findById(Long id, long flags);
 
     @FilterResult("#helper.canRead(#entity)")
-    ResultList<UserEntity> findByFilter(UserFilter filter, int limit, String bookmark);
+    ResultList<UserEntity> findByFilter(UserFilter filter, int limit, String bookmark, long flags);
 
     @CheckPermission("#helper.canCreate(#entity)")
     UserEntity createUser(UserEntity entity);

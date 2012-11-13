@@ -35,6 +35,7 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     private String phone;
 
+    @Index
     private String organizationId;
 
     private Date birthday;
