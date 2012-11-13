@@ -5,6 +5,9 @@ import android.content.Loader;
 import android.support.v4.app.LoaderManager;
 import cz.clovekvtisni.coordinator.android.util.MicroCache;
 import cz.clovekvtisni.coordinator.android.util.ThrowableLoader;
+import cz.clovekvtisni.coordinator.api.response.ApiResponse;
+import cz.clovekvtisni.coordinator.api.response.ApiResponse.Status;
+import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
 
 /**
  * Propojení našich Api volání se standardním Androidím {@link Loader} a {@link LoaderManager}.
@@ -14,7 +17,7 @@ import cz.clovekvtisni.coordinator.android.util.ThrowableLoader;
  * @param <REQUEST>
  * @param <RESPONSE>
  */
-public class ApiCallAsyncLoader<REQUEST, RESPONSE> extends ThrowableLoader<RESPONSE> {
+public class ApiCallAsyncLoader<REQUEST, RESPONSE extends ApiResponseData> extends ThrowableLoader<RESPONSE> {
 
 	private static final int TIME_TO_LIVE_IN_CACHE = 60 * 3;
 	
@@ -42,7 +45,7 @@ public class ApiCallAsyncLoader<REQUEST, RESPONSE> extends ThrowableLoader<RESPO
 		if (data != null) return data;
 		
 		ApiResponse<RESPONSE> response = apiCall.doRequest(requestData, authKey);
-		if (!response.isOk()) {
+		if (response.getStatus() != Status.OK) {
 			throw new ApiResponseException(response);
 		}
 		data = response.getData();

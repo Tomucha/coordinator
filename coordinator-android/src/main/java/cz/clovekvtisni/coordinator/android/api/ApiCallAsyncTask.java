@@ -3,6 +3,9 @@ package cz.clovekvtisni.coordinator.android.api;
 import roboguice.util.RoboAsyncTask;
 import android.content.Context;
 import cz.clovekvtisni.coordinator.android.util.CommonTool;
+import cz.clovekvtisni.coordinator.api.response.ApiResponse;
+import cz.clovekvtisni.coordinator.api.response.ApiResponse.Status;
+import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
 
 
 /**
@@ -14,7 +17,7 @@ import cz.clovekvtisni.coordinator.android.util.CommonTool;
  * @param <REQUEST>
  * @param <RESPONSE>
  */
-public abstract class ApiCallAsyncTask<REQUEST, RESPONSE> extends RoboAsyncTask<ApiResponse<RESPONSE>> {
+public abstract class ApiCallAsyncTask<REQUEST, RESPONSE extends ApiResponseData> extends RoboAsyncTask<ApiResponse<RESPONSE>> {
 
 	private ApiCall<REQUEST, RESPONSE> apiCall;
 	private REQUEST request;
@@ -53,13 +56,10 @@ public abstract class ApiCallAsyncTask<REQUEST, RESPONSE> extends RoboAsyncTask<
 	@Override
 	protected final void onSuccess(ApiResponse<RESPONSE> t) throws Exception {
 		CommonTool.logI(getClass().getSimpleName(), "Processing response: "+t);
-		if (t.getMessage() != null) {
-			CommonTool.showToast(getContext(), t.getMessage());
-		}
-		if (t.getStatus().equals(ApiResponseStatus.OK)) {
-			onResponse(t.getData());
-		} else {
+		if (t.getStatus() != Status.OK) {
 			throw new ApiResponseException(t);
+		} else {
+			onResponse(t.getData());
 		}
 	}
 

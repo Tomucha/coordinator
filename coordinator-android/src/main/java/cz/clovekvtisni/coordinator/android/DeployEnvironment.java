@@ -31,7 +31,7 @@ public class DeployEnvironment {
 	public static DeployEnvironment getTestingEnvironment() {
 		DeployEnvironment e = new DeployEnvironment();
 		e.apiHost = "coordinator-test.appspot.com";
-		e.apiPort = 8080;
+		e.apiPort = 443;
 		e.logLevel = Log.DEBUG;
 		return e;
 	}

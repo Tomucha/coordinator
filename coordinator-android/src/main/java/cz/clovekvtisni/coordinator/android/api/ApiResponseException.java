@@ -1,5 +1,7 @@
 package cz.clovekvtisni.coordinator.android.api;
 
+import cz.clovekvtisni.coordinator.api.response.ApiResponse;
+
 /**
  * Tahle vyjimka nam slouzi k tomu, aby zpropagovala error odpovedi na vyssi vrstvy.
  * 

@@ -9,6 +9,10 @@ import cz.clovekvtisni.coordinator.android.DeployEnvironment;
 import cz.clovekvtisni.coordinator.android.util.CommonTool;
 import cz.clovekvtisni.coordinator.android.util.GsonTool;
 import cz.clovekvtisni.coordinator.api.request.ApiRequest;
+import cz.clovekvtisni.coordinator.api.response.ApiResponse;
+import cz.clovekvtisni.coordinator.api.response.ApiResponse.Status;
+import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
+import cz.clovekvtisni.coordinator.exception.ErrorCode;
 
 /**
  * Tohle je jedno HTTP / JSON / API volani.
@@ -21,7 +25,7 @@ import cz.clovekvtisni.coordinator.api.request.ApiRequest;
  * 
  * @author tomucha
  */
-public final class ApiCall<REQUEST, RESPONSE> {
+public final class ApiCall<REQUEST, RESPONSE extends ApiResponseData> {
 
 	public static final String SERVER = CommonTool.getEnvironment().getApiHost();
 	public static final int PORT = CommonTool.getEnvironment().getApiPort();
@@ -45,8 +49,16 @@ public final class ApiCall<REQUEST, RESPONSE> {
 		this.responseDataType = responseDataType;
 	}
 	
+	/**
+	 * Method builds {@link ApiRequest}, executes {@link HttpRequest} and returns {@link ApiResponse}.
+	 * 
+	 * MUST NOT be called from UI thread, communicates over the network.
+	 * 
+	 * @param requestData
+	 * @param authKey
+	 * @return
+	 */
 	public ApiResponse<RESPONSE> doRequest(REQUEST requestData, String authKey) {
-		
 		// FIXME: sessionId, token apod.
 		ApiRequest request = new ApiRequest();
 		request.setData(requestData);
@@ -57,9 +69,32 @@ public final class ApiCall<REQUEST, RESPONSE> {
 		String responseBody = HttpRequest.post(apiUrl).send(requestBody).body();
 		JsonObject responseJson = (JsonObject) GsonTool.parse(responseBody);
 		CommonTool.logI(getClass().getSimpleName(), "API response: "+responseJson);
-		return new ApiResponse<RESPONSE>(responseJson, responseDataType);
+		
+		return buildApiResponse(responseJson);
 	}
 	
+	/**
+	 * This method takes JSON response and create an {@link ApiResponse} object, depending on obtained response {@link Status}.
+	 * @param responseJson
+	 * @return
+	 */
+	private ApiResponse<RESPONSE> buildApiResponse(JsonObject responseJson) {
+		ApiResponse<RESPONSE> response = null;
+		Status status = GsonTool.fromJson(responseJson.get(ApiConstants.API_RESPONSE_STATUS), Status.class);
+		if (status == Status.OK) {
+			// everything ok, let's parse response data
+			return new ApiResponse<RESPONSE>(GsonTool.fromJson(responseJson.get(ApiConstants.API_RESPONSE_DATA), responseDataType));
+		} else {
+			// something is wrong, return error response
+			ErrorCode code = GsonTool.fromJson(responseJson.get(ApiConstants.API_RESPONSE_ERROR_CODE), ErrorCode.class);
+			String message = null;
+			if (responseJson.has(ApiConstants.API_RESPONSE_ERROR_MESSAGE)) {
+				message = responseJson.get(ApiConstants.API_RESPONSE_ERROR_MESSAGE).getAsString();
+			}
+			return new ApiResponse<RESPONSE>(code, message);
+		}
+	}
+
 	@Override
 	public String toString() {
 		return "ApiCall [" + apiUrl + "]";
