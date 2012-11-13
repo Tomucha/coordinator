@@ -17,6 +17,12 @@ public class AuthorizationTool {
 
     public static final String SUPERADMIN = "SUPERADMIN";
 
+    public static final String ADMIN = "ADMIN";
+
+    public static final String BACKEND = "BACKEND";
+
+    public static final String ANONYMOUS = "ANONYMOUS";
+
     private Map<String, Role> roleMap;
 
     private Map<String, List<String>> roleParentMap;
@@ -38,7 +44,24 @@ public class AuthorizationTool {
         }
     }
 
+    public boolean canCreate(String roleId, String[] creatorRoles) {
+        return canCreate(roleId, Arrays.asList(creatorRoles));
+    }
+
+    public boolean canCreate(String roleId, List<String> creatorRoles) {
+        if (roleId == null || creatorRoles == null) return false;
+        if (roleId.equals(SUPERADMIN) || roleId.equals(ADMIN))
+            return isAuthorized(Arrays.asList(new String[] {SUPERADMIN}), creatorRoles);
+        if (roleId.equals(BACKEND))
+            return isAuthorized(Arrays.asList(new String[] {ADMIN}), creatorRoles);
+
+        return true;
+    }
+
     public boolean isAuthorized(List<String> needOneOfRoles, List<String>... hasAllRoles) {
+        if (needOneOfRoles == null) return true;
+        if (hasAllRoles == null) return needOneOfRoles.size() == 0;
+
         Set<String> hasRoles = new HashSet<String>();
         for (List<String> roles : hasAllRoles) {
             for (String role : roles) {

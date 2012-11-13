@@ -6,6 +6,8 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import cz.clovekvtisni.coordinator.domain.User;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.Date;
 
@@ -29,8 +31,11 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     private String lastName;
 
     @Index
+    @NotEmpty
+    @Email
     private String email;
 
+    @NotEmpty
     private String password;
 
     private String phone;
@@ -52,6 +57,7 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     private String reasonSuspended;
 
+    @NotEmpty
     private String[] roleIdList;
 
     public UserEntity() {

@@ -11,6 +11,8 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <title>Coordinator</title>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
     </head>
     <body class="<tiles:getAsString name="extraClass"/>">
             <div class="pageHeader">

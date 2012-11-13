@@ -23,9 +23,6 @@ public abstract class SecurityPlugin {
     protected abstract void register();
 
     @Autowired
-    protected AppContext appContext;
-
-    @Autowired
     public void setSecurityTool(SecurityTool securityTool) {
         this.securityTool = securityTool;
         registrarInfo = getClass().getSimpleName();

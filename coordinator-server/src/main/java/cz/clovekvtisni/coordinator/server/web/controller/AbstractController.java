@@ -31,10 +31,10 @@ import java.util.Locale;
 public class AbstractController {
 
     @Autowired
-    private MessageSource messageSource;
+    protected MessageSource messageSource;
 
     @Autowired
-    private AppContext appContext;
+    protected AppContext appContext;
 
     @Autowired
     protected SecurityTool securityTool;

@@ -25,10 +25,10 @@ public interface UserService extends Service {
     @FilterResult("#helper.canRead(#entity)")
     ResultList<UserEntity> findByFilter(UserFilter filter, int limit, String bookmark, long flags);
 
-    @CheckPermission("#helper.canCreate(#entity)")
+    @CheckPermission("#helper.canCreate(#p0)")
     UserEntity createUser(UserEntity entity);
 
-    @CheckPermission("#helper.canUpdate(#entity)")
+    @CheckPermission("#helper.canUpdate(#p0)")
     UserEntity updateUser(UserEntity user);
 
     @CheckPermission("#helper.canDelete(new cz.clovekvtisni.coordinator.server.domain.User(#p0))")

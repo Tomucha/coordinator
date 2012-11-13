@@ -2,12 +2,16 @@ package cz.clovekvtisni.coordinator.server.web.controller;
 
 import cz.clovekvtisni.coordinator.exception.MaException;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
+import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.security.CheckPermission;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.web.model.EventForm;
+import cz.clovekvtisni.coordinator.server.web.model.UserForm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,10 +29,16 @@ public class UserEditController extends AbstractController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private CoordinatorConfig config;
+
+    @Autowired
+    private AuthorizationTool authorizationTool;
+
     @RequestMapping(method = RequestMethod.GET)
     public String edit(@RequestParam(value = "userId", required = false) Long userId, Model model) {
-        /*
-        EventForm form = new EventForm();
+        UserForm form = new UserForm();
+        form.injectConfigValues(appContext, authorizationTool, config);
 
         if (userId != null) {
             UserEntity user = userService.findById(userId, 0);
@@ -38,30 +48,32 @@ public class UserEditController extends AbstractController {
         }
 
         model.addAttribute("form", form);
-          */
-        return "admin/event-edit";
+
+        return "admin/user-edit";
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String createOrUpdate(@ModelAttribute("form") @Valid EventForm form, BindingResult bindingResult) {
-        /*
+    public String createOrUpdate(@ModelAttribute("form") @Valid UserForm form, BindingResult bindingResult) {
+        form.injectConfigValues(appContext, authorizationTool, config);
+        form.postValidate(bindingResult, messageSource, appContext.getLocale());
+
         if (bindingResult.hasErrors()) {
-            return "admin/event-edit";
+            return "admin/user-edit";
         }
 
-        EventEntity event = new EventEntity().populateFrom(form);
+        UserEntity user = new UserEntity().populateFrom(form);
 
         try {
-            if (event.isNew()) {
-                eventService.createEvent(event);
+            if (user.isNew()) {
+                userService.createUser(user);
             } else {
-                eventService.updateEvent(event);
+                userService.updateUser(user);
             }
         } catch (MaException e) {
             addFormError(bindingResult, e);
-            return "admin/event-edit";
+            return "admin/user-edit";
         }
-          */
-        return "redirect:/admin/event/list";
+
+        return "redirect:/admin/user/list";
     }
 }

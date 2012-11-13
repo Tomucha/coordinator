@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.security.plugin;
 
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.security.command.IsSuperadminCommand;
 import cz.clovekvtisni.coordinator.server.security.command.PermissionCommand;
@@ -18,6 +19,9 @@ public class EventSecurityPlugin extends SecurityPlugin {
 
     @Autowired
     private AuthorizationTool authorizationTool;
+
+    @Autowired
+    private AppContext appContext;
 
     @Override
     protected void register() {

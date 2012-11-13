@@ -33,4 +33,28 @@
         <function-signature>boolean canRead(cz.clovekvtisni.coordinator.server.domain.CoordinatorEntity)</function-signature>
     </function>
 
+    <function>
+        <name>hasRole</name>
+        <function-class>cz.clovekvtisni.coordinator.server.web.tag.AuthorizationFunctions</function-class>
+        <function-signature>boolean hasRole(java.lang.String))</function-signature>
+    </function>
+
+    <function>
+        <name>isSuperadmin</name>
+        <function-class>cz.clovekvtisni.coordinator.server.web.tag.AuthorizationFunctions</function-class>
+        <function-signature>boolean isSuperAdmin()</function-signature>
+    </function>
+
+    <function>
+        <name>isAdmin</name>
+        <function-class>cz.clovekvtisni.coordinator.server.web.tag.AuthorizationFunctions</function-class>
+        <function-signature>boolean isAdmin()</function-signature>
+    </function>
+
+    <function>
+        <name>isBackend</name>
+        <function-class>cz.clovekvtisni.coordinator.server.web.tag.AuthorizationFunctions</function-class>
+        <function-signature>boolean isBackend()</function-signature>
+    </function>
+
 </taglib>

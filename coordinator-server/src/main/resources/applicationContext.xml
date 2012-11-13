@@ -16,8 +16,6 @@
     <context:annotation-config/>
 
     <context:component-scan base-package="cz.clovekvtisni.coordinator">
-        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
-        <context:exclude-filter type="annotation" expression="org.springframework.web.servlet.config.annotation.EnableWebMvc" />
     </context:component-scan>
 
     <aop:aspectj-autoproxy proxy-target-class="false"/>

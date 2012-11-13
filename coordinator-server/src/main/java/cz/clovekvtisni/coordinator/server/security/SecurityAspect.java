@@ -37,7 +37,8 @@ public class SecurityAspect implements Ordered {
 
     private SpelExpressionParser parser = new SpelExpressionParser();
 
-    @Around("this(cz.clovekvtisni.coordinator.server.service.Service || cz.clovekvtisni.coordinator.server.web.controller.AbstractController)")
+    //@Around("this(cz.clovekvtisni.coordinator.server.service.Service) || this(cz.clovekvtisni.coordinator.server.web.controller.AbstractController)")
+    @Around("this(cz.clovekvtisni.coordinator.server.service.Service)")
     public Object checkPermissions(final ProceedingJoinPoint pjp) throws Throwable {
 
         MethodSignature signature = (MethodSignature) pjp.getSignature();

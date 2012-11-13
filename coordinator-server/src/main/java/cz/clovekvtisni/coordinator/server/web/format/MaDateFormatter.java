@@ -73,7 +73,7 @@ public class MaDateFormatter implements Formatter<Date> {
 		DateFormat dateFormat;
         String pattern;
         if (this.pattern == null && style == null) {
-            pattern = messageSource.getMessage("format." + MaDateFormat.Style.DATE_TIME, new Object[0], locale);
+            pattern = messageSource.getMessage("format." + MaDateFormat.Style.DATE, new Object[0], locale);
         }
         else if (!ValueTool.isEmpty(this.pattern)) {
             pattern = this.pattern;
