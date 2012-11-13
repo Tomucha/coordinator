@@ -5,7 +5,7 @@ import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import cz.clovekvtisni.coordinator.domain.PoiLog;
 
-import com.googlecode.objectify.annotation.Id;;
+import com.googlecode.objectify.annotation.Id;
 import java.util.Date;
 
 /**

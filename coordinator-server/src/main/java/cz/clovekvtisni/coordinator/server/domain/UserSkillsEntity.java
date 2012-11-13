@@ -6,7 +6,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Index;
 import cz.clovekvtisni.coordinator.domain.UserSkill;
 
-import com.googlecode.objectify.annotation.Id;;
+import com.googlecode.objectify.annotation.Id;
 import java.util.Date;
 
 /**

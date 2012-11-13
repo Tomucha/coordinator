@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Coordinator</string>
+    <string name="action_logout">Logout</string>
+
+</resources>

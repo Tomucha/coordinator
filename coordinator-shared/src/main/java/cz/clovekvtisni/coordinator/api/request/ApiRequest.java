@@ -1,7 +1,5 @@
 package cz.clovekvtisni.coordinator.api.request;
 
-import cz.clovekvtisni.coordinator.util.SignatureTool;
-
 /**
  * Created by IntelliJ IDEA.
  * User: tomas
@@ -10,7 +8,6 @@ import cz.clovekvtisni.coordinator.util.SignatureTool;
  */
 public class ApiRequest {
     
-    private String signature;
     private String token;
     private Object data;
     private String sessionId;
@@ -31,15 +28,6 @@ public class ApiRequest {
         this.token = deviceId + ";" + System.currentTimeMillis() + ";" + c;
         this.sessionId = sessionId;
         this.data = data;
-        this.signature = SignatureTool.signApi(SignatureTool.computeHash(data), secret);
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
     }
 
     public String getToken() {
@@ -69,7 +57,6 @@ public class ApiRequest {
     @Override
     public String toString() {
         return "ApiRequest{" +
-                "signature='" + signature + '\'' +
                 ", token='" + token + '\'' +
                 ", data=" + data +
                 ", sessionId='" + sessionId + '\'' +
