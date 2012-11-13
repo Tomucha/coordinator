@@ -9,6 +9,7 @@ import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.SystemService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.UniqueKeyViolation;
 import cz.clovekvtisni.coordinator.util.RunnableWithResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class SystemServiceImpl extends AbstractServiceImpl implements SystemServ
                 // nothing to to do, we already know this
                 return;
             } else {
-                throw new IllegalStateException(ownerKey+ " is not an owner of "+k);
+                throw new UniqueKeyViolation(property, ownerKey);
             }
         }
         UniqueIndexEntity index = new UniqueIndexEntity(k, ownerKey);

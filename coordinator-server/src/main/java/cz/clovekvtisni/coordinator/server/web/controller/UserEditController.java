@@ -8,6 +8,7 @@ import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.security.CheckPermission;
 import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.UniqueKeyViolation;
 import cz.clovekvtisni.coordinator.server.web.model.EventForm;
 import cz.clovekvtisni.coordinator.server.web.model.UserForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,10 @@ public class UserEditController extends AbstractController {
             } else {
                 userService.updateUser(user);
             }
+        } catch (UniqueKeyViolation e) {
+            addFieldError(bindingResult, "form", e.getProperty().toString().toLowerCase(), null, "error.UNIQUE_KEY_VIOLATION");
+            return "admin/user-edit";
+
         } catch (MaException e) {
             addFormError(bindingResult, e);
             return "admin/user-edit";
