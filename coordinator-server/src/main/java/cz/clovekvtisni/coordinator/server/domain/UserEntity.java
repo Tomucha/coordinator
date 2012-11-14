@@ -35,7 +35,6 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     @Email
     private String email;
 
-    @NotEmpty
     private String password;
 
     private String phone;

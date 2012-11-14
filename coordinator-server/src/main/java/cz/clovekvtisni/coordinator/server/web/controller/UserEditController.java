@@ -63,6 +63,9 @@ public class UserEditController extends AbstractController {
         }
 
         UserEntity user = new UserEntity().populateFrom(form);
+        if (form.isNew()) {
+            user.setPassword(form.getNewPassword());
+        }
 
         try {
             if (user.isNew()) {

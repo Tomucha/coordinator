@@ -6,6 +6,7 @@ import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.MessageSource;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -19,6 +20,8 @@ import java.util.*;
  * Date: 13.11.12
  */
 public class UserForm extends UserEntity {
+
+    private String newPassword;
 
     private String confirmPassword;
 
@@ -65,8 +68,16 @@ public class UserForm extends UserEntity {
     }
 
     public void postValidate(BindingResult bindingResult, MessageSource messageSource, Locale locale) {
-        if (!getPassword().equals(getConfirmPassword())) {
+        if (getNewPassword() != null && !getNewPassword().equals(getConfirmPassword())) {
             bindingResult.addError(new FieldError("form", "confirmPassword", null, false, null, null, messageSource.getMessage("error.PASSWORD_CONFIRM_FAILED", null, locale)));
         }
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
 }

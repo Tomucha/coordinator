@@ -10,7 +10,12 @@
         $( "#birthdayInput" ).datepicker({dateFormat: "dd.mm.yy"});
     });
 </script>
-<h2><s:message code="header.userCreate"/></h2>
+<h2>
+    <c:choose>
+        <c:when test="${empty form.id}"><s:message code="header.userCreate"/></c:when>
+        <c:otherwise><s:message code="header.userUpdate"/></c:otherwise>
+    </c:choose>
+</h2>
 
 <div class="mainPanel">
     <div class="userForm">
@@ -51,17 +56,19 @@
                 </tags:input>
             </div>
 
-            <div>
-                <tags:input field="password" modelAttribute="form" captionCode="UserEntity.password">
-                    <sf:password path="password"/>
-                </tags:input>
-            </div>
+            <c:if test="${empty form.id}">
+                <div>
+                    <tags:input field="newPassword" modelAttribute="form" captionCode="UserEntity.password">
+                        <sf:password path="newPassword"/>
+                    </tags:input>
+                </div>
 
-            <div>
-                <tags:input field="confirmPassword" modelAttribute="form" captionCode="UserEntity.confirmPassword">
-                    <sf:password path="confirmPassword"/>
-                </tags:input>
-            </div>
+                <div>
+                    <tags:input field="confirmPassword" modelAttribute="form" captionCode="UserEntity.confirmPassword">
+                        <sf:password path="confirmPassword"/>
+                    </tags:input>
+                </div>
+            </c:if>
 
             <div>
                 <tags:input field="phone" modelAttribute="form" captionCode="UserEntity.phone">
