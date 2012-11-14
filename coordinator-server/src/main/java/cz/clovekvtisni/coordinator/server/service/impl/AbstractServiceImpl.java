@@ -1,6 +1,8 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
+import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
+import com.googlecode.objectify.ObjectifyService;
 import cz.clovekvtisni.coordinator.server.domain.AbstractPersistentEntity;
 import cz.clovekvtisni.coordinator.server.service.Service;
 import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
@@ -20,15 +22,14 @@ public class AbstractServiceImpl implements Service {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ObjectifyFactory objectifyFactory;
-
     @Autowired
     public void setObjectifyFactory(ObjectifyFactory objectifyFactory) {
-        this.objectifyFactory = objectifyFactory;
+        ObjectifyService.setFactory(objectifyFactory);
     }
 
     protected MaObjectify ofy() {
-        return new MaObjectify(objectifyFactory.begin());
+        // TODO maybe better than creating new instance is subclassing ObjectifyService
+        return new MaObjectify(ObjectifyService.ofy());
     }
 
     protected void updateSystemFields(AbstractPersistentEntity entity) {

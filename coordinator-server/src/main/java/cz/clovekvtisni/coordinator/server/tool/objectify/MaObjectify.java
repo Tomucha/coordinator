@@ -6,6 +6,7 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.cmd.LoadType;
+import com.googlecode.objectify.cmd.Query;
 import com.googlecode.objectify.util.cmd.ObjectifyWrapper;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
@@ -33,18 +34,22 @@ public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory>
 
     public <T extends Serializable> ResultList<T> findByFilter(Filter<T> filter, String bookmark, int limit) {
 
-        LoadType<T> query = load().type(filter.getEntityClass());
+        Query<T> query = load().type(filter.getEntityClass());
 
-        populateQueryFromFilter(query, filter);
+        query = populateQueryFromFilter(query, filter);
         if (filter.getOrder() != null) {
-            query.order(filter.getOrder());
-        }
-
-        if (!ValueTool.isEmpty(bookmark)) {
-            query.startAt(Cursor.fromWebSafeString(bookmark));
+            query = query.order(filter.getOrder());
         }
 
         boolean limited = limit > 0;
+        if (limited)
+            query = query.limit(limit);
+
+        if (!ValueTool.isEmpty(bookmark)) {
+            Cursor cursor = Cursor.fromWebSafeString(bookmark);
+            query = query.startAt(cursor);
+        }
+
         QueryResultIterator<T> iterator = query.iterator();
         List<T> entities = new ArrayList<T>();
         while (iterator.hasNext()) {
@@ -61,9 +66,9 @@ public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory>
         return new ResultList<T>(entities, null);
     }
 
-    private <T> void populateQueryFromFilter(LoadType<T> query, Filter filter) {
+    private <T> Query<T> populateQueryFromFilter(Query<T> query, Filter filter) {
         if (filter == null)
-            return;
+            return query;
 
         BeanWrapper sourceWrapper = new BeanWrapperImpl(filter);
 
@@ -82,13 +87,15 @@ public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory>
                     if (value != null) {
                         switch (operator) {
                             case EQ:
-                                query.filter(baseName, value);
+                                query = query.filter(baseName, value);
                                 break;
                         }
                     }
                 }
             }
         }
+
+        return query;
     }
 
     // heritage code

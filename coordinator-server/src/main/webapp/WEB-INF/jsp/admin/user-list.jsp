@@ -1,8 +1,7 @@
 <%@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags"
-%>
-<h2><s:message code="header.userList"/></h2>
+%><h2><s:message code="header.userList"/></h2>
 
 <div class="buttonPanel">
     <a href="${root}/admin/user/edit"><s:message code="button.createUser"/></a>
@@ -19,4 +18,8 @@
             </tr>
         </c:forEach>
     </table>
+
+    <div>
+        <a href="${root}/admin/user/list?bookmark=${userResult.bookmark}">&gt;&gt;</a>
+    </div>
 </div>

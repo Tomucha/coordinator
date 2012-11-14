@@ -1,7 +1,6 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.Work;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
@@ -27,13 +26,12 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
     @Override
     public UserEntity login(String email, String password) {
-        Objectify ofy = ofy();
-        Key<UserEntity> userKey = systemService.findUniqueValueOwner(ofy, UniqueIndexEntity.Property.EMAIL, ValueTool.normalizeEmail(email));
+        Key<UserEntity> userKey = systemService.findUniqueValueOwner(ofy(), UniqueIndexEntity.Property.EMAIL, ValueTool.normalizeEmail(email));
         if (userKey == null) {
             throw MaPermissionDeniedException.wrongCredentials();
         }
 
-        UserEntity userEntity = ofy.load().key(userKey).get();
+        UserEntity userEntity = ofy().load().key(userKey).get();
         if (userEntity == null || password == null || !passwordHash(userEntity.getId(), password).equals(userEntity.getPassword())) {
             throw MaPermissionDeniedException.wrongCredentials();
         }
@@ -62,19 +60,18 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
     @Override
     public UserEntity createUser(final UserEntity entity) {
-        final MaObjectify ofy = ofy();
-        return ofy.transact(new Work<UserEntity>() {
+        return ofy().transact(new Work<UserEntity>() {
             @Override
             public UserEntity run() {
                 logger.debug("creating " + entity);
                 entity.setId(null);
                 entity.setEmail(ValueTool.normalizeEmail(entity.getEmail()));
-                ofy.save().entity(entity).now();
+                ofy().save().entity(entity).now();
 
                 entity.setPassword(passwordHash(entity.getId(), entity.getPassword()));
-                ofy.save().entity(entity).now();
+                ofy().save().entity(entity).now();
 
-                systemService.saveUniqueIndexOwner(ofy, UniqueIndexEntity.Property.EMAIL, entity.getEmail(), entity.getKey());
+                systemService.saveUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, entity.getEmail(), entity.getKey());
                 return entity;
             }
         });
