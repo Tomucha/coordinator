@@ -16,6 +16,8 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
  */
 public interface UserService extends Service {
 
+    public static final long FLAG_FETCH_EQUIPMENT = 1l;
+
     @Anonymous
     UserEntity login(String login, String password) throws MaPermissionDeniedException;
 

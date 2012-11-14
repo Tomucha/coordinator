@@ -39,7 +39,9 @@ public class User extends AbstractModifiableEntity {
 
     private String reasonSuspended;
 
-    private List<String> roleIdList;
+    private String[] roleIdList;
+
+    private UserEquipment[] equipmentList;
 
     private String newPassword;
 
@@ -147,11 +149,11 @@ public class User extends AbstractModifiableEntity {
         this.reasonSuspended = reasonSuspended;
     }
 
-    public List<String> getRoleIdList() {
+    public String[] getRoleIdList() {
         return roleIdList;
     }
 
-    public void setRoleIdList(List<String> roleIdList) {
+    public void setRoleIdList(String[] roleIdList) {
         this.roleIdList = roleIdList;
     }
 
@@ -161,6 +163,14 @@ public class User extends AbstractModifiableEntity {
 
     public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
+    }
+
+    public UserEquipment[] getEquipmentList() {
+        return equipmentList;
+    }
+
+    public void setEquipmentList(UserEquipment[] equipmentList) {
+        this.equipmentList = equipmentList;
     }
 
     public String getFullName() {

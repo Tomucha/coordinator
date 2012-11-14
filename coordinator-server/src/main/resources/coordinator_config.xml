@@ -15,8 +15,17 @@
     </skill_list>
 
     <equipment_list>
-        <equipment id="eq1" name="Název eq 1">popis equip</equipment>
-        <equipment id="eq2" name="Název eq 2"/>
+        <equipment id="eq1" name="Equipment 1">popis equip</equipment>
+        <equipment id="eq2" name="Equipment 2"/>
+        <equipment id="eq3" name="Equipment 3">popis equip</equipment>
+        <equipment id="eq4" name="Equipment 4">popis equip</equipment>
+        <equipment id="eq5" name="Equipment 5">popis equip</equipment>
+        <equipment id="eq6" name="Equipment 6">popis equip</equipment>
+        <equipment id="eq7" name="Equipment 7">popis equip</equipment>
+        <equipment id="eq8" name="Equipment 8">popis equip</equipment>
+        <equipment id="eq9" name="Equipment 9">popis equip</equipment>
+        <equipment id="eq10" name="Equipment 10">popis equip</equipment>
+
     </equipment_list>
 
     <workflow_list>

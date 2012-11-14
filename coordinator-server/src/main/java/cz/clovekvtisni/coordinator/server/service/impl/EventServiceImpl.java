@@ -60,21 +60,20 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
 
     @Override
     public EventEntity createEvent(final EventEntity entity) {
-        final MaObjectify ofy = ofy();
         logger.debug("creating " + entity);
-        return ofy.transact(new Work<EventEntity>() {
+        return ofy().transact(new Work<EventEntity>() {
             @Override
             public EventEntity run() {
                 entity.setId(null);
                 updateSystemFields(entity);
-                ofy.save().entity(entity).now();
+                ofy().save().entity(entity).now();
 
                 if (entity.getEventLocationList() != null) {
                     for (EventLocationEntity location : entity.getEventLocationList()) {
                         location.setId(null);
                         location.setEventId(entity.getEventId());
                         updateSystemFields(location);
-                        Key<EventLocationEntity> inserted = ofy.save().entity(location).now();
+                        Key<EventLocationEntity> inserted = ofy().save().entity(location).now();
                         location.setId(inserted.getId());
                     }
                 }
@@ -157,7 +156,7 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
 
         ResultList<OrganizationInEventEntity> result = ofy.findByFilter(filter, bookmark, limit);
 
-        if ((flags & EventService.FLAG_FETCH_EVENT) != 0) {
+        if ((flags & FLAG_FETCH_EVENT) != 0) {
             Map<Key<EventEntity>, OrganizationInEventEntity> inEventMap = new HashMap<Key<EventEntity>, OrganizationInEventEntity>(result.getResult().size());
             for (OrganizationInEventEntity inEvent : result.getResult()) {
                 Key<EventEntity> key = Key.create(EventEntity.class, inEvent.getId());

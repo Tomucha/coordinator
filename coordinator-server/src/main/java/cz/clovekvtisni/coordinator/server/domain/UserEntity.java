@@ -1,10 +1,7 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cache;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.User;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -58,6 +55,9 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     @NotEmpty
     private String[] roleIdList;
+
+    @Ignore
+    private UserEquipmentEntity[] equipmentList;
 
     public UserEntity() {
     }
@@ -207,6 +207,14 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     public void setRoleIdList(String[] roleIdList) {
         this.roleIdList = roleIdList;
+    }
+
+    public UserEquipmentEntity[] getEquipmentList() {
+        return equipmentList;
+    }
+
+    public void setEquipmentList(UserEquipmentEntity[] equipmentList) {
+        this.equipmentList = equipmentList;
     }
 
     @Override

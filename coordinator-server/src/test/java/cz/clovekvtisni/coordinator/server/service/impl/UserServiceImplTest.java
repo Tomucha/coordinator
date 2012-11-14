@@ -10,8 +10,6 @@ import cz.clovekvtisni.coordinator.util.RunnableWithResult;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
-
 import static org.junit.Assert.*;
 
 /**
@@ -33,7 +31,7 @@ public class UserServiceImplTest extends LocalDatastoreTest {
 
         final User user = new User();
         user.setEmail(testEmail);
-        user.setRoleIdList(Arrays.asList(testRoleIdList));
+        user.setRoleIdList(testRoleIdList);
         user.setNewPassword("aaa");
 
         UserEntity res = securityTool.runWithDisabledSecurity(new RunnableWithResult<UserEntity>() {

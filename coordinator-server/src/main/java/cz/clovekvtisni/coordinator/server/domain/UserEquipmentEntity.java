@@ -1,9 +1,7 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cache;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.UserEquipment;
 
 import java.util.Date;
@@ -20,6 +18,10 @@ public class UserEquipmentEntity extends AbstractPersistentEntity<UserEquipment,
     @Id
     private Long id;
 
+    @Parent
+    private Key<UserEntity> parentKey;
+
+    @Index
     private Long userId;
 
     private String equipmentId;
@@ -40,7 +42,15 @@ public class UserEquipmentEntity extends AbstractPersistentEntity<UserEquipment,
 
     @Override
     public Key<UserEquipmentEntity> getKey() {
-        return Key.create(UserEquipmentEntity.class, id);
+        return Key.create(Key.create(UserEntity.class, userId), UserEquipmentEntity.class, id);
+    }
+
+    public Key<UserEntity> getParentKey() {
+        return parentKey;
+    }
+
+    public void setParentKey(Key<UserEntity> parentKey) {
+        this.parentKey = parentKey;
     }
 
     public String getUniqueKey() {

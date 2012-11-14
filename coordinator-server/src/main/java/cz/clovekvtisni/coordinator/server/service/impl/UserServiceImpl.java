@@ -2,16 +2,24 @@ package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
+import cz.clovekvtisni.coordinator.domain.UserEquipment;
+import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
+import cz.clovekvtisni.coordinator.server.filter.EquipmentFilter;
+import cz.clovekvtisni.coordinator.server.filter.UserEquipmentFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
+import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.util.SignatureTool;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -45,7 +53,22 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     public UserEntity findById(Long id, long flags) {
         UserEntity userEntity = ofy().load().key(Key.create(UserEntity.class, id)).get();
 
+        populateUser(userEntity, flags);
+
         return userEntity;
+    }
+
+    private void populateUser(UserEntity userEntity, long flags) {
+        if ((flags & FLAG_FETCH_EQUIPMENT) != 0) {
+            UserEquipmentFilter filter = new UserEquipmentFilter();
+            filter.setUserIdVal(userEntity.getId());
+            ResultList<UserEquipmentEntity> equipments = ofy().findByFilter(filter, null, 0);
+            if (equipments.getResultSize() > 0) {
+                userEntity.setEquipmentList(equipments.getResult().toArray(new UserEquipmentEntity[0]));
+            } else {
+                userEntity.setEquipmentList(new UserEquipmentEntity[0]);
+            }
+        }
     }
 
     @Override
@@ -66,12 +89,16 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 logger.debug("creating " + entity);
                 entity.setId(null);
                 entity.setEmail(ValueTool.normalizeEmail(entity.getEmail()));
+                updateSystemFields(entity);
                 ofy().save().entity(entity).now();
 
                 entity.setPassword(passwordHash(entity.getId(), entity.getPassword()));
                 ofy().save().entity(entity).now();
 
                 systemService.saveUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, entity.getEmail(), entity.getKey());
+
+                saveFields(entity, true);
+
                 return entity;
             }
         });
@@ -79,23 +106,58 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
     @Override
     public UserEntity updateUser(final UserEntity user) {
-        final MaObjectify ofy = ofy();
         logger.debug("updating " + user);
-        return ofy.transact(new Work<UserEntity>() {
+        return ofy().transact(new Work<UserEntity>() {
             @Override
             public UserEntity run() {
-                UserEntity toUpdate = ofy.load().key(Key.create(UserEntity.class, user.getId())).get();
+                //UserEntity toUpdate = ofy().load().key(Key.create(UserEntity.class, user.getId())).get();
+                updateSystemFields(user);
+                systemService.deleteUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, user.getEmail());
+                systemService.saveUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, user.getEmail(), user.getKey());
 
-                systemService.deleteUniqueIndexOwner(ofy, UniqueIndexEntity.Property.EMAIL, toUpdate.getEmail());
-                systemService.saveUniqueIndexOwner(ofy, UniqueIndexEntity.Property.EMAIL, toUpdate.getEmail(), toUpdate.getKey());
+                user.setEmail(ValueTool.normalizeEmail(user.getEmail()));
+                ofy().put(user);
 
-                toUpdate.setFirstName(user.getFirstName());
-                toUpdate.setLastName(user.getLastName());
-                toUpdate.setEmail(ValueTool.normalizeEmail(user.getEmail()));
-                ofy.save().entity(toUpdate).now();
-                return toUpdate;
+                saveFields(user, false);
+
+                return user;
             }
         });
+    }
+
+    private void saveFields(UserEntity entity, boolean isNew) {
+        if (entity.getEquipmentList() != null) {
+            for (UserEquipmentEntity equipmentEntity : entity.getEquipmentList()) {
+                if (equipmentEntity.isDeleted()) {
+                    if (equipmentEntity.isNew())
+                        continue;
+                    ofy().delete(equipmentEntity);
+
+                } else {
+                    equipmentEntity.setParentKey(entity.getKey());
+                    equipmentEntity.setUserId(entity.getId());
+                    updateSystemFields(equipmentEntity);
+
+                    /*
+                    if (!isNew) {
+                        systemService.deleteUniqueIndexOwner(
+                                ofy(),
+                                UniqueIndexEntity.Property.USER_EQUIPMENT,
+                                equipmentEntity.getUserId() + "+" + equipmentEntity.getEquipmentId()
+                        );
+                    }
+                    systemService.saveUniqueIndexOwner(
+                            ofy(),
+                            UniqueIndexEntity.Property.USER_EQUIPMENT,
+                            equipmentEntity.getUserId() + "+" + equipmentEntity.getEquipmentId(),
+                            entity.getKey()
+                    );
+                    */
+
+                    ofy().put(equipmentEntity);
+                }
+            }
+        }
     }
 
     @Override

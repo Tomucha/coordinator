@@ -42,7 +42,7 @@ public class UserEditController extends AbstractController {
         form.injectConfigValues(appContext, authorizationTool, config);
 
         if (userId != null) {
-            UserEntity user = userService.findById(userId, 0);
+            UserEntity user = userService.findById(userId, UserService.FLAG_FETCH_EQUIPMENT);
             if (user == null)
                 throw NotFoundException.idNotExist();
             form.populateFrom(user);
@@ -62,16 +62,16 @@ public class UserEditController extends AbstractController {
             return "admin/user-edit";
         }
 
-        UserEntity user = new UserEntity().populateFrom(form);
-        if (form.isNew()) {
-            user.setPassword(form.getNewPassword());
-        }
-
         try {
-            if (user.isNew()) {
+            if (form.isNew()) {
+                UserEntity user = form.export(new UserEntity());
+                user.setPassword(form.getNewPassword());
                 userService.createUser(user);
+
             } else {
-                userService.updateUser(user);
+                UserEntity user = userService.findById(form.getId(), UserService.FLAG_FETCH_EQUIPMENT);
+                UserEntity toSave = form.export(user);
+                userService.updateUser(toSave);
             }
         } catch (UniqueKeyViolation e) {
             addFieldError(bindingResult, "form", e.getProperty().toString().toLowerCase(), null, "error.UNIQUE_KEY_VIOLATION");
