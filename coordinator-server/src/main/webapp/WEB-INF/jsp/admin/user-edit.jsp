@@ -109,7 +109,13 @@
             </div>
 
             <div class="panel">
+                <h3><s:message code="header.equipmentList"/></h3>
                 <sf:checkboxes path="selectedEquipment" items="${form.allEquipmentList}" itemLabel="name" itemValue="id"/>
+            </div>
+
+            <div class="panel">
+                <h3><s:message code="header.skillList"/></h3>
+                <sf:checkboxes path="selectedSkill" items="${form.allSkillList}" itemLabel="name" itemValue="id"/>
             </div>
 
             <div class="buttonPanel">

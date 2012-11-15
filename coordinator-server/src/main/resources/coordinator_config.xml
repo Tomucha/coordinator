@@ -10,8 +10,8 @@
     </role_list>
 
     <skill_list>
-        <skill id="skill1" name="Název1" must_verify="true">popis skillu 1</skill>
-        <skill id="skill2" name="Název2">popis skillu 2</skill>
+        <skill id="skill1" name="Skill 1" must_verify="true">popis skillu 1</skill>
+        <skill id="skill2" name="Skill 2">popis skillu 2</skill>
     </skill_list>
 
     <equipment_list>

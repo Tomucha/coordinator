@@ -8,9 +8,7 @@ import cz.clovekvtisni.coordinator.domain.UserSkill;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -99,6 +97,11 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
         }
 
         return user;
+    }
+
+    @Override
+    public UserEntity populateFrom(UserEntity entity) {
+        return super.populateFrom(entity);
     }
 
     public Long getId() {
@@ -243,6 +246,24 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     public void setSkillEntityList(UserSkillEntity[] skillEntityList) {
         this.skillEntityList = skillEntityList;
+    }
+    
+    public Map<String, UserEquipmentEntity> getEquipmentEntityMap() {
+        if (equipmentEntityList == null) return new HashMap<String, UserEquipmentEntity>(); 
+        Map<String, UserEquipmentEntity> map = new HashMap<String, UserEquipmentEntity>(equipmentEntityList.length);
+        for (UserEquipmentEntity equipmentEntity : equipmentEntityList) {
+            map.put(equipmentEntity.getEquipmentId(), equipmentEntity);
+        }
+        return map;
+    }
+
+    public Map<String, UserSkillEntity> getSkillEntityMap() {
+        if (skillEntityList == null) return new HashMap<String, UserSkillEntity>();
+        Map<String, UserSkillEntity> map = new HashMap<String, UserSkillEntity>(skillEntityList.length);
+        for (UserSkillEntity skillEntity : skillEntityList) {
+            map.put(skillEntity.getSkillId(), skillEntity);
+        }
+        return map;
     }
 
     @Override

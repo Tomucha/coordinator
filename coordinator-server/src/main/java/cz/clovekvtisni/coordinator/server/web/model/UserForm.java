@@ -3,9 +3,11 @@ package cz.clovekvtisni.coordinator.server.web.model;
 import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 import cz.clovekvtisni.coordinator.domain.config.Role;
+import cz.clovekvtisni.coordinator.domain.config.Skill;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserSkillEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import org.springframework.context.MessageSource;
@@ -31,7 +33,7 @@ public class UserForm extends UserEntity {
 
     private List<Equipment> allEquipmentList;
 
-    private Set<String> selectedEquipment;
+    private List<Skill> allSkillList;
 
     public void injectConfigValues(AppContext appContext, AuthorizationTool authorizationTool, CoordinatorConfig config) {
         List<Organization> organizations = config.getOrganizationList();
@@ -55,6 +57,12 @@ public class UserForm extends UserEntity {
         }
 
         allEquipmentList = config.getEquipmentList();
+
+        allSkillList = config.getSkillList();
+    }
+
+    public List<Skill> getAllSkillList() {
+        return allSkillList;
     }
 
     public List<Equipment> getAllEquipmentList() {
@@ -92,53 +100,54 @@ public class UserForm extends UserEntity {
     }
 
     public Set<String> getSelectedEquipment() {
+        UserEquipmentEntity[] equipmentList = getEquipmentEntityList();
+        if (equipmentList == null) return new HashSet<String>();
+
+        Set<String> selectedEquipment = new HashSet<String>(equipmentList.length);
+        for (UserEquipmentEntity equipmentEntity : equipmentList) {
+            selectedEquipment.add(equipmentEntity.getEquipmentId());
+        }
+        
         return selectedEquipment;
     }
 
     public void setSelectedEquipment(Set<String> selectedEquipment) {
-        this.selectedEquipment = selectedEquipment;
-    }
-
-    public UserEntity export(UserEntity user) {
-        UserEntity exported = new UserEntity().populateFrom(this);
-
         if (selectedEquipment == null) {
-            selectedEquipment = new HashSet<String>();
+            setEquipmentEntityList(new UserEquipmentEntity[0]);
+            return;
         }
-
-        List<UserEquipmentEntity> equipmentList = new ArrayList<UserEquipmentEntity>();
-        if (!isNew()) {
-            for (UserEquipmentEntity equipmentEntity : user.getEquipmentEntityList()) {
-                if (selectedEquipment.contains(equipmentEntity.getEquipmentId())) {
-                    selectedEquipment.remove(equipmentEntity.getEquipmentId());
-
-                } else {
-                    equipmentEntity.setDeletedDate(new Date());
-                }
-                equipmentList.add(equipmentEntity);
-            }
-        }
+        List<UserEquipmentEntity> equipmentEntityList = new ArrayList<UserEquipmentEntity>(selectedEquipment.size());
         for (String equipmentId : selectedEquipment) {
-            UserEquipmentEntity equipment = new UserEquipmentEntity();
-            equipment.setEquipmentId(equipmentId);
-            equipmentList.add(equipment);
+            UserEquipmentEntity equipmentEntity = new UserEquipmentEntity();
+            equipmentEntity.setEquipmentId(equipmentId);
+            equipmentEntityList.add(equipmentEntity);
         }
-        exported.setEquipmentEntityList(equipmentList.toArray(new UserEquipmentEntity[0]));
-
-        return exported;
+        setEquipmentEntityList(equipmentEntityList.toArray(new UserEquipmentEntity[0]));
     }
 
-    @Override
-    public UserEntity populateFrom(UserEntity entity) {
-        super.populateFrom(entity);
-        UserEquipmentEntity[] equipmentList = entity.getEquipmentEntityList();
-        if (equipmentList != null) {
-            selectedEquipment = new HashSet<String>(equipmentList.length);
-            for (UserEquipmentEntity equipmentEntity : equipmentList) {
-                selectedEquipment.add(equipmentEntity.getEquipmentId());
-            }
+    public Set<String> getSelectedSkill() {
+        UserSkillEntity[] skillList = getSkillEntityList();
+        if (skillList == null) return new HashSet<String>();
+
+        Set<String> selectedSkill = new HashSet<String>(skillList.length);
+        for (UserSkillEntity skillEntity : skillList) {
+            selectedSkill.add(skillEntity.getSkillId());
         }
 
-        return this;
+        return selectedSkill;
+    }
+
+    public void setSelectedSkill(Set<String> selectedSkill) {
+        if (selectedSkill == null) {
+            setSkillEntityList(new UserSkillEntity[0]);
+            return;
+        }
+        List<UserSkillEntity> skillEntityList = new ArrayList<UserSkillEntity>(selectedSkill.size());
+        for (String skillId : selectedSkill) {
+            UserSkillEntity skillEntity = new UserSkillEntity();
+            skillEntity.setSkillId(skillId);
+            skillEntityList.add(skillEntity);
+        }
+        setSkillEntityList(skillEntityList.toArray(new UserSkillEntity[0]));
     }
 }

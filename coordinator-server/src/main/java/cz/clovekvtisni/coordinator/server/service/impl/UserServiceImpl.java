@@ -9,6 +9,7 @@ import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserSkillEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserEquipmentFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
+import cz.clovekvtisni.coordinator.server.filter.UserSkillFilter;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.util.CloneTool;
@@ -16,7 +17,9 @@ import cz.clovekvtisni.coordinator.util.SignatureTool;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,6 +70,16 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 userEntity.setEquipmentEntityList(new UserEquipmentEntity[0]);
             }
         }
+        if ((flags & FLAG_FETCH_SKILLS) != 0) {
+            UserSkillFilter filter = new UserSkillFilter();
+            filter.setUserIdVal(userEntity.getId());
+            ResultList<UserSkillEntity> skills = ofy().findByFilter(filter, null, 0);
+            if (skills.getResultSize() > 0) {
+                userEntity.setSkillEntityList(skills.getResult().toArray(new UserSkillEntity[0]));
+            } else {
+                userEntity.setSkillEntityList(new UserSkillEntity[0]);
+            }
+        }
     }
 
     @Override
@@ -95,7 +108,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
                 systemService.saveUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, entity.getEmail(), entity.getKey());
 
-                saveFields(entity);
+                saveFields(entity, null);
 
                 return entity;
             }
@@ -105,12 +118,12 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     @Override
     public UserEntity updateUser(final UserEntity updated) {
         final UserEntity user = CloneTool.deepClone(updated);
+        final UserEntity old = findById(user.getId(), UserService.FLAG_FETCH_EQUIPMENT | UserService.FLAG_FETCH_SKILLS);
         logger.debug("updating " + user);
         return ofy().transact(new Work<UserEntity>() {
             @Override
             public UserEntity run() {
                 // TODO co kdyz appengina nic nevrati? vyhodit vyjimku?
-                UserEntity old = ofy().get(updated.getKey());
                 // only special method is able to change password
                 user.setPassword(old.getPassword());
                 updateSystemFields(user, old);
@@ -120,53 +133,76 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 user.setEmail(ValueTool.normalizeEmail(user.getEmail()));
                 UserEntity created = ofy().put(user);
 
-                saveFields(created);
+                saveFields(created, old);
 
                 return created;
             }
         });
     }
 
-    private void saveFields(UserEntity entity) {
-        if (entity.getEquipmentEntityList() != null) {
-            Map<String, UserEquipmentEntity> map = new HashMap<String, UserEquipmentEntity>();
-            for (UserEquipmentEntity equipmentEntity : entity.getEquipmentEntityList()) {
-                if (equipmentEntity.isDeleted()) {
-                    if (equipmentEntity.isNew())
-                        continue;
-                    ofy().delete(equipmentEntity);
+    /** updated "verify" fields is ignored here */
+    private void saveFields(UserEntity entity, UserEntity old) {
+        UserEquipmentEntity[] newEquipmentList = entity.getEquipmentEntityList();
+        if (newEquipmentList != null) {
+            Map<String, UserEquipmentEntity> oldEquipmentMap = old != null ? old.getEquipmentEntityMap() : new HashMap<String, UserEquipmentEntity>();
+            List<UserEquipmentEntity> saved = new ArrayList<UserEquipmentEntity>();
+            Map<String, UserEquipmentEntity> toSave = new HashMap<String, UserEquipmentEntity>();
+
+            for (UserEquipmentEntity equipmentEntity : newEquipmentList) {
+                if (equipmentEntity.isDeleted())
+                    continue;
+                else if (oldEquipmentMap.containsKey(equipmentEntity.getEquipmentId())) {
+                    saved.add(oldEquipmentMap.get(equipmentEntity.getEquipmentId()));
+                    oldEquipmentMap.remove(equipmentEntity.getEquipmentId());
 
                 } else {
-                    equipmentEntity.setParentKey(entity.getKey());
                     equipmentEntity.setUserId(entity.getId());
+                    equipmentEntity.setParentKey(entity.getKey());
                     updateSystemFields(equipmentEntity, null);
-                    map.put(equipmentEntity.getEquipmentId(), equipmentEntity);
+                    toSave.put(equipmentEntity.getEquipmentId(), equipmentEntity);
+                    saved.add(equipmentEntity);
                 }
             }
-            for (UserEquipmentEntity equipmentEntity : map.values()) {
+
+            for (UserEquipmentEntity equipmentEntity : toSave.values()) {
                 ofy().put(equipmentEntity);
             }
+            for (UserEquipmentEntity equipmentEntity : oldEquipmentMap.values()) {
+                ofy().delete(equipmentEntity);
+            }
+
+            entity.setEquipmentEntityList(saved.toArray(new UserEquipmentEntity[0]));
         }
-        if (entity.getSkillEntityList() != null) {
-            Map<String, UserSkillEntity> map = new HashMap<String, UserSkillEntity>();
-            for (UserSkillEntity skillEntity : entity.getSkillEntityList()) {
-                if (skillEntity.isDeleted()) {
-                    if (skillEntity.isNew())
-                        continue;
-                    ofy().delete(skillEntity);
+
+        UserSkillEntity[] newSkillList = entity.getSkillEntityList();
+        if (newSkillList != null) {
+            Map<String, UserSkillEntity> oldSkillMap = old != null ? old.getSkillEntityMap() : new HashMap<String, UserSkillEntity>();
+            List<UserSkillEntity> saved = new ArrayList<UserSkillEntity>();
+            Map<String, UserSkillEntity> toSave = new HashMap<String, UserSkillEntity>();
+
+            for (UserSkillEntity skillEntity : newSkillList) {
+                if (skillEntity.isDeleted())
+                    continue;
+                else if (oldSkillMap.containsKey(skillEntity.getSkillId())) {
+                    saved.add(oldSkillMap.get(skillEntity.getSkillId()));
+                    oldSkillMap.remove(skillEntity.getSkillId());
 
                 } else {
-                    skillEntity.setParentKey(entity.getKey());
                     skillEntity.setUserId(entity.getId());
+                    skillEntity.setParentKey(entity.getKey());
                     updateSystemFields(skillEntity, null);
-                    map.put(skillEntity.getSkillId(), skillEntity);
+                    toSave.put(skillEntity.getSkillId(), skillEntity);
+                    saved.add(skillEntity);
                 }
             }
-            for (UserSkillEntity skillEntity : map.values()) {
+
+            for (UserSkillEntity skillEntity : toSave.values()) {
                 ofy().put(skillEntity);
             }
+            for (UserSkillEntity skillEntity : oldSkillMap.values()) {
+                ofy().delete(skillEntity);
+            }
         }
-
     }
 
     @Override
