@@ -4,6 +4,7 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import cz.clovekvtisni.coordinator.server.domain.AbstractPersistentEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.service.Service;
 import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
 import org.slf4j.Logger;
@@ -32,10 +33,13 @@ public class AbstractServiceImpl implements Service {
         return new MaObjectify(ObjectifyService.ofy());
     }
 
-    protected void updateSystemFields(AbstractPersistentEntity entity) {
+    protected void updateSystemFields(AbstractPersistentEntity entity, AbstractPersistentEntity old) {
         Date now = new Date();
-        if (entity.isNew())
+        if (entity.isNew()) {
             entity.setCreatedDate(now);
+        } else if (old != null) {
+            entity.setCreatedDate(old.getCreatedDate());
+        }
         entity.setModifiedDate(now);
     }
 }

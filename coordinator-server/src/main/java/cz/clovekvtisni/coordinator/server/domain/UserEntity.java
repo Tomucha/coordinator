@@ -3,10 +3,14 @@ package cz.clovekvtisni.coordinator.server.domain;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.User;
+import cz.clovekvtisni.coordinator.domain.UserEquipment;
+import cz.clovekvtisni.coordinator.domain.UserSkill;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -57,7 +61,10 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     private String[] roleIdList;
 
     @Ignore
-    private UserEquipmentEntity[] equipmentList;
+    private UserEquipmentEntity[] equipmentEntityList;
+
+    @Ignore
+    private UserSkillEntity[] skillEntityList;
 
     public UserEntity() {
     }
@@ -68,17 +75,30 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     }
 
     @Override
-    public UserEntity populateFrom(User entity) {
-        super.populateFrom(entity);
-        if (entity.getNewPassword() != null) {
-            setPassword(entity.getNewPassword());
-        }
-        return this;
+    public Key<UserEntity> getKey() {
+        return Key.create(UserEntity.class, id);
     }
 
     @Override
-    public Key<UserEntity> getKey() {
-        return Key.create(UserEntity.class, id);
+    public User buildTargetEntity() {
+        User user = super.buildTargetEntity();
+        if (equipmentEntityList != null) {
+            List<UserEquipment> equipmentList = new ArrayList<UserEquipment>(equipmentEntityList.length);
+            for (UserEquipmentEntity equipmentEntity : equipmentEntityList) {
+                equipmentList.add(equipmentEntity.buildTargetEntity());
+            }
+            user.setEquipmentList(equipmentList.toArray(new UserEquipment[0]));
+        }
+
+        if (skillEntityList != null) {
+            List<UserSkill> skillList = new ArrayList<UserSkill>(skillEntityList.length);
+            for (UserSkillEntity skillEntity : skillEntityList) {
+                skillList.add(skillEntity.buildTargetEntity());
+            }
+            user.setSkillList(skillList.toArray(new UserSkill[0]));
+        }
+
+        return user;
     }
 
     public Long getId() {
@@ -209,12 +229,20 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
         this.roleIdList = roleIdList;
     }
 
-    public UserEquipmentEntity[] getEquipmentList() {
-        return equipmentList;
+    public UserEquipmentEntity[] getEquipmentEntityList() {
+        return equipmentEntityList;
     }
 
-    public void setEquipmentList(UserEquipmentEntity[] equipmentList) {
-        this.equipmentList = equipmentList;
+    public void setEquipmentEntityList(UserEquipmentEntity[] equipmentEntityList) {
+        this.equipmentEntityList = equipmentEntityList;
+    }
+
+    public UserSkillEntity[] getSkillEntityList() {
+        return skillEntityList;
+    }
+
+    public void setSkillEntityList(UserSkillEntity[] skillEntityList) {
+        this.skillEntityList = skillEntityList;
     }
 
     @Override

@@ -2,24 +2,22 @@ package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
-import cz.clovekvtisni.coordinator.domain.UserEquipment;
-import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
-import cz.clovekvtisni.coordinator.server.filter.EquipmentFilter;
+import cz.clovekvtisni.coordinator.server.domain.UserSkillEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserEquipmentFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
-import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
-import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import cz.clovekvtisni.coordinator.util.CloneTool;
 import cz.clovekvtisni.coordinator.util.SignatureTool;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -64,9 +62,9 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             filter.setUserIdVal(userEntity.getId());
             ResultList<UserEquipmentEntity> equipments = ofy().findByFilter(filter, null, 0);
             if (equipments.getResultSize() > 0) {
-                userEntity.setEquipmentList(equipments.getResult().toArray(new UserEquipmentEntity[0]));
+                userEntity.setEquipmentEntityList(equipments.getResult().toArray(new UserEquipmentEntity[0]));
             } else {
-                userEntity.setEquipmentList(new UserEquipmentEntity[0]);
+                userEntity.setEquipmentEntityList(new UserEquipmentEntity[0]);
             }
         }
     }
@@ -89,15 +87,15 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 logger.debug("creating " + entity);
                 entity.setId(null);
                 entity.setEmail(ValueTool.normalizeEmail(entity.getEmail()));
-                updateSystemFields(entity);
-                ofy().save().entity(entity).now();
+                updateSystemFields(entity, null);
+                ofy().put(entity);
 
                 entity.setPassword(passwordHash(entity.getId(), entity.getPassword()));
-                ofy().save().entity(entity).now();
+                ofy().put(entity);
 
                 systemService.saveUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, entity.getEmail(), entity.getKey());
 
-                saveFields(entity, true);
+                saveFields(entity);
 
                 return entity;
             }
@@ -105,29 +103,34 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     @Override
-    public UserEntity updateUser(final UserEntity user) {
+    public UserEntity updateUser(final UserEntity updated) {
+        final UserEntity user = CloneTool.deepClone(updated);
         logger.debug("updating " + user);
         return ofy().transact(new Work<UserEntity>() {
             @Override
             public UserEntity run() {
-                //UserEntity toUpdate = ofy().load().key(Key.create(UserEntity.class, user.getId())).get();
-                updateSystemFields(user);
-                systemService.deleteUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, user.getEmail());
+                // TODO co kdyz appengina nic nevrati? vyhodit vyjimku?
+                UserEntity old = ofy().get(updated.getKey());
+                // only special method is able to change password
+                user.setPassword(old.getPassword());
+                updateSystemFields(user, old);
+                systemService.deleteUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, old.getEmail());
                 systemService.saveUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, user.getEmail(), user.getKey());
 
                 user.setEmail(ValueTool.normalizeEmail(user.getEmail()));
-                ofy().put(user);
+                UserEntity created = ofy().put(user);
 
-                saveFields(user, false);
+                saveFields(created);
 
-                return user;
+                return created;
             }
         });
     }
 
-    private void saveFields(UserEntity entity, boolean isNew) {
-        if (entity.getEquipmentList() != null) {
-            for (UserEquipmentEntity equipmentEntity : entity.getEquipmentList()) {
+    private void saveFields(UserEntity entity) {
+        if (entity.getEquipmentEntityList() != null) {
+            Map<String, UserEquipmentEntity> map = new HashMap<String, UserEquipmentEntity>();
+            for (UserEquipmentEntity equipmentEntity : entity.getEquipmentEntityList()) {
                 if (equipmentEntity.isDeleted()) {
                     if (equipmentEntity.isNew())
                         continue;
@@ -136,28 +139,34 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 } else {
                     equipmentEntity.setParentKey(entity.getKey());
                     equipmentEntity.setUserId(entity.getId());
-                    updateSystemFields(equipmentEntity);
-
-                    /*
-                    if (!isNew) {
-                        systemService.deleteUniqueIndexOwner(
-                                ofy(),
-                                UniqueIndexEntity.Property.USER_EQUIPMENT,
-                                equipmentEntity.getUserId() + "+" + equipmentEntity.getEquipmentId()
-                        );
-                    }
-                    systemService.saveUniqueIndexOwner(
-                            ofy(),
-                            UniqueIndexEntity.Property.USER_EQUIPMENT,
-                            equipmentEntity.getUserId() + "+" + equipmentEntity.getEquipmentId(),
-                            entity.getKey()
-                    );
-                    */
-
-                    ofy().put(equipmentEntity);
+                    updateSystemFields(equipmentEntity, null);
+                    map.put(equipmentEntity.getEquipmentId(), equipmentEntity);
                 }
             }
+            for (UserEquipmentEntity equipmentEntity : map.values()) {
+                ofy().put(equipmentEntity);
+            }
         }
+        if (entity.getSkillEntityList() != null) {
+            Map<String, UserSkillEntity> map = new HashMap<String, UserSkillEntity>();
+            for (UserSkillEntity skillEntity : entity.getSkillEntityList()) {
+                if (skillEntity.isDeleted()) {
+                    if (skillEntity.isNew())
+                        continue;
+                    ofy().delete(skillEntity);
+
+                } else {
+                    skillEntity.setParentKey(entity.getKey());
+                    skillEntity.setUserId(entity.getId());
+                    updateSystemFields(skillEntity, null);
+                    map.put(skillEntity.getSkillId(), skillEntity);
+                }
+            }
+            for (UserSkillEntity skillEntity : map.values()) {
+                ofy().put(skillEntity);
+            }
+        }
+
     }
 
     @Override

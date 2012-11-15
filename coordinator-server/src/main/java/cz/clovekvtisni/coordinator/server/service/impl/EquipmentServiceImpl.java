@@ -48,21 +48,4 @@ public class EquipmentServiceImpl extends AbstractEntityServiceImpl implements E
 
         return new ResultList<Equipment>(equipmentList, null);
     }
-
-    @Override
-    public UserEquipmentEntity addUserEquipment(final UserEquipmentEntity equipmentEntity) {
-        final MaObjectify ofy = ofy();
-
-        logger.debug("adding " + equipmentEntity);
-        return ofy.transact(new Work<UserEquipmentEntity>() {
-            @Override
-            public UserEquipmentEntity run() {
-                equipmentEntity.setId(null);
-                ofy.put(equipmentEntity);
-                systemService.saveUniqueIndexOwner(ofy, UniqueIndexEntity.Property.USER_EQUIPMENT, "u" + equipmentEntity.getUniqueKey(), equipmentEntity.getKey());
-
-                return equipmentEntity;
-            }
-        });
-    }
 }

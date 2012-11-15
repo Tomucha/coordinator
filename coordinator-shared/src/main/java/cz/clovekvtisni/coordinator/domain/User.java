@@ -43,7 +43,7 @@ public class User extends AbstractModifiableEntity {
 
     private UserEquipment[] equipmentList;
 
-    private String newPassword;
+    private UserSkill[] skillList;
 
     public String getFirstName() {
         return firstName;
@@ -157,20 +157,20 @@ public class User extends AbstractModifiableEntity {
         this.roleIdList = roleIdList;
     }
 
-    public String getNewPassword() {
-        return newPassword;
-    }
-
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
-    }
-
     public UserEquipment[] getEquipmentList() {
         return equipmentList;
     }
 
     public void setEquipmentList(UserEquipment[] equipmentList) {
         this.equipmentList = equipmentList;
+    }
+
+    public UserSkill[] getSkillList() {
+        return skillList;
+    }
+
+    public void setSkillList(UserSkill[] skillList) {
+        this.skillList = skillList;
     }
 
     public String getFullName() {

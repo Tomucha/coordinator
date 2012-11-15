@@ -12,7 +12,8 @@ public abstract class NoDeletedFilter<T extends AbstractPersistentEntity> extend
         setAfterLoadCallback(new AfterLoadCallback<T>() {
             @Override
             public boolean accept(T entity) {
-                return !entity.isDeleted();
+                // not null test due to latency of app engine
+                return entity != null && !entity.isDeleted();
             }
         });
     }

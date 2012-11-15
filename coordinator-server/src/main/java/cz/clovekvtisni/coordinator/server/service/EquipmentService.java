@@ -14,7 +14,4 @@ public interface EquipmentService extends Service {
 
     @FilterResult("#helper.canRead(#entity)")
     ResultList<Equipment> findByFilter(EquipmentFilter filter);
-
-    @CheckPermission("#helper.canCreate(#entity)")
-    UserEquipmentEntity addUserEquipment(UserEquipmentEntity entity);
 }

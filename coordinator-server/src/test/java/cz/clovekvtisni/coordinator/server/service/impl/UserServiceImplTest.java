@@ -32,7 +32,6 @@ public class UserServiceImplTest extends LocalDatastoreTest {
         final User user = new User();
         user.setEmail(testEmail);
         user.setRoleIdList(testRoleIdList);
-        user.setNewPassword("aaa");
 
         UserEntity res = securityTool.runWithDisabledSecurity(new RunnableWithResult<UserEntity>() {
             @Override

@@ -15,17 +15,11 @@ public class RegisterRequestParams implements RequestParams {
 
     private User newUser;
 
-    private List<UserSkill> skills;
-
-    private List<UserEquipment> equipments;
-
     public RegisterRequestParams() {
     }
 
-    public RegisterRequestParams(User newUser, List<UserSkill> skills, List<UserEquipment> equipments) {
+    public RegisterRequestParams(User newUser, List<UserSkill> skills) {
         this.newUser = newUser;
-        this.skills = skills;
-        this.equipments = equipments;
     }
 
     public User getNewUser() {
@@ -34,22 +28,6 @@ public class RegisterRequestParams implements RequestParams {
 
     public void setNewUser(User newUser) {
         this.newUser = newUser;
-    }
-
-    public List<UserSkill> getSkills() {
-        return skills;
-    }
-
-    public void setSkills(List<UserSkill> skills) {
-        this.skills = skills;
-    }
-
-    public List<UserEquipment> getEquipments() {
-        return equipments;
-    }
-
-    public void setEquipments(List<UserEquipment> equipments) {
-        this.equipments = equipments;
     }
 
     @Override

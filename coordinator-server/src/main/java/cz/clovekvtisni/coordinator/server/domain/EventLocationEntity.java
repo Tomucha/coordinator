@@ -1,12 +1,8 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cache;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.EventLocation;
-
-import com.googlecode.objectify.annotation.Id;;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,6 +15,9 @@ public class EventLocationEntity extends AbstractPersistentEntity<EventLocation,
 
     @Id
     private Long id;
+
+    @Parent
+    private Key<EventEntity> parentKey;
 
     @Index
     private String eventId;
@@ -39,7 +38,7 @@ public class EventLocationEntity extends AbstractPersistentEntity<EventLocation,
 
     @Override
     public Key<EventLocationEntity> getKey() {
-        return Key.create(EventLocationEntity.class, id);
+        return Key.create(Key.create(EventEntity.class, eventId), EventLocationEntity.class, id);
     }
 
     public Long getId() {
@@ -80,5 +79,13 @@ public class EventLocationEntity extends AbstractPersistentEntity<EventLocation,
 
     public void setRadius(Long radius) {
         this.radius = radius;
+    }
+
+    public Key<EventEntity> getParentKey() {
+        return parentKey;
+    }
+
+    public void setParentKey(Key<EventEntity> parentKey) {
+        this.parentKey = parentKey;
     }
 }

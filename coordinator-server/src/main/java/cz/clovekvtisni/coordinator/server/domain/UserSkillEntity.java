@@ -1,12 +1,9 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cache;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.UserSkill;
 
-import com.googlecode.objectify.annotation.Id;
 import java.util.Date;
 
 /**
@@ -16,10 +13,13 @@ import java.util.Date;
  */
 @Cache
 @Entity(name = "UserSkill")
-public class UserSkillsEntity extends AbstractPersistentEntity<UserSkill, UserSkillsEntity> implements CoordinatorEntity<UserSkillsEntity> {
+public class UserSkillEntity extends AbstractPersistentEntity<UserSkill, UserSkillEntity> implements CoordinatorEntity<UserSkillEntity> {
 
     @Id
     private Long id;
+
+    @Parent
+    private Key<UserEntity> parentKey;
 
     @Index
     private Long userId;
@@ -34,7 +34,7 @@ public class UserSkillsEntity extends AbstractPersistentEntity<UserSkill, UserSk
 
     private Date validTill;
 
-    public UserSkillsEntity() {
+    public UserSkillEntity() {
     }
 
     @Override
@@ -43,8 +43,16 @@ public class UserSkillsEntity extends AbstractPersistentEntity<UserSkill, UserSk
     }
 
     @Override
-    public Key<UserSkillsEntity> getKey() {
-        return Key.create(UserSkillsEntity.class, id);
+    public Key<UserSkillEntity> getKey() {
+        return Key.create(UserSkillEntity.class, id);
+    }
+
+    public Key<UserEntity> getParentKey() {
+        return parentKey;
+    }
+
+    public void setParentKey(Key<UserEntity> parentKey) {
+        this.parentKey = parentKey;
     }
 
     public Long getId() {
@@ -105,7 +113,7 @@ public class UserSkillsEntity extends AbstractPersistentEntity<UserSkill, UserSk
 
     @Override
     public String toString() {
-        return "UserSkillsEntity{" +
+        return "UserSkillEntity{" +
                 "id=" + id +
                 ", userId=" + userId +
                 ", skillId='" + skillId + '\'' +

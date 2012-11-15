@@ -74,7 +74,7 @@ public class UserEditController extends AbstractController {
                 userService.updateUser(toSave);
             }
         } catch (UniqueKeyViolation e) {
-            addFieldError(bindingResult, "form", e.getProperty().toString().toLowerCase(), null, "error.UNIQUE_KEY_VIOLATION");
+            addFieldError(bindingResult, "form", e.getProperty().toString().toLowerCase(), form.getEmail(), "error.UNIQUE_KEY_VIOLATION");
             return "admin/user-edit";
 
         } catch (MaException e) {

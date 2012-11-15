@@ -73,13 +73,6 @@ public class UserApiController extends AbstractApiController {
         }
         UserEntity user = userService.createUser(new UserEntity().populateFrom(newUser));
 
-        if (params.getEquipments() != null) {
-            for (UserEquipment equipment : params.getEquipments()) {
-                equipment.setUserId(user.getId());
-                equipmentService.addUserEquipment(new UserEquipmentEntity().populateFrom(equipment));
-            }
-        }
-
         return okResult(new RegisterResponseData(user.buildTargetEntity()));
     }
 }

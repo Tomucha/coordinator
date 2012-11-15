@@ -27,22 +27,19 @@ import java.util.Map;
 public class EventServiceImpl extends AbstractServiceImpl implements EventService {
     @Override
     public EventEntity findByEventId(String id, long flags) {
-        MaObjectify ofy = ofy();
         EventFilter filter = new EventFilter();
         filter.setEventIdVal(id);
-        ResultList<EventEntity> result = ofy.findByFilter(filter, null, 1);
+        ResultList<EventEntity> result = ofy().findByFilter(filter, null, 1);
         if (result.getResultSize() == 0) return null;
         EventEntity event = result.firstResult();
-        populateEvent(ofy, event, flags);
+        populateEvent(ofy(), event, flags);
 
         return  event;
     }
 
     @Override
     public ResultList<EventEntity> findByFilter(EventFilter filter, int limit, String bookmark, long flags) {
-        MaObjectify ofy = ofy();
-
-        return ofy.findByFilter(filter, bookmark, limit);
+        return ofy().findByFilter(filter, bookmark, limit);
     }
 
     @Override
@@ -65,14 +62,14 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
             @Override
             public EventEntity run() {
                 entity.setId(null);
-                updateSystemFields(entity);
-                ofy().save().entity(entity).now();
+                updateSystemFields(entity, null);
+                ofy().put(entity);
 
                 if (entity.getEventLocationList() != null) {
                     for (EventLocationEntity location : entity.getEventLocationList()) {
                         location.setId(null);
                         location.setEventId(entity.getEventId());
-                        updateSystemFields(location);
+                        updateSystemFields(location, null);
                         Key<EventLocationEntity> inserted = ofy().save().entity(location).now();
                         location.setId(inserted.getId());
                     }
@@ -85,18 +82,19 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
 
     @Override
     public EventEntity updateEvent(final EventEntity entity) {
-        final MaObjectify ofy = ofy();
         logger.debug("updating " + entity);
-        return ofy.transact(new Work<EventEntity>() {
+        return ofy().transact(new Work<EventEntity>() {
             @Override
             public EventEntity run() {
-                updateSystemFields(entity);
-                ofy.save().entity(entity).now();
+                // TODO co kdyz appengina nic nevrati? vyhodit vyjimku? Nebo nejak poresit v MaObjectify?
+                EventEntity old = ofy().get(entity.getKey());
+                updateSystemFields(entity, old);
+                ofy().put(entity);
 
                 List<EventLocationEntity> locationList = entity.getEventLocationList();
                 if (locationList != null) {
                     Map<Long, EventLocationEntity> savedLocationMap = new HashMap<Long, EventLocationEntity>();
-                    for (EventLocationEntity saved : getEventLocations(ofy, entity.getEventId())) {
+                    for (EventLocationEntity saved : getEventLocations(entity.getEventId())) {
                         savedLocationMap.put(saved.getId(), saved);
                     }
 
@@ -105,24 +103,24 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
                         if (location.isNew()) {
                             location.setId(null);
                             location.setEventId(entity.getEventId());
-                            updateSystemFields(location);
-                            ofy.put(location);
+                            updateSystemFields(location, old);
+                            ofy().put(location);
                             newList.add(location);
 
                         } else if (location.isDeleted()) {
-                            ofy.delete(location);
+                            ofy().delete(location);
                             savedLocationMap.remove(location.getId());
 
                         } else {
-                            updateSystemFields(location);
-                            ofy.put(location);
+                            updateSystemFields(location, old);
+                            ofy().put(location);
                             savedLocationMap.remove(location.getId());
                             newList.add(location);
                         }
                     }
 
                     for (EventLocationEntity toDelete : savedLocationMap.values()) {
-                        ofy.delete(toDelete);
+                        ofy().delete(toDelete);
                     }
 
                     entity.setEventLocationList(newList);
@@ -138,23 +136,21 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
         // TODO
     }
 
-    private List<EventLocationEntity> getEventLocations(MaObjectify ofy, String eventId) {
+    private List<EventLocationEntity> getEventLocations(String eventId) {
         EventLocationFilter filter = new EventLocationFilter();
         filter.setEventIdVal(eventId);
 
-        ResultList<EventLocationEntity> locations = ofy.findByFilter(filter, null, 0);
+        ResultList<EventLocationEntity> locations = ofy().findByFilter(filter, null, 0);
 
         return locations.getResult();
     }
 
     @Override
     public ResultList<OrganizationInEventEntity> getOrganizationInEventList(String organizationId, int limit, String bookmark, long flags) {
-        MaObjectify ofy = ofy();
-
         OrganizationInEventFilter filter = new OrganizationInEventFilter();
         filter.setOrganizationIdVal(organizationId);
 
-        ResultList<OrganizationInEventEntity> result = ofy.findByFilter(filter, bookmark, limit);
+        ResultList<OrganizationInEventEntity> result = ofy().findByFilter(filter, bookmark, limit);
 
         if ((flags & FLAG_FETCH_EVENT) != 0) {
             Map<Key<EventEntity>, OrganizationInEventEntity> inEventMap = new HashMap<Key<EventEntity>, OrganizationInEventEntity>(result.getResult().size());
@@ -162,10 +158,10 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
                 Key<EventEntity> key = Key.create(EventEntity.class, inEvent.getId());
                 inEventMap.put(key, inEvent);
             }
-            Map<Key<EventEntity>, EventEntity> entityMap = ofy.get(inEventMap.keySet());
+            Map<Key<EventEntity>, EventEntity> entityMap = ofy().get(inEventMap.keySet());
             for (Map.Entry<Key<EventEntity>, EventEntity> entry : entityMap.entrySet()) {
                 if (entry.getValue().isDeleted()) continue;
-                populateEvent(ofy, entry.getValue(), flags);
+                populateEvent(ofy(), entry.getValue(), flags);
                 inEventMap.get(entry.getKey()).setEventEntity(entry.getValue());
             }
         }

@@ -1,6 +1,5 @@
 package cz.clovekvtisni.coordinator.server.web.model;
 
-import cz.clovekvtisni.coordinator.domain.UserEquipment;
 import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 import cz.clovekvtisni.coordinator.domain.config.Role;
@@ -80,7 +79,7 @@ public class UserForm extends UserEntity {
 
     public void postValidate(BindingResult bindingResult, MessageSource messageSource, Locale locale) {
         if (getNewPassword() != null && !getNewPassword().equals(getConfirmPassword())) {
-            bindingResult.addError(new FieldError("form", "confirmPassword", null, false, null, null, messageSource.getMessage("error.PASSWORD_CONFIRM_FAILED", null, locale)));
+            bindingResult.addError(new FieldError("form", "confirmPassword", getNewPassword(), false, null, null, messageSource.getMessage("error.PASSWORD_CONFIRM_FAILED", null, locale)));
         }
     }
 
@@ -109,7 +108,7 @@ public class UserForm extends UserEntity {
 
         List<UserEquipmentEntity> equipmentList = new ArrayList<UserEquipmentEntity>();
         if (!isNew()) {
-            for (UserEquipmentEntity equipmentEntity : user.getEquipmentList()) {
+            for (UserEquipmentEntity equipmentEntity : user.getEquipmentEntityList()) {
                 if (selectedEquipment.contains(equipmentEntity.getEquipmentId())) {
                     selectedEquipment.remove(equipmentEntity.getEquipmentId());
 
@@ -124,7 +123,7 @@ public class UserForm extends UserEntity {
             equipment.setEquipmentId(equipmentId);
             equipmentList.add(equipment);
         }
-        exported.setEquipmentList(equipmentList.toArray(new UserEquipmentEntity[0]));
+        exported.setEquipmentEntityList(equipmentList.toArray(new UserEquipmentEntity[0]));
 
         return exported;
     }
@@ -132,7 +131,7 @@ public class UserForm extends UserEntity {
     @Override
     public UserEntity populateFrom(UserEntity entity) {
         super.populateFrom(entity);
-        UserEquipmentEntity[] equipmentList = entity.getEquipmentList();
+        UserEquipmentEntity[] equipmentList = entity.getEquipmentEntityList();
         if (equipmentList != null) {
             selectedEquipment = new HashSet<String>(equipmentList.length);
             for (UserEquipmentEntity equipmentEntity : equipmentList) {

@@ -24,7 +24,7 @@
             <sf:errors />
 
             <div class="formPanel">
-                <c:if test="${can:isSuperadmin()}">
+                <c:if test="${can:isSuperadmin() and empty form.id}">
                     <div>
                         <tags:input field="organizationId" modelAttribute="form" captionCode="UserEntity.organization">
                             <sf:select path="organizationId" items="${form.organizationMap}"/>

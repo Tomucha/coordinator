@@ -110,11 +110,11 @@ public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory>
         return entity;
     }
 
-    public Map<Key<EventEntity>, EventEntity> get(Set<Key<EventEntity>> keys) {
+    public <T> Map<Key<T>, T> get(Set<Key<T>> keys) {
         return load().keys(keys);
     }
 
-    public PoiEntity get(Key<PoiEntity> poiEntityKey) {
-        return load().key(poiEntityKey).get();
+    public <T> T get(Key<T> key) {
+        return load().key(key).get();
     }
 }
