@@ -5,6 +5,7 @@ import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserEquipment;
 import cz.clovekvtisni.coordinator.domain.UserSkill;
+import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -264,6 +265,29 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
             map.put(skillEntity.getSkillId(), skillEntity);
         }
         return map;
+    }
+
+    public String getFullName() {
+        if (ValueTool.isEmpty(firstName) && ValueTool.isEmpty(lastName))
+            return "";
+        else if (ValueTool.isEmpty(firstName))
+            return lastName;
+        else
+            return lastName + ", " + firstName;
+    }
+
+    public String getFullAddress() {
+        StringBuilder str = new StringBuilder();
+        if (!ValueTool.isEmpty(addressLine))
+            str.append(addressLine);
+        if (!ValueTool.isEmpty(city))
+            str.append((str.length() == 0 ? "" : ", ") + city);
+        if (!ValueTool.isEmpty(zip))
+            str.append((str.length() == 0 ? "" : ", ") + zip);
+        if (!ValueTool.isEmpty(country))
+            str.append((str.length() == 0 ? "" : ", ") + country);
+
+        return str.toString();
     }
 
     @Override

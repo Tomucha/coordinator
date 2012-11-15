@@ -25,7 +25,7 @@ public class EventEditController extends AbstractController {
     @Autowired
     private EventService eventService;
 
-    @CheckPermission("#helper.canCreate(eventEntity)")
+    @CheckPermission("#helper.canCreate(eventEntity)") // nefunkcni, TODO
     @RequestMapping(method = RequestMethod.GET)
     public String edit(@RequestParam(value = "eventId", required = false) String eventId, Model model) {
         EventForm form = new EventForm();

@@ -49,7 +49,9 @@
                         </td>
                         <td>
                             <a href="/admin/event/edit?eventId=<c:out value="${event.eventId}"/>"><s:message code="button.detail"/></a> /
-                            <a href="/admin/event/edit?eventId=<c:out value="${event.eventId}"/>"><s:message code="button.edit"/></a>
+                            <c:if test="${can:create('eventEntity')}">
+                                <a href="/admin/event/edit?eventId=<c:out value="${event.eventId}"/>"><s:message code="button.edit"/></a>
+                            </c:if>
                         </td>
                     </tr>
                 </c:forEach>

@@ -2,6 +2,7 @@ package cz.clovekvtisni.coordinator.server.security;
 
 import cz.clovekvtisni.coordinator.domain.config.Role;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -56,6 +57,11 @@ public class AuthorizationTool {
             return isAuthorized(Arrays.asList(new String[] {ADMIN}), creatorRoles);
 
         return true;
+    }
+
+    public boolean hasRole(String roleId, UserEntity user) {
+        if (user == null) return roleId == null;
+        return isAuthorized(Arrays.asList(new String[] {roleId}), Arrays.asList(user.getRoleIdList()));
     }
 
     public boolean isAuthorized(List<String> needOneOfRoles, List<String>... hasAllRoles) {

@@ -11,7 +11,9 @@
     <table>
         <c:forEach items="${userResult.result}" var="user">
             <tr>
+                <td><c:out value="${user.fullName}"/></td>
                 <td><c:out value="${user.email}"/></td>
+                <td><c:out value="${user.fullAddress}"/></td>
                 <td>
                     <a href="${root}/admin/user/edit?userId=<c:out value="${user.id}"/>"><s:message code="button.edit"/></a>
                 </td>

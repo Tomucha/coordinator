@@ -13,14 +13,16 @@
 
             <sf:errors />
 
-            <div>
-                <sf:hidden path="id"/>
-                <tags:input field="eventId" modelAttribute="form" captionCode="label.eventId">
-                    <sf:input path="eventId" />
-                </tags:input>
-            </div>
+            <c:if test="${form.new}">
+                <div>
+                    <tags:input field="eventId" modelAttribute="form" captionCode="label.eventId">
+                        <sf:input path="eventId" />
+                    </tags:input>
+                </div>
+            </c:if>
 
             <div>
+                <sf:hidden path="id"/>
                 <tags:input field="name" modelAttribute="form" captionCode="label.name">
                     <sf:input path="name"/>
                 </tags:input>

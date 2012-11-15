@@ -39,6 +39,9 @@ public class EventServiceImpl extends AbstractServiceImpl implements EventServic
 
     @Override
     public ResultList<EventEntity> findByFilter(EventFilter filter, int limit, String bookmark, long flags) {
+        if (filter.getOrganizationIdVal() != null) {
+            return findByOrganization(filter.getOrganizationIdVal(), limit, bookmark, flags);
+        }
         return ofy().findByFilter(filter, bookmark, limit);
     }
 

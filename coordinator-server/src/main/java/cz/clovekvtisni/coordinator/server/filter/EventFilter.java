@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.filter;
 
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.NoDeletedFilter;
 
 /**
@@ -13,6 +14,10 @@ public class EventFilter extends NoDeletedFilter<EventEntity> {
     private String eventIdVal;
 
     private Operator eventIdOp = Operator.EQ;
+
+    private String organizationIdVal;
+
+    private Operator organizationIdOp = Operator.EQ;
 
     @Override
     public Class<EventEntity> getEntityClass() {
@@ -33,5 +38,21 @@ public class EventFilter extends NoDeletedFilter<EventEntity> {
 
     public void setEventIdOp(Operator eventIdOp) {
         this.eventIdOp = eventIdOp;
+    }
+
+    public String getOrganizationIdVal() {
+        return organizationIdVal;
+    }
+
+    public void setOrganizationIdVal(String organizationIdVal) {
+        this.organizationIdVal = organizationIdVal;
+    }
+
+    public Operator getOrganizationIdOp() {
+        return organizationIdOp;
+    }
+
+    public void setOrganizationIdOp(Operator organizationIdOp) {
+        this.organizationIdOp = organizationIdOp;
     }
 }

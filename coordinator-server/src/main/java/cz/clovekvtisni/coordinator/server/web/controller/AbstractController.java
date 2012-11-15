@@ -3,10 +3,7 @@ package cz.clovekvtisni.coordinator.server.web.controller;
 import cz.clovekvtisni.coordinator.exception.MaException;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
-import cz.clovekvtisni.coordinator.server.security.AppContext;
-import cz.clovekvtisni.coordinator.server.security.PermissionCheckResultModel;
-import cz.clovekvtisni.coordinator.server.security.SecurityTool;
-import cz.clovekvtisni.coordinator.server.security.ServicePermissionCheckDescriptor;
+import cz.clovekvtisni.coordinator.server.security.*;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +27,8 @@ import java.util.Locale;
  */
 public class AbstractController {
 
+    protected static int DEFAULT_LIST_LENGTH = 30;
+
     @Autowired
     protected MessageSource messageSource;
 
@@ -41,6 +40,9 @@ public class AbstractController {
 
     @Autowired
     protected PoiService poiService;
+
+    @Autowired
+    protected AuthorizationTool authorizationTool;
 
     @ModelAttribute
     public void loggedUser(Model model) {
@@ -79,5 +81,17 @@ public class AbstractController {
 
     protected UserEntity getLoggedUser() {
         return appContext.getLoggedUser();
+    }
+
+    protected boolean isSuperAdmin(UserEntity user) {
+        return authorizationTool.hasRole(AuthorizationTool.SUPERADMIN, user);
+    }
+
+    protected boolean isAdmin(UserEntity user) {
+        return authorizationTool.hasRole(AuthorizationTool.ADMIN, user);
+    }
+
+    protected boolean isBackendAdmin(UserEntity user) {
+        return authorizationTool.hasRole(AuthorizationTool.BACKEND, user);
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.beans.BeanWrapperImpl;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,12 +72,20 @@ public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory>
             return query;
 
         BeanWrapper sourceWrapper = new BeanWrapperImpl(filter);
+        BeanWrapperImpl dstWrapper = new BeanWrapperImpl(filter.getEntityClass());
+        PropertyDescriptor[] dstPropertyDescriptors = dstWrapper.getPropertyDescriptors();
+        List<String> entityProperties = new ArrayList<String>(dstPropertyDescriptors.length);
+        for (PropertyDescriptor dstPropertyDescriptor : dstPropertyDescriptors) {
+            entityProperties.add(dstPropertyDescriptor.getName());
+        }
 
         final PropertyDescriptor[] srcPropertyDescriptors = sourceWrapper.getPropertyDescriptors();
         for (PropertyDescriptor srcPropertyDescriptor : srcPropertyDescriptors) {
             final String srcPropertyName = srcPropertyDescriptor.getName();
             if (srcPropertyName.endsWith("Val")) {
                 String baseName = srcPropertyName.substring(0, srcPropertyName.length() - 3);
+                if (!entityProperties.contains(baseName))
+                    continue;
                 String operatorName = baseName + "Op";
                 if (sourceWrapper.isReadableProperty(srcPropertyName) && sourceWrapper.isReadableProperty(operatorName)) {
                     Filter.Operator operator = (Filter.Operator) sourceWrapper.getPropertyValue(operatorName);

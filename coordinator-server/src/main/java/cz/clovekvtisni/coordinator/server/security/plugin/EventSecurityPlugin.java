@@ -17,11 +17,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class EventSecurityPlugin extends SecurityPlugin {
 
-    @Autowired
     private AuthorizationTool authorizationTool;
 
-    @Autowired
     private AppContext appContext;
+
+    @Autowired
+    public EventSecurityPlugin(AuthorizationTool authorizationTool, AppContext appContext) {
+        this.authorizationTool = authorizationTool;
+        this.appContext = appContext;
+    }
 
     @Override
     protected void register() {
