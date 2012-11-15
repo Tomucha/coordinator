@@ -29,7 +29,7 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
     private String description;
 
     @Ignore
-    private List<EventLocationEntity> eventLocationList;
+    private EventLocationEntity[] eventLocationList;
 
     public EventEntity() {
     }
@@ -76,11 +76,11 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
         this.description = description;
     }
 
-    public List<EventLocationEntity> getEventLocationList() {
+    public EventLocationEntity[] getEventLocationList() {
         return eventLocationList;
     }
 
-    public void setEventLocationList(List<EventLocationEntity> eventLocationList) {
+    public void setEventLocationList(EventLocationEntity[] eventLocationList) {
         this.eventLocationList = eventLocationList;
     }
 

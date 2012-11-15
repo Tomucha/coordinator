@@ -1,21 +1,18 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
-import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.server.LocalDatastoreTest;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.EventLocationEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserEntity;
-import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.util.RunnableWithResult;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,7 +40,7 @@ public class EventServiceImplTest extends LocalDatastoreTest {
 
         event.setEventId(testEventId);
         event.setDescription(testDescription);
-        event.setEventLocationList(locationList);
+        event.setEventLocationList(locationList.toArray(new EventLocationEntity[0]));
 
         securityTool.runWithDisabledSecurity(new RunnableWithResult<Object>() {
             @Override
@@ -54,7 +51,7 @@ public class EventServiceImplTest extends LocalDatastoreTest {
                 assertEquals(testDescription, res.getDescription());
                 assertEquals(testEventId, res.getEventId());
                 assertNotNull(res.getEventLocationList());
-                assertEquals(1, res.getEventLocationList().size());
+                assertEquals(1, res.getEventLocationList().length);
                 return null;
             }
         });
