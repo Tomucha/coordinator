@@ -7,6 +7,13 @@
 %>
 <h2><s:message code="header.eventCreate"/></h2>
 
+<div class="eastPanel" style="float:right;width: 300px;margin-left: 30px">
+    <div class="buttonPanel">
+        <button type="button" onclick="CoordinatorMap.startSetLocation()">__Set location__</button>
+    </div>
+    <tags:osm width="300px" height="300px" longitude="14.4489967" latitude="50.0789306" zoom="13"/>
+</div>
+
 <div class="mainPanel">
     <div class="eventForm">
         <sf:form method="POST" action="${root}/admin/event/edit" modelAttribute="form">
@@ -37,10 +44,9 @@
             <div class="buttonPanel">
                 <sf:button><s:message code="button.save"/></sf:button>
             </div>
+
+
         </sf:form>
     </div>
 </div>
 
-<div class="eastPanel">
-    <div class="map">tady bude mapa</div>
-</div>
