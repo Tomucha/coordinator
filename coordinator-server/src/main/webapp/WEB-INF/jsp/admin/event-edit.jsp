@@ -14,9 +14,40 @@
     <tags:osm width="300px" height="300px" longitude="14.4489967" latitude="50.0789306" zoom="13"/>
 </div>
 
+<script type="text/javascript">
+    function fetchLocations() {
+        var locations = CoordinatorMap.getLocations();
+        var cont = $("#hiddenInputContainer");
+        for (var i = 0 ; i < locations.length ; i++) {
+            var location = locations[i];
+            $('<input>').attr({
+                <%-- TODO json --%>
+                eventId: "<c:out value="${form.eventId}" escapeXml="true"/>",
+                type: 'hidden',
+                name: 'locationList[' + i + '].longitude',
+                value: location.longitude
+            }).appendTo(cont);
+            $('<input>').attr({
+                eventId: "<c:out value="${form.eventId}" escapeXml="true"/>",
+                type: 'hidden',
+                name: 'locationList[' + i + '].latitude',
+                value: location.latitude
+            }).appendTo('form');
+            $('<input>').attr({
+                eventId: "<c:out value="${form.eventId}" escapeXml="true"/>",
+                type: 'hidden',
+                name: 'locationList[' + i + '].radius',
+                value: location.radius
+            }).appendTo('form');
+        }
+
+        return true;
+    }
+</script>
+
 <div class="mainPanel">
     <div class="eventForm">
-        <sf:form method="POST" action="${root}/admin/event/edit" modelAttribute="form">
+        <sf:form method="POST" action="${root}/admin/event/edit" modelAttribute="form" onsubmit="return fetchLocations()">
 
             <sf:errors />
 
@@ -28,7 +59,7 @@
                 </div>
             </c:if>
 
-            <div>
+            <div id="hiddenInputContainer">
                 <sf:hidden path="id"/>
                 <tags:input field="name" modelAttribute="form" captionCode="label.name">
                     <sf:input path="name"/>
@@ -44,7 +75,6 @@
             <div class="buttonPanel">
                 <sf:button><s:message code="button.save"/></sf:button>
             </div>
-
 
         </sf:form>
     </div>

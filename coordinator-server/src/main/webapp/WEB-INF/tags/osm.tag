@@ -25,17 +25,93 @@
     size = new OpenLayers.Size(21, 25);
     var icon = new OpenLayers.Icon('http://www.openstreetmap.org/openlayers/img/marker.png', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
 
+    var popup = null;
+    var editedLocationMarker = null;
+
     var CoordinatorMap = {
         position: function(lon, lat) {
             return new OpenLayers.LonLat(lon, lat).transform( fromProjection, toProjection);
         },
 
-        addLocation: function(lon, lat) {
+        setState: function(newState) {
+            state = newState;
+        },
 
+        getState: function() {
+            return state;
+        },
+
+        addLocation: function(lonLat) {
+            var marker = new OpenLayers.Marker(lonLat, icon.clone());
+            marker.id = new Date().getTime();
+            marker.events.register("click", marker, function(event) {
+                editedLocationMarker = marker;
+                CoordinatorMap.showLocationEditForm(marker.id);
+            });
+
+            markerLayer.addMarker(marker);
+        },
+
+        getLocations: function() {
+            var length = markerLayer.markers.length;
+            result = new Array();
+            for (var i = 0 ; i < length ; i++) {
+                var marker = markerLayer.markers[i];
+                var lonlat = new OpenLayers.LonLat(marker.lonlat.lon, marker.lonlat.lat).transform( toProjection, fromProjection);
+                result[i] = {
+                    latitude: lonlat.lat,
+                    longitude: lonlat.lon,
+                    radius: marker.radius
+                };
+            }
+
+            return result;
+        },
+
+        saveLocationRadius: function(radius) {
+            if (editedLocationMarker != null) {
+                var length = markerLayer.markers.length;
+                for (var i = 0 ; i < length ; i++) {
+                    if (markerLayer.markers[i].id == editedLocationMarker.id) {
+                        markerLayer.markers[i].radius = radius;
+                        break;
+                    }
+                }
+            }
+            CoordinatorMap.closeLocationEditForm();
+        },
+
+        closeLocationEditForm: function() {
+            if (popup != null) {
+                map.removePopup(popup);
+            }
+        },
+
+        showLocationEditForm: function(markerId) {
+            CoordinatorMap.closeLocationEditForm();
+            var length = markerLayer.markers.length;
+            for (var i = 0 ; i < length ; i++) {
+                if (markerLayer.markers[i].id == markerId) {
+                    var marker = markerLayer.markers[i];
+                    editedLocationMarker = marker;
+                    var form = $("#locationEditForm");
+                    if (marker && marker.radius) {
+                        form.find("#radius").attr("value", marker.radius);
+                    }
+                    popup = new OpenLayers.Popup(
+                            "Rozsah místa",
+                            marker.lonlat,
+                            new OpenLayers.Size(125, 100),
+                            form.html()
+                    );
+                    map.addPopup(popup);
+                    popup.show();
+                }
+            }
         },
 
         startSetLocation: function() {
-            state = STATE_SET_LOCATION;
+            CoordinatorMap.setState(STATE_SET_LOCATION);
         }
     };
 
@@ -61,10 +137,9 @@
         },
 
         trigger: function(event) {
-            if (state == STATE_SET_LOCATION) {
+            if (CoordinatorMap.getState() == STATE_SET_LOCATION) {
                 var lonLat = map.getLonLatFromPixel(event.xy);
-                marker = new OpenLayers.Marker(lonLat, icon.clone());
-                markerLayer.addMarker(marker);
+                CoordinatorMap.addLocation(lonLat);
             }
         }
 
@@ -86,3 +161,10 @@
     });
 </script>
 <div id="mapContainer"></div>
+<div id="locationEditForm" style="display: none;">
+    <div><input id="radius" size="4"/> km</div>
+    <div>
+        <button type="button" onclick="CoordinatorMap.closeLocationEditForm()">Zrušit</button>
+        <button type="button" onclick="CoordinatorMap.saveLocationRadius($('#radius').val())">Ok</button>
+    </div>
+</div>
