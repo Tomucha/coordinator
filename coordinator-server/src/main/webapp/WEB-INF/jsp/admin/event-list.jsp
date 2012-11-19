@@ -32,7 +32,6 @@
                             <c:out value="${event.name}"/>
                         </td>
                         <td>
-                            50°15'50.979"N, 15°15'1.899"E
                             <c:if test="${!empty event.eventLocationEntityList}">
                                 <c:forEach items="${event.eventLocationEntityList}" var="location">
                                     <div><tags:gps longitude="${location.longitude}" latitude="${location.latitude}"/></div>
@@ -40,7 +39,6 @@
                             </c:if>
                         </td>
                         <td>
-                            36 km
                             <c:if test="${!empty event.eventLocationEntityList}">
                                 <c:forEach items="${event.eventLocationEntityList}" var="location">
                                     <div><c:out value="${location.radius}"/> km</div>
@@ -48,7 +46,6 @@
                             </c:if>
                         </td>
                         <td>
-                            <a href="/admin/event/edit?id=<c:out value="${event.id}"/>"><s:message code="button.detail"/></a> /
                             <c:if test="${can:create('eventEntity')}">
                                 <a href="/admin/event/edit?id=<c:out value="${event.id}"/>"><s:message code="button.edit"/></a>
                             </c:if>

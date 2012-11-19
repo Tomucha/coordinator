@@ -60,13 +60,11 @@
 
             <sf:errors />
 
-            <c:if test="${form.new}">
-                <div>
-                    <tags:input field="eventId" modelAttribute="form" captionCode="label.eventId">
-                        <sf:input path="eventId" />
-                    </tags:input>
-                </div>
-            </c:if>
+            <div style="display:${form.new ? 'block' : 'none'}">
+                <tags:input field="eventId" modelAttribute="form" captionCode="label.eventId">
+                    <sf:input path="eventId" />
+                </tags:input>
+            </div>
 
             <div id="hiddenInputContainer">
                 <sf:hidden path="id"/>

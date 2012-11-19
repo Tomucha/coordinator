@@ -46,8 +46,9 @@ public class EventEditController extends AbstractController {
 
     @CheckPermission("#helper.canCreate(eventEntity)")
     @RequestMapping(method = RequestMethod.POST)
-    public String createOrUpdate(@ModelAttribute("form") @Valid EventForm form, BindingResult bindingResult) {
+    public String createOrUpdate(@ModelAttribute("form") @Valid EventForm form, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("breadcrumbs", breadcrumbs(form));
             return "admin/event-edit";
         }
 
@@ -60,6 +61,7 @@ public class EventEditController extends AbstractController {
                 eventService.updateEvent(event);
             }
         } catch (MaException e) {
+            model.addAttribute("breadcrumbs", breadcrumbs(form));
             addFormError(bindingResult, e);
             return "admin/event-edit";
         }
