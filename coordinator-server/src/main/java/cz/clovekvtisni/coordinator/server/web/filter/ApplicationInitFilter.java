@@ -8,6 +8,7 @@ import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.web.RequestKeys;
 import cz.clovekvtisni.coordinator.server.web.SessionKeys;
 import cz.clovekvtisni.coordinator.util.Url;
+import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -61,7 +62,13 @@ public class ApplicationInitFilter implements Filter {
 
         try {
             if (loggedUserId == null && !isWithoutLoginRequest(hRequest)) {
-                hResponse.sendRedirect(root + "/login?retUrl=" + Url.encode(hRequest.getRequestURL().toString()));
+                Url url = new Url(hRequest.getRequestURL().toString());
+                String[] path = url.getPath();
+                String urlPath = root + "/login";
+                if (path != null && path.length > 0 && !ValueTool.isEmpty(path[0])) {
+                    urlPath += "?retUrl=" + Url.encode(hRequest.getRequestURL().toString());
+                }
+                hResponse.sendRedirect(urlPath);
                 return;
             }
 

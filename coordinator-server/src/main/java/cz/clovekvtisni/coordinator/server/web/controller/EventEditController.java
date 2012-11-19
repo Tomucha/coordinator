@@ -6,6 +6,7 @@ import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.security.CheckPermission;
 import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.web.model.EventForm;
+import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,17 +28,18 @@ public class EventEditController extends AbstractController {
 
     @CheckPermission("#helper.canCreate(eventEntity)") // nefunkcni, TODO
     @RequestMapping(method = RequestMethod.GET)
-    public String edit(@RequestParam(value = "eventId", required = false) String eventId, Model model) {
+    public String edit(@RequestParam(value = "id", required = false) Long eventId, Model model) {
         EventForm form = new EventForm();
 
         if (eventId != null) {
-            EventEntity event = eventService.findByEventId(eventId, EventService.FLAG_FETCH_LOCATIONS);
+            EventEntity event = eventService.findById(eventId, EventService.FLAG_FETCH_LOCATIONS);
             if (event == null)
                 throw NotFoundException.idNotExist();
             form.populateFrom(event);
         }
 
         model.addAttribute("form", form);
+        model.addAttribute("breadcrumbs", breadcrumbs(form));
 
         return "admin/event-edit";
     }
@@ -63,5 +65,27 @@ public class EventEditController extends AbstractController {
         }
 
         return "redirect:/admin/event/list";
+    }
+
+    public static Breadcrumb getBreadcrumb(EventEntity entity) {
+        return new Breadcrumb(entity, "/admin/event/edit", "breadcrumb.eventEdit");
+    }
+
+    public Breadcrumb[] breadcrumbs(EventEntity entity) {
+        if (entity == null || entity.isNew()) {
+            return new Breadcrumb[] {
+                    UserListController.getBreadcrumb(),
+                    EventListController.getBreadcrumb()
+            };
+
+        } else {
+            return new Breadcrumb[] {
+                    HomeController.getBreadcrumb(),
+                    EventMapController.getBreadcrumb(entity),
+                    EventUsersController.getBreadcrumb(entity),
+                    EventPlacesController.getBreadcrumb(entity),
+                    EventEditController.getBreadcrumb(entity)
+            };
+        }
     }
 }

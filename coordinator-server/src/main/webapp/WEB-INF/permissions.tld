@@ -34,6 +34,12 @@
     </function>
 
     <function>
+        <name>viewBreadcrumb</name>
+        <function-class>cz.clovekvtisni.coordinator.server.web.tag.AuthorizationFunctions</function-class>
+        <function-signature>boolean canRead(cz.clovekvtisni.coordinator.server.web.util.Breadcrumb)</function-signature>
+    </function>
+
+    <function>
         <name>hasRole</name>
         <function-class>cz.clovekvtisni.coordinator.server.web.tag.AuthorizationFunctions</function-class>
         <function-signature>boolean hasRole(java.lang.String))</function-signature>

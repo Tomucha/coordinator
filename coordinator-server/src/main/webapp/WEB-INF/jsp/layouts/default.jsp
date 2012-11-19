@@ -13,6 +13,7 @@
         <title>Coordinator</title>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+        <link type="text/css" href="${root}/css/coordinator.css" rel="stylesheet"/>
     </head>
     <body class="<tiles:getAsString name="extraClass"/>">
             <div class="pageHeader">
@@ -45,9 +46,11 @@
 
                 <div class="pageContentMain">
                     <div class="tabPanel">
-                        <a href="<s:url value="/admin/event/list"/>"><s:message code="tab.eventList"/></a>
-                        <a href="<s:url value="/admin/user/list"/>"><s:message code="tab.userList"/></a>
-                        <a href=""><s:message code="tab.placeList"/></a>
+                        <c:if test="${!empty breadcrumbs}">
+                            <c:forEach items="${breadcrumbs}" var="breadcrumb">
+                                <a href="<s:url value="${breadcrumb.linkUrl}"/>"><s:message code="${breadcrumb.labelCode}"/></a>
+                            </c:forEach>
+                        </c:if>
                     </div>
                     <div class="tabContent">
                         <tiles:insertAttribute name="content" />

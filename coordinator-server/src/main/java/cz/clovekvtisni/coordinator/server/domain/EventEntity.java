@@ -83,7 +83,7 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
     }
 
     public EventLocationEntity getFirstEventLocation() {
-        if (eventLocationEntityList == null) return null;
+        if (eventLocationEntityList == null || eventLocationEntityList.length == 0) return null;
         return eventLocationEntityList[0];
     }
 

@@ -7,6 +7,7 @@ import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.security.permission.CreatePermission;
 import cz.clovekvtisni.coordinator.server.security.permission.ReadPermission;
+import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +43,14 @@ public class AuthorizationFunctions {
 
     public static boolean canRead(CoordinatorEntity entity) {
         return securityTool.check(new ReadPermission(entity));
+    }
+
+    public static boolean canRead(Breadcrumb link) {
+        for (String roleId : link.isVisibleFor()) {
+            if (hasRole(roleId))
+                return true;
+        }
+        return false;
     }
 
     public static boolean canCreate(CoordinatorEntity entity) {

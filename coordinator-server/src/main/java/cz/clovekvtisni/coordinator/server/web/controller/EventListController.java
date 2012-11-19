@@ -8,6 +8,7 @@ import cz.clovekvtisni.coordinator.server.filter.EventFilter;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -77,4 +78,17 @@ public class EventListController extends AbstractController {
 
         return pois;
     }
+
+    public static Breadcrumb getBreadcrumb() {
+        return new Breadcrumb("/admin/event/list", "breadcrumb.eventList");
+    }
+
+    @ModelAttribute("breadcrumbs")
+    public Breadcrumb[] breadcrumbs() {
+        return new Breadcrumb[] {
+                UserListController.getBreadcrumb(),
+                EventListController.getBreadcrumb()
+        };
+    }
+
 }

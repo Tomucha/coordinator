@@ -25,6 +25,9 @@ public interface EventService extends Service {
     EventEntity findByEventId(String id, long flags);
 
     @FilterResult("#helper.canRead(#entity)")
+    EventEntity findById(Long id, long flags);
+
+    @FilterResult("#helper.canRead(#entity)")
     ResultList<EventEntity> findByFilter(EventFilter filter, int limit, String bookmark, long flags);
 
     @FilterResult("#helper.canRead(#entity)")

@@ -1,1 +1,10 @@
-/**/
+.pageContentLeft {
+    width: 300px;
+    float: left;
+    margin-right: 12px;
+    margin-bottom: 12px;
+    background-color: #eee;
+}
+.pageContentMain {
+    padding-left: 320px;
+}

@@ -15,7 +15,7 @@
                 <td><c:out value="${user.email}"/></td>
                 <td><c:out value="${user.fullAddress}"/></td>
                 <td>
-                    <a href="${root}/admin/user/edit?userId=<c:out value="${user.id}"/>"><s:message code="button.edit"/></a>
+                    <a href="${root}/admin/user/edit?id=<c:out value="${user.id}"/>"><s:message code="button.edit"/></a>
                 </td>
             </tr>
         </c:forEach>

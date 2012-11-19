@@ -11,6 +11,7 @@ import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.UniqueKeyViolation;
 import cz.clovekvtisni.coordinator.server.web.model.EventForm;
 import cz.clovekvtisni.coordinator.server.web.model.UserForm;
+import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
@@ -37,7 +38,7 @@ public class UserEditController extends AbstractController {
     private AuthorizationTool authorizationTool;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String edit(@RequestParam(value = "userId", required = false) Long userId, Model model) {
+    public String edit(@RequestParam(value = "id", required = false) Long userId, Model model) {
         UserForm form = new UserForm();
         form.injectConfigValues(appContext, authorizationTool, config);
 
@@ -80,4 +81,13 @@ public class UserEditController extends AbstractController {
 
         return "redirect:/admin/user/list";
     }
+
+    @ModelAttribute("breadcrumbs")
+    public Breadcrumb[] breadcrumbs() {
+        return new Breadcrumb[] {
+                UserListController.getBreadcrumb(),
+                EventListController.getBreadcrumb()
+        };
+    }
+
 }

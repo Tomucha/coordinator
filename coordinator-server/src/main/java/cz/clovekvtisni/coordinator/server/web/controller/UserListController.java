@@ -5,9 +5,11 @@ import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.security.CheckPermission;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -30,4 +32,15 @@ public class UserListController extends AbstractController {
         return "admin/user-list";
     }
 
+    public static Breadcrumb getBreadcrumb() {
+        return new Breadcrumb("/admin/user/list", "breadcrumb.userList");
+    }
+
+    @ModelAttribute("breadcrumbs")
+    public Breadcrumb[] breadcrumbs() {
+        return new Breadcrumb[] {
+                UserListController.getBreadcrumb(),
+                EventListController.getBreadcrumb()
+        };
+    }
 }

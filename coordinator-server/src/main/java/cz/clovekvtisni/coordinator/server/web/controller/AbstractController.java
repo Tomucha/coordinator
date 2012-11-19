@@ -6,6 +6,7 @@ import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.*;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.ui.Model;
@@ -25,7 +26,7 @@ import java.util.Locale;
  * Date: 10/26/12
  * Time: 11:59 PM
  */
-public class AbstractController {
+public abstract class AbstractController {
 
     protected static int DEFAULT_LIST_LENGTH = 30;
 
