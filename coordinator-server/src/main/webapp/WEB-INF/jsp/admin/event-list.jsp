@@ -33,16 +33,16 @@
                         </td>
                         <td>
                             50°15'50.979"N, 15°15'1.899"E
-                            <c:if test="${!empty event.eventLocationList}">
-                                <c:forEach items="${event.eventLocationList}" var="location">
+                            <c:if test="${!empty event.eventLocationEntityList}">
+                                <c:forEach items="${event.eventLocationEntityList}" var="location">
                                     <div><tags:gps longitude="${location.longitude}" latitude="${location.latitude}"/></div>
                                 </c:forEach>
                             </c:if>
                         </td>
                         <td>
                             36 km
-                            <c:if test="${!empty event.eventLocationList}">
-                                <c:forEach items="${event.eventLocationList}" var="location">
+                            <c:if test="${!empty event.eventLocationEntityList}">
+                                <c:forEach items="${event.eventLocationEntityList}" var="location">
                                     <div><c:out value="${location.radius}"/> km</div>
                                 </c:forEach>
                             </c:if>

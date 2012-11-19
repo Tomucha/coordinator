@@ -11,14 +11,4 @@ import java.util.List;
  * Date: 8.11.12
  */
 public class EventForm extends EventEntity {
-
-    private List<EventLocation> locationList;
-
-    public List<EventLocation> getLocationList() {
-        return locationList;
-    }
-
-    public void setLocationList(List<EventLocation> locationList) {
-        this.locationList = locationList;
-    }
 }

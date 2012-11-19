@@ -31,7 +31,7 @@ public class EventEditController extends AbstractController {
         EventForm form = new EventForm();
 
         if (eventId != null) {
-            EventEntity event = eventService.findByEventId(eventId, 0);
+            EventEntity event = eventService.findByEventId(eventId, EventService.FLAG_FETCH_LOCATIONS);
             if (event == null)
                 throw NotFoundException.idNotExist();
             form.populateFrom(event);

@@ -75,22 +75,6 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
         });
     }
 
-    protected void saveFields(EventEntity entity, EventEntity oldEntity) {
-        if (entity.getEventLocationList() == null) return;
-        entity.setEventLocationList(mergeEntities(oldEntity != null ? oldEntity.getEventLocationList() : null, entity.getEventLocationList()).toArray(new EventLocationEntity[0]));
-        for (EventLocationEntity location : entity.getEventLocationList()) {
-            if (oldEntity == null)
-                location.setId(null);
-            location.setEventId(entity.getEventId());
-            location.setParentKey(entity.getKey());
-            updateSystemFields(location, null);
-            if (location.isDeleted())
-                ofy().delete(location);
-            else
-                ofy().put(location);
-        }
-    }
-
     @Override
     public EventEntity updateEvent(final EventEntity entity) {
         logger.debug("updating " + entity);
@@ -106,6 +90,22 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
                 return entity;
             }
         });
+    }
+
+    protected void saveFields(EventEntity entity, EventEntity oldEntity) {
+        if (entity.getEventLocationEntityList() == null) return;
+        entity.setEventLocationEntityList(mergeEntities(oldEntity != null ? oldEntity.getEventLocationEntityList() : null, entity.getEventLocationEntityList()).toArray(new EventLocationEntity[0]));
+        for (EventLocationEntity location : entity.getEventLocationEntityList()) {
+            if (oldEntity == null)
+                location.setId(null);
+            location.setEventId(entity.getEventId());
+            location.setParentKey(entity.getKey());
+            updateSystemFields(location, null);
+            if (location.isDeleted())
+                ofy().delete(location);
+            else
+                ofy().put(location);
+        }
     }
 
     @Override
@@ -151,7 +151,7 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
             EventLocationFilter filter = new EventLocationFilter();
             filter.setEventIdVal(entity.getEventId());
             ResultList<EventLocationEntity> result = ofy.findByFilter(filter, null, 0);
-            entity.setEventLocationList(result.getResult().toArray(new EventLocationEntity[0]));
+            entity.setEventLocationEntityList(result.getResult().toArray(new EventLocationEntity[0]));
         }
     }
 }

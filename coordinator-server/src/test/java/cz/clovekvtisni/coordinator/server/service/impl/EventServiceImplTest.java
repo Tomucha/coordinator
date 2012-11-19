@@ -40,7 +40,7 @@ public class EventServiceImplTest extends LocalDatastoreTest {
 
         event.setEventId(testEventId);
         event.setDescription(testDescription);
-        event.setEventLocationList(locationList.toArray(new EventLocationEntity[0]));
+        event.setEventLocationEntityList(locationList.toArray(new EventLocationEntity[0]));
 
         securityTool.runWithDisabledSecurity(new RunnableWithResult<Object>() {
             @Override
@@ -50,8 +50,8 @@ public class EventServiceImplTest extends LocalDatastoreTest {
                 assertNotNull(res);
                 assertEquals(testDescription, res.getDescription());
                 assertEquals(testEventId, res.getEventId());
-                assertNotNull(res.getEventLocationList());
-                assertEquals(1, res.getEventLocationList().length);
+                assertNotNull(res.getEventLocationEntityList());
+                assertEquals(1, res.getEventLocationEntityList().length);
                 return null;
             }
         });

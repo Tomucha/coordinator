@@ -4,17 +4,7 @@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
-%>
-<h2><s:message code="header.eventCreate"/></h2>
-
-<div class="eastPanel" style="float:right;width: 300px;margin-left: 30px">
-    <div class="buttonPanel">
-        <button type="button" onclick="CoordinatorMap.startSetLocation()">__Set location__</button>
-    </div>
-    <tags:osm width="300px" height="300px" longitude="14.4489967" latitude="50.0789306" zoom="13"/>
-</div>
-
-<script type="text/javascript">
+%><script type="text/javascript">
     function fetchLocations() {
         var locations = CoordinatorMap.getLocations();
         var cont = $("#hiddenInputContainer");
@@ -24,26 +14,45 @@
                 <%-- TODO json --%>
                 eventId: "<c:out value="${form.eventId}" escapeXml="true"/>",
                 type: 'hidden',
-                name: 'locationList[' + i + '].longitude',
+                name: 'eventLocationEntityList[' + i + '].longitude',
                 value: location.longitude
             }).appendTo(cont);
             $('<input>').attr({
                 eventId: "<c:out value="${form.eventId}" escapeXml="true"/>",
                 type: 'hidden',
-                name: 'locationList[' + i + '].latitude',
+                name: 'eventLocationEntityList[' + i + '].latitude',
                 value: location.latitude
-            }).appendTo('form');
+            }).appendTo(cont);
             $('<input>').attr({
                 eventId: "<c:out value="${form.eventId}" escapeXml="true"/>",
                 type: 'hidden',
-                name: 'locationList[' + i + '].radius',
+                name: 'eventLocationEntityList[' + i + '].radius',
                 value: location.radius
-            }).appendTo('form');
+            }).appendTo(cont);
         }
 
         return true;
     }
+
+    function initialize() {
+        <c:if test="${!empty form.eventLocationEntityList}">
+            <c:forEach items="${form.eventLocationEntityList}" var="eventLocation">
+                 <c:if test="${!empty eventLocation.longitude and !empty eventLocation.latitude}">
+                     CoordinatorMap.addLocation(
+                             CoordinatorMap.position(<c:out value="${eventLocation.longitude}"/>, <c:out value="${eventLocation.latitude}"/>),
+                             <c:out value="${!empty eventLocation.radius ? eventLocation.radius : 'null'}"/>
+                     );
+                </c:if>
+            </c:forEach>
+        </c:if>
+    }
 </script>
+
+<h2><s:message code="header.eventCreate"/></h2>
+
+<div class="eastPanel" style="float:right;width: 300px;margin-left: 30px">
+    <tags:osm width="300px" height="300px" longitude="${!empty form.firstEventLocation and form.firstEventLocation.longitude > 0.0 ? form.firstEventLocation.longitude : null}" latitude="${!empty form.firstEventLocation and form.firstEventLocation.latitude > 0.0 ? form.firstEventLocation.latitude : null}" zoom="13" onLoad="initialize()" enableLocations="true"/>
+</div>
 
 <div class="mainPanel">
     <div class="eventForm">

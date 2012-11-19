@@ -5,8 +5,6 @@ import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.Event;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import java.util.List;
-
 /**
  * Created with IntelliJ IDEA.
  * User: jka
@@ -29,7 +27,7 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
     private String description;
 
     @Ignore
-    private EventLocationEntity[] eventLocationList;
+    private EventLocationEntity[] eventLocationEntityList;
 
     public EventEntity() {
     }
@@ -76,12 +74,17 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
         this.description = description;
     }
 
-    public EventLocationEntity[] getEventLocationList() {
-        return eventLocationList;
+    public EventLocationEntity[] getEventLocationEntityList() {
+        return eventLocationEntityList;
     }
 
-    public void setEventLocationList(EventLocationEntity[] eventLocationList) {
-        this.eventLocationList = eventLocationList;
+    public void setEventLocationEntityList(EventLocationEntity[] eventLocationEntityList) {
+        this.eventLocationEntityList = eventLocationEntityList;
+    }
+
+    public EventLocationEntity getFirstEventLocation() {
+        if (eventLocationEntityList == null) return null;
+        return eventLocationEntityList[0];
     }
 
     @Override
