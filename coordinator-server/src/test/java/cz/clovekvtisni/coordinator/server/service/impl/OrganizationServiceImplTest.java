@@ -20,7 +20,7 @@ public class OrganizationServiceImplTest extends AbstractTest {
 
     @Test
     public void testFindById() throws Exception {
-        Organization org1 = organizationService.findById("org1");
+        Organization org1 = organizationService.findById("org1", 0l);
         assertNotNull(org1);
     }
 }

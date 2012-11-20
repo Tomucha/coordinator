@@ -27,7 +27,7 @@
                 <c:if test="${can:isSuperadmin() and empty form.id}">
                     <div>
                         <tags:input field="organizationId" modelAttribute="form" captionCode="UserEntity.organization">
-                            <sf:select path="organizationId" items="${form.organizationMap}"/>
+                            <sf:select path="organizationId" items="${config.organizationMap}"/>
                         </tags:input>
                     </div>
                 </c:if>
@@ -59,8 +59,8 @@
 
                 <c:if test="${empty form.id}">
                     <div>
-                        <tags:input field="newPassword" modelAttribute="form" captionCode="UserEntity.password">
-                            <sf:password path="newPassword"/>
+                        <tags:input field="password" modelAttribute="form" captionCode="UserEntity.password">
+                            <sf:password path="password"/>
                         </tags:input>
                     </div>
 
@@ -110,12 +110,12 @@
 
             <div class="panel">
                 <h3><s:message code="header.equipmentList"/></h3>
-                <sf:checkboxes path="selectedEquipment" items="${form.allEquipmentList}" itemLabel="name" itemValue="id"/>
+                <sf:checkboxes path="selectedEquipment" items="${config.equipmentList}" itemLabel="name" itemValue="id"/>
             </div>
 
             <div class="panel">
                 <h3><s:message code="header.skillList"/></h3>
-                <sf:checkboxes path="selectedSkill" items="${form.allSkillList}" itemLabel="name" itemValue="id"/>
+                <sf:checkboxes path="selectedSkill" items="${config.skillList}" itemLabel="name" itemValue="id"/>
             </div>
 
             <div class="buttonPanel">
@@ -123,8 +123,4 @@
             </div>
         </sf:form>
     </div>
-</div>
-
-<div class="eastPanel">
-    <div class="map">tady bude mapa</div>
 </div>

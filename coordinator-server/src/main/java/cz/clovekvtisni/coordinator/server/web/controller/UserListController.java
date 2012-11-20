@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.annotation.Resource;
+
 @Controller
 @RequestMapping("/admin/user/list")
 public class UserListController extends AbstractController {
@@ -20,7 +22,6 @@ public class UserListController extends AbstractController {
     @Autowired
     private UserService userService;
 
-    @CheckPermission("#helper.canUpdate(#entity)")
     @RequestMapping
     public String list(@RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
         UserEntity admin = getLoggedUser();

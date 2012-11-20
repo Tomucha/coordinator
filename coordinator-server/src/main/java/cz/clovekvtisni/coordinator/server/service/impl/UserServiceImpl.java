@@ -89,7 +89,9 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     private String passwordHash(Long userId, String password) {
-        return SignatureTool.md5Digest(userId + "~" + PASSWORD_SEED + "~" + password);
+        String passwd = SignatureTool.md5Digest(userId + "~" + PASSWORD_SEED + "~" + password);
+
+        return passwd;
     }
 
     @Override

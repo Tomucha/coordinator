@@ -10,9 +10,14 @@
 
 <div class="mainPanel">
     <div class="buttonPanel">
-        <c:if test="${can:create('eventEntity')}">
-            <a href="<s:url value="/admin/event/edit"/>"><s:message code="button.createEvent"/></a>
-        </c:if>
+        <c:choose>
+            <c:when test="${can:create('eventEntity')}">
+                <a href="<s:url value="/admin/event/edit"/>"><s:message code="button.createEvent"/></a>
+            </c:when>
+            <c:when test="${can:hasRole('ADMIN')}">
+                <a href="<s:url value="/admin/organization/register-to-event"/>"><s:message code="button.registerToEvent"/></a>
+            </c:when>
+        </c:choose>
     </div>
 
     <div class="eventListTable">
@@ -55,8 +60,4 @@
             </tbody>
         </table>
     </div>
-</div>
-
-<div class="eastPanel">
-    <div class="map">tady bude mapa</div>
 </div>

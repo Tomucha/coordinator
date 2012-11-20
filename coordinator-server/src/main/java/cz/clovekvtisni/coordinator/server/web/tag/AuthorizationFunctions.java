@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+/**
+ * TODO case insensitive
+ */
 @Component
 public class AuthorizationFunctions {
 

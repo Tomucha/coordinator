@@ -5,18 +5,15 @@ import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
-import com.googlecode.objectify.cmd.LoadType;
 import com.googlecode.objectify.cmd.Query;
+import com.googlecode.objectify.cmd.QueryKeys;
 import com.googlecode.objectify.util.cmd.ObjectifyWrapper;
-import cz.clovekvtisni.coordinator.server.domain.EventEntity;
-import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +28,20 @@ public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory>
 
     public MaObjectify(Objectify ofy) {
         super(ofy);
+    }
+
+    public <T extends Serializable> List<Key<T>> findKeysByFilter(Filter<T> filter) {
+        Query<T> query = load().type(filter.getEntityClass());
+
+        query = populateQueryFromFilter(query, filter);
+        QueryKeys<T> keys = query.keys();
+
+        List<Key<T>> asList = new ArrayList<Key<T>>();
+        for (Key<T> key : keys) {
+            asList.add(key);
+        }
+
+        return asList;
     }
 
     public <T extends Serializable> ResultList<T> findByFilter(Filter<T> filter, String bookmark, int limit) {
