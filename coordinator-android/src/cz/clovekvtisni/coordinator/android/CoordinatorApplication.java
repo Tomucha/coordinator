@@ -13,7 +13,7 @@ import cz.clovekvtisni.coordinator.android.util.CommonTool;
 /**
  * Coordinator Mobile application, taken from Android Bootstrap.
  */
-public class BaseApplication extends Application {
+public class CoordinatorApplication extends Application {
 	
 	static {
 		CommonTool.setTag("Coordinator");
@@ -22,7 +22,7 @@ public class BaseApplication extends Application {
     /**
      * Create main application
      */
-    public BaseApplication() {
+    public CoordinatorApplication() {
         // Disable http.keepAlive on Froyo and below
         if (SDK_INT <= FROYO)
             HttpRequest.keepAlive(false);
@@ -33,7 +33,7 @@ public class BaseApplication extends Application {
      *
      * @param context
      */
-    public BaseApplication(final Context context) {
+    public CoordinatorApplication(final Context context) {
         this();
         attachBaseContext(context);
     }
@@ -43,7 +43,7 @@ public class BaseApplication extends Application {
      *
      * @param instrumentation
      */
-    public BaseApplication(final Instrumentation instrumentation) {
+    public CoordinatorApplication(final Instrumentation instrumentation) {
         this();
         attachBaseContext(instrumentation.getTargetContext());
     }

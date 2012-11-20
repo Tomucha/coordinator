@@ -1,6 +1,5 @@
 package cz.clovekvtisni.coordinator.android.api;
 
-import roboguice.inject.ContextSingleton;
 import cz.clovekvtisni.coordinator.api.response.GlobalConfigResponse;
 
 /**
@@ -9,7 +8,6 @@ import cz.clovekvtisni.coordinator.api.response.GlobalConfigResponse;
  * 
  * @author tomucha
  */
-@ContextSingleton
 public class ApiCallFactory {
 
 	public ApiCall<Void, GlobalConfigResponse> globalConfiguration() {

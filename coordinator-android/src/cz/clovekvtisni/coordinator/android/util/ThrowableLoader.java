@@ -1,7 +1,6 @@
 
 package cz.clovekvtisni.coordinator.android.util;
 
-import roboguice.util.Ln;
 import android.content.Context;
 
 /**
@@ -33,7 +32,6 @@ public abstract class ThrowableLoader<D> extends AsyncLoader<D> {
         try {
             return loadData();
         } catch (Exception e) {
-            Ln.d(e, "Exception loading data");
             exception = e;
             return data;
         }

@@ -2,8 +2,8 @@
 
 package cz.clovekvtisni.coordinator.android.util;
 
-import roboguice.content.RoboAsyncTaskLoader;
 import android.content.Context;
+import android.support.v4.content.AsyncTaskLoader;
 
 /**
  * Loader which extends AsyncTaskLoaders and handles caveats as pointed out in
@@ -15,7 +15,7 @@ import android.content.Context;
  *            data type
  * @author Alexander Blom (me@alexanderblom.se)
  */
-public abstract class AsyncLoader<D> extends RoboAsyncTaskLoader<D> {
+public abstract class AsyncLoader<D> extends AsyncTaskLoader<D> {
     private D data;
 
     /**
