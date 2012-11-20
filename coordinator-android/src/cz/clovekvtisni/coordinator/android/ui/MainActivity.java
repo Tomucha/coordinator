@@ -1,70 +1,56 @@
 package cz.clovekvtisni.coordinator.android.ui;
 
-import roboguice.inject.InjectView;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Window;
-import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
-import com.google.inject.Inject;
 
-import cz.clovekvtisni.coordinator.android.Constants;
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiCallAsyncLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiCallFactory;
 import cz.clovekvtisni.coordinator.android.util.CommonTool;
 import cz.clovekvtisni.coordinator.api.response.GlobalConfigResponse;
 
-/**
- * Application starts here.
- */
-public class MainActivity extends RoboSherlockFragmentActivity implements LoaderCallbacks<GlobalConfigResponse> {
-	
-	@InjectView(R.id.label_text)
+public class MainActivity extends SherlockFragmentActivity implements
+		LoaderCallbacks<GlobalConfigResponse> {
+
+	private static final int LOADER_CONFIG = 1;
+
 	private TextView labelText;
-	
-	@InjectView(R.id.pb_loading)
-	private ProgressBar loading;
-	
-	// I can inject my own objects, like this factory
-	@Inject
 	private ApiCallFactory apiCallFactory;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-		
+		setContentView(R.layout.activity_main);
+
+		labelText = (TextView) findViewById(R.id.label);
+		apiCallFactory = new ApiCallFactory();
+
 		// immediatelly start loading config data
-		getSupportLoaderManager().initLoader(Constants.LOADER_CONFIG, null, this);
-		
+		getSupportLoaderManager().initLoader(LOADER_CONFIG, null, this);
+
 		// show progress
-		loading.setVisibility(View.VISIBLE);
-		labelText.setVisibility(View.GONE);
+		labelText.setText("Loading...");
 	}
 
 	@Override
 	public Loader<GlobalConfigResponse> onCreateLoader(int arg0, Bundle arg1) {
 		// create async loader based on ApiCallFactory
-		return new ApiCallAsyncLoader<Void, GlobalConfigResponse>(
-				getApplicationContext(),
-				apiCallFactory.globalConfiguration(),
-				null);
+		return new ApiCallAsyncLoader<Void, GlobalConfigResponse>(getApplicationContext(),
+				apiCallFactory.globalConfiguration(), null);
 	}
 
 	@Override
 	public void onLoadFinished(Loader<GlobalConfigResponse> loader, GlobalConfigResponse config) {
 		// hide progress
-		loading.setVisibility(View.GONE);
-		labelText.setVisibility(View.VISIBLE);
-		
+		labelText.setText("Done");
+
 		// check loader exception
-		Exception e = ((ApiCallAsyncLoader)loader).getException();
+		Exception e = ((ApiCallAsyncLoader) loader).getException();
 		if (e != null) {
 			CommonTool.showToast(this, e.toString());
 		} else {

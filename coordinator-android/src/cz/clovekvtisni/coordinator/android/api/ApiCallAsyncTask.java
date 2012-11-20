@@ -1,8 +1,8 @@
 package cz.clovekvtisni.coordinator.android.api;
 
-import roboguice.util.RoboAsyncTask;
 import android.content.Context;
 import cz.clovekvtisni.coordinator.android.util.CommonTool;
+import cz.clovekvtisni.coordinator.android.util.SafeAsyncTask;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse.Status;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
@@ -17,13 +17,12 @@ import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
  * @param <REQUEST>
  * @param <RESPONSE>
  */
-public abstract class ApiCallAsyncTask<REQUEST, RESPONSE extends ApiResponseData> extends RoboAsyncTask<ApiResponse<RESPONSE>> {
+public abstract class ApiCallAsyncTask<REQUEST, RESPONSE extends ApiResponseData> extends SafeAsyncTask<ApiResponse<RESPONSE>> {
 
 	private ApiCall<REQUEST, RESPONSE> apiCall;
 	private REQUEST request;
 
 	protected ApiCallAsyncTask(Context context, ApiCall<REQUEST, RESPONSE> call, REQUEST request) {
-		super(context);
 		this.apiCall = call;
 		this.request = request;
 	}
