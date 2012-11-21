@@ -24,8 +24,6 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     @Id
     private Long id;
 
-    private String[] authKey;
-
     private String firstName;
 
     private String lastName;
@@ -111,14 +109,6 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String[] getAuthKey() {
-        return authKey;
-    }
-
-    public void setAuthKey(String[] authKey) {
-        this.authKey = authKey;
     }
 
     public String getFirstName() {
@@ -294,7 +284,6 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     public String toString() {
         return "UserEntity{" +
                 "id=" + id +
-                ", authKey=" + authKey +
                 ", email='" + email + '\'' +
                 ", organizationId='" + organizationId + '\'' +
                 ", city='" + city + '\'' +

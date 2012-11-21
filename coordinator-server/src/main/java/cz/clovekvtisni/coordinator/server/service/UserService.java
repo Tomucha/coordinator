@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.service;
 
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
+import cz.clovekvtisni.coordinator.server.domain.AuthKey;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.security.Anonymous;
@@ -40,4 +41,10 @@ public interface UserService extends Service {
 
     @CheckPermission("@appContext.loggedUser != null")
     void logout();
+
+    @Anonymous
+    AuthKey createAuthKey(UserEntity user);
+
+    @Anonymous
+    UserEntity getByAuthKey(String key);
 }

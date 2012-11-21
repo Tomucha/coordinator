@@ -13,8 +13,6 @@ import java.util.List;
  */
 public class User extends AbstractModifiableEntity {
 
-    private String[] authKey;
-
     private String firstName;
 
     private String lastName;
@@ -67,14 +65,6 @@ public class User extends AbstractModifiableEntity {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String[] getAuthKey() {
-        return authKey;
-    }
-
-    public void setAuthKey(String[] authKey) {
-        this.authKey = authKey;
     }
 
     public String getPhone() {

@@ -1,15 +1,14 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Work;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
-import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserSkillEntity;
+import cz.clovekvtisni.coordinator.server.domain.*;
 import cz.clovekvtisni.coordinator.server.filter.UserEquipmentFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserSkillFilter;
+import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.util.CloneTool;
@@ -17,10 +16,7 @@ import cz.clovekvtisni.coordinator.util.SignatureTool;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -215,5 +211,25 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     @Override
     public void logout() {
         appContext.setLoggedUser(null);
+    }
+
+    @Override
+    public AuthKey createAuthKey(UserEntity user) {
+        String random = SignatureTool.md5Digest(user.getId() + user.getEmail() + Math.random());
+        AuthKey authKey = new AuthKey();
+        authKey.setAuthKey(random);
+        authKey.setUser(user);
+
+        AuthKey saved = ofy().put(authKey);
+
+        return saved;
+    }
+
+    @Override
+    public UserEntity getByAuthKey(String key) {
+        AuthKey authKey = ofy().get(Key.create(AuthKey.class, key));
+        if (authKey == null)
+            return null;
+        return authKey.getUser();
     }
 }

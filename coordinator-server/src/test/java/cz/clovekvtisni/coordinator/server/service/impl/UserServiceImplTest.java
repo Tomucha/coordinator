@@ -2,6 +2,7 @@ package cz.clovekvtisni.coordinator.server.service.impl;
 
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.server.LocalDatastoreTest;
+import cz.clovekvtisni.coordinator.server.domain.AuthKey;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.service.UserService;
@@ -55,5 +56,22 @@ public class UserServiceImplTest extends LocalDatastoreTest {
         ResultList<UserEntity> resultList = userService.findByFilter(filter, 2, null, 0l);
         assertNotNull(resultList.getResult());
         assertEquals(1, resultList.getResultSize());
+    }
+
+    @Test
+    public void testAuthKey() {
+        UserEntity user = securityTool.runWithDisabledSecurity(new RunnableWithResult<UserEntity>() {
+            @Override
+            public UserEntity run() {
+                UserEntity user = new UserEntity();
+                user.setEmail("foo@bar.cz");
+                return userService.createUser(user);
+            }
+        });
+        AuthKey authKey = userService.createAuthKey(user);
+        assertNotNull(authKey);
+        UserEntity loaded = userService.getByAuthKey(authKey.getAuthKey());
+        assertEquals(user, loaded);
+        assertEquals(user.getEmail(), loaded.getEmail());
     }
 }
