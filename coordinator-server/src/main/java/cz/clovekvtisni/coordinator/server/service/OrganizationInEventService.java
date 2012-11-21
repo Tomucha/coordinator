@@ -7,6 +7,8 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 
 public interface OrganizationInEventService extends Service {
 
+    public static final long FLAG_FETCH_EVENT = 1l;
+
     @FilterResult("#helper.canRead(#entity)")
     OrganizationInEventEntity findById(Long id, long flags);
 

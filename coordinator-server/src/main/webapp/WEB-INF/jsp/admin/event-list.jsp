@@ -51,6 +51,9 @@
                             </c:if>
                         </td>
                         <td>
+                            <c:if test="${can:read('eventEntity')}">
+                                <a href="/admin/event/detail?id=<c:out value="${event.id}"/>"><s:message code="button.detail"/></a>
+                            </c:if>
                             <c:if test="${can:create('eventEntity')}">
                                 <a href="/admin/event/edit?id=<c:out value="${event.id}"/>"><s:message code="button.edit"/></a>
                             </c:if>

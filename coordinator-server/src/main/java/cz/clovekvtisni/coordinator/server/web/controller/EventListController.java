@@ -4,6 +4,7 @@ import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.EventFilter;
+import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
@@ -29,11 +30,15 @@ public class EventListController extends AbstractController {
     public String list(@RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
 
         UserEntity loggedUser = getLoggedUser();
-        EventFilter filter = new EventFilter();
-        if (!isSuperAdmin(loggedUser))
-            filter.setOrganizationIdVal(loggedUser.getOrganizationId());
+        ResultList<EventEntity> events;
+        if (isSuperAdmin(loggedUser)) {
+            events = eventService.findByFilter(new EventFilter(), DEFAULT_LIST_LENGTH, bookmark, EventService.FLAG_FETCH_LOCATIONS);
 
-        ResultList<EventEntity> events = eventService.findByFilter(filter, DEFAULT_LIST_LENGTH, bookmark, EventService.FLAG_FETCH_LOCATIONS);
+        } else {
+            OrganizationInEventFilter inEventFilter = new OrganizationInEventFilter();
+            //inEventFilter.setOrganizationIdVal(loggedUser.getOrganizationId());
+            events = eventService.findByOrganizationFilter(inEventFilter, DEFAULT_LIST_LENGTH, bookmark, EventService.FLAG_FETCH_LOCATIONS);
+        }
 
         model.addAttribute("events", events.getResult());
 

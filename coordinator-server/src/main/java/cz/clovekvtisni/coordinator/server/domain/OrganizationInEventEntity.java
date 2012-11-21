@@ -9,6 +9,7 @@ import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -28,7 +29,7 @@ public class OrganizationInEventEntity extends AbstractPersistentEntity<Organiza
     private String organizationId;
 
     @Index
-    @NotEmpty
+    @NotNull
     private Long eventId;
 
     @NotEmpty

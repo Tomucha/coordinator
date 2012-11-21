@@ -6,6 +6,7 @@ import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
+import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.OrganizationFilter;
 import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
@@ -15,7 +16,9 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,7 +37,27 @@ public class OrganizationInEventServiceImpl extends AbstractEntityServiceImpl im
 
     @Override
     public ResultList<OrganizationInEventEntity> findByFilter(OrganizationInEventFilter filter, int limit, String bookmark, long flags) {
-        return ofy().findByFilter(filter, bookmark, limit);
+        ResultList<OrganizationInEventEntity> result = ofy().findByFilter(filter, bookmark, limit);
+
+        populate(result.getResult(), flags);
+
+        return result;
+    }
+
+    private void populate(List<OrganizationInEventEntity> result, long flags) {
+        if ((flags & FLAG_FETCH_EVENT) != 0) {
+            Map<Key<EventEntity>, OrganizationInEventEntity> inEventMap = new HashMap<Key<EventEntity>, OrganizationInEventEntity>(result.size());
+            for (OrganizationInEventEntity inEvent : result) {
+                Key<EventEntity> key = Key.create(EventEntity.class, inEvent.getEventId());
+                inEventMap.put(key, inEvent);
+            }
+            Map<Key<EventEntity>, EventEntity> entityMap = ofy().get(inEventMap.keySet());
+            for (Map.Entry<Key<EventEntity>, EventEntity> entry : entityMap.entrySet()) {
+                if (entry.getValue().isDeleted()) continue;
+                inEventMap.get(entry.getKey()).setEventEntity(entry.getValue());
+            }
+        }
+
     }
 
     @Override

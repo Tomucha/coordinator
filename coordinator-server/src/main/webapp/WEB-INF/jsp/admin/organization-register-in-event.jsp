@@ -8,16 +8,20 @@
 
     <sf:errors />
 
+    <c:if test="${empty form.organizationId}">
+        <div><s:message code="msg.notEventsDueEmptyOrganizationId"/></div>
+    </c:if>
+
     <div>
         <sf:hidden path="organizationId"/>
 
         <tags:input field="eventId" modelAttribute="form" captionCode="OrganizationInEventEntity.eventId">
-            <sf:select path="eventId" disabled="${form.new}">
-                <c:forEach items="${eventList}" var="event">
-                    <sf:option value="${event.id}" label="${event.name}"/>
-                </c:forEach>
-            </sf:select>
+            <sf:select path="eventId" disabled="${!form.new}" items="${eventList}" itemLabel="name" itemValue="id"/>
         </tags:input>
+
+        <c:if test="${!form.new}">
+                <sf:hidden path="eventId"/>
+        </c:if>
     </div>
 
     <div>

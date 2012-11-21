@@ -77,7 +77,7 @@ public abstract class AbstractPersistentEntity<TARGET extends AbstractModifiable
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        AbstractModifiableEntity that = (AbstractModifiableEntity) o;
+        AbstractPersistentEntity that = (AbstractPersistentEntity) o;
 
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
 

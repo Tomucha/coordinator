@@ -9,8 +9,10 @@ import cz.clovekvtisni.coordinator.server.filter.EventFilter;
 import cz.clovekvtisni.coordinator.server.filter.EventLocationFilter;
 import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.EventService;
+import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,6 +27,10 @@ import java.util.Map;
  */
 @Service("eventService")
 public class EventServiceImpl extends AbstractEntityServiceImpl implements EventService {
+
+    @Autowired
+    private OrganizationInEventService organizationInEventService;
+
     @Override
     public EventEntity findByEventId(String id, long flags) {
         EventFilter filter = new EventFilter();
@@ -46,19 +52,18 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
 
     @Override
     public ResultList<EventEntity> findByFilter(EventFilter filter, int limit, String bookmark, long flags) {
-        if (filter.getOrganizationIdVal() != null) {
-            return findByOrganization(filter.getOrganizationIdVal(), limit, bookmark, flags);
-        }
         return ofy().findByFilter(filter, bookmark, limit);
     }
 
     @Override
-    public ResultList<EventEntity> findByOrganization(String organizationId, int limit, String bookmark, long flags) {
-        ResultList<OrganizationInEventEntity> inEventList = getOrganizationInEventList(organizationId, limit, bookmark, flags | FLAG_FETCH_EVENT);
+    public ResultList<EventEntity> findByOrganizationFilter(OrganizationInEventFilter filter, int limit, String bookmark, long flags) {
+        ResultList<OrganizationInEventEntity> inEventList = organizationInEventService.findByFilter(filter, limit, bookmark, OrganizationInEventService.FLAG_FETCH_EVENT);
         List<EventEntity> events = new ArrayList<EventEntity>(inEventList.getResultSize());
         for (OrganizationInEventEntity inEventEntity : inEventList) {
             if (inEventEntity.getEventEntity() != null) {
-                events.add(inEventEntity.getEventEntity());
+                EventEntity event = inEventEntity.getEventEntity();
+                populateEvent(ofy(), event, flags);
+                events.add(event);
             }
         }
 
@@ -127,30 +132,6 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
         ResultList<EventLocationEntity> locations = ofy().findByFilter(filter, null, 0);
 
         return locations.getResult();
-    }
-
-    @Override
-    public ResultList<OrganizationInEventEntity> getOrganizationInEventList(String organizationId, int limit, String bookmark, long flags) {
-        OrganizationInEventFilter filter = new OrganizationInEventFilter();
-        filter.setOrganizationIdVal(organizationId);
-
-        ResultList<OrganizationInEventEntity> result = ofy().findByFilter(filter, bookmark, limit);
-
-        if ((flags & FLAG_FETCH_EVENT) != 0) {
-            Map<Key<EventEntity>, OrganizationInEventEntity> inEventMap = new HashMap<Key<EventEntity>, OrganizationInEventEntity>(result.getResult().size());
-            for (OrganizationInEventEntity inEvent : result.getResult()) {
-                Key<EventEntity> key = Key.create(EventEntity.class, inEvent.getId());
-                inEventMap.put(key, inEvent);
-            }
-            Map<Key<EventEntity>, EventEntity> entityMap = ofy().get(inEventMap.keySet());
-            for (Map.Entry<Key<EventEntity>, EventEntity> entry : entityMap.entrySet()) {
-                if (entry.getValue().isDeleted()) continue;
-                populateEvent(ofy(), entry.getValue(), flags);
-                inEventMap.get(entry.getKey()).setEventEntity(entry.getValue());
-            }
-        }
-        
-        return result;
     }
 
     private void populateEvent(MaObjectify ofy, EventEntity entity, long flags) {

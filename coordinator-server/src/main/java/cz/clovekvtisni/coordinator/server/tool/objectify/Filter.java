@@ -10,9 +10,18 @@ public abstract class Filter<T> implements Serializable {
     }
 
     public static enum Operator implements Serializable {
-        EQ,
-        /* GT, GE, LT, LE, LIKE, ILIKE,
-        NOT_EQ, NOT_LIKE, NOT_ILIKE,*/
+        EQ("="), NOT_EQ("!="), GT(">"), GE(">="), LT("<"), LE("<="), IN("in");
+
+        private String op;
+
+        Operator(String op) {
+            this.op = op;
+        }
+
+        public String renderCondition(Object value) {
+            // TODO collection
+            return value + " " + op;
+        }
     }
 
     private String order;

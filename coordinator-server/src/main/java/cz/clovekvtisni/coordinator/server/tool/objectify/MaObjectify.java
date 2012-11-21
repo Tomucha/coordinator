@@ -99,17 +99,12 @@ public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory>
                     continue;
                 String operatorName = baseName + "Op";
                 if (sourceWrapper.isReadableProperty(srcPropertyName) && sourceWrapper.isReadableProperty(operatorName)) {
-                    Filter.Operator operator = (Filter.Operator) sourceWrapper.getPropertyValue(operatorName);
-                    if (operator == null) {
-                        operator = Filter.Operator.EQ;
-                    }
                     final Object value = sourceWrapper.getPropertyValue(srcPropertyName);
                     if (value != null) {
-                        switch (operator) {
-                            case EQ:
-                                query = query.filter(baseName, value);
-                                break;
-                        }
+                        Filter.Operator operator = (Filter.Operator) sourceWrapper.getPropertyValue(operatorName);
+                        if (operator == null)
+                            operator = Filter.Operator.EQ;
+                        query = query.filter(operator.renderCondition(baseName), value);
                     }
                 }
             }
