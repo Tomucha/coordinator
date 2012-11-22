@@ -22,7 +22,7 @@ public class MicroCache<K, V> implements Serializable {
 
 	private transient Map<K, MicroCacheEntry<V>> contentMap = null;
     private int defaultTtlSec = 600;
-	
+
 	/**
 	 * @param key klic
 	 * @param value hodnota
@@ -45,7 +45,7 @@ public class MicroCache<K, V> implements Serializable {
 		ensureMap();
 		contentMap.remove(key);
 	}
-	
+
 	/**
 	 * Returns an object stored under specified key, or null, if cache doesnt contain such object, or it's entry has expired.
 	 * 
@@ -80,7 +80,7 @@ public class MicroCache<K, V> implements Serializable {
 			}
 		}
 	}
-	
+
 	private void ensureMap() {
 		if (contentMap == null) {
 			contentMap = new HashMap<K, MicroCacheEntry<V>>();
@@ -96,11 +96,11 @@ public class MicroCache<K, V> implements Serializable {
 	 * @author Tomas Zverina
 	 */
 	private static class MicroCacheEntry<V> {
-		
+
 		private SoftReference<V> value = null;
 		private int ttlSec = 0;
 		private long createdTimestamp = 0;
-		
+
 		/**
 		 * @param value hodnota
 		 * @param ttlSec platnost ve vterinach
@@ -111,17 +111,17 @@ public class MicroCache<K, V> implements Serializable {
 			this.ttlSec = ttlSec * 1000;
 			createdTimestamp = System.currentTimeMillis();
 		}
-		
+
 		V getValue() {
 			return value.get();
 		}
-		
+
 		boolean isAlive() {
 			return (
 				((System.currentTimeMillis()-createdTimestamp) < ttlSec)
 				&& (value.get() != null)
 			);
 		}
-		
+
 	}
 }

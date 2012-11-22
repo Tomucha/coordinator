@@ -2,7 +2,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="Coordinator" parent="@style/Theme.Sherlock.Light.DarkActionBar">
-        <item name="android:progressBarStyle">@android:style/Widget.ProgressBar.Large</item>
+        <item name="android:progressBarStyle">@android:style/Widget.Holo.Light.ProgressBar.Large</item>
 	</style>
 	
 </resources>

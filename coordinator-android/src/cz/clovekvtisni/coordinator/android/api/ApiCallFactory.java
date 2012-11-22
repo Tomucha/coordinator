@@ -10,7 +10,7 @@ import cz.clovekvtisni.coordinator.api.response.GlobalConfigResponse;
  */
 public class ApiCallFactory {
 
-	public ApiCall<Void, GlobalConfigResponse> globalConfiguration() {
+	public static ApiCall<Void, GlobalConfigResponse> globalConfiguration() {
 		return new ApiCall<Void, GlobalConfigResponse>("config", "global", GlobalConfigResponse.class);
 	}
 
