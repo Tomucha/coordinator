@@ -7,13 +7,11 @@ import cz.clovekvtisni.coordinator.api.response.LoginResponseData;
 import cz.clovekvtisni.coordinator.api.response.RegisterResponseData;
 import cz.clovekvtisni.coordinator.api.response.UserPropertiesResponseData;
 import cz.clovekvtisni.coordinator.domain.User;
-import cz.clovekvtisni.coordinator.domain.UserEquipment;
 import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.domain.config.Skill;
 import cz.clovekvtisni.coordinator.exception.MaParseException;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
 import cz.clovekvtisni.coordinator.server.service.EquipmentService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.service.SkillService;
@@ -48,8 +46,8 @@ public class UserApiController extends AbstractApiController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody ApiResponse login(HttpServletRequest request) {
-        LoginRequestParams params = parseParams(request, LoginRequestParams.class);
-        UserEntity user = userService.login(params.getLogin(), params.getPassword());
+        UserRequest<LoginRequestParams> req = parseRequestAnonymous(request, LoginRequestParams.class);
+        UserEntity user = userService.login(req.params.getLogin(), req.params.getPassword());
         if (user == null) {
             throw MaPermissionDeniedException.wrongCredentials();
         }
@@ -66,8 +64,8 @@ public class UserApiController extends AbstractApiController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public @ResponseBody ApiResponse register(HttpServletRequest request) {
-        RegisterRequestParams params = parseParams(request, RegisterRequestParams.class);
-        User newUser = params.getNewUser();
+        UserRequest<RegisterRequestParams> req = parseRequestAnonymous(request, RegisterRequestParams.class);
+        User newUser = req.params.getNewUser();
         if (newUser == null) {
             throw MaParseException.wrongRequestParams();
         }

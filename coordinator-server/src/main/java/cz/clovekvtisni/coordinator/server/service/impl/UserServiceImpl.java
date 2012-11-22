@@ -41,6 +41,8 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             throw MaPermissionDeniedException.wrongCredentials();
         }
 
+        createAuthKey(userEntity);
+
         appContext.setLoggedUser(userEntity);
 
         return userEntity;
