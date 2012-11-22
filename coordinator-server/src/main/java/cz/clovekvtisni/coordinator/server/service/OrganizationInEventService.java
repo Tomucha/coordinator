@@ -16,9 +16,9 @@ public interface OrganizationInEventService extends Service {
     @FilterResult("#helper.canRead(#entity)")
     ResultList<OrganizationInEventEntity> findByFilter(OrganizationInEventFilter filter, int limit, String bookmark, long flags);
 
-    @CheckPermission("#helper.canCreate(#entity)")
+    @CheckPermission("#helper.canCreate(#p0)")
     OrganizationInEventEntity create(OrganizationInEventEntity inEvent);
 
-    @CheckPermission("#helper.canUpdate(#entity)")
+    @CheckPermission("#helper.canUpdate(#p0)")
     OrganizationInEventEntity update(OrganizationInEventEntity inEvent);
 }
