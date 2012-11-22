@@ -1,23 +1,10 @@
 package cz.clovekvtisni.coordinator.android.util;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.Signature;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 import cz.clovekvtisni.coordinator.android.DeployEnvironment;
 
@@ -30,7 +17,7 @@ import cz.clovekvtisni.coordinator.android.DeployEnvironment;
  */
 public class CommonTool {
 
-	private static String TAG = "";
+	private static final String TAG = "Coordinator";
 
 	private static DeployEnvironment stylBeeEnvironment;
 
@@ -39,10 +26,6 @@ public class CommonTool {
 			stylBeeEnvironment = DeployEnvironment.getTestingEnvironment();
 		}
 		return stylBeeEnvironment;
-	}
-
-	public static void setTag(String tag) {
-		TAG = tag;
 	}
 
 	public static String getTAG() {
