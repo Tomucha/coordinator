@@ -1,6 +1,5 @@
 package cz.clovekvtisni.coordinator.api.response;
 
-import com.sun.deploy.security.AuthKey;
 import cz.clovekvtisni.coordinator.domain.User;
 
 /**
