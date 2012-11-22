@@ -27,4 +27,8 @@ public class MaPermissionDeniedException extends MaException {
     public static MaPermissionDeniedException permissionDenied() {
         return new MaPermissionDeniedException(ErrorCode.PERMISSION_DENIED);
     }
+
+    public static MaPermissionDeniedException registrationNotAllowed() {
+        return new MaPermissionDeniedException(ErrorCode.REGISTRATION_NOT_ALLOWED);
+    }
 }

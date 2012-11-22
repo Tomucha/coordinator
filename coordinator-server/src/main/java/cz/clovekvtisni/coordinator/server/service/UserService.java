@@ -2,7 +2,9 @@ package cz.clovekvtisni.coordinator.server.service;
 
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.AuthKey;
+import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.security.Anonymous;
 import cz.clovekvtisni.coordinator.server.security.CheckPermission;
@@ -47,4 +49,10 @@ public interface UserService extends Service {
 
     @Anonymous
     UserEntity getByAuthKey(String key);
+
+    @Anonymous
+    UserEntity preRegister(UserEntity newUser);
+
+    @Anonymous
+    UserInEventEntity register(UserEntity newUser, UserInEventEntity event);
 }

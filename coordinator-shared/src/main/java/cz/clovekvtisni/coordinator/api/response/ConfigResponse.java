@@ -9,7 +9,7 @@ import java.util.List;
  * User: jka
  * Date: 7.11.12
  */
-public class GlobalConfigResponse implements ApiResponseData {
+public class ConfigResponse implements ApiResponseData {
 
     private Role[] roleList;
 

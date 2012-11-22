@@ -1,22 +1,27 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Work;
+import cz.clovekvtisni.coordinator.domain.config.Organization;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.*;
 import cz.clovekvtisni.coordinator.server.filter.UserEquipmentFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserSkillFilter;
-import cz.clovekvtisni.coordinator.server.security.SecurityTool;
+import cz.clovekvtisni.coordinator.server.service.OrganizationService;
+import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.util.CloneTool;
 import cz.clovekvtisni.coordinator.util.SignatureTool;
 import cz.clovekvtisni.coordinator.util.ValueTool;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,6 +33,12 @@ import java.util.*;
 public class UserServiceImpl extends AbstractEntityServiceImpl implements UserService {
 
     private static final String PASSWORD_SEED = "e{\"DFGP:2354\":asdlghH%$~23'5;'";
+
+    @Autowired
+    private OrganizationService organizationService;
+
+    @Autowired
+    private UserInEventService userInEventService;
 
     @Override
     public UserEntity login(String email, String password) {
@@ -233,5 +244,39 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         if (authKey == null)
             return null;
         return authKey.getUser();
+    }
+
+    @Override
+    public UserEntity preRegister(UserEntity newUser) {
+        Organization organization = organizationService.findById(newUser.getOrganizationId(), 0l);
+
+        if (organization == null)
+            throw new IllegalArgumentException("Not existed organization id in " + newUser);
+
+        if (!organization.isAllowsPreRegistration())
+            throw MaPermissionDeniedException.registrationNotAllowed();
+
+        return createUser(newUser);
+    }
+
+    @Override
+    public UserInEventEntity register(UserEntity newUser, UserInEventEntity inEvent) {
+        Organization organization = organizationService.findById(newUser.getOrganizationId(), 0l);
+
+        if (organization == null)
+            throw new IllegalArgumentException("Not existed organization id in " + newUser);
+
+        if (!organization.isAllowsRegistration())
+            throw MaPermissionDeniedException.registrationNotAllowed();
+
+        UserEntity user = createUser(newUser);
+
+        inEvent.setUserId(user.getId());
+        inEvent.setId(null);
+
+        userInEventService.create(inEvent);
+        inEvent.setUserEntity(user);
+
+        return inEvent;
     }
 }

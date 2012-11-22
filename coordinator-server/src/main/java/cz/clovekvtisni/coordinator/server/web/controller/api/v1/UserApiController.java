@@ -54,14 +54,6 @@ public class UserApiController extends AbstractApiController {
         return okResult(new LoginResponseData(user.buildTargetEntity()));
     }
 
-    @RequestMapping("/proplist")
-    public @ResponseBody ApiResponse propList(HttpServletRequest request) {
-        ResultList<Equipment> equipments = equipmentService.findByFilter(null);
-        ResultList<Skill> skills = skillService.findByFilter(null);
-
-        return okResult(new UserPropertiesResponseData(equipments.getResult(), skills.getResult()));
-    }
-
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public @ResponseBody ApiResponse register(HttpServletRequest request) {
         UserRequest<RegisterRequestParams> req = parseRequestAnonymous(request, RegisterRequestParams.class);
@@ -69,6 +61,13 @@ public class UserApiController extends AbstractApiController {
         if (newUser == null) {
             throw MaParseException.wrongRequestParams();
         }
+
+
+
+        // TODO Check organization permission to register in
+
+
+
         UserEntity user = userService.createUser(new UserEntity().populateFrom(newUser));
 
         return okResult(new RegisterResponseData(user.buildTargetEntity()));

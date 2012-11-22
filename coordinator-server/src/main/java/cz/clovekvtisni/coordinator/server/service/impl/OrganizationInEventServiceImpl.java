@@ -16,6 +16,7 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,8 @@ public class OrganizationInEventServiceImpl extends AbstractEntityServiceImpl im
     @Override
     public OrganizationInEventEntity findById(Long id, long flags) {
         OrganizationInEventEntity inEvent = ofy().get(Key.create(OrganizationInEventEntity.class, id));
+
+        populate(Arrays.asList(new OrganizationInEventEntity[] {inEvent}), flags);
 
         return inEvent;
     }

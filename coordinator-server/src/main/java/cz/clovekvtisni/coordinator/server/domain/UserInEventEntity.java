@@ -4,8 +4,10 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 
+import javax.persistence.Transient;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -48,6 +50,12 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     private Date lastPoiDate;
 
     private Long[] groups;
+
+    @Ignore
+    private EventEntity eventEntity;
+
+    @Ignore
+    private UserEntity userEntity;
 
     public UserInEventEntity() {
     }
@@ -180,6 +188,22 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     public void setGroups(Long[] groups) {
         this.groups = groups;
+    }
+
+    public EventEntity getEventEntity() {
+        return eventEntity;
+    }
+
+    public void setEventEntity(EventEntity eventEntity) {
+        this.eventEntity = eventEntity;
+    }
+
+    public UserEntity getUserEntity() {
+        return userEntity;
+    }
+
+    public void setUserEntity(UserEntity userEntity) {
+        this.userEntity = userEntity;
     }
 
     @Override

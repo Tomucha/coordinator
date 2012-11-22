@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server;
 
+import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import org.junit.After;
 import org.junit.Before;
@@ -20,6 +21,9 @@ public abstract class AbstractTest extends AbstractJUnit4SpringContextTests {
 
     @Autowired
     protected AppContext appContext;
+
+    @Autowired
+    protected CoordinatorConfig config;
 
     @Before
     public void prepareAppContext() {

@@ -1,9 +1,12 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
 import cz.clovekvtisni.coordinator.domain.User;
+import cz.clovekvtisni.coordinator.domain.config.Organization;
+import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.LocalDatastoreTest;
 import cz.clovekvtisni.coordinator.server.domain.AuthKey;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
@@ -73,5 +76,39 @@ public class UserServiceImplTest extends LocalDatastoreTest {
         UserEntity loaded = userService.getByAuthKey(authKey.getAuthKey());
         assertEquals(user, loaded);
         assertEquals(user.getEmail(), loaded.getEmail());
+    }
+
+    @Test
+    public void testPreRegister() {
+        UserEntity user = securityTool.runWithDisabledSecurity(new RunnableWithResult<UserEntity>() {
+            @Override
+            public UserEntity run() {
+                UserEntity user = new UserEntity();
+                for (Organization organization : config.getOrganizationList()) {
+                    if (organization.isAllowsPreRegistration()) {
+                        user.setOrganizationId(organization.getId());
+                        return userService.preRegister(user);
+                    }
+                }
+                return null;
+            }
+        });
+        assertNotNull(user);
+        assertNotNull(user.getId());
+    }
+
+    @Test
+    public void testRegister() {
+        UserInEventEntity res = securityTool.runWithDisabledSecurity(new RunnableWithResult<UserInEventEntity>() {
+            @Override
+            public UserInEventEntity run() {
+                UserEntity user = new UserEntity();
+                user.setOrganizationId("org1");
+                UserInEventEntity inEvent = new UserInEventEntity();
+                return userService.register(user, inEvent);
+            }
+        });
+        assertNotNull(res);
+        assertNotNull(res.getId());
     }
 }

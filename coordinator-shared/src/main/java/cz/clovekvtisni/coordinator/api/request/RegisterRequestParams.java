@@ -13,6 +13,8 @@ import java.util.List;
  */
 public class RegisterRequestParams implements RequestParams {
 
+    private Long eventId;
+
     private User newUser;
 
     public RegisterRequestParams() {
@@ -28,6 +30,14 @@ public class RegisterRequestParams implements RequestParams {
 
     public void setNewUser(User newUser) {
         this.newUser = newUser;
+    }
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 
     @Override

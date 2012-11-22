@@ -1,7 +1,8 @@
 package cz.clovekvtisni.coordinator.server.web.controller.api.v1;
 
+import cz.clovekvtisni.coordinator.api.request.EmptyRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse;
-import cz.clovekvtisni.coordinator.api.response.GlobalConfigResponse;
+import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.domain.config.*;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.web.controller.api.AbstractApiController;
@@ -24,9 +25,10 @@ public class ConfigApiController extends AbstractApiController {
     @Autowired
     private CoordinatorConfig config;
 
-    @RequestMapping("/global")
+    @RequestMapping
     public @ResponseBody ApiResponse global(HttpServletRequest request) {
-        GlobalConfigResponse response = new GlobalConfigResponse();
+        parseRequest(request, EmptyRequestParams.class); // Only to check authKey
+        ConfigResponse response = new ConfigResponse();
         response.setEquipmentList(config.getEquipmentList().toArray(new Equipment[0]));
         response.setOrganizationList(config.getOrganizationList().toArray(new Organization[0]));
         response.setPoiCategoryList(config.getPoiCategoryList().toArray(new PoiCategory[0]));

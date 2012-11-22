@@ -1,10 +1,7 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cache;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -49,7 +46,7 @@ public class OrganizationInEventEntity extends AbstractPersistentEntity<Organiza
 
     private Date dateClosed;
 
-    @Transient
+    @Ignore
     private EventEntity eventEntity;
 
     public OrganizationInEventEntity() {
