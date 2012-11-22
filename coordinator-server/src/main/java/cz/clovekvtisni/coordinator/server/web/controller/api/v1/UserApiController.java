@@ -56,6 +56,11 @@ public class UserApiController extends AbstractApiController {
             throw MaParseException.wrongRequestParams();
 
         final UserEntity newUserEntity = new UserEntity().populateFrom(newUser);
+
+        // this method is only for new users. For existed users will be method /add-to-event
+        if (!newUserEntity.isNew())
+            throw MaPermissionDeniedException.registrationNotAllowed();
+
         newUserEntity.setRoleIdList(new String[] {AuthorizationTool.ANONYMOUS});
         UserInEvent inEvent = req.params.getUserInEvent();
 
