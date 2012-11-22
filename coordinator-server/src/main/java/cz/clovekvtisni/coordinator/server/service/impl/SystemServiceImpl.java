@@ -46,7 +46,7 @@ public class SystemServiceImpl extends AbstractServiceImpl implements SystemServ
                 // nothing to to do, we already know this
                 return;
             } else {
-                throw new UniqueKeyViolation(property, ownerKey);
+                throw UniqueKeyViolation.entityKeyExists(property, ownerKey);
             }
         }
         UniqueIndexEntity index = new UniqueIndexEntity(k, ownerKey);

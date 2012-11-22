@@ -191,11 +191,9 @@ public class SecurityTool implements BeanFactoryAware {
 
     public boolean canCallMethod(Object target, Method method, Object[] args) {
 
-        Anonymous anonymousAnnotation = findAnonymousAnnotation(method);
-
         MaAnnotationUtils.AnnotationHolder<CheckPermission> checkPermissionAnnotation = findCheckPermissionAnnotation(method);
 
-        if (checkPermissionAnnotation != null) {
+        if (checkPermissionAnnotation != null && !isAnonymousEnabled()) {
 
             StandardEvaluationContext evaluationContext = buildEvaluationContext(target, checkPermissionAnnotation.getAnnotatedMethod(), args);
 

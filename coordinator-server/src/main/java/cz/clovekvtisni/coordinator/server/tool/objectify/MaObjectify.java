@@ -5,6 +5,7 @@ import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
+import com.googlecode.objectify.Work;
 import com.googlecode.objectify.cmd.Query;
 import com.googlecode.objectify.cmd.QueryKeys;
 import com.googlecode.objectify.util.cmd.ObjectifyWrapper;
@@ -25,6 +26,9 @@ import java.util.Set;
  * Date: 7.11.12
  */
 public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory> {
+
+    // objectify is not thread-safe
+    private static boolean inTransaction;
 
     public MaObjectify(Objectify ofy) {
         super(ofy);
@@ -131,5 +135,23 @@ public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory>
 
     public <T> T get(Key<T> key) {
         return load().key(key).get();
+    }
+
+    /** enables pseudo nested transaction */
+    @Override
+    public <R> R transact(Work<R> work) {
+        if (inTransaction)
+            return work.run();
+        else {
+            R result;
+            try {
+                inTransaction = true;
+                result = super.transact(work);
+
+            } finally {
+                inTransaction = false;
+            }
+            return result;
+        }
     }
 }

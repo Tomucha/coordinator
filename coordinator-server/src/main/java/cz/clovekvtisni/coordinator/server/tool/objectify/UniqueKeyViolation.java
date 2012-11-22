@@ -17,9 +17,14 @@ public class UniqueKeyViolation extends MaException {
 
     private Key<? extends CoordinatorEntity> ownerKey;
 
-    public UniqueKeyViolation(UniqueIndexEntity.Property property, Key<? extends CoordinatorEntity> ownerKey) {
+    protected UniqueKeyViolation(ErrorCode code, UniqueIndexEntity.Property property, Key<? extends CoordinatorEntity> ownerKey) {
+        super(code, property.toString());
         this.property = property;
         this.ownerKey = ownerKey;
+    }
+
+    public static UniqueKeyViolation entityKeyExists(UniqueIndexEntity.Property property, Key<? extends CoordinatorEntity> ownerKey) {
+        return new UniqueKeyViolation(ErrorCode.KEY_EXISTS, property, ownerKey);
     }
 
     public UniqueIndexEntity.Property getProperty() {

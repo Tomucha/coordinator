@@ -1,8 +1,7 @@
 package cz.clovekvtisni.coordinator.server.service;
 
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
-import cz.clovekvtisni.coordinator.server.domain.AuthKey;
-import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserAuthKey;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
@@ -45,14 +44,14 @@ public interface UserService extends Service {
     void logout();
 
     @Anonymous
-    AuthKey createAuthKey(UserEntity user);
+    UserAuthKey createAuthKey(UserEntity user);
 
     @Anonymous
     UserEntity getByAuthKey(String key);
 
-    @Anonymous
+    @Anonymous(Anonymous.Mode.PROPAGATE)
     UserEntity preRegister(UserEntity newUser);
 
-    @Anonymous
+    @Anonymous(Anonymous.Mode.PROPAGATE)
     UserInEventEntity register(UserEntity newUser, UserInEventEntity event);
 }

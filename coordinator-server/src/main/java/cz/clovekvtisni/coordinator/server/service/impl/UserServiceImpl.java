@@ -5,9 +5,11 @@ import com.googlecode.objectify.Work;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.*;
+import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserEquipmentFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserSkillFilter;
+import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
 import cz.clovekvtisni.coordinator.server.service.OrganizationService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
@@ -18,10 +20,7 @@ import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,6 +38,9 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
     @Autowired
     private UserInEventService userInEventService;
+
+    @Autowired
+    private OrganizationInEventService organizationInEventService;
 
     @Override
     public UserEntity login(String email, String password) {
@@ -227,20 +229,20 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     @Override
-    public AuthKey createAuthKey(UserEntity user) {
+    public UserAuthKey createAuthKey(UserEntity user) {
         String random = SignatureTool.md5Digest(user.getId() + user.getEmail() + Math.random());
-        AuthKey authKey = new AuthKey();
+        UserAuthKey authKey = new UserAuthKey();
         authKey.setAuthKey(random);
         authKey.setUser(user);
 
-        AuthKey saved = ofy().put(authKey);
+        UserAuthKey saved = ofy().put(authKey);
 
         return saved;
     }
 
     @Override
     public UserEntity getByAuthKey(String key) {
-        AuthKey authKey = ofy().get(Key.create(AuthKey.class, key));
+        UserAuthKey authKey = ofy().get(Key.create(UserAuthKey.class, key));
         if (authKey == null)
             return null;
         return authKey.getUser();
@@ -260,7 +262,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     @Override
-    public UserInEventEntity register(UserEntity newUser, UserInEventEntity inEvent) {
+    public UserInEventEntity register(final UserEntity newUser, final UserInEventEntity inEvent) {
         Organization organization = organizationService.findById(newUser.getOrganizationId(), 0l);
 
         if (organization == null)
@@ -269,14 +271,31 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         if (!organization.isAllowsRegistration())
             throw MaPermissionDeniedException.registrationNotAllowed();
 
-        UserEntity user = createUser(newUser);
+        OrganizationInEventFilter filter = new OrganizationInEventFilter();
+        filter.setOrganizationIdVal(organization.getId());
+        filter.setEventIdVal(inEvent.getEventId());
+        OrganizationInEventEntity info = organizationInEventService.findByFilter(filter, 1, null, 0l).firstResult();
 
-        inEvent.setUserId(user.getId());
-        inEvent.setId(null);
+        if (info == null
+            || (info.getDateClosedRegistration() != null && info.getDateClosedRegistration().compareTo(new Date()) < 0)
+            || !newUser.getOrganizationId().equals(info.getOrganizationId())
+        )
+            throw MaPermissionDeniedException.registrationNotAllowed();
 
-        userInEventService.create(inEvent);
-        inEvent.setUserEntity(user);
+        return ofy().transact(new Work<UserInEventEntity>() {
+            @Override
+            public UserInEventEntity run() {
+                UserEntity user = createUser(newUser);
 
-        return inEvent;
+                inEvent.setParentKey(user.getKey());
+                inEvent.setUserId(user.getId());
+                inEvent.setId(null);
+
+                userInEventService.create(inEvent);
+                inEvent.setUserEntity(user);
+
+                return inEvent;
+            }
+        });
     }
 }

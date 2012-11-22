@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.api.response;
 
+import com.sun.deploy.security.AuthKey;
 import cz.clovekvtisni.coordinator.domain.User;
 
 /**
@@ -11,6 +12,8 @@ public class RegisterResponseData implements ApiResponseData {
 
     private User user;
 
+    private String authKey;
+
     public RegisterResponseData(User user) {
         this.user = user;
     }
@@ -21,5 +24,13 @@ public class RegisterResponseData implements ApiResponseData {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getAuthKey() {
+        return authKey;
+    }
+
+    public void setAuthKey(String authKey) {
+        this.authKey = authKey;
     }
 }

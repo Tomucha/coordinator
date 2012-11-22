@@ -2,9 +2,8 @@ package cz.clovekvtisni.coordinator.server.service.impl;
 
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
-import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.LocalDatastoreTest;
-import cz.clovekvtisni.coordinator.server.domain.AuthKey;
+import cz.clovekvtisni.coordinator.server.domain.UserAuthKey;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
@@ -71,7 +70,7 @@ public class UserServiceImplTest extends LocalDatastoreTest {
                 return userService.createUser(user);
             }
         });
-        AuthKey authKey = userService.createAuthKey(user);
+        UserAuthKey authKey = userService.createAuthKey(user);
         assertNotNull(authKey);
         UserEntity loaded = userService.getByAuthKey(authKey.getAuthKey());
         assertEquals(user, loaded);

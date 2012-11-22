@@ -14,7 +14,7 @@ import com.googlecode.objectify.impl.ref.StdRef;
  */
 @Cache
 @Entity
-public class AuthKey {
+public class UserAuthKey {
 
     @Id
     private String authKey;

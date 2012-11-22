@@ -7,7 +7,7 @@ public class UserInEvent extends AbstractModifiableEntity {
 
     private Long userId;
 
-    private String eventId;
+    private Long eventId;
 
     private boolean usesSmartphoneApp;
 
@@ -41,11 +41,11 @@ public class UserInEvent extends AbstractModifiableEntity {
         this.userId = userId;
     }
 
-    public String getEventId() {
+    public Long getEventId() {
         return eventId;
     }
 
-    public void setEventId(String eventId) {
+    public void setEventId(Long eventId) {
         this.eventId = eventId;
     }
 

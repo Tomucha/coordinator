@@ -2,6 +2,7 @@ package cz.clovekvtisni.coordinator.api.request;
 
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserEquipment;
+import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.domain.UserSkill;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public class RegisterRequestParams implements RequestParams {
 
-    private Long eventId;
+    private UserInEvent userInEvent;
 
     private User newUser;
 
@@ -32,12 +33,12 @@ public class RegisterRequestParams implements RequestParams {
         this.newUser = newUser;
     }
 
-    public Long getEventId() {
-        return eventId;
+    public UserInEvent getUserInEvent() {
+        return userInEvent;
     }
 
-    public void setEventId(Long eventId) {
-        this.eventId = eventId;
+    public void setUserInEvent(UserInEvent userInEvent) {
+        this.userInEvent = userInEvent;
     }
 
     @Override

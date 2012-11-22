@@ -1,13 +1,9 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cache;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Ignore;
+import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 
-import javax.persistence.Transient;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -23,9 +19,12 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     @Id
     private Long id;
 
+    @Parent
+    private Key<UserEntity> parentKey;
+
     private Long userId;
 
-    private String eventId;
+    private Long eventId;
 
     private boolean usesSmartphoneApp;
 
@@ -86,11 +85,11 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
         this.userId = userId;
     }
 
-    public String getEventId() {
+    public Long getEventId() {
         return eventId;
     }
 
-    public void setEventId(String eventId) {
+    public void setEventId(Long eventId) {
         this.eventId = eventId;
     }
 
@@ -204,6 +203,14 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     public void setUserEntity(UserEntity userEntity) {
         this.userEntity = userEntity;
+    }
+
+    public Key<UserEntity> getParentKey() {
+        return parentKey;
+    }
+
+    public void setParentKey(Key<UserEntity> parentKey) {
+        this.parentKey = parentKey;
     }
 
     @Override
