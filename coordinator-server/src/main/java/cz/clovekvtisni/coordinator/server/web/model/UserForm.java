@@ -23,8 +23,6 @@ import java.util.*;
  */
 public class UserForm extends UserEntity {
 
-    private String newPassword;
-
     private String confirmPassword;
 
     private Map<String, String> organizationMap;
@@ -39,13 +37,6 @@ public class UserForm extends UserEntity {
         List<Organization> organizations = config.getOrganizationList();
         List<Role> roles = config.getRoleList();
         UserEntity editor = appContext.getLoggedUser();
-
-        organizationMap = new HashMap<String, String>(organizations.size());
-        if (organizations != null) {
-            for (Organization organization : organizations) {
-                organizationMap.put(organization.getId(), organization.getName());
-            }
-        }
 
         acceptableRoleMap = new HashMap<String, String>();
         if (roles != null) {
@@ -86,17 +77,9 @@ public class UserForm extends UserEntity {
     }
 
     public void postValidate(BindingResult bindingResult, MessageSource messageSource, Locale locale) {
-        if (getNewPassword() != null && !getNewPassword().equals(getConfirmPassword())) {
-            bindingResult.addError(new FieldError("form", "confirmPassword", getNewPassword(), false, null, null, messageSource.getMessage("error.PASSWORD_CONFIRM_FAILED", null, locale)));
+        if (getPassword() != null && !getPassword().equals(getConfirmPassword())) {
+            bindingResult.addError(new FieldError("form", "confirmPassword", getPassword(), false, null, null, messageSource.getMessage("error.PASSWORD_CONFIRM_FAILED", null, locale)));
         }
-    }
-
-    public String getNewPassword() {
-        return newPassword;
-    }
-
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
     }
 
     public Set<String> getSelectedEquipment() {

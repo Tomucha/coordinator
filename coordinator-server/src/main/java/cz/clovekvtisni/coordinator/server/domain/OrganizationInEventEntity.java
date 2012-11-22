@@ -6,6 +6,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Transient;
 import java.util.Date;
@@ -23,11 +24,14 @@ public class OrganizationInEventEntity extends AbstractPersistentEntity<Organiza
     private Long id;
 
     @Index
+    @NotEmpty
     private String organizationId;
 
     @Index
-    private String eventId;
+    @NotEmpty
+    private Long eventId;
 
+    @NotEmpty
     private String name;
 
     private String description;
@@ -76,11 +80,11 @@ public class OrganizationInEventEntity extends AbstractPersistentEntity<Organiza
         this.organizationId = organizationId;
     }
 
-    public String getEventId() {
+    public Long getEventId() {
         return eventId;
     }
 
-    public void setEventId(String eventId) {
+    public void setEventId(Long eventId) {
         this.eventId = eventId;
     }
 

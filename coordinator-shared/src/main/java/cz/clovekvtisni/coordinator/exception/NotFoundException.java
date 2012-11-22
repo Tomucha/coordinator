@@ -16,4 +16,9 @@ public class NotFoundException extends MaException {
     public static NotFoundException idNotExist() {
         return new NotFoundException(ErrorCode.NOT_FOUND, "id not found");
     }
+
+    public static NotFoundException idNotExist(String entityKind, Object id) {
+        return new NotFoundException(ErrorCode.NOT_FOUND, "id not found, entity=" + entityKind + ", id=" + id);
+    }
+
 }

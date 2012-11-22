@@ -117,6 +117,18 @@ public class CoordinatorConfig {
         }
     }
 
+    public Map<String, String> getOrganizationMap() {
+        List<Organization> organizations = getOrganizationList();
+        HashMap<String, String> organizationMap = new HashMap<String, String>(organizations.size());
+        if (organizations != null) {
+            for (Organization organization : organizations) {
+                organizationMap.put(organization.getId(), organization.getName());
+            }
+        };
+
+        return organizationMap;
+    }
+
     @Override
     public String toString() {
         return "CoordinatorConfig{" +

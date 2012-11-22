@@ -1,6 +1,11 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
+import cz.clovekvtisni.coordinator.domain.config.Equipment;
+import cz.clovekvtisni.coordinator.domain.config.Organization;
+import cz.clovekvtisni.coordinator.domain.config.Role;
+import cz.clovekvtisni.coordinator.domain.config.Skill;
 import cz.clovekvtisni.coordinator.exception.MaException;
+import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.*;
@@ -15,10 +20,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -44,6 +46,9 @@ public abstract class AbstractController {
 
     @Autowired
     protected AuthorizationTool authorizationTool;
+
+    @Autowired
+    protected CoordinatorConfig config;
 
     @ModelAttribute
     public void loggedUser(Model model) {
@@ -95,4 +100,19 @@ public abstract class AbstractController {
     protected boolean isBackendAdmin(UserEntity user) {
         return authorizationTool.hasRole(AuthorizationTool.BACKEND, user);
     }
+
+    @ModelAttribute("config")
+    public CoordinatorConfig config() {
+        return config;
+    }
+
+/*
+    public List<Equipment> getAllEquipmentList() {
+        return config.getEquipmentList();
+    }
+
+    private List<Skill> getAllSkillList() {
+        return config.getSkillList();
+    }
+*/
 }
