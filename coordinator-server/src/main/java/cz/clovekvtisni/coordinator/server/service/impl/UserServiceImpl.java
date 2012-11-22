@@ -262,11 +262,11 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     @Override
-    public UserInEventEntity register(final UserEntity newUser, final UserInEventEntity inEvent) {
-        Organization organization = organizationService.findById(newUser.getOrganizationId(), 0l);
+    public UserInEventEntity register(final UserEntity user, final UserInEventEntity inEvent) {
+        Organization organization = organizationService.findById(user.getOrganizationId(), 0l);
 
         if (organization == null)
-            throw new IllegalArgumentException("Not existed organization id in " + newUser);
+            throw new IllegalArgumentException("Not existed organization id in " + user);
 
         if (!organization.isAllowsRegistration())
             throw MaPermissionDeniedException.registrationNotAllowed();
@@ -278,23 +278,25 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
         if (info == null
             || (info.getDateClosedRegistration() != null && info.getDateClosedRegistration().compareTo(new Date()) < 0)
-            || !newUser.getOrganizationId().equals(info.getOrganizationId())
+            || !user.getOrganizationId().equals(info.getOrganizationId())
         )
             throw MaPermissionDeniedException.registrationNotAllowed();
 
         return ofy().transact(new Work<UserInEventEntity>() {
             @Override
             public UserInEventEntity run() {
-                UserEntity user = createUser(newUser);
+                UserEntity connectedUser = user.isNew() ? createUser(user) : user;
 
-                inEvent.setParentKey(user.getKey());
-                inEvent.setUserId(user.getId());
+                inEvent.setParentKey(connectedUser.getKey());
+                inEvent.setUserId(connectedUser.getId());
                 inEvent.setId(null);
 
-                userInEventService.create(inEvent);
-                inEvent.setUserEntity(user);
+                UserInEventEntity resultEvent = userInEventService.create(inEvent);
+                systemService.saveUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.USER_IN_EVENT, resultEvent.getUserId() + "~" + resultEvent.getEventId(), resultEvent.getKey());
 
-                return inEvent;
+                resultEvent.setUserEntity(connectedUser);
+
+                return resultEvent;
             }
         });
     }

@@ -83,6 +83,10 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
         return ofy().transact(new Work<UserInEventEntity>() {
             @Override
             public UserInEventEntity run() {
+                // we cannot change this fields
+                inEvent.setEventId(old.getEventId());
+                inEvent.setUserId(old.getUserId());
+
                 updateSystemFields(inEvent, old);
 
                 ofy().put(inEvent);

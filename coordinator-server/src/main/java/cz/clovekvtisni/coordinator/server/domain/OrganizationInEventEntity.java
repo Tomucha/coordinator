@@ -159,6 +159,14 @@ public class OrganizationInEventEntity extends AbstractPersistentEntity<Organiza
     }
 
     @Override
+    public OrganizationInEvent buildTargetEntity() {
+        OrganizationInEvent inEvent = super.buildTargetEntity();
+        if (eventEntity != null)
+            inEvent.setEvent(eventEntity.buildTargetEntity());
+        return inEvent;
+    }
+
+    @Override
     public String toString() {
         return "OrganizationInEventEntity{" +
                 "id=" + id +

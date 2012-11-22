@@ -7,6 +7,7 @@ import cz.clovekvtisni.coordinator.exception.ErrorCode;
 import cz.clovekvtisni.coordinator.exception.MaException;
 import cz.clovekvtisni.coordinator.exception.MaParseException;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
+import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.UserService;
@@ -61,6 +62,9 @@ public abstract class AbstractApiController {
 
     @Autowired
     protected SecurityTool securityTool;
+
+    @Autowired
+    protected CoordinatorConfig config;
 
     protected <PARAMS extends RequestParams> UserRequest<PARAMS> parseRequestAnonymous(HttpServletRequest request, final Class<PARAMS> paramClass) {
         return parseParams(request, true, paramClass);

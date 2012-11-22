@@ -6,7 +6,7 @@ public class OrganizationInEvent extends AbstractModifiableEntity {
 
     private String organizationId;
 
-    private String eventId;
+    private Long eventId;
 
     private String name;
 
@@ -24,6 +24,8 @@ public class OrganizationInEvent extends AbstractModifiableEntity {
 
     private Date dateClosed;
 
+    private Event event;
+
     public String getOrganizationId() {
         return organizationId;
     }
@@ -32,11 +34,11 @@ public class OrganizationInEvent extends AbstractModifiableEntity {
         this.organizationId = organizationId;
     }
 
-    public String getEventId() {
+    public Long getEventId() {
         return eventId;
     }
 
-    public void setEventId(String eventId) {
+    public void setEventId(Long eventId) {
         this.eventId = eventId;
     }
 
@@ -102,6 +104,14 @@ public class OrganizationInEvent extends AbstractModifiableEntity {
 
     public void setDateClosed(Date dateClosed) {
         this.dateClosed = dateClosed;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
     }
 
     @Override
