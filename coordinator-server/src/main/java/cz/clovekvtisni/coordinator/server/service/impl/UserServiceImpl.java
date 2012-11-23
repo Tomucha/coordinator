@@ -4,6 +4,7 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
+import cz.clovekvtisni.coordinator.exception.ValidationError;
 import cz.clovekvtisni.coordinator.server.domain.*;
 import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserEquipmentFilter;
@@ -65,37 +66,40 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     public UserEntity findById(Long id, long flags) {
         UserEntity userEntity = ofy().load().key(Key.create(UserEntity.class, id)).get();
 
-        populateUser(userEntity, flags);
+        populateUsers(Arrays.asList(new UserEntity[]{userEntity}), flags);
 
         return userEntity;
     }
 
-    private void populateUser(UserEntity userEntity, long flags) {
-        if ((flags & FLAG_FETCH_EQUIPMENT) != 0) {
-            UserEquipmentFilter filter = new UserEquipmentFilter();
-            filter.setUserIdVal(userEntity.getId());
-            ResultList<UserEquipmentEntity> equipments = ofy().findByFilter(filter, null, 0);
-            if (equipments.getResultSize() > 0) {
-                userEntity.setEquipmentEntityList(equipments.getResult().toArray(new UserEquipmentEntity[0]));
-            } else {
-                userEntity.setEquipmentEntityList(new UserEquipmentEntity[0]);
+    private void populateUsers(Collection<UserEntity> entities, long flags) {
+        for (UserEntity userEntity : entities) {
+            if ((flags & FLAG_FETCH_EQUIPMENT) != 0) {
+                UserEquipmentFilter filter = new UserEquipmentFilter();
+                filter.setUserIdVal(userEntity.getId());
+                ResultList<UserEquipmentEntity> equipments = ofy().findByFilter(filter, null, 0);
+                if (equipments.getResultSize() > 0) {
+                    userEntity.setEquipmentEntityList(equipments.getResult().toArray(new UserEquipmentEntity[0]));
+                } else {
+                    userEntity.setEquipmentEntityList(new UserEquipmentEntity[0]);
+                }
             }
-        }
-        if ((flags & FLAG_FETCH_SKILLS) != 0) {
-            UserSkillFilter filter = new UserSkillFilter();
-            filter.setUserIdVal(userEntity.getId());
-            ResultList<UserSkillEntity> skills = ofy().findByFilter(filter, null, 0);
-            if (skills.getResultSize() > 0) {
-                userEntity.setSkillEntityList(skills.getResult().toArray(new UserSkillEntity[0]));
-            } else {
-                userEntity.setSkillEntityList(new UserSkillEntity[0]);
+            if ((flags & FLAG_FETCH_SKILLS) != 0) {
+                UserSkillFilter filter = new UserSkillFilter();
+                filter.setUserIdVal(userEntity.getId());
+                ResultList<UserSkillEntity> skills = ofy().findByFilter(filter, null, 0);
+                if (skills.getResultSize() > 0) {
+                    userEntity.setSkillEntityList(skills.getResult().toArray(new UserSkillEntity[0]));
+                } else {
+                    userEntity.setSkillEntityList(new UserSkillEntity[0]);
+                }
             }
         }
     }
 
     @Override
     public ResultList<UserEntity> findByFilter(UserFilter filter, int limit, String bookmark, long flags) {
-        filter.setOrder("id");
+        if (filter.getOrder() == null)
+            filter.setOrder("id");
         return ofy().findByFilter(filter, bookmark, limit);
     }
 
@@ -111,6 +115,11 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             @Override
             public UserEntity run() {
                 logger.debug("creating " + entity);
+
+                // TODO maybe more IQ solution
+                if (ValueTool.isEmpty(entity.getEmail()))
+                    throw ValidationError.entityInvalid();
+
                 entity.setId(null);
                 entity.setEmail(ValueTool.normalizeEmail(entity.getEmail()));
                 updateSystemFields(entity, null);
@@ -299,5 +308,22 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 return resultEvent;
             }
         });
+    }
+
+    @Override
+    public List<UserEntity> findByIds(long flags, Long... ids) {
+        if (ids == null)
+            return null;
+
+        Set<Key<UserEntity>> keys = new HashSet<Key<UserEntity>>(ids.length);
+        for (Long id : ids) {
+            if (id != null)
+                keys.add(Key.create(UserEntity.class, id));
+        }
+
+        Map<Key<UserEntity>, UserEntity> entityMap = ofy().get(keys);
+        populateUsers(entityMap.values(), flags);
+
+        return new ArrayList<UserEntity>(entityMap.values());
     }
 }

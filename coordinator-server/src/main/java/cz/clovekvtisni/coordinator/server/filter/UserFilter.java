@@ -4,6 +4,8 @@ import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.NoDeletedFilter;
 
+import java.util.Date;
+
 /**
  * Created by IntelliJ IDEA.
  * User: tomas
@@ -19,6 +21,10 @@ public class UserFilter extends NoDeletedFilter<UserEntity> {
     private String organizationIdVal;
 
     private Operator organizationIdOp = Operator.EQ;
+
+    private Date modifiedDateVal;
+
+    private Operator modifiedDateOp = Operator.EQ;
 
     @Override
     public Class<UserEntity> getEntityClass() {
@@ -57,11 +63,31 @@ public class UserFilter extends NoDeletedFilter<UserEntity> {
         this.organizationIdOp = organizationIdOp;
     }
 
+    public Date getModifiedDateVal() {
+        return modifiedDateVal;
+    }
+
+    public void setModifiedDateVal(Date modifiedDateVal) {
+        this.modifiedDateVal = modifiedDateVal;
+    }
+
+    public Operator getModifiedDateOp() {
+        return modifiedDateOp;
+    }
+
+    public void setModifiedDateOp(Operator modifiedDateOp) {
+        this.modifiedDateOp = modifiedDateOp;
+    }
+
     @Override
     public String toString() {
         return "UserFilter{" +
                 "emailVal='" + emailVal + '\'' +
                 ", emailOp=" + emailOp +
+                ", organizationIdVal='" + organizationIdVal + '\'' +
+                ", organizationIdOp=" + organizationIdOp +
+                ", modifiedDateVal=" + modifiedDateVal +
+                ", modifiedDateOp=" + modifiedDateOp +
                 '}';
     }
 }

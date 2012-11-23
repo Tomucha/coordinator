@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
+import com.googlecode.objectify.annotation.Index;
 import cz.clovekvtisni.coordinator.domain.AbstractModifiableEntity;
 import cz.clovekvtisni.coordinator.util.CloneTool;
 
@@ -12,11 +13,12 @@ import java.util.Date;
  */
 public abstract class AbstractPersistentEntity<TARGET extends AbstractModifiableEntity, SELF extends CoordinatorEntity<SELF>> implements CoordinatorEntity<SELF> {
 
-    private Date createdDate;
+    protected Date createdDate;
 
-    private Date modifiedDate;
+    @Index
+    protected Date modifiedDate;
 
-    private Date deletedDate;
+    protected Date deletedDate;
 
     protected abstract TARGET createTargetEntity();
 

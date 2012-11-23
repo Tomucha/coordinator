@@ -2,9 +2,9 @@ package cz.clovekvtisni.coordinator.server.web.controller.api.v1;
 
 import cz.clovekvtisni.coordinator.api.request.LoginRequestParams;
 import cz.clovekvtisni.coordinator.api.request.RegisterRequestParams;
-import cz.clovekvtisni.coordinator.api.response.ApiResponse;
-import cz.clovekvtisni.coordinator.api.response.LoginResponseData;
-import cz.clovekvtisni.coordinator.api.response.RegisterResponseData;
+import cz.clovekvtisni.coordinator.api.request.UserByIdRequestParams;
+import cz.clovekvtisni.coordinator.api.request.UserFilterRequestParams;
+import cz.clovekvtisni.coordinator.api.response.*;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.exception.MaParseException;
@@ -12,9 +12,13 @@ import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.UserAuthKey;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
+import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import cz.clovekvtisni.coordinator.server.util.EntityTool;
 import cz.clovekvtisni.coordinator.server.web.controller.api.AbstractApiController;
 import cz.clovekvtisni.coordinator.util.RunnableWithResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -79,5 +85,35 @@ public class UserApiController extends AbstractApiController {
         responseData.setAuthKey(authKey.getAuthKey());
 
         return okResult(responseData);
+    }
+
+    @RequestMapping(value = "/filter", method = RequestMethod.POST)
+    public @ResponseBody ApiResponse filter(HttpServletRequest request) {
+        UserRequest<UserFilterRequestParams> req = parseRequest(request, UserFilterRequestParams.class);
+
+        UserFilter filter = new UserFilter();
+        filter.setOrganizationIdVal(req.user.getOrganizationId());
+        if (req.params.getModifiedFrom() != null) {
+            filter.setModifiedDateVal(req.params.getModifiedFrom());
+            filter.setModifiedDateOp(Filter.Operator.GT);
+        }
+        filter.setOrder("modifiedDate");
+
+        ResultList<UserEntity> result = userService.findByFilter(filter, 0, null, 0l);
+        List<User> users = new EntityTool().buildTargetEntities(result.getResult());
+
+        return okResult(new UserFilterResponseData(users));
+    }
+
+    @RequestMapping(value = "/by-id", method = RequestMethod.POST)
+    public @ResponseBody ApiResponse byId(HttpServletRequest request) {
+        UserRequest<UserByIdRequestParams> req = parseRequest(request, UserByIdRequestParams.class);
+
+        if (req.params.getById() == null)
+            return okResult(new UserByIdResponseData(new User[0]));
+
+        List<User> result = new EntityTool().buildTargetEntities(userService.findByIds(0l, req.params.getById()));
+
+        return okResult(new UserByIdResponseData(result));
     }
 }

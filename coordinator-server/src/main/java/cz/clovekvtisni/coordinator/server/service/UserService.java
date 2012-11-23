@@ -10,6 +10,8 @@ import cz.clovekvtisni.coordinator.server.security.CheckPermission;
 import cz.clovekvtisni.coordinator.server.security.FilterResult;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * User: tomas
@@ -27,6 +29,9 @@ public interface UserService extends Service {
 
     @FilterResult("#helper.canRead(#entity)")
     UserEntity findById(Long id, long flags);
+
+    @FilterResult("#helper.canRead(#entity)")
+    List<UserEntity> findByIds(long flags, Long... ids);
 
     @FilterResult("#helper.canRead(#entity)")
     ResultList<UserEntity> findByFilter(UserFilter filter, int limit, String bookmark, long flags);
