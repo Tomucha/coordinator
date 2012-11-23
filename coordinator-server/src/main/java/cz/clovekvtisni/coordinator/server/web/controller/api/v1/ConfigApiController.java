@@ -27,7 +27,7 @@ public class ConfigApiController extends AbstractApiController {
 
     @RequestMapping
     public @ResponseBody ApiResponse global(HttpServletRequest request) {
-        parseRequest(request, EmptyRequestParams.class); // Only to check authKey
+        parseRequestAnonymous(request, EmptyRequestParams.class);
         ConfigResponse response = new ConfigResponse();
         response.setEquipmentList(config.getEquipmentList().toArray(new Equipment[0]));
         response.setOrganizationList(config.getOrganizationList().toArray(new Organization[0]));
