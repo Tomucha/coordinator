@@ -14,13 +14,11 @@ import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
-import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.util.EntityTool;
 import cz.clovekvtisni.coordinator.server.web.controller.api.AbstractApiController;
-import cz.clovekvtisni.coordinator.util.RunnableWithResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -98,6 +95,7 @@ public class UserApiController extends AbstractApiController {
             filter.setModifiedDateOp(Filter.Operator.GT);
         }
         filter.setOrder("modifiedDate");
+        filter.includeDeleted(true);
 
         ResultList<UserEntity> result = userService.findByFilter(filter, 0, null, 0l);
         List<User> users = new EntityTool().buildTargetEntities(result.getResult());
