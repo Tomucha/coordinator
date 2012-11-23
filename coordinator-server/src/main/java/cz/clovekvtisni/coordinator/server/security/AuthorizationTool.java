@@ -60,7 +60,7 @@ public class AuthorizationTool {
     }
 
     public boolean hasRole(String roleId, UserEntity user) {
-        if (user == null) return roleId == null;
+        if (user == null || user.getRoleIdList() == null) return roleId == null;
         return isAuthorized(Arrays.asList(new String[] {roleId}), Arrays.asList(user.getRoleIdList()));
     }
 
