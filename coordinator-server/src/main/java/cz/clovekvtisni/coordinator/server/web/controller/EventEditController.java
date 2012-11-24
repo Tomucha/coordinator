@@ -26,7 +26,6 @@ public class EventEditController extends AbstractController {
     @Autowired
     private EventService eventService;
 
-    @CheckPermission("#helper.canCreate(eventEntity)") // nefunkcni, TODO
     @RequestMapping(method = RequestMethod.GET)
     public String edit(@RequestParam(value = "id", required = false) Long eventId, Model model) {
         EventForm form = new EventForm();
@@ -44,7 +43,6 @@ public class EventEditController extends AbstractController {
         return "admin/event-edit";
     }
 
-    @CheckPermission("#helper.canCreate(eventEntity)")
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid EventForm form, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {

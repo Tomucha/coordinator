@@ -133,7 +133,7 @@ public abstract class AbstractApiController {
             String signatureComputed = SignatureTool.signApi(SignatureTool.computeHash(params), getSecret());
             if (signature == null || !signature.equalsIgnoreCase(signatureComputed)) {
                 logger.info("wrong signature '{}', correct '{}'", signature, signatureComputed);
-                //throw MaPermissionDeniedException.wrongSignature(signature, "json");
+                throw MaPermissionDeniedException.wrongSignature(signature, "json");
             }
         } catch (IOException e) {
             throw MaParseException.wrongRequestParams();

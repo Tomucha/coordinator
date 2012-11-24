@@ -40,10 +40,12 @@ public class OrganizationInEventEntity extends AbstractPersistentEntity<Organiza
 
     private String[] registrationSkills;
 
+    @Index
     private Date datePublish;
 
     private Date dateClosedRegistration;
 
+    @Index
     private Date dateClosed;
 
     @Ignore

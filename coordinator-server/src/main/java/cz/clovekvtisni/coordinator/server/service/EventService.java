@@ -32,12 +32,12 @@ public interface EventService extends Service {
     @FilterResult("#helper.canRead(#entity)")
     ResultList<EventEntity> findByOrganizationFilter(OrganizationInEventFilter filter, int limit, String bookmark, long flags);
 
-    @CheckPermission("#helper.canCreate(#entity)")
+    @CheckPermission("#helper.canCreate(#p0)")
     EventEntity createEvent(EventEntity entity);
 
-    @CheckPermission("#helper.canUpdate(#entity)")
+    @CheckPermission("#helper.canUpdate(#p0)")
     EventEntity updateEvent(EventEntity entity);
 
-    @CheckPermission("#helper.canDelete(#entity)")
+    @CheckPermission("#helper.canDelete(#p0)")
     void deleteEvent(EventEntity entity);
 }

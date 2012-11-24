@@ -40,9 +40,10 @@ public class OrganizationInEventController extends AbstractController {
     private OrganizationInEventService organizationInEventService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String getForm(@RequestParam(value = "id", required = false) Long organizationInEventId, Model model) {
+    public String getForm(
+            @RequestParam(value = "id", required = false) Long organizationInEventId, Model model) {
         if (organizationInEventId != null) {
-            OrganizationInEventEntity registration = organizationInEventService.findById(organizationInEventId, 0l);
+            OrganizationInEventEntity registration = organizationInEventService.findById(organizationInEventId, OrganizationInEventService.FLAG_FETCH_EVENT);
             if (registration == null)
                 throw NotFoundException.idNotExist(OrganizationInEventEntity.class.getSimpleName(), organizationInEventId);
             model.addAttribute("form", new OrganizationInEventForm().populateFrom(registration));
