@@ -45,7 +45,7 @@
     <organization_list>
         <organization
                 id="org1"
-                name="Název org 1"
+                name="Organizace 1"
                 color_primary="#RRGGBB"
                 color_secondary="#RRGGBB"
                 allows_registration="true"
@@ -53,7 +53,19 @@
                 pre_registration_equipment="eq1, eq2"
                 pre_registration_skill="skill1"
                 >
-            popis organization
+            popis organizace 1
+        </organization>
+        <organization
+                id="org2"
+                name="Organizace 2"
+                color_primary="#RRGGBB"
+                color_secondary="#RRGGBB"
+                allows_registration="true"
+                allows_pre_registration="true"
+                pre_registration_equipment="eq1, eq2"
+                pre_registration_skill="skill1"
+                >
+            popis organizace 2
         </organization>
     </organization_list>
 

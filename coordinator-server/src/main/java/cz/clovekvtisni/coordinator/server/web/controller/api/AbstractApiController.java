@@ -122,12 +122,16 @@ public abstract class AbstractApiController {
                 }
             }
 
-            if (!isAnonymous) {
-                if (authKey == null)
-                    throw MaPermissionDeniedException.permissionDenied();
+            if (!isAnonymous && authKey == null) {
+                logger.error("empty auth key");
+                throw MaPermissionDeniedException.permissionDenied();
+
+            } else if (authKey != null) {
                 req.user = userService.getByAuthKey(authKey);
-                if (req.user == null)
+                if (req.user == null) {
+                    logger.error("unknown auth key {}", authKey);
                     throw MaPermissionDeniedException.permissionDenied();
+                }
             }
 
             String signatureComputed = SignatureTool.signApi(SignatureTool.computeHash(params), getSecret());

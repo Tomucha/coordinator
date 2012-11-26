@@ -36,7 +36,7 @@ public class EventListController extends AbstractController {
 
         } else {
             OrganizationInEventFilter inEventFilter = new OrganizationInEventFilter();
-            //inEventFilter.setOrganizationIdVal(loggedUser.getOrganizationId());
+            inEventFilter.setOrganizationIdVal(loggedUser.getOrganizationId());
             events = eventService.findByOrganizationFilter(inEventFilter, DEFAULT_LIST_LENGTH, bookmark, EventService.FLAG_FETCH_LOCATIONS);
         }
 
