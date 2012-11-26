@@ -15,11 +15,6 @@ public class MaPermissionDeniedException extends MaException {
         super(code, params);
     }
 
-
-    public static MaPermissionDeniedException wrongSignature(String signature, String tag) {
-        return new MaPermissionDeniedException(ErrorCode.WRONG_SIGNATURE, signature, tag);
-    }
-
     public static MaPermissionDeniedException wrongCredentials() {
         return new MaPermissionDeniedException(ErrorCode.WRONG_CREDENTIALS);
     }

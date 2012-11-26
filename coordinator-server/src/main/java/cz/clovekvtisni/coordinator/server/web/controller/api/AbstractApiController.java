@@ -1,5 +1,19 @@
 package cz.clovekvtisni.coordinator.server.web.controller.api;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import cz.clovekvtisni.coordinator.api.request.RequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
@@ -11,20 +25,6 @@ import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.UserService;
-import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
-import cz.clovekvtisni.coordinator.util.SignatureTool;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonToken;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -134,11 +134,6 @@ public abstract class AbstractApiController {
                 }
             }
 
-            String signatureComputed = SignatureTool.signApi(SignatureTool.computeHash(params), getSecret());
-            if (signature == null || !signature.equalsIgnoreCase(signatureComputed)) {
-                logger.info("wrong signature '{}', correct '{}'", signature, signatureComputed);
-                throw MaPermissionDeniedException.wrongSignature(signature, "json");
-            }
         } catch (IOException e) {
             throw MaParseException.wrongRequestParams();
         }
