@@ -5,6 +5,7 @@ import cz.clovekvtisni.coordinator.api.request.EventFilterRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse;
 import cz.clovekvtisni.coordinator.api.response.EventFilterResponseData;
 import cz.clovekvtisni.coordinator.domain.Event;
+import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
@@ -47,23 +48,18 @@ public class EventApiController extends AbstractApiController {
 
         Set<Long> eventIds = new HashSet<Long>();
 
-        if (req.params.getOrganizationId() != null) {
-            OrganizationInEventFilter filter = new OrganizationInEventFilter();
-            filter.setOrganizationIdVal(req.params.getOrganizationId());
-            ResultList<OrganizationInEventEntity> eventsByOrg = organizationInEventService.findByFilter(filter, 0, null, 0l);
-            responseData.setOrganizationInEvents(new EntityTool().buildTargetEntities(eventsByOrg.getResult()));
-            for (OrganizationInEventEntity entity : eventsByOrg.getResult()) {
-                eventIds.add(entity.getEventId());
-            }
-        }
-        if (req.params.getUserId() != null) {
+        if (req.user != null) {
+            responseData.setOrganizationInEvents(getEventsByOrganizationId(req.user.getOrganizationId(), eventIds));
             UserInEventFilter filter = new UserInEventFilter();
-            filter.setUserIdVal(req.params.getUserId());
+            filter.setUserIdVal(req.user.getId());
             ResultList<UserInEventEntity> eventsByUser = userInEventService.findByFilter(filter, 0, null, 0l);
             responseData.setUserInEvents(new EntityTool().buildTargetEntities(eventsByUser.getResult()));
             for (UserInEventEntity entity : eventsByUser.getResult()) {
                 eventIds.add(entity.getEventId());
             }
+
+        } else if (req.params.getOrganizationId() != null) {
+            responseData.setOrganizationInEvents(getEventsByOrganizationId(req.params.getOrganizationId(), eventIds));
         }
 
         if (eventIds.size() > 0) {
@@ -72,5 +68,16 @@ public class EventApiController extends AbstractApiController {
         }
 
         return okResult(responseData);
+    }
+
+    private List<OrganizationInEvent> getEventsByOrganizationId(String organizationId, Set<Long> eventIds) {
+        OrganizationInEventFilter filter = new OrganizationInEventFilter();
+        filter.setOrganizationIdVal(organizationId);
+        ResultList<OrganizationInEventEntity> eventsByOrg = organizationInEventService.findByFilter(filter, 0, null, 0l);
+        for (OrganizationInEventEntity entity : eventsByOrg.getResult()) {
+            eventIds.add(entity.getEventId());
+        }
+
+        return new EntityTool().buildTargetEntities(eventsByOrg.getResult());
     }
 }

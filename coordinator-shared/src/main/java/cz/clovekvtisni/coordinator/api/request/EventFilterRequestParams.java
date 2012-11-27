@@ -9,19 +9,9 @@ import java.util.Date;
  */
 public class EventFilterRequestParams implements RequestParams {
 
-    private Long userId;
-
     private String organizationId;
 
     public EventFilterRequestParams() {
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public String getOrganizationId() {
