@@ -3,9 +3,8 @@ package cz.clovekvtisni.coordinator.server.domain;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
 import cz.clovekvtisni.coordinator.domain.UserGroup;
-
-import com.googlecode.objectify.annotation.Id;;
 
 /**
  * Created with IntelliJ IDEA.

@@ -3,6 +3,7 @@ package cz.clovekvtisni.coordinator.server.service;
 import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.EventFilter;
 import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
 import cz.clovekvtisni.coordinator.server.security.CheckPermission;
@@ -25,6 +26,9 @@ public interface EventService extends Service {
 
     @FilterResult("#helper.canRead(#entity)")
     EventEntity findById(Long id, long flags);
+
+    @FilterResult("#helper.canRead(#entity)")
+    List<EventEntity> findByIds(long flags, Long... ids);
 
     @FilterResult("#helper.canRead(#entity)")
     ResultList<EventEntity> findByFilter(EventFilter filter, int limit, String bookmark, long flags);

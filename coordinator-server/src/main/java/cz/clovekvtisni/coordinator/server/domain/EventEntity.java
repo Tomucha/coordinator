@@ -3,7 +3,11 @@ package cz.clovekvtisni.coordinator.server.domain;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.Event;
+import cz.clovekvtisni.coordinator.domain.EventLocation;
+import cz.clovekvtisni.coordinator.server.util.EntityTool;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import java.util.Arrays;
 
 /**
  * Created with IntelliJ IDEA.
@@ -85,6 +89,20 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
     public EventLocationEntity getFirstEventLocation() {
         if (eventLocationEntityList == null || eventLocationEntityList.length == 0) return null;
         return eventLocationEntityList[0];
+    }
+
+    @Override
+    public Event buildTargetEntity() {
+        Event event = super.buildTargetEntity();
+
+        if (eventLocationEntityList != null) {
+            event.setLocationList(
+                    new EntityTool().buildTargetEntities(Arrays.asList(eventLocationEntityList))
+                            .toArray(new EventLocation[0])
+            );
+        }
+
+        return event;
     }
 
     @Override

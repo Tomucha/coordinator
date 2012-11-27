@@ -8,6 +8,8 @@ public class Event extends AbstractModifiableEntity {
 
     private String description;
 
+    private EventLocation[] locationList;
+
     public String getEventId() {
         return eventId;
     }
@@ -30,6 +32,14 @@ public class Event extends AbstractModifiableEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public EventLocation[] getLocationList() {
+        return locationList;
+    }
+
+    public void setLocationList(EventLocation[] locationList) {
+        this.locationList = locationList;
     }
 
     @Override

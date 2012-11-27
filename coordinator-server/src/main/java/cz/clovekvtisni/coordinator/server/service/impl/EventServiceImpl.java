@@ -10,15 +10,11 @@ import cz.clovekvtisni.coordinator.server.filter.EventLocationFilter;
 import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
-import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -38,7 +34,7 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
         ResultList<EventEntity> result = ofy().findByFilter(filter, null, 1);
         if (result.getResultSize() == 0) return null;
         EventEntity event = result.firstResult();
-        populateEvent(ofy(), event, flags);
+        populate(Arrays.asList(new EventEntity[] {event}), flags);
 
         return  event;
     }
@@ -46,7 +42,7 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
     @Override
     public EventEntity findById(Long id, long flags) {
         EventEntity entity = ofy().get(Key.create(EventEntity.class, id));
-        populateEvent(ofy(), entity, flags);
+        populate(Arrays.asList(new EventEntity[]{entity}), flags);
         return entity;
     }
 
@@ -62,10 +58,11 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
         for (OrganizationInEventEntity inEventEntity : inEventList) {
             if (inEventEntity.getEventEntity() != null) {
                 EventEntity event = inEventEntity.getEventEntity();
-                populateEvent(ofy(), event, flags);
                 events.add(event);
             }
         }
+
+        populate(events, flags);
 
         return new ResultList<EventEntity>(events, bookmark);
     }
@@ -134,12 +131,33 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
         return locations.getResult();
     }
 
-    private void populateEvent(MaObjectify ofy, EventEntity entity, long flags) {
-        if ((flags & EventService.FLAG_FETCH_LOCATIONS) != 0) {
-            EventLocationFilter filter = new EventLocationFilter();
-            filter.setEventIdVal(entity.getEventId());
-            ResultList<EventLocationEntity> result = ofy.findByFilter(filter, null, 0);
-            entity.setEventLocationEntityList(result.getResult().toArray(new EventLocationEntity[0]));
+    private void populate(Collection<EventEntity> events, long flags) {
+        for (EventEntity entity : events) {
+            if ((flags & EventService.FLAG_FETCH_LOCATIONS) != 0) {
+                EventLocationFilter filter = new EventLocationFilter();
+                filter.setEventIdVal(entity.getEventId());
+                ResultList<EventLocationEntity> result = ofy().findByFilter(filter, null, 0);
+                entity.setEventLocationEntityList(result.getResult().toArray(new EventLocationEntity[0]));
+            }
         }
     }
+
+
+    @Override
+    public List<EventEntity> findByIds(long flags, Long... ids) {
+        if (ids == null)
+            return null;
+
+        Set<Key<EventEntity>> keys = new HashSet<Key<EventEntity>>(ids.length);
+        for (Long id : ids) {
+            if (id != null)
+                keys.add(Key.create(EventEntity.class, id));
+        }
+
+        Map<Key<EventEntity>, EventEntity> entityMap = ofy().get(keys);
+        populate(entityMap.values(), flags);
+
+        return new ArrayList<EventEntity>(entityMap.values());
+    }
+
 }
