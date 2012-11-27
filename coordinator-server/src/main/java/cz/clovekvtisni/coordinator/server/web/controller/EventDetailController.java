@@ -7,10 +7,12 @@ import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.EventFilter;
 import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
+import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.web.model.OrganizationInEventForm;
+import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,8 +32,8 @@ import java.util.List;
  * Date: 20.11.12
  */
 @Controller
-@RequestMapping("/admin/organization/register-to-event")
-public class OrganizationInEventController extends AbstractController {
+@RequestMapping("/admin/event/detail")
+public class EventDetailController extends AbstractEventController {
 
     @Autowired
     private EventService eventService;
@@ -41,28 +43,39 @@ public class OrganizationInEventController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String getForm(
-            @RequestParam(value = "id", required = false) Long organizationInEventId, Model model) {
-        if (organizationInEventId != null) {
-            OrganizationInEventEntity registration = organizationInEventService.findById(organizationInEventId, OrganizationInEventService.FLAG_FETCH_EVENT);
-            if (registration == null)
-                throw NotFoundException.idNotExist(OrganizationInEventEntity.class.getSimpleName(), organizationInEventId);
+            @RequestParam(value = "id", required = false) Long eventId, Model model) {
+
+        UserEntity user = getLoggedUser();
+
+        if (eventId != null) {
+            OrganizationInEventFilter inEventFilter = new OrganizationInEventFilter();
+            inEventFilter.setOrganizationIdVal(user.getOrganizationId());
+            inEventFilter.setEventIdVal(eventId);
+            ResultList<OrganizationInEventEntity> result = organizationInEventService.findByFilter(inEventFilter, 0, null, OrganizationInEventService.FLAG_FETCH_EVENT);
+            if (result.getResultSize() == 0 || result.firstResult() == null)
+                throw NotFoundException.idNotExist();
+            OrganizationInEventEntity registration = result.firstResult();
             model.addAttribute("form", new OrganizationInEventForm().populateFrom(registration));
+            populateEventModel(model, registration.getEventEntity());
+
         } else {
             OrganizationInEventForm form = new OrganizationInEventForm();
-            form.setOrganizationId(getLoggedUser().getOrganizationId());
+            form.setOrganizationId(user.getOrganizationId());
             model.addAttribute("form", form);
+            populateEventModel(model, null);
         }
 
         populateModel(model);
 
-        return "admin/organization-register-in-event";
+        return "admin/event-detail";
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid OrganizationInEventForm form, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
+            populateEventModel(model, getEventById(form.getEventId()));
             populateModel(model);
-            return "admin/organization-register-in-event";
+            return "admin/event-detail";
         }
 
         try {
@@ -73,15 +86,16 @@ public class OrganizationInEventController extends AbstractController {
                 organizationInEventService.update(entity);
 
         } catch (MaException e) {
+            populateEventModel(model, getEventById(form.getEventId()));
             addFormError(bindingResult, e);
             populateModel(model);
-            return "admin/organization-register-in-event";
+            return "admin/event-detail";
         }
 
         return "redirect:/admin/event/list";
     }
 
-    public void populateModel(Model model) {
+    protected void populateModel(Model model) {
         UserEntity loggedUser = getLoggedUser();
         if (loggedUser.getOrganizationId() == null) return;
         OrganizationInEventFilter filter = new OrganizationInEventFilter();
@@ -95,5 +109,9 @@ public class OrganizationInEventController extends AbstractController {
         }
 
         model.addAttribute("eventList", result);
+    }
+
+    public static Breadcrumb getBreadcrumb(EventEntity entity) {
+        return new Breadcrumb(entity, "/admin/event/detail", "breadcrumb.eventDetail", AuthorizationTool.ADMIN);
     }
 }

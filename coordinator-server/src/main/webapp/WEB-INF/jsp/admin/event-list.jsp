@@ -15,7 +15,7 @@
                 <a href="<s:url value="/admin/event/edit"/>"><s:message code="button.createEvent"/></a>
             </c:when>
             <c:when test="${can:hasRole('ADMIN')}">
-                <a href="<s:url value="/admin/organization/register-to-event"/>"><s:message code="button.registerToEvent"/></a>
+                <a href="<s:url value="/admin/event/detail"/>"><s:message code="button.registerToEvent"/></a>
             </c:when>
         </c:choose>
     </div>
@@ -54,7 +54,7 @@
                             </td>
                             <td>
                                 <c:if test="${can:create('organizationInEventEntity')}">
-                                    <a href="/admin/find/organization-in-event/by-event-id?id=<c:out value="${event.id}"/>"><s:message code="button.detail"/></a>
+                                    <a href="/admin/event/detail?id=<c:out value="${event.id}"/>"><s:message code="button.detail"/></a>
                                 </c:if>
                                 <c:if test="${can:create('eventEntity')}">
                                     <a href="/admin/event/edit?id=<c:out value="${event.id}"/>"><s:message code="button.edit"/></a>

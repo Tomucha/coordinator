@@ -92,5 +92,4 @@ public class EventListController extends AbstractController {
                 EventListController.getBreadcrumb()
         };
     }
-
 }

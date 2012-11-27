@@ -6,6 +6,13 @@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %><c:choose>
     <c:when test="${!form.new or !empty eventList}">
+        <script>
+            $(function() {
+                $( "#datePublishInput" ).datepicker({dateFormat: "dd.mm.yy"});
+                $( "#dateClosedInput" ).datepicker({dateFormat: "dd.mm.yy"});
+                $( "#dateClosedRegistrationInput" ).datepicker({dateFormat: "dd.mm.yy"});
+            });
+        </script>
         <sf:form method="POST" modelAttribute="form">
 
             <sf:errors />
@@ -51,6 +58,24 @@
             <div>
                 <tags:input field="operationalInfo" modelAttribute="form" captionCode="OrganizationInEventEntity.operationalInfo">
                     <sf:textarea path="operationalInfo"/>
+                </tags:input>
+            </div>
+            
+            <div>
+                <tags:input field="datePublish" modelAttribute="form" captionCode="OrganizationInEventEntity.datePublish">
+                    <sf:input path="datePublish" id="datePublishInput"/>
+                </tags:input>
+            </div>
+            
+            <div>
+                <tags:input field="dateClosedRegistration" modelAttribute="form" captionCode="OrganizationInEventEntity.dateClosedRegistration">
+                    <sf:input path="dateClosedRegistration" id="dateClosedRegistrationInput"/>
+                </tags:input>
+            </div>
+
+            <div>
+                <tags:input field="dateClosed" modelAttribute="form" captionCode="OrganizationInEventEntity.dateClosed">
+                    <sf:input path="dateClosed" id="dateClosedInput"/>
                 </tags:input>
             </div>
 

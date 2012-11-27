@@ -49,6 +49,9 @@ public class AuthorizationFunctions {
     }
 
     public static boolean canRead(Breadcrumb link) {
+        if (link.isVisibleFor().size() == 0)
+            return true;
+
         for (String roleId : link.isVisibleFor()) {
             if (hasRole(roleId))
                 return true;

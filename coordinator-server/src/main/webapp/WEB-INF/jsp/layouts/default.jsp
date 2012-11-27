@@ -2,6 +2,7 @@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags" %><%@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
+        taglib prefix="can" uri="/WEB-INF/permissions.tld" %><%@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -48,7 +49,9 @@
                     <div class="tabPanel">
                         <c:if test="${!empty breadcrumbs}">
                             <c:forEach items="${breadcrumbs}" var="breadcrumb">
-                                <a href="<s:url value="${breadcrumb.linkUrl}"/>"><s:message code="${breadcrumb.labelCode}"/></a>
+                                <c:if test="${can:viewBreadcrumb(breadcrumb)}">
+                                    <a href="<s:url value="${breadcrumb.linkUrl}"/>"><s:message code="${breadcrumb.labelCode}"/></a>
+                                </c:if>
                             </c:forEach>
                         </c:if>
                     </div>

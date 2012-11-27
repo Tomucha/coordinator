@@ -19,7 +19,8 @@ public class EventPlacesController extends AbstractEventController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String list(@RequestParam("id") Long eventId, Model model) {
-        EventEntity event = populate(eventId, model);
+        EventEntity event = getEventById(eventId);
+        populateEventModel(model, event);
 
         return "admin/event-places";
     }

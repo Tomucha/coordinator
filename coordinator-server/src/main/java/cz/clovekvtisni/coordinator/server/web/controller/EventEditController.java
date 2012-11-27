@@ -1,9 +1,8 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
 import cz.clovekvtisni.coordinator.exception.MaException;
-import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
-import cz.clovekvtisni.coordinator.server.security.CheckPermission;
+import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.web.model.EventForm;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
@@ -15,13 +14,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/admin/event/edit")
-public class EventEditController extends AbstractController {
+public class EventEditController extends AbstractEventController {
 
     @Autowired
     private EventService eventService;
@@ -31,14 +29,11 @@ public class EventEditController extends AbstractController {
         EventForm form = new EventForm();
 
         if (eventId != null) {
-            EventEntity event = eventService.findById(eventId, EventService.FLAG_FETCH_LOCATIONS);
-            if (event == null)
-                throw NotFoundException.idNotExist();
-            form.populateFrom(event);
+            form.populateFrom(getEventById(eventId));
         }
 
+        populateEventModel(model, form);
         model.addAttribute("form", form);
-        model.addAttribute("breadcrumbs", breadcrumbs(form));
 
         return "admin/event-edit";
     }
@@ -46,7 +41,7 @@ public class EventEditController extends AbstractController {
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid EventForm form, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("breadcrumbs", breadcrumbs(form));
+            populateEventModel(model, form);
             return "admin/event-edit";
         }
 
@@ -59,7 +54,7 @@ public class EventEditController extends AbstractController {
                 eventService.updateEvent(event);
             }
         } catch (MaException e) {
-            model.addAttribute("breadcrumbs", breadcrumbs(form));
+            populateEventModel(model, form);
             addFormError(bindingResult, e);
             return "admin/event-edit";
         }
@@ -68,24 +63,6 @@ public class EventEditController extends AbstractController {
     }
 
     public static Breadcrumb getBreadcrumb(EventEntity entity) {
-        return new Breadcrumb(entity, "/admin/event/edit", "breadcrumb.eventEdit");
-    }
-
-    public Breadcrumb[] breadcrumbs(EventEntity entity) {
-        if (entity == null || entity.isNew()) {
-            return new Breadcrumb[] {
-                    UserListController.getBreadcrumb(),
-                    EventListController.getBreadcrumb()
-            };
-
-        } else {
-            return new Breadcrumb[] {
-                    HomeController.getBreadcrumb(),
-                    EventMapController.getBreadcrumb(entity),
-                    EventUsersController.getBreadcrumb(entity),
-                    EventPlacesController.getBreadcrumb(entity),
-                    EventEditController.getBreadcrumb(entity)
-            };
-        }
+        return new Breadcrumb(entity, "/admin/event/edit", "breadcrumb.eventEdit", AuthorizationTool.SUPERADMIN);
     }
 }
