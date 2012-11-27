@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,15 +49,20 @@ public class EventApiController extends AbstractApiController {
 
         Set<Long> eventIds = new HashSet<Long>();
 
+        if (req.params.getOrganizationId() == null)
+            throw new IllegalArgumentException("organization id cannot be null");
+
         if (req.user != null) {
-            responseData.setOrganizationInEvents(getEventsByOrganizationId(req.user.getOrganizationId(), eventIds));
+            responseData.setOrganizationInEvents(getEventsByOrganizationId(req.params.getOrganizationId(), eventIds));
             UserInEventFilter filter = new UserInEventFilter();
             filter.setUserIdVal(req.user.getId());
             ResultList<UserInEventEntity> eventsByUser = userInEventService.findByFilter(filter, 0, null, 0l);
-            responseData.setUserInEvents(new EntityTool().buildTargetEntities(eventsByUser.getResult()));
-            for (UserInEventEntity entity : eventsByUser.getResult()) {
-                eventIds.add(entity.getEventId());
+            List<UserInEventEntity> byOrganization = new ArrayList<UserInEventEntity>();
+            for (UserInEventEntity entity : eventsByUser) {
+                if (eventIds.contains(entity.getEventId()))
+                    byOrganization.add(entity);
             }
+            responseData.setUserInEvents(new EntityTool().buildTargetEntities(byOrganization));
 
         } else if (req.params.getOrganizationId() != null) {
             responseData.setOrganizationInEvents(getEventsByOrganizationId(req.params.getOrganizationId(), eventIds));
