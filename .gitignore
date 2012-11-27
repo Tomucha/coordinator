@@ -18,3 +18,9 @@ coordinator-server/.settings/
 coordinator-shared/.classpath
 coordinator-shared/.project
 coordinator-shared/.settings/
+
+coordinator-android/.settings/org.eclipse.core.resources.prefs
+
+coordinator-android/.settings/org.eclipse.jdt.core.prefs
+
+coordinator-android/.settings/org.eclipse.m2e.core.prefs
