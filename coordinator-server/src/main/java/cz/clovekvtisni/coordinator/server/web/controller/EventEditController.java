@@ -4,7 +4,9 @@ import cz.clovekvtisni.coordinator.exception.MaException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.EventService;
+import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.EventForm;
+import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -32,7 +34,7 @@ public class EventEditController extends AbstractEventController {
             form.populateFrom(getEventById(eventId));
         }
 
-        populateEventModel(model, form);
+        populateEventModel(model, new EventFilterParams(form));
         model.addAttribute("form", form);
 
         return "admin/event-edit";
@@ -41,7 +43,7 @@ public class EventEditController extends AbstractEventController {
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid EventForm form, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            populateEventModel(model, form);
+            populateEventModel(model, new EventFilterParams(form));
             return "admin/event-edit";
         }
 
@@ -54,7 +56,7 @@ public class EventEditController extends AbstractEventController {
                 eventService.updateEvent(event);
             }
         } catch (MaException e) {
-            populateEventModel(model, form);
+            populateEventModel(model, new EventFilterParams(form));
             addFormError(bindingResult, e);
             return "admin/event-edit";
         }
@@ -62,7 +64,7 @@ public class EventEditController extends AbstractEventController {
         return "redirect:/admin/event/list";
     }
 
-    public static Breadcrumb getBreadcrumb(EventEntity entity) {
-        return new Breadcrumb(entity, "/admin/event/edit", "breadcrumb.eventEdit", AuthorizationTool.SUPERADMIN);
+    public static Breadcrumb getBreadcrumb(FilterParams params) {
+        return new Breadcrumb(params, "/admin/event/edit", "breadcrumb.eventEdit", AuthorizationTool.SUPERADMIN);
     }
 }

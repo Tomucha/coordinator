@@ -12,6 +12,8 @@ import cz.clovekvtisni.coordinator.server.security.*;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.ui.Model;
@@ -31,6 +33,8 @@ import java.util.*;
 public abstract class AbstractController {
 
     protected static int DEFAULT_LIST_LENGTH = 30;
+
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     protected MessageSource messageSource;

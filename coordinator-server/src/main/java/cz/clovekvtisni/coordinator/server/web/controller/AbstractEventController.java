@@ -3,6 +3,7 @@ package cz.clovekvtisni.coordinator.server.web.controller;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.service.EventService;
+import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -25,16 +26,14 @@ public abstract class AbstractEventController extends AbstractController {
         return event;
     }
 
-    protected EventEntity populateEventModel(Model model, EventEntity event) {
-        model.addAttribute("event", event);
-        model.addAttribute("breadcrumbs", breadcrumbs(event));
-
-        return event;
+    protected void populateEventModel(Model model, FilterParams params) {
+        model.addAttribute("event", params);
+        model.addAttribute("breadcrumbs", breadcrumbs(params));
     }
 
 
-    protected Breadcrumb[] breadcrumbs(EventEntity entity) {
-        if (entity == null || entity.isNew()) {
+    protected Breadcrumb[] breadcrumbs(FilterParams params) {
+        if (params == null || params.toMap().size() == 0) {
             return new Breadcrumb[] {
                     UserListController.getBreadcrumb(),
                     EventListController.getBreadcrumb()
@@ -43,11 +42,11 @@ public abstract class AbstractEventController extends AbstractController {
         } else {
             return new Breadcrumb[] {
                     HomeController.getBreadcrumb(),
-                    EventMapController.getBreadcrumb(entity),
-                    EventUsersController.getBreadcrumb(entity),
-                    EventPlacesController.getBreadcrumb(entity),
-                    EventDetailController.getBreadcrumb(entity),
-                    EventEditController.getBreadcrumb(entity)
+                    EventMapController.getBreadcrumb(params),
+                    EventUsersController.getBreadcrumb(params),
+                    EventPlacesController.getBreadcrumb(params),
+                    EventDetailController.getBreadcrumb(params),
+                    EventEditController.getBreadcrumb(params)
             };
         }
     }

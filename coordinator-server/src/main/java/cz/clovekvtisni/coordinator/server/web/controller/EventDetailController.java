@@ -11,6 +11,8 @@ import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
+import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.OrganizationInEventForm;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +58,7 @@ public class EventDetailController extends AbstractEventController {
                 throw NotFoundException.idNotExist();
             OrganizationInEventEntity registration = result.firstResult();
             model.addAttribute("form", new OrganizationInEventForm().populateFrom(registration));
-            populateEventModel(model, registration.getEventEntity());
+            populateEventModel(model, new EventFilterParams(registration.getEventEntity()));
 
         } else {
             OrganizationInEventForm form = new OrganizationInEventForm();
@@ -73,7 +75,7 @@ public class EventDetailController extends AbstractEventController {
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid OrganizationInEventForm form, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            populateEventModel(model, getEventById(form.getEventId()));
+            populateEventModel(model, new EventFilterParams(getEventById(form.getEventId())));
             populateModel(model);
             return "admin/event-detail";
         }
@@ -86,7 +88,7 @@ public class EventDetailController extends AbstractEventController {
                 organizationInEventService.update(entity);
 
         } catch (MaException e) {
-            populateEventModel(model, getEventById(form.getEventId()));
+            populateEventModel(model, new EventFilterParams(getEventById(form.getEventId())));
             addFormError(bindingResult, e);
             populateModel(model);
             return "admin/event-detail";
@@ -111,7 +113,7 @@ public class EventDetailController extends AbstractEventController {
         model.addAttribute("eventList", result);
     }
 
-    public static Breadcrumb getBreadcrumb(EventEntity entity) {
-        return new Breadcrumb(entity, "/admin/event/detail", "breadcrumb.eventDetail", AuthorizationTool.ADMIN);
+    public static Breadcrumb getBreadcrumb(FilterParams params) {
+        return new Breadcrumb(params, "/admin/event/detail", "breadcrumb.eventDetail", AuthorizationTool.ADMIN);
     }
 }
