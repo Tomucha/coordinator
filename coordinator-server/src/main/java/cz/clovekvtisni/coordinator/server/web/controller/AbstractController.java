@@ -5,6 +5,7 @@ import cz.clovekvtisni.coordinator.domain.config.Organization;
 import cz.clovekvtisni.coordinator.domain.config.Role;
 import cz.clovekvtisni.coordinator.domain.config.Skill;
 import cz.clovekvtisni.coordinator.exception.MaException;
+import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
@@ -53,6 +54,9 @@ public abstract class AbstractController {
 
     @Autowired
     protected CoordinatorConfig config;
+
+    @Autowired
+    protected UserService userService;
 
     @ModelAttribute
     public void loggedUser(Model model) {
@@ -110,13 +114,10 @@ public abstract class AbstractController {
         return config;
     }
 
-/*
-    public List<Equipment> getAllEquipmentList() {
-        return config.getEquipmentList();
+    protected UserEntity loadUserById(Long id, long flags) {
+        UserEntity user = userService.findById(id, flags);
+        if (user == null)
+            throw NotFoundException.idNotExist("userEntity", id);
+        return user;
     }
-
-    private List<Skill> getAllSkillList() {
-        return config.getSkillList();
-    }
-*/
 }

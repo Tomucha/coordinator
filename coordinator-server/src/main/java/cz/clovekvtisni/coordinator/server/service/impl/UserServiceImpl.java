@@ -116,6 +116,8 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             public UserEntity run() {
                 logger.debug("creating " + entity);
 
+                // TODO validace roli
+
                 // TODO maybe more IQ solution
                 if (ValueTool.isEmpty(entity.getEmail()))
                     throw ValidationError.entityInvalid();

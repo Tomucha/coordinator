@@ -54,7 +54,6 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     private String reasonSuspended;
 
-    @NotEmpty
     private String[] roleIdList;
 
     @Ignore

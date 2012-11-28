@@ -27,14 +27,13 @@ public class EventEditController extends AbstractEventController {
     private EventService eventService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String edit(@RequestParam(value = "id", required = false) Long eventId, Model model) {
+    public String edit(@ModelAttribute("params") EventFilterParams params, Model model) {
         EventForm form = new EventForm();
 
-        if (eventId != null) {
-            form.populateFrom(getEventById(eventId));
-        }
+        if (params.getEventId() != null)
+            form.populateFrom(getEventById(params.getEventId()));
 
-        populateEventModel(model, new EventFilterParams(form));
+        populateEventModel(model, params);
         model.addAttribute("form", form);
 
         return "admin/event-edit";

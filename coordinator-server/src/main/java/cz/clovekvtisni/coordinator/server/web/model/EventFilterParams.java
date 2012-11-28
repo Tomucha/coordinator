@@ -47,7 +47,7 @@ public class EventFilterParams implements FilterParams {
     public Map<String, String> toMap() {
         Map<String, String> map = new HashMap<String, String>(2);
         if (eventId != null)
-            map.put("id", eventId.toString());
+            map.put("eventId", eventId.toString());
         if (userFulltext != null)
             map.put("userFulltext", userFulltext);
 

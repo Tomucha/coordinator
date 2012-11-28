@@ -1,6 +1,8 @@
 package cz.clovekvtisni.coordinator.server.tool.objectify;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings({"serial"})
 public abstract class Filter<T> implements Serializable {
@@ -26,19 +28,25 @@ public abstract class Filter<T> implements Serializable {
 
     private String order;
 
-    private AfterLoadCallback afterLoadCallback;
+    private List<AfterLoadCallback> afterLoadCallbacks;
 
     public abstract Class<T> getEntityClass();
 
-    public void setAfterLoadCallback(AfterLoadCallback afterLoadCallback) {
-        this.afterLoadCallback = afterLoadCallback;
+    public void addAfterLoadCallback(AfterLoadCallback afterLoadCallback) {
+        if (afterLoadCallbacks == null)
+            afterLoadCallbacks = new ArrayList<AfterLoadCallback>();
+        this.afterLoadCallbacks.add(afterLoadCallback);
     }
 
     public boolean accept(T entity) {
-        if (afterLoadCallback != null)
-            return afterLoadCallback.accept(entity);
-        else
-            return true;
+        if (afterLoadCallbacks != null) {
+            for (AfterLoadCallback afterLoadCallback : afterLoadCallbacks) {
+                if (!afterLoadCallback.accept(entity))
+                    return false;
+            }
+        }
+
+        return true;
     }
 
     public String getOrder() {

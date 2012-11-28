@@ -28,15 +28,6 @@ import javax.validation.Valid;
 @RequestMapping("/admin/user/edit")
 public class UserEditController extends AbstractController {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private CoordinatorConfig config;
-
-    @Autowired
-    private AuthorizationTool authorizationTool;
-
     @RequestMapping(method = RequestMethod.GET)
     public String edit(@RequestParam(value = "id", required = false) Long userId, Model model) {
         UserForm form = new UserForm();

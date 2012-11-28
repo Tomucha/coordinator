@@ -15,6 +15,10 @@ public class UserInEventFilter extends NoDeletedFilter<UserInEventEntity> {
 
     private Operator userIdOp = Operator.EQ;
 
+    private Long eventIdVal;
+
+    private Operator eventIdOp = Operator.EQ;
+
     public Long getUserIdVal() {
         return userIdVal;
     }
@@ -29,6 +33,22 @@ public class UserInEventFilter extends NoDeletedFilter<UserInEventEntity> {
 
     public void setUserIdOp(Operator userIdOp) {
         this.userIdOp = userIdOp;
+    }
+
+    public Long getEventIdVal() {
+        return eventIdVal;
+    }
+
+    public void setEventIdVal(Long eventIdVal) {
+        this.eventIdVal = eventIdVal;
+    }
+
+    public Operator getEventIdOp() {
+        return eventIdOp;
+    }
+
+    public void setEventIdOp(Operator eventIdOp) {
+        this.eventIdOp = eventIdOp;
     }
 
     @Override

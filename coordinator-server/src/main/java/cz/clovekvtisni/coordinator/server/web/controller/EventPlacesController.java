@@ -1,11 +1,13 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
+import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,8 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class EventPlacesController extends AbstractEventController {
 
     @RequestMapping(method = RequestMethod.GET)
-    public String list(@RequestParam("id") Long eventId, Model model) {
-        EventEntity event = getEventById(eventId);
+    public String list(@ModelAttribute("params") EventFilterParams params, Model model) {
+        if (params.getEventId() == null)
+            throw NotFoundException.idNotExist();
+
+        EventEntity event = getEventById(params.getEventId());
         populateEventModel(model, new EventFilterParams(event));
 
         return "admin/event-places";

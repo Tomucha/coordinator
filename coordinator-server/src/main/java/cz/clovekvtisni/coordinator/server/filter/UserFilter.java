@@ -26,6 +26,13 @@ public class UserFilter extends NoDeletedFilter<UserEntity> {
 
     private Operator modifiedDateOp = Operator.EQ;
 
+    public UserFilter() {
+    }
+
+    public UserFilter(boolean includeDeleted) {
+        super(includeDeleted);
+    }
+
     @Override
     public Class<UserEntity> getEntityClass() {
         return UserEntity.class;

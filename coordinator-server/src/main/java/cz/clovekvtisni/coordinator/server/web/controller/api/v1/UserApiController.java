@@ -88,14 +88,13 @@ public class UserApiController extends AbstractApiController {
     public @ResponseBody ApiResponse filter(HttpServletRequest request) {
         UserRequest<UserFilterRequestParams> req = parseRequest(request, UserFilterRequestParams.class);
 
-        UserFilter filter = new UserFilter();
+        UserFilter filter = new UserFilter(true);
         filter.setOrganizationIdVal(req.user.getOrganizationId());
         if (req.params.getModifiedFrom() != null) {
             filter.setModifiedDateVal(req.params.getModifiedFrom());
             filter.setModifiedDateOp(Filter.Operator.GT);
         }
         filter.setOrder("modifiedDate");
-        filter.includeDeleted(true);
 
         ResultList<UserEntity> result = userService.findByFilter(filter, 0, null, 0l);
         List<User> users = new EntityTool().buildTargetEntities(result.getResult());

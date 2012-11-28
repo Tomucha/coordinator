@@ -44,15 +44,14 @@ public class EventDetailController extends AbstractEventController {
     private OrganizationInEventService organizationInEventService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String getForm(
-            @RequestParam(value = "id", required = false) Long eventId, Model model) {
+    public String getForm(@ModelAttribute("params") EventFilterParams params, Model model) {
 
         UserEntity user = getLoggedUser();
 
-        if (eventId != null) {
+        if (params.getEventId() != null) {
             OrganizationInEventFilter inEventFilter = new OrganizationInEventFilter();
             inEventFilter.setOrganizationIdVal(user.getOrganizationId());
-            inEventFilter.setEventIdVal(eventId);
+            inEventFilter.setEventIdVal(params.getEventId());
             ResultList<OrganizationInEventEntity> result = organizationInEventService.findByFilter(inEventFilter, 0, null, OrganizationInEventService.FLAG_FETCH_EVENT);
             if (result.getResultSize() == 0 || result.firstResult() == null)
                 throw NotFoundException.idNotExist();

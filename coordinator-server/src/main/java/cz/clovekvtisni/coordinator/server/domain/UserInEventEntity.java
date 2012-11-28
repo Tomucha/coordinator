@@ -22,8 +22,10 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     @Parent
     private Key<UserEntity> parentKey;
 
+    @Index
     private Long userId;
 
+    @Index
     private Long eventId;
 
     private boolean usesSmartphoneApp;
