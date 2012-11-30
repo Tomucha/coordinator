@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android;
+package cz.clovekvtisni.coordinator.android.api;
 
 import android.util.Log;
 

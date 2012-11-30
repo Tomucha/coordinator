@@ -6,7 +6,6 @@ import com.github.kevinsawicki.http.HttpRequest;
 import com.google.common.base.Objects;
 import com.google.gson.JsonObject;
 
-import cz.clovekvtisni.coordinator.android.DeployEnvironment;
 import cz.clovekvtisni.coordinator.android.util.CommonTool;
 import cz.clovekvtisni.coordinator.android.util.GsonTool;
 import cz.clovekvtisni.coordinator.api.request.ApiRequest;

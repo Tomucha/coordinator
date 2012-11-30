@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -16,8 +17,8 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiCallAsyncLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiCallFactory;
-import cz.clovekvtisni.coordinator.android.util.CommonTool;
-import cz.clovekvtisni.coordinator.api.response.GlobalConfigResponse;
+import cz.clovekvtisni.coordinator.api.request.EmptyRequestParams;
+import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 
 public class MainActivity extends SherlockFragmentActivity {
@@ -37,26 +38,43 @@ public class MainActivity extends SherlockFragmentActivity {
 			}
 		});
 	}
+	
+	private void initTryAgainButton() {
+		findViewById(R.id.try_again).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				loadOrganizations();
+			}
+		});
+	}
+	
+	private void loadOrganizations() {
+		onLoadingStateChanged(LoadingState.LOADING);
+		getSupportLoaderManager().restartLoader(LOADER_CONFIG, null, configCallbacks);
+	}
 
 	@Override
 	protected void onCreate(Bundle state) {
 		super.onCreate(state);
 		setContentView(R.layout.activity_main);
 
+		initTryAgainButton();
 		initListView();
 
-		getSupportLoaderManager().initLoader(LOADER_CONFIG, null, configCallbacks);
+		loadOrganizations();
 	}
 
-	private void updateLoadingUi(LoadingState state) {
+	private void onLoadingStateChanged(LoadingState state) {
 		int loadingVisibility = state == LoadingState.LOADING ? View.VISIBLE : View.GONE;
 		findViewById(R.id.loading_overlay).setVisibility(loadingVisibility);
+		
+		int errorVisibility = state == LoadingState.ERROR ? View.VISIBLE : View.GONE;
+		findViewById(R.id.error_overlay).setVisibility(errorVisibility);
 	}
 
 	private void onOrganizationsLoaded(Organization[] organizations) {
 		adapter.setOrganizations(organizations);
 		adapter.notifyDataSetChanged();
-		updateLoadingUi(LoadingState.DONE);
 	}
 
 	private void onOrganizationSelected(Organization organization) {
@@ -99,26 +117,28 @@ public class MainActivity extends SherlockFragmentActivity {
 		}
 	}
 
-	private class ConfigCallbacks implements LoaderCallbacks<GlobalConfigResponse> {
+	private class ConfigCallbacks implements LoaderCallbacks<ConfigResponse> {
 		@Override
-		public Loader<GlobalConfigResponse> onCreateLoader(int id, Bundle args) {
-			return new ApiCallAsyncLoader<Void, GlobalConfigResponse>(getApplicationContext(),
-					ApiCallFactory.globalConfiguration(), null);
+		public Loader<ConfigResponse> onCreateLoader(int id, Bundle args) {
+			return new ApiCallAsyncLoader<EmptyRequestParams, ConfigResponse>(
+					getApplicationContext(), ApiCallFactory.configuration(),
+					new EmptyRequestParams());
 		}
 
 		@Override
-		public void onLoadFinished(Loader<GlobalConfigResponse> loader, GlobalConfigResponse config) {
+		public void onLoadFinished(Loader<ConfigResponse> loader, ConfigResponse config) {
 			ApiCallAsyncLoader apiLoader = (ApiCallAsyncLoader) loader;
 			Exception e = apiLoader.getException();
 			if (e != null) {
-				CommonTool.showToast(MainActivity.this, e.toString());
+				onLoadingStateChanged(LoadingState.ERROR);
 			} else {
 				onOrganizationsLoaded(config.getOrganizationList());
+				onLoadingStateChanged(LoadingState.DONE);
 			}
 		}
 
 		@Override
-		public void onLoaderReset(Loader<GlobalConfigResponse> loader) {
+		public void onLoaderReset(Loader<ConfigResponse> loader) {
 		}
 	}
 

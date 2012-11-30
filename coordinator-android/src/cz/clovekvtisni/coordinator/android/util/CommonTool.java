@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 import android.widget.Toast;
-import cz.clovekvtisni.coordinator.android.DeployEnvironment;
+import cz.clovekvtisni.coordinator.android.api.DeployEnvironment;
 
 /**
  * This class contains a set of common Android utilities for logging and debuging.
