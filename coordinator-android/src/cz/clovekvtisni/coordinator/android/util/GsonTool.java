@@ -4,11 +4,16 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
+import java.util.Date;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 /**
@@ -22,13 +27,14 @@ import com.google.gson.JsonParser;
  * 
  */
 public class GsonTool {
-	
+
 	private static JsonParser parser = new JsonParser();
 	private static Gson gson;
 	static {
-		gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+		gson = new GsonBuilder().registerTypeAdapter(Date.class, new JsonDateDeserializer())
+				.create();
 	}
-	
+
 	public static JsonElement parse(InputStream is) {
 		try {
 			return parser.parse(new InputStreamReader(is, "UTF-8"));
@@ -36,7 +42,7 @@ public class GsonTool {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
 	public static String getString(JsonObject object, String name) {
 		if (object == null) return null;
 		if (name == null) return null;
@@ -51,10 +57,10 @@ public class GsonTool {
 		return object.get(name).getAsLong();
 	}
 
-	public static JsonObject render(Object ... pairs) {
+	public static JsonObject render(Object... pairs) {
 		JsonObject res = new JsonObject();
-		for (int a=0; a<pairs.length; a+=2){
-			res.add((String) pairs[a], toJson(pairs[a+1]));
+		for (int a = 0; a < pairs.length; a += 2) {
+			res.add((String) pairs[a], toJson(pairs[a + 1]));
 		}
 		return res;
 	}
@@ -83,4 +89,11 @@ public class GsonTool {
 		}
 	}
 
+	private static class JsonDateDeserializer implements JsonDeserializer<Date> {
+		public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+				throws JsonParseException {
+			Date d = new Date(json.getAsJsonPrimitive().getAsLong());
+			return d;
+		}
+	}
 }

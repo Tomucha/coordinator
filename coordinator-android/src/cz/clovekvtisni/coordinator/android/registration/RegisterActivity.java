@@ -59,10 +59,9 @@ public class RegisterActivity extends SherlockFragmentActivity {
 			ApiCallAsyncLoader apiLoader = (ApiCallAsyncLoader) loader;
 			Exception e = apiLoader.getException();
 			if (e != null) {
-				System.out.println(e.getMessage());
-				e.printStackTrace();
 				CommonTool.showToast(RegisterActivity.this, e.toString());
 			} else {
+				finish();
 			}
 		}
 
