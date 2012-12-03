@@ -7,12 +7,14 @@
 
     <TextView
         android:id="@+id/title"
+        style="@style/RegisterPageTitle" />
+
+    <ListView
+        android:id="@android:id/list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:fontFamily="sans-serif-thin"
-        android:text="Bydliště"
-        android:textColor="#09c"
-        android:textSize="36sp" />
-    
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:saveEnabled="false"
+        android:scrollbarStyle="outsideInset" />
+
 </LinearLayout>

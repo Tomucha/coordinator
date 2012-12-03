@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android.wizardpager.wizard.ui;
+package cz.clovekvtisni.coordinator.android.register.wizard.ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +14,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import cz.clovekvtisni.coordinator.android.R;
-import cz.clovekvtisni.coordinator.android.wizardpager.wizard.model.Page;
-import cz.clovekvtisni.coordinator.android.wizardpager.wizard.model.SingleFixedChoicePage;
+import cz.clovekvtisni.coordinator.android.register.wizard.model.Page;
+import cz.clovekvtisni.coordinator.android.register.wizard.model.SingleFixedChoicePage;
 
 public class SingleChoiceFragment extends ListFragment {
     private static final String ARG_KEY = "key";
@@ -55,8 +55,8 @@ public class SingleChoiceFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.frag_registration, container, false);
-        ((TextView) rootView.findViewById(android.R.id.title)).setText(mPage.getTitle());
+        View rootView = inflater.inflate(R.layout.frag_register, container, false);
+        ((TextView) rootView.findViewById(R.id.title)).setText(mPage.getTitle());
 
         final ListView listView = (ListView) rootView.findViewById(android.R.id.list);
         setListAdapter(new ArrayAdapter<String>(getActivity(),

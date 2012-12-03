@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/RegisterPageContainer" >
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/RegisterPageTitle" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="8dp" >
+
+            <TextView
+                style="@style/RegisterFormLabel"
+                android:text="ADRESA" />
+
+            <EditText
+                android:id="@+id/street"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:inputType="textCapSentences"
+                android:saveEnabled="false" />
+
+            <TextView
+                style="@style/RegisterFormLabel"
+                android:text="MĚSTO" />
+
+            <EditText
+                android:id="@+id/city"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:inputType="textCapSentences"
+                android:saveEnabled="false" />
+
+            <TextView
+                style="@style/RegisterFormLabel"
+                android:text="PSČ" />
+
+            <EditText
+                android:id="@+id/zip_code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:saveEnabled="false" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

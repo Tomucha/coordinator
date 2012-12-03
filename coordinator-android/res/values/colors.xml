@@ -4,6 +4,8 @@
     <color name="line">#ccc</color>
 
     <color name="text">#000</color>
-    <color name="text_light">#9000</color>
+    <color name="text_light">#7000</color>
+    
+    <color name="review_green">#ff669900</color>
 
 </resources>

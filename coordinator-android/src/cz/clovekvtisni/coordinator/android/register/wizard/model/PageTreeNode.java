@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android.wizardpager.wizard.model;
+package cz.clovekvtisni.coordinator.android.register.wizard.model;
 
 import java.util.ArrayList;
 

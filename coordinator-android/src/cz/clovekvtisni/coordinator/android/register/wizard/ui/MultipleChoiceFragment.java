@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android.wizardpager.wizard.ui;
+package cz.clovekvtisni.coordinator.android.register.wizard.ui;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,15 +17,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import cz.clovekvtisni.coordinator.android.R;
-import cz.clovekvtisni.coordinator.android.wizardpager.wizard.model.MultipleFixedChoicePage;
-import cz.clovekvtisni.coordinator.android.wizardpager.wizard.model.Page;
+import cz.clovekvtisni.coordinator.android.register.wizard.model.MultipleFixedChoicePage;
+import cz.clovekvtisni.coordinator.android.register.wizard.model.Page;
 
 public class MultipleChoiceFragment extends ListFragment {
     private static final String ARG_KEY = "key";
 
     private PageFragmentCallbacks mCallbacks;
-    private String mKey;
-    private List<String> mChoices;
     private Page mPage;
 
     public static MultipleChoiceFragment create(String key) {
@@ -39,29 +37,40 @@ public class MultipleChoiceFragment extends ListFragment {
 
     public MultipleChoiceFragment() {
     }
-
+    
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
 
-        Bundle args = getArguments();
-        mKey = args.getString(ARG_KEY);
-        mPage = mCallbacks.onGetPage(mKey);
-
-        MultipleFixedChoicePage fixedChoicePage = (MultipleFixedChoicePage) mPage;
-        mChoices = new ArrayList<String>();
-        for (int i = 0; i < fixedChoicePage.getOptionCount(); i++) {
-            mChoices.add(fixedChoicePage.getOptionAt(i));
+        if (!(activity instanceof PageFragmentCallbacks)) {
+            throw new ClassCastException("Activity must implement PageFragmentCallbacks");
         }
+
+        mCallbacks = (PageFragmentCallbacks) activity;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.frag_registration, container, false);
-        ((TextView) rootView.findViewById(R.id.title)).setText(mPage.getTitle());
+        return inflater.inflate(R.layout.frag_register, container, false);
+    }
+    
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+    	super.onActivityCreated(savedInstanceState);
+    	
+    	Bundle args = getArguments();
+        mPage = mCallbacks.onGetPage(args.getString(ARG_KEY));
 
-        final ListView listView = (ListView) rootView.findViewById(android.R.id.list);
+        MultipleFixedChoicePage fixedChoicePage = (MultipleFixedChoicePage) mPage;
+        final List<String> mChoices = new ArrayList<String>();
+        for (int i = 0; i < fixedChoicePage.getOptionCount(); i++) {
+            mChoices.add(fixedChoicePage.getOptionAt(i));
+        }
+    	
+    	((TextView) getView().findViewById(R.id.title)).setText(mPage.getTitle());
+
+        final ListView listView = (ListView) getView().findViewById(android.R.id.list);
         setListAdapter(new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_list_item_multiple_choice,
                 android.R.id.text1,
@@ -87,21 +96,8 @@ public class MultipleChoiceFragment extends ListFragment {
                 }
             }
         });
-
-        return rootView;
     }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        if (!(activity instanceof PageFragmentCallbacks)) {
-            throw new ClassCastException("Activity must implement PageFragmentCallbacks");
-        }
-
-        mCallbacks = (PageFragmentCallbacks) activity;
-    }
-
+    
     @Override
     public void onDetach() {
         super.onDetach();

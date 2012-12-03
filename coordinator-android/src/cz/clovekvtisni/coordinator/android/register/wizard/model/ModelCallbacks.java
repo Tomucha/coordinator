@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android.wizardpager.wizard.model;
+package cz.clovekvtisni.coordinator.android.register.wizard.model;
 
 /**
  * Callback interface connecting {@link Page}, {@link AbstractWizardModel}, and model container

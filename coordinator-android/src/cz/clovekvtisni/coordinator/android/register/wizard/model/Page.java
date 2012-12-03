@@ -1,9 +1,10 @@
-package cz.clovekvtisni.coordinator.android.wizardpager.wizard.model;
+package cz.clovekvtisni.coordinator.android.register.wizard.model;
+
+import java.util.ArrayList;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-
-import java.util.ArrayList;
+import cz.clovekvtisni.coordinator.domain.User;
 
 /**
  * Represents a single page in the wizard.
@@ -61,13 +62,16 @@ public abstract class Page implements PageTreeNode {
         return (mParentKey != null) ? mParentKey + ":" + mTitle : mTitle;
     }
 
+    public abstract void getReviewItems(ArrayList<ReviewItem> dest);
+
     public boolean isCompleted() {
         return true;
     }
+    
+    public abstract void saveToUser(User user);
 
-    public void resetData(Bundle data) {
+    public void setData(Bundle data) {
         mData = data;
-        notifyDataChanged();
     }
 
     public void notifyDataChanged() {

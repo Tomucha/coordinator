@@ -14,7 +14,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiCallAsyncLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiCallFactory;
-import cz.clovekvtisni.coordinator.android.registration.RegisterActivity;
+import cz.clovekvtisni.coordinator.android.register.RegisterActivity;
 import cz.clovekvtisni.coordinator.android.util.CommonTool;
 import cz.clovekvtisni.coordinator.api.request.OrganizationEventsRequestParams;
 import cz.clovekvtisni.coordinator.api.response.OrganizationEventsResponseData;
@@ -39,7 +39,6 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 	
 	private void initWebView() {
 		WebView webView = (WebView) findViewById(R.id.webView);
-		webView.loadUrl("http://news.ycombinator.com");
 	}
 
 	@Override
