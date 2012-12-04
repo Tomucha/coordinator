@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Controller
 @RequestMapping("/admin/event/users")
-public class EventUsersController extends AbstractEventController {
+public class EventUserListController extends AbstractEventController {
 
     @Autowired
     private UserInEventService userInEventService;

@@ -43,7 +43,7 @@ public abstract class AbstractEventController extends AbstractController {
             return new Breadcrumb[] {
                     HomeController.getBreadcrumb(),
                     EventMapController.getBreadcrumb(params),
-                    EventUsersController.getBreadcrumb(params),
+                    EventUserListController.getBreadcrumb(params),
                     EventPlacesController.getBreadcrumb(params),
                     EventDetailController.getBreadcrumb(params),
                     EventEditController.getBreadcrumb(params)

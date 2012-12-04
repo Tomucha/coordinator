@@ -28,6 +28,7 @@
                     <sf:hidden path="id"/>
                     <sf:hidden path="eventId"/>
                     <sf:hidden path="organizationId"/>
+                    <sf:hidden path="userInEventId"/>
 
                     <tags:input field="firstName" modelAttribute="form" captionCode="UserEntity.firstName">
                         <sf:input path="firstName" />
@@ -92,7 +93,12 @@
 
                 <div>
                     <tags:input field="country" modelAttribute="form" captionCode="UserEntity.country">
-                        <tags:selectcountry path="country" emptyLabelCode="label.emptyCountry"/>
+                        <sf:select path="country">
+                            <sf:option value=""><s:message code="label.emptyCountry"/></sf:option>
+                            <c:forEach items="${config.countryMap}" var="entry">
+                                <sf:option value="${entry.key}" label="${entry.value}"/>
+                            </c:forEach>
+                        </sf:select>
                     </tags:input>
                 </div>
             </div>
