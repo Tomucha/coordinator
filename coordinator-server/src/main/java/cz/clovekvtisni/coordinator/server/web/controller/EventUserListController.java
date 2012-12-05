@@ -51,7 +51,7 @@ public class EventUserListController extends AbstractEventController {
         ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER);
         model.addAttribute("userInEvents", userInEvents.getResult());
 
-        populateEventModel(model, new EventFilterParams(params.getEventId()));
+        populateEventModel(model, params);
 
         return "admin/event-users";
     }

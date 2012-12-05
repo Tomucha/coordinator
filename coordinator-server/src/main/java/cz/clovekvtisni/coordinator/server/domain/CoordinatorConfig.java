@@ -132,6 +132,17 @@ public class CoordinatorConfig {
         return organizationMap;
     }
 
+    public Map<String, PoiCategory> getPoiCategoryMap() {
+        if (poiCategoryList == null) return new HashMap<String, PoiCategory>();
+
+        Map<String, PoiCategory> map = new HashMap<String, PoiCategory>(poiCategoryList.size());
+        for (PoiCategory category : poiCategoryList) {
+            map.put(category.getId(), category);
+        }
+
+        return map;
+    }
+
     public Map<String, String> getCountryMap() {
         if (countryMap != null)
             return countryMap;

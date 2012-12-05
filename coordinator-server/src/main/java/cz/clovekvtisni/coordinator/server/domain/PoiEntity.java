@@ -1,12 +1,13 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.annotation.Cache;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.Poi;
 
-import com.googlecode.objectify.annotation.Id;
+import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
+import cz.clovekvtisni.coordinator.domain.config.Workflow;
+import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
+
 import java.util.Arrays;
 
 /**
@@ -21,12 +22,16 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     @Id
     private Long id;
 
-    private Long poiCategoryId;
-
     @Index
-    private Long workflowId;
+    private Long eventId;
 
-    private Long workflowStateId;
+    private String organizationId;
+
+    private String poiCategoryId;
+
+    private String workflowId;
+
+    private String workflowStateId;
 
     @Index
     private Long[] userId;
@@ -38,6 +43,15 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     private Long precission;
 
     private boolean confirmed;
+
+    @Ignore
+    private PoiCategory poiCategory;
+
+    @Ignore
+    private Workflow workflow;
+
+    @Ignore
+    private WorkflowState workflowState;
 
     public PoiEntity() {
     }
@@ -55,27 +69,43 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
         this.id = id;
     }
 
-    public Long getPoiCategoryId() {
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public String getPoiCategoryId() {
         return poiCategoryId;
     }
 
-    public void setPoiCategoryId(Long poiCategoryId) {
+    public void setPoiCategoryId(String poiCategoryId) {
         this.poiCategoryId = poiCategoryId;
     }
 
-    public Long getWorkflowId() {
+    public String getWorkflowId() {
         return workflowId;
     }
 
-    public void setWorkflowId(Long workflowId) {
+    public void setWorkflowId(String workflowId) {
         this.workflowId = workflowId;
     }
 
-    public Long getWorkflowStateId() {
+    public String getWorkflowStateId() {
         return workflowStateId;
     }
 
-    public void setWorkflowStateId(Long workflowStateId) {
+    public void setWorkflowStateId(String workflowStateId) {
         this.workflowStateId = workflowStateId;
     }
 
@@ -124,6 +154,33 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
         return Key.create(PoiEntity.class, id);
     }
 
+    public PoiCategory getPoiCategory() {
+        return poiCategory;
+    }
+
+    public void setPoiCategory(PoiCategory poiCategory) {
+        this.poiCategory = poiCategory;
+    }
+
+    public Workflow getWorkflow() {
+        return workflow;
+    }
+
+    public void setWorkflow(Workflow workflow) {
+        this.workflow = workflow;
+    }
+
+    public WorkflowState getWorkflowState() {
+        return workflowState;
+    }
+
+    public void setWorkflowState(WorkflowState workflowState) {
+        this.workflowState = workflowState;
+    }
+
+    public int getUserCount() {
+        return userId != null ? userId.length : 0;
+    }
     @Override
     public String toString() {
         return "PoiEntity{" +

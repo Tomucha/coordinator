@@ -14,6 +14,8 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
  */
 public interface PoiService extends Service {
 
+    public static final long FLAG_FETCH_FROM_CONFIG = 1l;
+
     @FilterResult("#helper.canRead(#entity)")
     PoiEntity findById(Long id, long flags);
 

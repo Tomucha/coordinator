@@ -1,14 +1,22 @@
 package cz.clovekvtisni.coordinator.domain;
 
+import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
+import cz.clovekvtisni.coordinator.domain.config.Workflow;
+import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
+
 import java.util.Arrays;
 
 public class Poi extends AbstractModifiableEntity {
 
-    private Long poiCategoryId;
+    private Long eventId;
 
-    private Long workflowId;
+    private String organizationId;
 
-    private Long workflowStateId;
+    private String poiCategoryId;
+
+    private String workflowId;
+
+    private String workflowStateId;
 
     private Long[] userId;
 
@@ -20,27 +28,49 @@ public class Poi extends AbstractModifiableEntity {
 
     private boolean confirmed;
 
-    public Long getPoiCategoryId() {
+    private PoiCategory poiCategory;
+
+    private Workflow workflow;
+
+    private WorkflowState workflowState;
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public String getPoiCategoryId() {
         return poiCategoryId;
     }
 
-    public void setPoiCategoryId(Long poiCategoryId) {
+    public void setPoiCategoryId(String poiCategoryId) {
         this.poiCategoryId = poiCategoryId;
     }
 
-    public Long getWorkflowId() {
+    public String getWorkflowId() {
         return workflowId;
     }
 
-    public void setWorkflowId(Long workflowId) {
+    public void setWorkflowId(String workflowId) {
         this.workflowId = workflowId;
     }
 
-    public Long getWorkflowStateId() {
+    public String getWorkflowStateId() {
         return workflowStateId;
     }
 
-    public void setWorkflowStateId(Long workflowStateId) {
+    public void setWorkflowStateId(String workflowStateId) {
         this.workflowStateId = workflowStateId;
     }
 
@@ -82,6 +112,30 @@ public class Poi extends AbstractModifiableEntity {
 
     public void setConfirmed(boolean confirmed) {
         this.confirmed = confirmed;
+    }
+
+    public PoiCategory getPoiCategory() {
+        return poiCategory;
+    }
+
+    public void setPoiCategory(PoiCategory poiCategory) {
+        this.poiCategory = poiCategory;
+    }
+
+    public Workflow getWorkflow() {
+        return workflow;
+    }
+
+    public void setWorkflow(Workflow workflow) {
+        this.workflow = workflow;
+    }
+
+    public WorkflowState getWorkflowState() {
+        return workflowState;
+    }
+
+    public void setWorkflowState(WorkflowState workflowState) {
+        this.workflowState = workflowState;
     }
 
     @Override

@@ -2,13 +2,17 @@ package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
+import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
+import cz.clovekvtisni.coordinator.domain.config.Workflow;
+import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,16 +22,46 @@ import java.util.Date;
 @Service("poiService")
 public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
+    @Autowired
+    private CoordinatorConfig config;
+
     @Override
     public PoiEntity findById(Long id, long flags) {
         PoiEntity poi = ofy().get(Key.create(PoiEntity.class, id));
 
+        populate(Arrays.asList(new PoiEntity[] {poi}), flags);
+
         return poi;
+    }
+
+    private void populate(Collection<PoiEntity> entities, long flags) {
+        if ((flags & FLAG_FETCH_FROM_CONFIG) != 0l) {
+            Map<String,PoiCategory> categoryMap = config.getPoiCategoryMap();
+            for (PoiEntity poi : entities) {
+                if (poi.getPoiCategoryId() != null) {
+                    poi.setPoiCategory(categoryMap.get(poi.getPoiCategoryId()));
+                }
+            }
+
+            Map<String,Workflow> workflowMap = config.getWorkflowMap();
+            for (PoiEntity poi : entities) {
+                if (poi.getWorkflowId() != null) {
+                    Workflow workflow = workflowMap.get(poi.getWorkflowId());
+                    poi.setWorkflow(workflow);
+                    if (workflow != null && poi.getWorkflowStateId() != null) {
+                        poi.setWorkflowState(workflow.getStateMap().get(poi.getWorkflowStateId()));
+                    }
+                }
+            }
+        }
     }
 
     @Override
     public ResultList<PoiEntity> findByFilter(PoiFilter filter, int limit, String bookmark, long flags) {
-        return ofy().findByFilter(filter, bookmark, limit);
+        ResultList<PoiEntity> result = ofy().findByFilter(filter, bookmark, limit);
+        populate(result.getResult(), flags);
+
+        return result;
     }
 
     @Override
