@@ -8,6 +8,7 @@ import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
 
+import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 
 /**
@@ -23,10 +24,13 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     private Long id;
 
     @Index
+    @NotNull
     private Long eventId;
 
+    @NotNull
     private String organizationId;
 
+    @NotNull
     private String poiCategoryId;
 
     private String workflowId;
