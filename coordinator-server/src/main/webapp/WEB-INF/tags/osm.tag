@@ -5,7 +5,10 @@
         attribute name="longitude" required="false" %><%@
         attribute name="latitude" required="false" %><%@
         attribute name="onLoad" required="false" %><%@
+        attribute name="onNewMarker" required="false" %><%@
+        attribute name="popupType" required="false" %><%@
         attribute name="enableLocations" required="false" type="java.lang.Boolean" %><%@
+        attribute name="maxLocations" required="false" type="java.lang.Integer" %><%@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags"
 %><style type="text/css">
@@ -28,6 +31,8 @@
 
     var state = STATE_BROWSE;
     var locationsEnabled = <c:out value="${empty enableLocations or enableLocations == false ? 'false' : 'true'}"/>;
+    var maxLocations = <c:out value="${!empty maxLocations ? maxLocations : 0}"/>;
+    var popupType= "<c:out value="${!empty popupType ? popupType : ''}"/>";
 
     size = new OpenLayers.Size(21, 25);
     var icon = new OpenLayers.Icon('http://www.openstreetmap.org/openlayers/img/marker.png', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
@@ -58,22 +63,60 @@
             });
 
             markerLayer.addMarker(marker);
+
+            <c:if test="${!empty onNewMarker}">
+            ${onNewMarker}(marker);
+            </c:if>
+        },
+
+        removeLocation: function(markerId) {
+            var length = markerLayer.markers.length;
+            result = new Array();
+            var marker = null;
+            for (var i = 0 ; i < length ; i++) {
+                marker = markerLayer.markers[i];
+            }
+            if (marker != null) {
+                markerLayer.removeMarker(marker);
+            }
+        },
+
+        trimLocations: function() {
+            if (maxLocations > 0) {
+                var deleteCount = markerLayer.markers.length - maxLocations;
+                if (deleteCount > 0) {
+                    while (markerLayer.markers.length > 0 && deleteCount-- > 0) {
+                        markerLayer.removeMarker(markerLayer.markers[0]);
+                    }
+                }
+            }
         },
 
         getLocations: function() {
             var length = markerLayer.markers.length;
             result = new Array();
             for (var i = 0 ; i < length ; i++) {
-                var marker = markerLayer.markers[i];
+                result[i] = CoordinatorMap.toLocation(markerLayer.markers[i]);
+                /*
                 var lonlat = new OpenLayers.LonLat(marker.lonlat.lon, marker.lonlat.lat).transform( toProjection, fromProjection);
                 result[i] = {
                     latitude: lonlat.lat,
                     longitude: lonlat.lon,
                     radius: marker.radius
                 };
+                */
             }
 
             return result;
+        },
+
+        toLocation: function(marker) {
+            var lonlat = new OpenLayers.LonLat(marker.lonlat.lon, marker.lonlat.lat).transform( toProjection, fromProjection);
+            return {
+                latitude: lonlat.lat,
+                longitude: lonlat.lon,
+                radius: marker.radius
+            };
         },
 
         saveLocationRadius: function(radius) {
@@ -103,18 +146,22 @@
                 if (markerLayer.markers[i].id == markerId) {
                     var marker = markerLayer.markers[i];
                     editedLocationMarker = marker;
-                    var form = $("#locationEditForm");
-                    if (marker && marker.radius) {
-                        form.find("#radius").attr("value", marker.radius);
+                    switch (popupType) {
+                        case "locationForm":
+                            var form = $("#locationEditForm");
+                            if (marker && marker.radius) {
+                                form.find("#radius").attr("value", marker.radius);
+                            }
+                            popup = new OpenLayers.Popup(
+                                    "Rozsah místa",
+                                    marker.lonlat,
+                                    new OpenLayers.Size(125, 100),
+                                    form.html()
+                            );
+                            map.addPopup(popup);
+                            popup.show();
+                            break;
                     }
-                    popup = new OpenLayers.Popup(
-                            "Rozsah místa",
-                            marker.lonlat,
-                            new OpenLayers.Size(125, 100),
-                            form.html()
-                    );
-                    map.addPopup(popup);
-                    popup.show();
                 }
             }
         },
@@ -125,6 +172,10 @@
             } else {
                 CoordinatorMap.setState(STATE_BROWSE);
             }
+        },
+
+        stopSetLocation: function() {
+            CoordinatorMap.setState(STATE_BROWSE);
         }
     };
 
@@ -153,6 +204,8 @@
             if (CoordinatorMap.getState() == STATE_SET_LOCATION) {
                 var lonLat = map.getLonLatFromPixel(event.xy);
                 CoordinatorMap.addLocation(lonLat, null);
+                if (maxLocations > 0)
+                    CoordinatorMap.trimLocations();
             }
         }
 

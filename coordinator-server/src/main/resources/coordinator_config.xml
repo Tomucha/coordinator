@@ -70,7 +70,11 @@
     </organization_list>
 
     <poi_category_list>
-        <poi_category id="poi1" name="Název poi 1" icon="obrazek.png" important="true" workflow_id="workflow1">
+        <poi_category id="poiCategory1" name="Poi Category 1" icon="obrazek.png" important="true" workflow_id="workflow1">
+            popis poi
+        </poi_category>
+
+        <poi_category id="poiCategory2" name="Poi Category 2" icon="obrazek.png" important="true">
             popis poi
         </poi_category>
     </poi_category_list>
