@@ -17,11 +17,11 @@
         var workflowId = $("#workflowSelect").val();
 
         if (workflowId == "") {
-            $("#workflowStateSelect").hide();
+            $("#workflowStateBox").hide();
             return;
         }
 
-        $("#workflowStateSelect").show();
+        $("#workflowStateBox").show();
 
         // TODO no completely safe
         $("#workflowStateSelect option").each(function(index, option) {
@@ -37,6 +37,15 @@
         showWorkflowStates();
     });
 
+    function initialize() {
+    <c:if test="${!empty form.latitude and !empty form.longitude}">
+        CoordinatorMap.addLocation(
+                CoordinatorMap.position(<c:out value="${form.longitude}"/>, <c:out value="${form.latitude}"/>),
+                0
+        );
+    </c:if>
+    }
+
 </script>
 
 <h2>
@@ -51,6 +60,7 @@
             latitude="${form.latitude}"
             zoom="13"
             enableLocations="true"
+            onLoad="initialize()"
             onNewMarker="onNewMarker"
             maxLocations="1"
             />
@@ -106,7 +116,7 @@
                     </tags:input>
                 </div>
 
-                <div >
+                <div id="workflowStateBox">
                     <tags:input field="workflowStateId" modelAttribute="form" caption="PoiEntity.workflowState">
                         <sf:select id="workflowStateSelect" path="workflowStateId">
                             <sf:option value=""></sf:option>

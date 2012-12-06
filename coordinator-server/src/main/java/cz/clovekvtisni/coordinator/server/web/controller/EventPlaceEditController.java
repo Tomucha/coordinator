@@ -37,16 +37,16 @@ public class EventPlaceEditController extends AbstractEventController {
             @RequestParam(value = "placeId", required = false) Long placeId,
             Model model) {
 
-        EventEntity event = getEventById(params.getEventId());
-
         PoiForm form;
         if (placeId == null) {
+            EventEntity event = getEventById(params.getEventId());
             UserEntity user = getLoggedUser();
             form = new PoiForm();
             form.setEventId(event.getId());
             form.setOrganizationId(user.getOrganizationId());
         } else {
             PoiEntity poiEntity = poiService.findById(placeId, 0l);
+            params.setEventId(poiEntity.getEventId());
             if (poiEntity == null)
                 throw NotFoundException.idNotExist("PoiEntity", placeId);
             form = new PoiForm();

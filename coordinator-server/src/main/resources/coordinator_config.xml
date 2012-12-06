@@ -29,12 +29,31 @@
     </equipment_list>
 
     <workflow_list>
-        <workflow id="workflow1" name="Název workflow1" can_be_started_by="ANONYMOUS, BACKEND">
+        <workflow id="workflow1" name="Workflow 1" can_be_started_by="ANONYMOUS, BACKEND">
             <description>popis workflow</description>
-            <state id="state1" name="Název state 1" requires_assignment="true" visible_for_role="ANONYMOUS, BACKEND"
+            <state id="workflow1_state1" name="W1 State 1" requires_assignment="true" visible_for_role="ANONYMOUS, BACKEND"
                    editable_for_role="ANONYMOUS">
                 <description>popis state</description>
-                <transition id="transition1" name="Název transition 1" to_state_id="state1"
+                <transition id="transition1" name="Transition 1" to_state_id="state1"
+                            allowed_for_role="ANONYMOUS, BACKEND">
+                    popis transition
+                </transition>
+            </state>
+        </workflow>
+        <workflow id="workflow2" name="Workflow 2" can_be_started_by="ANONYMOUS, BACKEND">
+            <description>popis workflow</description>
+            <state id="workflow2_state1" name="W2 State 1" requires_assignment="true" visible_for_role="ANONYMOUS, BACKEND"
+                   editable_for_role="ANONYMOUS">
+                <description>popis state</description>
+                <transition id="transition2" name="Transition 1" to_state_id="state1"
+                            allowed_for_role="ANONYMOUS, BACKEND">
+                    popis transition
+                </transition>
+            </state>
+            <state id="workflow2_state2" name="W2 State 2" requires_assignment="true" visible_for_role="ANONYMOUS, BACKEND"
+                   editable_for_role="ANONYMOUS">
+                <description>popis state</description>
+                <transition id="transition3" name="Transition 2" to_state_id="state1"
                             allowed_for_role="ANONYMOUS, BACKEND">
                     popis transition
                 </transition>

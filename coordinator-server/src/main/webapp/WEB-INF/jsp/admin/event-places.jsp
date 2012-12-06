@@ -29,11 +29,11 @@
                     <tbody>
                     <c:forEach items="${placeList}" var="poi">
                         <tr>
-                            <td><c:out value="${poi.category.name}"/></td>
+                            <td><c:out value="${poi.poiCategory.name}"/></td>
                             <td><tags:gps longitude="${poi.longitude}" latitude="${poi.latitude}"/></td>
                             <td><c:out value="${poi.userCount}"/></td>
                             <td>
-                                <a href="<s:url value="${root}/admin/event/user/edit?placeId=${place.id}"/>"><s:message code="button.edit"/></a>
+                                <a href="<s:url value="${root}/admin/event/place/edit?placeId=${poi.id}"/>"><s:message code="button.edit"/></a>
                             </td>
                         </tr>
                     </c:forEach>

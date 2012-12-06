@@ -19,6 +19,7 @@ public abstract class AbstractEventController extends AbstractController {
     private EventService eventService;
 
     protected EventEntity getEventById(Long eventId) {
+        if (eventId == null) throw NotFoundException.idNotExist();
         EventEntity event = eventService.findById(eventId, EventService.FLAG_FETCH_LOCATIONS);
         if (event == null)
             throw NotFoundException.idNotExist();
