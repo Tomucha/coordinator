@@ -5,6 +5,10 @@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %><script type="text/javascript">
+    CoordinatorMap.clickHandlers[TYPE_POI] = function(point) {
+        return null;
+    };
+
     function onNewPoint(point) {
        $("#latitudeInput").val(point.latitude);
        $("#longitudeInput").val(point.longitude);
@@ -32,14 +36,13 @@
         });
     }
 
-    $(function() {
-        showWorkflowStates();
-    });
+
 
     function initialize() {
     <c:if test="${!empty form.latitude and !empty form.longitude}">
         CoordinatorMap.addPoint({
-            type: TYPE_LOCATION,
+            type: TYPE_POI,
+            placeId: <c:out value="${form.id}"/>,
             longitude: <c:out value="${form.longitude}"/>,
             latitude: <c:out value="${form.latitude}"/>
         });
@@ -61,8 +64,8 @@
             zoom="13"
             onLoad="initialize()"
             onNewPoint="onNewPoint"
-            maxPoints="loc=1"
-            buttons="addLocation"
+            maxPoints="poi=1"
+            buttons="addPlace"
             />
 </div>
 
@@ -139,4 +142,8 @@
         </sf:form>
     </div>
 </div>
-
+<script type="text/javascript">
+    $(function() {
+        showWorkflowStates();
+    });
+</script>

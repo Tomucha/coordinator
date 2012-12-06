@@ -47,6 +47,7 @@
     var popup = null;
     var editedLocationMarker = null;
     var selectedPointId = null;
+    var currentPointType;
     var points = {};
 
     var CoordinatorMap = {
@@ -82,7 +83,7 @@
                     CoordinatorMap.setState(STATE_BROWSE);
                     CoordinatorMap.closePopup();
 
-                    var elementId = CoordinatorMap.clickHandlers[TYPE_LOCATION](point);
+                    var elementId = CoordinatorMap.clickHandlers[point.type](point);
                     if (elementId != null) {
                         var win = $(elementId);
                         win.find("input, select, textarea").each(function(index, input) {
@@ -199,10 +200,10 @@
         startSetLocation: function(type) {
             if (CoordinatorMap.getState() != STATE_SET_LOCATION) {
                 CoordinatorMap.setState(STATE_SET_LOCATION);
-                pointTypeActive = type;
+                currentPointType = type;
             } else {
                 CoordinatorMap.setState(STATE_BROWSE);
-                pointTypeActive = null;
+                currentPointType = null;
             }
         },
 
@@ -213,6 +214,12 @@
 
     CoordinatorMap.clickHandlers[TYPE_LOCATION] = function(point) {
         return "#locationEditForm";
+    }
+    CoordinatorMap.clickHandlers[TYPE_USER] = function(point) {
+        return "#userForm";
+    }
+    CoordinatorMap.clickHandlers[TYPE_POI] = function(point) {
+        return "#poiForm";
     }
 
     <c:if test="${!empty maxPoints}">
@@ -249,7 +256,7 @@
             if (CoordinatorMap.getState() == STATE_SET_LOCATION) {
                 var lonLat = CoordinatorMap.fromProjection(map.getLonLatFromPixel(event.xy));
                 var point = {
-                    type: TYPE_LOCATION,
+                    type: currentPointType,
                     latitude: lonLat.lat,
                     longitude: lonLat.lon
                 };
@@ -290,9 +297,18 @@
                 switch (buttonType.replace(/\s*/, "")) {
                     case "addLocation":
                         controls[controls.length] = new OpenLayers.Control.Button({
-                            title: "Add location",
+                            title: "+location",
                             trigger: function() {
                                 CoordinatorMap.startSetLocation(TYPE_LOCATION);
+                            }
+                        });
+                        break;
+
+                    case "addPlace":
+                        controls[controls.length] = new OpenLayers.Control.Button({
+                            title: "+place",
+                            trigger: function() {
+                                CoordinatorMap.startSetLocation(TYPE_POI);
                             }
                         });
                         break;
@@ -316,10 +332,39 @@
 </script>
 <div id="mapContainer"></div>
 <div id="locationEditForm" style="display: none;">
-    <div><input type="hidden" name="id" size="4"/>
+    <div><input type="hidden" name="id"/>
     <input name="radius" size="4"/> km</div>
     <div>
         <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
         <button type="button" onclick="CoordinatorMap.closeAndSavePopup()"><s:message code="button.ok"/></button>
+    </div>
+</div>
+
+<div id="userForm" style="display: none;">
+    <div>
+        <input type="hidden" name="id"/>
+        <input name="name" readonly="readonly"/>
+        <form action="${root}/admin/event/user/edit">
+            <div>
+                <input type="hidden" name="userId"/>
+                <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
+                <button type="submit"><s:message code="button.edit"/></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div id="poiForm" style="display: none;">
+    <div>
+        <input type="hidden" name="id"/>
+        <input name="description" readonly="readonly"/>
+        <form action="${root}/admin/event/place/edit">
+            <div>
+                <input type="hidden" name="placeId"/>
+                <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
+                <button type="submit"><s:message code="button.edit"/></button>
+            </div>
+        </form>
     </div>
 </div>

@@ -2,9 +2,18 @@ package cz.clovekvtisni.coordinator.server.web.controller;
 
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
+import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
+import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
+import cz.clovekvtisni.coordinator.server.security.plugin.PoiSecurityPlugin;
+import cz.clovekvtisni.coordinator.server.service.PoiService;
+import cz.clovekvtisni.coordinator.server.service.UserInEventService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,12 +30,30 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/admin/event/map")
 public class EventMapController extends AbstractEventController {
 
+    @Autowired
+    private UserInEventService userInEventService;
+
+    @Autowired
+    private PoiService poiService;
+
     @RequestMapping(method = RequestMethod.GET)
     public String map(@ModelAttribute("params") EventFilterParams params, Model model) {
         if (params.getEventId() == null)
             throw NotFoundException.idNotExist();
         EventEntity event = getEventById(params.getEventId());
         populateEventModel(model, new EventFilterParams(event));
+
+        UserInEventFilter userInEventFilter = new UserInEventFilter();
+        userInEventFilter.setEventIdVal(event.getId());
+        ResultList<UserInEventEntity> users = userInEventService.findByFilter(userInEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER);
+        model.addAttribute("userInEventList", users.getResult());
+
+        PoiFilter poiFilter = new PoiFilter();
+        poiFilter.setEventIdVal(event.getId());
+        ResultList<PoiEntity> places = poiService.findByFilter(poiFilter, 0, null, PoiService.FLAG_FETCH_FROM_CONFIG);
+        model.addAttribute("placeList", places.getResult());
+
+        model.addAttribute("event", event);
 
         return "admin/event-map";
     }

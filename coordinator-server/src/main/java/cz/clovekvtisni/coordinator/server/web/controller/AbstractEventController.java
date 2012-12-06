@@ -28,7 +28,7 @@ public abstract class AbstractEventController extends AbstractController {
     }
 
     protected void populateEventModel(Model model, FilterParams params) {
-        model.addAttribute("event", params);
+        model.addAttribute("params", params);
         model.addAttribute("breadcrumbs", breadcrumbs(params));
     }
 

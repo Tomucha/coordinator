@@ -41,16 +41,17 @@ public class EventUserEditController extends AbstractEventController {
 
         EventUserForm form = new EventUserForm();
         form.injectConfigValues(appContext, authorizationTool, config);
-        form.setEventId(params.getEventId());
 
         if (userId != null) {
             UserEntity user = loadUserById(userId, 0l);
             form.populateFrom(user);
             UserInEventEntity inEvent = fetchUserInEvent(params.getEventId(), userId);
+            form.setEventId(inEvent.getEventId());
             if (inEvent != null)
                 form.setUserInEventId(inEvent.getId());
-        } else
-            form.setOrganizationId(getLoggedUser().getOrganizationId());
+        } else {
+            form.setEventId(params.getEventId());
+        }
 
         model.addAttribute("form", form);
         populateEventModel(model, params);
