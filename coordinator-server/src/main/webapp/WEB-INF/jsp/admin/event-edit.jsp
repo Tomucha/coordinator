@@ -6,10 +6,12 @@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %><script type="text/javascript">
     function fetchLocations() {
-        var locations = CoordinatorMap.getLocations();
+        var points = CoordinatorMap.getPoints();
         var cont = $("#hiddenInputContainer");
-        for (var i = 0 ; i < locations.length ; i++) {
-            var location = locations[i];
+        var i = 0;
+        for (var id in points) {
+            var location = points[id];
+            if (location.type != TYPE_LOCATION) continue;
             $('<input>').attr({
                 <%-- TODO json --%>
                 eventId: "<c:out value="${form.eventId}" escapeXml="true"/>",
@@ -29,6 +31,7 @@
                 name: 'eventLocationEntityList[' + i + '].radius',
                 value: location.radius
             }).appendTo(cont);
+            i++;
         }
 
         return true;
@@ -38,10 +41,12 @@
         <c:if test="${!empty form.eventLocationEntityList}">
             <c:forEach items="${form.eventLocationEntityList}" var="eventLocation">
                  <c:if test="${!empty eventLocation.longitude and !empty eventLocation.latitude}">
-                     CoordinatorMap.addLocation(
-                             CoordinatorMap.position(<c:out value="${eventLocation.longitude}"/>, <c:out value="${eventLocation.latitude}"/>),
-                             <c:out value="${!empty eventLocation.radius ? eventLocation.radius : 'null'}"/>
-                     );
+                     CoordinatorMap.addPoint({
+                         type: TYPE_LOCATION,
+                         longitude: <c:out value="${eventLocation.longitude}"/>,
+                         latitude: <c:out value="${eventLocation.latitude}"/>,
+                         radius: <c:out value="${!empty eventLocation.radius ? eventLocation.radius : 'null'}"/>
+                    });
                 </c:if>
             </c:forEach>
         </c:if>
@@ -60,8 +65,7 @@
             latitude="${!empty form.firstEventLocation and form.firstEventLocation.latitude > 0.0 ? form.firstEventLocation.latitude : null}"
             zoom="13"
             onLoad="initialize()"
-            enableLocations="true"
-            popupType="locationEdit"
+            buttons="addLocation"
             />
 </div>
 

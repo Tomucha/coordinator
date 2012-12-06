@@ -5,10 +5,9 @@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %><script type="text/javascript">
-    function onNewMarker(marker) {
-       var location = CoordinatorMap.toLocation(marker);
-       $("#latitudeInput").val(location.latitude);
-       $("#longitudeInput").val(location.longitude);
+    function onNewPoint(point) {
+       $("#latitudeInput").val(point.latitude);
+       $("#longitudeInput").val(point.longitude);
     }
 
     function showWorkflowStates() {
@@ -39,10 +38,11 @@
 
     function initialize() {
     <c:if test="${!empty form.latitude and !empty form.longitude}">
-        CoordinatorMap.addLocation(
-                CoordinatorMap.position(<c:out value="${form.longitude}"/>, <c:out value="${form.latitude}"/>),
-                0
-        );
+        CoordinatorMap.addPoint({
+            type: TYPE_LOCATION,
+            longitude: <c:out value="${form.longitude}"/>,
+            latitude: <c:out value="${form.latitude}"/>
+        });
     </c:if>
     }
 
@@ -59,10 +59,10 @@
             longitude="${form.longitude}"
             latitude="${form.latitude}"
             zoom="13"
-            enableLocations="true"
             onLoad="initialize()"
-            onNewMarker="onNewMarker"
-            maxLocations="1"
+            onNewPoint="onNewPoint"
+            maxPoints="loc=1"
+            buttons="addLocation"
             />
 </div>
 

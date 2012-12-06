@@ -5,10 +5,9 @@
         attribute name="longitude" required="false" %><%@
         attribute name="latitude" required="false" %><%@
         attribute name="onLoad" required="false" %><%@
-        attribute name="onNewMarker" required="false" %><%@
-        attribute name="popupType" required="false" %><%@
-        attribute name="enableLocations" required="false" type="java.lang.Boolean" %><%@
-        attribute name="maxLocations" required="false" type="java.lang.Integer" %><%@
+        attribute name="onNewPoint" required="false" %><%@
+        attribute name="buttons" required="false" %><%@
+        attribute name="maxPoints" required="false" %><%@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags"
 %><style type="text/css">
@@ -30,19 +29,38 @@
     var STATE_SET_LOCATION = 1;
 
     var state = STATE_BROWSE;
-    var locationsEnabled = <c:out value="${empty enableLocations or enableLocations == false ? 'false' : 'true'}"/>;
-    var maxLocations = <c:out value="${!empty maxLocations ? maxLocations : 0}"/>;
-    var popupType= "<c:out value="${!empty popupType ? popupType : ''}"/>";
 
     size = new OpenLayers.Size(21, 25);
+
+    // TODO deprecated
     var icon = new OpenLayers.Icon('http://www.openstreetmap.org/openlayers/img/marker.png', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
+
+    var TYPE_POI = "poi";
+    var TYPE_LOCATION = "loc";
+    var TYPE_USER = "usr";
+
+    var icons = {};
+    icons[TYPE_LOCATION] = new OpenLayers.Icon('http://www.openstreetmap.org/openlayers/img/marker.png', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
+    icons[TYPE_USER] = new OpenLayers.Icon('http://www.openstreetmap.org/openlayers/img/marker-blue.png', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
+    icons[TYPE_POI] = new OpenLayers.Icon('http://www.openstreetmap.org/openlayers/img/marker-gold.png', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
 
     var popup = null;
     var editedLocationMarker = null;
+    var selectedPointId = null;
+    var points = {};
 
     var CoordinatorMap = {
+
+        clickHandlers: {},
+
+        limits: {},
+
         position: function(lon, lat) {
             return new OpenLayers.LonLat(lon, lat).transform( fromProjection, toProjection);
+        },
+
+        fromProjection: function(lonLat) {
+            return new OpenLayers.LonLat(lonLat.lon, lonLat.lat).transform(toProjection, fromProjection);
         },
 
         setState: function(newState) {
@@ -53,124 +71,138 @@
             return state;
         },
 
-        addLocation: function(lonLat, radius) {
-            var marker = new OpenLayers.Marker(lonLat, icon.clone());
-            marker.id = new Date().getTime();
-            marker.radius = radius;
-            marker.events.register("click", marker, function(event) {
-                editedLocationMarker = marker;
-                CoordinatorMap.showLocationEditForm(marker.id);
-            });
+        addPoint: function(point) {
+            var lonLat = CoordinatorMap.position(point.longitude, point.latitude);
+            var marker = new OpenLayers.Marker(lonLat, icons[point.type].clone());
+            point.id = marker.id = "point" + Math.floor(Math.random() * 100000);
+
+            if (CoordinatorMap.clickHandlers[point.type]) {
+                marker.events.register("click", marker, function(event) {
+                    selectedPointId = point.id;
+                    CoordinatorMap.setState(STATE_BROWSE);
+                    CoordinatorMap.closePopup();
+
+                    var elementId = CoordinatorMap.clickHandlers[TYPE_LOCATION](point);
+                    if (elementId != null) {
+                        var win = $(elementId);
+                        win.find("input, select, textarea").each(function(index, input) {
+                            var name = $(input).attr("name");
+                            if (name) {
+                                $(input).attr("value", point[name] ? point[name] : "");
+                            }
+                        });
+
+                        popup = new OpenLayers.Popup(
+                                "Rozsah místa",
+                                marker.lonlat,
+                                new OpenLayers.Size(125, 100),
+                                win.html()
+                        );
+                        map.addPopup(popup);
+                        popup.show();
+                    }
+                });
+            }
+
+            points[point.id] = point;
 
             markerLayer.addMarker(marker);
 
-            <c:if test="${!empty onNewMarker}">
-            ${onNewMarker}(marker);
+            <c:if test="${!empty onNewPoint}">
+            ${onNewPoint}(point);
             </c:if>
+
+            return point;
         },
 
-        removeLocation: function(markerId) {
+        getPointById: function(id) {
+            return points[id];
+        },
+
+        getPoints: function() {
+            return points;
+        },
+
+        closeAndSavePopup: function() {
+            if (popup != null && popup.visible()) {
+                var data = {};
+                $(popup.div).find("input, select, textarea").each(function(index, input) {
+                    var input = $(input);
+                    var name = input.attr("name");
+                    if (name)
+                        data[name] = input.val() != "" ? input.val() : null;
+                });
+                if (data.id) {
+                    for (index in data) {
+                        points[data.id][index] = data[index];
+                    }
+                }
+            }
+            CoordinatorMap.closePopup();
+        },
+
+        removeLocation: function(id) {
             var length = markerLayer.markers.length;
             result = new Array();
             var marker = null;
             for (var i = 0 ; i < length ; i++) {
-                marker = markerLayer.markers[i];
+                if (markerLayer.markers[i].id == id) {
+                    marker = markerLayer.markers[i];
+                    break;
+                }
             }
             if (marker != null) {
                 markerLayer.removeMarker(marker);
             }
+
+            delete points[id];
         },
 
         trimLocations: function() {
-            if (maxLocations > 0) {
-                var deleteCount = markerLayer.markers.length - maxLocations;
-                if (deleteCount > 0) {
-                    while (markerLayer.markers.length > 0 && deleteCount-- > 0) {
-                        markerLayer.removeMarker(markerLayer.markers[0]);
+            var counting = {};
+            for (var i in points) {
+                var type = points[i].type;
+                if (!counting[type])
+                    counting[type] = [points[i].id];
+                else
+                    counting[type][counting[type].length] = points[i].id;
+            }
+            for (var key in CoordinatorMap.limits) {
+                var limit = CoordinatorMap.limits[key];
+                if (limit && counting[key] && limit > 0 && limit < counting[key].length) {
+                    var deleteCount = counting[key].length - limit;
+                    while (counting[key].length > 0 && deleteCount-- > 0) {
+                        var id = counting[key].shift();
+                        var length = markerLayer.markers.length;
+                        for (var i = 0 ; i < length ; i++) {
+                            if (markerLayer.markers[i].id == id) {
+                                marker = markerLayer.removeMarker(markerLayer.markers[i]);
+                                delete points[id];
+                                break;
+                            }
+                        }
                     }
                 }
             }
         },
 
-        getLocations: function() {
-            var length = markerLayer.markers.length;
-            result = new Array();
-            for (var i = 0 ; i < length ; i++) {
-                result[i] = CoordinatorMap.toLocation(markerLayer.markers[i]);
-                /*
-                var lonlat = new OpenLayers.LonLat(marker.lonlat.lon, marker.lonlat.lat).transform( toProjection, fromProjection);
-                result[i] = {
-                    latitude: lonlat.lat,
-                    longitude: lonlat.lon,
-                    radius: marker.radius
-                };
-                */
-            }
-
-            return result;
+        getPoints: function() {
+            return points;
         },
 
-        toLocation: function(marker) {
-            var lonlat = new OpenLayers.LonLat(marker.lonlat.lon, marker.lonlat.lat).transform( toProjection, fromProjection);
-            return {
-                latitude: lonlat.lat,
-                longitude: lonlat.lon,
-                radius: marker.radius
-            };
-        },
-
-        saveLocationRadius: function(radius) {
-            if (editedLocationMarker != null) {
-                var length = markerLayer.markers.length;
-                for (var i = 0 ; i < length ; i++) {
-                    if (markerLayer.markers[i].id == editedLocationMarker.id) {
-                        markerLayer.markers[i].radius = radius;
-                        break;
-                    }
-                }
-            }
-            CoordinatorMap.closeLocationEditForm();
-        },
-
-        closeLocationEditForm: function() {
+        closePopup: function() {
             if (popup != null) {
                 map.removePopup(popup);
             }
         },
 
-        showLocationEditForm: function(markerId) {
-            CoordinatorMap.closeLocationEditForm();
-            CoordinatorMap.setState(STATE_BROWSE);
-            var length = markerLayer.markers.length;
-            for (var i = 0 ; i < length ; i++) {
-                if (markerLayer.markers[i].id == markerId) {
-                    var marker = markerLayer.markers[i];
-                    editedLocationMarker = marker;
-                    switch (popupType) {
-                        case "locationForm":
-                            var form = $("#locationEditForm");
-                            if (marker && marker.radius) {
-                                form.find("#radius").attr("value", marker.radius);
-                            }
-                            popup = new OpenLayers.Popup(
-                                    "Rozsah místa",
-                                    marker.lonlat,
-                                    new OpenLayers.Size(125, 100),
-                                    form.html()
-                            );
-                            map.addPopup(popup);
-                            popup.show();
-                            break;
-                    }
-                }
-            }
-        },
-
-        startSetLocation: function() {
+        startSetLocation: function(type) {
             if (CoordinatorMap.getState() != STATE_SET_LOCATION) {
                 CoordinatorMap.setState(STATE_SET_LOCATION);
+                pointTypeActive = type;
             } else {
                 CoordinatorMap.setState(STATE_BROWSE);
+                pointTypeActive = null;
             }
         },
 
@@ -179,6 +211,19 @@
         }
     };
 
+    CoordinatorMap.clickHandlers[TYPE_LOCATION] = function(point) {
+        return "#locationEditForm";
+    }
+
+    <c:if test="${!empty maxPoints}">
+    var tok = "<c:out value="${maxPoints}"/>".split(",");
+    for (i in tok) {
+        var vals = tok[i].split("=");
+        if (vals.length == 2) {
+            CoordinatorMap.limits[vals[0].replace(/\s*/, "")] = parseInt(vals[1].replace(/\s*/, ""));
+        }
+    }
+    </c:if>
 
     // click control
     OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
@@ -202,10 +247,14 @@
 
         trigger: function(event) {
             if (CoordinatorMap.getState() == STATE_SET_LOCATION) {
-                var lonLat = map.getLonLatFromPixel(event.xy);
-                CoordinatorMap.addLocation(lonLat, null);
-                if (maxLocations > 0)
-                    CoordinatorMap.trimLocations();
+                var lonLat = CoordinatorMap.fromProjection(map.getLonLatFromPixel(event.xy));
+                var point = {
+                    type: TYPE_LOCATION,
+                    latitude: lonLat.lat,
+                    longitude: lonLat.lon
+                };
+                CoordinatorMap.addPoint(point);
+                CoordinatorMap.trimLocations();
             }
         }
 
@@ -221,7 +270,7 @@
         map.addLayer(mapLayer);
         map.addLayer(markerLayer);
 
-        <c:if test="${!empty enableLocations and enableLocations}">
+        <c:if test="${!empty buttons}">
 
             var panel = new OpenLayers.Control.Panel({
                 type: OpenLayers.Control.TYPE_BUTTON,
@@ -234,14 +283,23 @@
                 }
             });
 
-            panel.addControls([
-                new OpenLayers.Control.Button({
-                    title: "Add location",
-                    trigger: function() {
-                        CoordinatorMap.startSetLocation();
-                    }
-                })
-            ]);
+            var controls = [];
+            var buttons = "<c:out value="${buttons}"/>".split(",");
+            for (var index in buttons) {
+                var buttonType = buttons[index];
+                switch (buttonType.replace(/\s*/, "")) {
+                    case "addLocation":
+                        controls[controls.length] = new OpenLayers.Control.Button({
+                            title: "Add location",
+                            trigger: function() {
+                                CoordinatorMap.startSetLocation(TYPE_LOCATION);
+                            }
+                        });
+                        break;
+                }
+            }
+
+            panel.addControls(controls);
             map.addControl(panel);
         </c:if>
 
@@ -258,9 +316,10 @@
 </script>
 <div id="mapContainer"></div>
 <div id="locationEditForm" style="display: none;">
-    <div><input id="radius" size="4"/> km</div>
+    <div><input type="hidden" name="id" size="4"/>
+    <input name="radius" size="4"/> km</div>
     <div>
-        <button type="button" onclick="CoordinatorMap.closeLocationEditForm()"><s:message code="button.cancel"/></button>
-        <button type="button" onclick="CoordinatorMap.saveLocationRadius($('#radius').val())"><s:message code="button.ok"/></button>
+        <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
+        <button type="button" onclick="CoordinatorMap.closeAndSavePopup()"><s:message code="button.ok"/></button>
     </div>
 </div>
