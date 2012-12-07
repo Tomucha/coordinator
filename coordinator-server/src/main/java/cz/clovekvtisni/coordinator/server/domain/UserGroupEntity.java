@@ -18,8 +18,6 @@ public class UserGroupEntity extends AbstractPersistentEntity<UserGroup, UserGro
     @Id
     private Long id;
 
-    private Long groupId;
-
     private String eventId;
 
     private String organizationId;
@@ -49,14 +47,6 @@ public class UserGroupEntity extends AbstractPersistentEntity<UserGroup, UserGro
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
     }
 
     public String getEventId() {
@@ -103,7 +93,6 @@ public class UserGroupEntity extends AbstractPersistentEntity<UserGroup, UserGro
     public String toString() {
         return "UserGroupEntity{" +
                 "id=" + id +
-                ", groupId=" + groupId +
                 ", eventId='" + eventId + '\'' +
                 ", organizationId='" + organizationId + '\'' +
                 ", name='" + name + '\'' +

@@ -2,8 +2,6 @@ package cz.clovekvtisni.coordinator.domain;
 
 public class UserGroup extends AbstractModifiableEntity {
 
-    private Long groupId;
-
     private String eventId;
 
     private String organizationId;
@@ -13,14 +11,6 @@ public class UserGroup extends AbstractModifiableEntity {
     private String role;
 
     private Long createdBy;
-
-    public Long getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
-    }
 
     public String getEventId() {
         return eventId;
@@ -65,7 +55,6 @@ public class UserGroup extends AbstractModifiableEntity {
     @Override
     public String toString() {
         return "UserGroup{" +
-                "groupId=" + groupId +
                 ", eventId='" + eventId + '\'' +
                 ", organizationId='" + organizationId + '\'' +
                 ", name='" + name + '\'' +
