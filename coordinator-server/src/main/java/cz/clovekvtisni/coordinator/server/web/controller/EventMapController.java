@@ -41,7 +41,7 @@ public class EventMapController extends AbstractEventController {
         if (params.getEventId() == null)
             throw NotFoundException.idNotExist();
         EventEntity event = getEventById(params.getEventId());
-        populateEventModel(model, new EventFilterParams(event));
+        populateEventModel(model, params);
 
         UserInEventFilter userInEventFilter = new UserInEventFilter();
         userInEventFilter.setEventIdVal(event.getId());

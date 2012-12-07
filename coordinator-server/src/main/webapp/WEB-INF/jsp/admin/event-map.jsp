@@ -15,7 +15,7 @@
                         name: "<c:out value="${userInEvent.userEntity.fullName}"/>",
                         longitude: <c:out value="${userInEvent.lastLocationLongitude}"/>,
                         latitude: <c:out value="${userInEvent.lastLocationLatitude}"/>
-                    })
+                    });
                 </c:if>
             </c:forEach>
         </c:if>
@@ -29,14 +29,32 @@
             description: "<c:out value="${place.poiCategory.name}"/>",
             longitude: <c:out value="${place.longitude}"/>,
             latitude: <c:out value="${place.latitude}"/>
-        })
+        });
         </c:if>
         </c:forEach>
         </c:if>
+
+        <c:if test="${!empty event.eventLocationEntityList}">
+        <c:forEach items="${event.eventLocationEntityList}" var="location">
+        CoordinatorMap.addPoint({
+            type: TYPE_LOCATION,
+            longitude: <c:out value="${location.longitude}" default="null"/>,
+            latitude: <c:out value="${location.latitude}" default="null"/>,
+            radius: <c:out value="${location.radius}" default="0"/>
+        });
+        </c:forEach>
+        </c:if>
+
+        CoordinatorMap.clickHandlers[TYPE_LOCATION] = function(event) {
+            return "#locationPopup";
+        };
     }
 </script>
 
 <div>
+    <h1><c:out value="${event.name}"/></h1>
+    <p><c:out value="${event.description}"/></p>
+    <div>
     <tags:osm
             width="90%"
             height="450px"
@@ -44,4 +62,14 @@
             longitude="${event.firstEventLocation.longitude}"
             onLoad="init()"
             />
+    </div>
+</div>
+
+<div id="locationPopup" style="display: none;">
+    <input type="hidden" name="id"/>
+    <div>
+        <input name="radius" size="4" readonly="readonly"/> km</div>
+    <div>
+        <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
+    </div>
 </div>
