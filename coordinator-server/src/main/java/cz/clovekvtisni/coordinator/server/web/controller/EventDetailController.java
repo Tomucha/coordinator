@@ -22,7 +22,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public class EventDetailController extends AbstractEventController {
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid OrganizationInEventForm form, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            populateEventModel(model, new EventFilterParams(getEventById(form.getEventId())));
+            populateEventModel(model, new EventFilterParams(loadEventById(form.getEventId())));
             populateModel(model);
             return "admin/event-detail";
         }
@@ -87,7 +86,7 @@ public class EventDetailController extends AbstractEventController {
                 organizationInEventService.update(entity);
 
         } catch (MaException e) {
-            populateEventModel(model, new EventFilterParams(getEventById(form.getEventId())));
+            populateEventModel(model, new EventFilterParams(loadEventById(form.getEventId())));
             addFormError(bindingResult, e);
             populateModel(model);
             return "admin/event-detail";

@@ -13,6 +13,7 @@ import java.util.Date;
  */
 public abstract class AbstractPersistentEntity<TARGET extends AbstractModifiableEntity, SELF extends CoordinatorEntity<SELF>> implements CoordinatorEntity<SELF> {
 
+    @Index
     protected Date createdDate;
 
     @Index

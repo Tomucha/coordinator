@@ -10,6 +10,7 @@ import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -98,5 +99,21 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     public void deletePoi(PoiEntity entity) {
         entity.setDeletedDate(new Date());
         updatePoi(entity);
+    }
+
+    @Override
+    public ResultList<PoiEntity> findLast(String organizationId) {
+        PoiFilter filter = new PoiFilter();
+        filter.setOrganizationIdVal(organizationId);
+        filter.setOrder("-createdDate");
+        return findByFilter(filter, LAST_POI_LIST_LENGTH, null, PoiService.FLAG_FETCH_FROM_CONFIG);
+    }
+
+    @Override
+    public ResultList<PoiEntity> findLastByEventId(Long eventId) {
+        PoiFilter filter = new PoiFilter();
+        filter.setEventIdVal(eventId);
+        filter.setOrder("-createdDate");
+        return findByFilter(filter, LAST_POI_LIST_LENGTH, null, PoiService.FLAG_FETCH_FROM_CONFIG);
     }
 }

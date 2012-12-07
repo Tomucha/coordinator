@@ -15,7 +15,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 
@@ -31,7 +30,7 @@ public class EventEditController extends AbstractEventController {
         EventForm form = new EventForm();
 
         if (params.getEventId() != null)
-            form.populateFrom(getEventById(params.getEventId()));
+            form.populateFrom(loadEventById(params.getEventId()));
 
         populateEventModel(model, params);
         model.addAttribute("form", form);

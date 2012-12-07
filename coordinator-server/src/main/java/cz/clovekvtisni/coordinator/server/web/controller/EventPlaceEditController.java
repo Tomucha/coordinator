@@ -6,7 +6,6 @@ import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
-import cz.clovekvtisni.coordinator.server.web.model.EventUserForm;
 import cz.clovekvtisni.coordinator.server.web.model.PoiForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -39,7 +38,7 @@ public class EventPlaceEditController extends AbstractEventController {
 
         PoiForm form;
         if (placeId == null) {
-            EventEntity event = getEventById(params.getEventId());
+            EventEntity event = loadEventById(params.getEventId());
             UserEntity user = getLoggedUser();
             form = new PoiForm();
             form.setEventId(event.getId());
@@ -63,7 +62,7 @@ public class EventPlaceEditController extends AbstractEventController {
     public String createOrUpdate(@ModelAttribute("form") @Valid PoiForm form, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             populateEventModel(model, new EventFilterParams(form.getEventId()));
-            return "admin/event-user-edit";
+            return "admin/event-place-edit";
         }
 
         PoiEntity poiEntity = new PoiEntity().populateFrom(form);

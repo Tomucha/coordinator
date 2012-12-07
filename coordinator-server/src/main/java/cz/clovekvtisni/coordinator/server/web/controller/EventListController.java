@@ -45,42 +45,6 @@ public class EventListController extends AbstractController {
         return "admin/event-list";
     }
 
-    @ModelAttribute("lastPoiList")
-    public List<PoiEntity> lastPoiList() {
-        /*
-        PoiFilter filter = new PoiFilter();
-        filter.setOrder("createdDate");
-        ResultList<PoiEntity> result = poiService.findByFilter(filter, 30, null, 0l);
-
-        return result.getResult();
-        */
-
-        List<PoiEntity> pois = new ArrayList<PoiEntity>(3);
-
-        Calendar cal = Calendar.getInstance();
-        PoiEntity poi1 = new PoiEntity();
-        poi1.setLatitude(50.0339164);
-        poi1.setLongitude(14.5563036);
-        poi1.setCreatedDate(cal.getTime());
-        pois.add(poi1);
-
-        cal.add(Calendar.HOUR_OF_DAY, -3);
-        PoiEntity poi2 = new PoiEntity();
-        poi2.setLatitude(50.0339164);
-        poi2.setLongitude(14.5563036);
-        poi2.setCreatedDate(cal.getTime());
-        pois.add(poi2);
-
-        cal.add(Calendar.DAY_OF_MONTH, -3);
-        PoiEntity poi3 = new PoiEntity();
-        poi3.setLatitude(50.0339164);
-        poi3.setLongitude(14.5563036);
-        poi3.setCreatedDate(cal.getTime());
-        pois.add(poi3);
-
-        return pois;
-    }
-
     public static Breadcrumb getBreadcrumb() {
         return new Breadcrumb("/admin/event/list", "breadcrumb.eventList");
     }

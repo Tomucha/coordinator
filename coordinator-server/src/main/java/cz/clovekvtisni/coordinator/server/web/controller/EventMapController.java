@@ -6,7 +6,6 @@ import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
-import cz.clovekvtisni.coordinator.server.security.plugin.PoiSecurityPlugin;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
@@ -19,7 +18,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Created with IntelliJ IDEA.
@@ -40,7 +38,7 @@ public class EventMapController extends AbstractEventController {
     public String map(@ModelAttribute("params") EventFilterParams params, Model model) {
         if (params.getEventId() == null)
             throw NotFoundException.idNotExist();
-        EventEntity event = getEventById(params.getEventId());
+        EventEntity event = loadEventById(params.getEventId());
         populateEventModel(model, params);
 
         UserInEventFilter userInEventFilter = new UserInEventFilter();

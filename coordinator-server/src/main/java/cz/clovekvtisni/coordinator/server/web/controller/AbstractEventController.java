@@ -1,11 +1,7 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
-import cz.clovekvtisni.coordinator.exception.NotFoundException;
-import cz.clovekvtisni.coordinator.server.domain.EventEntity;
-import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 
 /**
@@ -14,18 +10,6 @@ import org.springframework.ui.Model;
  * Date: 19.11.12
  */
 public abstract class AbstractEventController extends AbstractController {
-
-    @Autowired
-    private EventService eventService;
-
-    protected EventEntity getEventById(Long eventId) {
-        if (eventId == null) throw NotFoundException.idNotExist();
-        EventEntity event = eventService.findById(eventId, EventService.FLAG_FETCH_LOCATIONS);
-        if (event == null)
-            throw NotFoundException.idNotExist();
-
-        return event;
-    }
 
     protected void populateEventModel(Model model, FilterParams params) {
         model.addAttribute("params", params);

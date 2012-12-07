@@ -27,6 +27,7 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     @NotNull
     private Long eventId;
 
+    @Index
     @NotNull
     private String organizationId;
 
@@ -40,8 +41,10 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     @Index
     private Long[] userId;
 
+    @NotNull
     private Double latitude;
 
+    @NotNull
     private Double longitude;
 
     private Long precission;
