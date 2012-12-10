@@ -2,11 +2,19 @@ package cz.clovekvtisni.coordinator.android.register.wizard.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import android.content.Context;
 import android.os.Bundle;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.domain.User;
+import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
+import cz.clovekvtisni.coordinator.domain.config.Skill;
 
 /**
  * Represents a wizard model, including the pages/steps in the wizard, their
@@ -18,20 +26,37 @@ public class WizardModel implements ModelCallbacks {
 	private List<ModelCallbacks> mListeners = new ArrayList<ModelCallbacks>();
 	private PageList mRootPageList;
 
-	public WizardModel(Context context, Organization organization) {
+	public WizardModel(Context context, Organization organization, ConfigResponse config) {
 		mContext = context;
 
 		Page personalInfo = new PersonalInfoPage(this, "Osobní údaje").setRequired(true);
+
 		Page address = new AddressPage(this, "Bydliště").setRequired(true);
-		Page equipment = new MultipleFixedChoicePage(this, "Vybavení").setChoices(organization
-				.getPreRegistrationEquipment());
-		Page skills = new MultipleFixedChoicePage(this, "Dovednosti").setChoices(organization
-				.getPreRegistrationSkills());
+
+		List<Equipment> equipmentList = Lists.newArrayList();
+		Set<String> equipmentIds = Sets.newHashSet(organization.getPreRegistrationEquipment());
+		for (Equipment equipment : config.getEquipmentList()) {
+			if (equipmentIds.contains(equipment.getId())) {
+				equipmentList.add(equipment);
+			}
+		}
+		Page equipment = new EquipmentPage(this, "Vybavení").setEquipments(equipmentList);
+
+		List<Skill> skillList = Lists.newArrayList();
+		Set<String> skillIds = Sets.newHashSet(organization.getPreRegistrationSkills());
+		for (Skill skill : config.getSkillList()) {
+			if (skillIds.contains(skill.getId())) {
+				skillList.add(skill);
+			}
+		}
+		Page skills = new SkillsPage(this, "Dovednosti").setSkills(skillList);
+
 		mRootPageList = new PageList(personalInfo, address, equipment, skills);
 	}
 
 	public void saveToUser(User user) {
-		for(Page page: mRootPageList) page.saveToUser(user);
+		for (Page page : mRootPageList)
+			page.saveToUser(user);
 	}
 
 	@Override

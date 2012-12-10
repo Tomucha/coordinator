@@ -17,25 +17,25 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import cz.clovekvtisni.coordinator.android.R;
-import cz.clovekvtisni.coordinator.android.register.wizard.model.MultipleFixedChoicePage;
+import cz.clovekvtisni.coordinator.android.register.wizard.model.EquipmentPage;
 import cz.clovekvtisni.coordinator.android.register.wizard.model.Page;
 
-public class MultipleChoiceFragment extends ListFragment {
+public class EquipmentFragment extends ListFragment {
     private static final String ARG_KEY = "key";
 
     private PageFragmentCallbacks mCallbacks;
-    private Page mPage;
+    private EquipmentPage page;
 
-    public static MultipleChoiceFragment create(String key) {
+    public static EquipmentFragment create(String key) {
         Bundle args = new Bundle();
         args.putString(ARG_KEY, key);
 
-        MultipleChoiceFragment fragment = new MultipleChoiceFragment();
+        EquipmentFragment fragment = new EquipmentFragment();
         fragment.setArguments(args);
         return fragment;
     }
 
-    public MultipleChoiceFragment() {
+    public EquipmentFragment() {
     }
     
     @Override
@@ -60,15 +60,14 @@ public class MultipleChoiceFragment extends ListFragment {
     	super.onActivityCreated(savedInstanceState);
     	
     	Bundle args = getArguments();
-        mPage = mCallbacks.onGetPage(args.getString(ARG_KEY));
+    	page = (EquipmentPage) mCallbacks.onGetPage(args.getString(ARG_KEY));
 
-        MultipleFixedChoicePage fixedChoicePage = (MultipleFixedChoicePage) mPage;
         final List<String> mChoices = new ArrayList<String>();
-        for (int i = 0; i < fixedChoicePage.getOptionCount(); i++) {
-            mChoices.add(fixedChoicePage.getOptionAt(i));
+        for (int i = 0; i < page.getEquipmentsList().size(); i++) {
+            mChoices.add(page.getEquipmentsList().get(i).getName());
         }
     	
-    	((TextView) getView().findViewById(R.id.title)).setText(mPage.getTitle());
+    	((TextView) getView().findViewById(R.id.title)).setText(page.getTitle());
 
         final ListView listView = (ListView) getView().findViewById(android.R.id.list);
         setListAdapter(new ArrayAdapter<String>(getActivity(),
@@ -77,20 +76,18 @@ public class MultipleChoiceFragment extends ListFragment {
                 mChoices));
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-        // Pre-select currently selected items.
         new Handler().post(new Runnable() {
             @Override
             public void run() {
-                ArrayList<String> selectedItems = mPage.getData().getStringArrayList(
-                        Page.SIMPLE_DATA_KEY);
+                ArrayList<Integer> selectedItems = page.getData().getIntegerArrayList(Page.SIMPLE_DATA_KEY);
                 if (selectedItems == null || selectedItems.size() == 0) {
                     return;
                 }
 
-                Set<String> selectedSet = new HashSet<String>(selectedItems);
+                Set<Integer> selectedSet = new HashSet<Integer>(selectedItems);
 
                 for (int i = 0; i < mChoices.size(); i++) {
-                    if (selectedSet.contains(mChoices.get(i))) {
+                    if (selectedSet.contains(i)) {
                         listView.setItemChecked(i, true);
                     }
                 }
@@ -107,14 +104,14 @@ public class MultipleChoiceFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         SparseBooleanArray checkedPositions = getListView().getCheckedItemPositions();
-        ArrayList<String> selections = new ArrayList<String>();
+        ArrayList<Integer> selections = new ArrayList<Integer>();
         for (int i = 0; i < checkedPositions.size(); i++) {
             if (checkedPositions.valueAt(i)) {
-                selections.add(getListAdapter().getItem(checkedPositions.keyAt(i)).toString());
+                selections.add(i);
             }
         }
 
-        mPage.getData().putStringArrayList(Page.SIMPLE_DATA_KEY, selections);
-        mPage.notifyDataChanged();
+        page.getData().putIntegerArrayList(Page.SIMPLE_DATA_KEY, selections);
+        page.notifyDataChanged();
     }
 }
