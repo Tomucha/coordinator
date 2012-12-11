@@ -17,7 +17,7 @@ public class UserInEvent extends AbstractModifiableEntity {
 
     private Date validTo;
 
-    private String status;
+    private RegistrationStatus status;
 
     private Double lastLocationLatitude;
 
@@ -81,11 +81,11 @@ public class UserInEvent extends AbstractModifiableEntity {
         this.validTo = validTo;
     }
 
-    public String getStatus() {
+    public RegistrationStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(RegistrationStatus status) {
         this.status = status;
     }
 

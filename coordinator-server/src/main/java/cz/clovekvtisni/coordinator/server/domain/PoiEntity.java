@@ -34,6 +34,7 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     @NotNull
     private String poiCategoryId;
 
+    @Index
     private String workflowId;
 
     private String workflowStateId;

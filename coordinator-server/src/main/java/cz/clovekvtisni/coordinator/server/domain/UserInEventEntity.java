@@ -2,6 +2,7 @@ package cz.clovekvtisni.coordinator.server.domain;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.*;
+import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 
 import java.util.Arrays;
@@ -36,7 +37,7 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     private Date validTo;
 
-    private String status;
+    private RegistrationStatus status;
 
     private Double lastLocationLatitude;
 
@@ -127,11 +128,11 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
         this.validTo = validTo;
     }
 
-    public String getStatus() {
+    public RegistrationStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(RegistrationStatus status) {
         this.status = status;
     }
 

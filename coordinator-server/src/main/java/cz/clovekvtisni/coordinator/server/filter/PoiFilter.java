@@ -20,6 +20,10 @@ public class PoiFilter extends NoDeletedFilter<PoiEntity> {
 
     private Operator organizationIdOp = Operator.EQ;
 
+    private Long workflowIdVal;
+
+    private Operator workflowIdOp = Operator.EQ;
+
     private Operator Op = Operator.EQ;
 
     public Long getEventIdVal() {
@@ -60,6 +64,22 @@ public class PoiFilter extends NoDeletedFilter<PoiEntity> {
 
     public void setOp(Operator op) {
         Op = op;
+    }
+
+    public Long getWorkflowIdVal() {
+        return workflowIdVal;
+    }
+
+    public void setWorkflowIdVal(Long workflowIdVal) {
+        this.workflowIdVal = workflowIdVal;
+    }
+
+    public Operator getWorkflowIdOp() {
+        return workflowIdOp;
+    }
+
+    public void setWorkflowIdOp(Operator workflowIdOp) {
+        this.workflowIdOp = workflowIdOp;
     }
 
     @Override

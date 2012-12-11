@@ -19,31 +19,51 @@
 
     <c:choose>
         <c:when test="${!empty userInEvents}">
-            <div class="eventListTable">
-                <table>
-                    <thead>
-                    <tr>
-                        <th><s:message code="label.name"/></th>
-                        <th><s:message code="label.phone"/></th>
-                        <th><s:message code="label.status"/></th>
-                        <th><s:message code="label.address"/></th>
-                        <th><s:message code="label.action"/></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <c:forEach items="${userInEvents}" var="userInEvent">
+            <sf:form action="${root}/admin/event/users" method="post">
+                <div class="eventListTable">
+                    <sf:hidden path="${params.eventId}"/>
+
+                    <table>
+                        <thead>
                         <tr>
-                            <td><c:out value="${userInEvent.userEntity.fullName}"/></td>
-                            <td><c:out value="${userInEvent.userEntity.phone}"/></td>
-                            <td><c:out value="${userInEvent.status}"/></td>
-                            <td><c:out value="${userInEvent.userEntity.fullAddress}"/></td>
-                            <td>
-                                <a href="<s:url value="${root}/admin/event/user/edit?eventId=${params.eventId}&userId=${userInEvent.userId}"/>"><s:message code="button.detail"/></a>
-                            </td>
+                            <th></th>
+                            <th><s:message code="label.name"/></th>
+                            <th><s:message code="label.phone"/></th>
+                            <th><s:message code="label.status"/></th>
+                            <th><s:message code="label.address"/></th>
+                            <th><s:message code="label.action"/></th>
                         </tr>
+                        </thead>
+                        <tbody>
+                        <c:forEach items="${userInEvents}" var="userInEvent">
+                            <tr>
+                                <td><sf:checkbox path="selectedUsers" /></td>
+                                <td><c:out value="${userInEvent.userEntity.fullName}"/></td>
+                                <td><c:out value="${userInEvent.userEntity.phone}"/></td>
+                                <td><c:out value="${userInEvent.status}"/></td>
+                                <td><c:out value="${userInEvent.userEntity.fullAddress}"/></td>
+                                <td>
+                                    <a href="<s:url value="${root}/admin/event/user/edit?eventId=${params.eventId}&userId=${userInEvent.userId}"/>"><s:message code="button.detail"/></a>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+            </sf:form>
+
+            <div>
+                <sf:select path="selectedAction" onchange="$('selectedTaskId').toggle(this.value=='registerToAsk')">
+                    <sf:option value="delete"><s:message code="label.delete"/></sf:option>
+                    <sf:option value="suspend"><s:message code="label.suspend"/></sf:option>
+                    <sf:option value="registerToTask"><s:message code="label.registerToTask"/></sf:option>
+                </sf:select>
+
+                <sf:select path="selectedTaskId" id="selectedTaskIdSelect" cssStyle="display: none;">
+                    <c:forEach items="${tasks}" var="task">
+                        <sf:option value="${task.id}"><c:out value="${task.poiCategory.name}"/> - <c:out value="${task.createdDate}"/></sf:option>
                     </c:forEach>
-                    </tbody>
-                </table>
+                </sf:select>
             </div>
 
         </c:when>
