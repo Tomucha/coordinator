@@ -83,7 +83,7 @@ public class AuthorizationFunctions {
         UserEntity user = appContext.getLoggedUser();
         if (appContext == null )
             return false;
-        if (user == null) return false;
+        if (user == null || user.getRoleIdList() == null) return false;
         return authorizationTool.isAuthorized(Arrays.asList(new String[] {roleId}), Arrays.asList(user.getRoleIdList()));
     }
 }

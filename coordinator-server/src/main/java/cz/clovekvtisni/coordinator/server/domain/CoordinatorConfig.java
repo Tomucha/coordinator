@@ -5,10 +5,7 @@ import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.core.Validate;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -133,14 +130,28 @@ public class CoordinatorConfig {
     }
 
     public Map<String, PoiCategory> getPoiCategoryMap() {
-        if (poiCategoryList == null) return new HashMap<String, PoiCategory>();
+        if (poiCategoryList == null) return new TreeMap<String, PoiCategory>();
 
-        Map<String, PoiCategory> map = new HashMap<String, PoiCategory>(poiCategoryList.size());
+        final Map<String, PoiCategory> map = new HashMap<String, PoiCategory>(poiCategoryList.size());
         for (PoiCategory category : poiCategoryList) {
             map.put(category.getId(), category);
         }
 
-        return map;
+        Map<String, PoiCategory> sorted = new TreeMap<String, PoiCategory>(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                String val1 = map.get(o1).getName();
+                String val2 = map.get(o2).getName();
+
+                if (val1 == null) return 1;
+                if (val2 == null) return -1;
+                return val1.compareTo(val2);
+            }
+        });
+
+        sorted.putAll(map);
+
+        return sorted;
     }
 
     public Map<String, String> getCountryMap() {

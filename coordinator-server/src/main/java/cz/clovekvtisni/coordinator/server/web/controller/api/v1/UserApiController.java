@@ -1,9 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.controller.api.v1;
 
-import cz.clovekvtisni.coordinator.api.request.LoginRequestParams;
-import cz.clovekvtisni.coordinator.api.request.RegisterRequestParams;
-import cz.clovekvtisni.coordinator.api.request.UserByIdRequestParams;
-import cz.clovekvtisni.coordinator.api.request.UserFilterRequestParams;
+import cz.clovekvtisni.coordinator.api.request.*;
 import cz.clovekvtisni.coordinator.api.response.*;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
@@ -13,6 +10,7 @@ import cz.clovekvtisni.coordinator.server.domain.UserAuthKey;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
+import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
@@ -48,7 +46,10 @@ public class UserApiController extends AbstractApiController {
         if (user == null) {
             throw MaPermissionDeniedException.wrongCredentials();
         }
-        return okResult(new LoginResponseData(user.buildTargetEntity()));
+        LoginResponseData responseData = new LoginResponseData(user.buildTargetEntity());
+        UserAuthKey authKey = userService.createAuthKey(user);
+        responseData.setAuthKey(authKey.getAuthKey());
+        return okResult(responseData);
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
@@ -84,9 +85,9 @@ public class UserApiController extends AbstractApiController {
         return okResult(responseData);
     }
 
-    @RequestMapping(value = "/filter", method = RequestMethod.POST)
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
     public @ResponseBody ApiResponse filter(HttpServletRequest request) {
-        UserRequest<UserFilterRequestParams> req = parseRequest(request, UserFilterRequestParams.class);
+        UserRequest<UserListRequestParams> req = parseRequest(request, UserListRequestParams.class);
 
         UserFilter filter = new UserFilter(true);
         filter.setOrganizationIdVal(req.user.getOrganizationId());
@@ -113,4 +114,5 @@ public class UserApiController extends AbstractApiController {
 
         return okResult(new UserByIdResponseData(result));
     }
+
 }

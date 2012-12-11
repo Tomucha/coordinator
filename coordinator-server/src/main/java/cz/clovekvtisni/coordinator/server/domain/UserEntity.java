@@ -259,8 +259,13 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     public String getFullName() {
         if (ValueTool.isEmpty(firstName) && ValueTool.isEmpty(lastName))
             return "";
+
         else if (ValueTool.isEmpty(firstName))
             return lastName;
+
+        else if (ValueTool.isEmpty(lastName))
+            return firstName;
+
         else
             return lastName + ", " + firstName;
     }

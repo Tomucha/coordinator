@@ -26,8 +26,8 @@ import java.util.Map;
 public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements UserInEventService {
 
     @Override
-    public UserInEventEntity findById(Long id, long flags) {
-        UserInEventEntity inEvent = ofy().get(Key.create(UserInEventEntity.class, id));
+    public UserInEventEntity findById(Long id, Long parentUserId, long flags) {
+        UserInEventEntity inEvent = ofy().load().key(Key.create(Key.create(UserEntity.class, parentUserId), UserInEventEntity.class, id)).get();
 
         populate(Arrays.asList(new UserInEventEntity[] {inEvent}), flags);
 
@@ -90,7 +90,7 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
     @Override
     public UserInEventEntity update(final UserInEventEntity inEvent) {
         logger.debug("updating " + inEvent);
-        final UserInEventEntity old = findById(inEvent.getId(), 0l);
+        final UserInEventEntity old = findById(inEvent.getId(), inEvent.getUserId(), 0l);
         if (old == null)
             throw NotFoundException.idNotExist(UserInEvent.class.getSimpleName(), inEvent.getId());
         return ofy().transact(new Work<UserInEventEntity>() {

@@ -5,13 +5,20 @@ import java.util.Date;
 /**
  * Created with IntelliJ IDEA.
  * User: jka
- * Date: 23.11.12
+ * Date: 11.12.12
  */
-public class UserFilterRequestParams implements RequestParams {
+public class EventPoiListRequestParams implements RequestParams {
+
+    private Long eventId;
 
     private Date modifiedFrom;
 
-    public UserFilterRequestParams() {
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 
     public Date getModifiedFrom() {
@@ -24,6 +31,6 @@ public class UserFilterRequestParams implements RequestParams {
 
     @Override
     public String getSignature() {
-        return "" + modifiedFrom;
+        return eventId + "~" + modifiedFrom;
     }
 }

@@ -24,10 +24,26 @@
             <sf:errors />
 
             <div class="formPanel">
+
+                <div>
+                    <c:choose>
+                        <c:when test="${can:isSuperadmin() and empty form.id}">
+                            <div>
+                                <tags:input field="organizationId" modelAttribute="form" captionCode="UserEntity.organization">
+                                    <sf:select path="organizationId" items="${config.organizationMap}"/>
+                                </tags:input>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <sf:hidden path="organizationId"/>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+
                 <div>
                     <sf:hidden path="id"/>
                     <sf:hidden path="eventId"/>
-                    <sf:hidden path="organizationId"/>
+
                     <sf:hidden path="userInEventId"/>
 
                     <tags:input field="firstName" modelAttribute="form" captionCode="UserEntity.firstName">

@@ -5,6 +5,8 @@ import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.NoDeletedFilter;
 
+import java.util.Date;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jka
@@ -24,7 +26,9 @@ public class PoiFilter extends NoDeletedFilter<PoiEntity> {
 
     private Operator workflowIdOp = Operator.EQ;
 
-    private Operator Op = Operator.EQ;
+    private Date modifiedDateVal;
+
+    private Operator modifiedDateOp = Operator.EQ;
 
     public Long getEventIdVal() {
         return eventIdVal;
@@ -58,14 +62,6 @@ public class PoiFilter extends NoDeletedFilter<PoiEntity> {
         this.organizationIdOp = organizationIdOp;
     }
 
-    public Operator getOp() {
-        return Op;
-    }
-
-    public void setOp(Operator op) {
-        Op = op;
-    }
-
     public Long getWorkflowIdVal() {
         return workflowIdVal;
     }
@@ -80,6 +76,22 @@ public class PoiFilter extends NoDeletedFilter<PoiEntity> {
 
     public void setWorkflowIdOp(Operator workflowIdOp) {
         this.workflowIdOp = workflowIdOp;
+    }
+
+    public Date getModifiedDateVal() {
+        return modifiedDateVal;
+    }
+
+    public void setModifiedDateVal(Date modifiedDateVal) {
+        this.modifiedDateVal = modifiedDateVal;
+    }
+
+    public Operator getModifiedDateOp() {
+        return modifiedDateOp;
+    }
+
+    public void setModifiedDateOp(Operator modifiedDateOp) {
+        this.modifiedDateOp = modifiedDateOp;
     }
 
     @Override

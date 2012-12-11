@@ -68,6 +68,17 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     }
 
     @Override
+    public UserInEvent buildTargetEntity() {
+        UserInEvent inEvent = super.buildTargetEntity();
+        if (eventEntity != null)
+            inEvent.setEvent(eventEntity.buildTargetEntity());
+        if (userEntity != null)
+            inEvent.setUser(userEntity.buildTargetEntity());
+
+        return inEvent;
+    }
+
+    @Override
     public Key<UserInEventEntity> getKey() {
         return Key.create(UserInEventEntity.class, id);
     }

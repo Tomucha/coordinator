@@ -25,7 +25,7 @@ public interface UserService extends Service {
     public static final long FLAG_FETCH_SKILLS = 2l;
 
     @Anonymous
-    UserEntity login(String login, String password) throws MaPermissionDeniedException;
+    UserEntity login(String login, String password, String... hasRoles) throws MaPermissionDeniedException;
 
     @FilterResult("#helper.canRead(#entity)")
     UserEntity findById(Long id, long flags);

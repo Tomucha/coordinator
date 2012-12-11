@@ -6,6 +6,8 @@ public class LoginResponseData implements ApiResponseData {
 
     private User user;
 
+    private String authKey;
+
     public LoginResponseData(User user) {
         this.user = user;
     }
@@ -14,7 +16,15 @@ public class LoginResponseData implements ApiResponseData {
         return user;
     }
 
-	@Override
+    public String getAuthKey() {
+        return authKey;
+    }
+
+    public void setAuthKey(String authKey) {
+        this.authKey = authKey;
+    }
+
+    @Override
 	public String toString() {
 		return "LoginUserResponse [user=" + user + "]";
 	}

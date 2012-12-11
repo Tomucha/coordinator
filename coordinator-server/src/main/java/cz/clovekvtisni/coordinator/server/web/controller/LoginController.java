@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
+import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -45,7 +46,12 @@ public class LoginController extends AbstractController {
 
         String retUrl;
         try {
-            userService.login(loginForm.email, loginForm.password);
+            userService.login(
+                    loginForm.email,
+                    loginForm.password,
+                    AuthorizationTool.SUPERADMIN,
+                    AuthorizationTool.ADMIN,
+                    AuthorizationTool.BACKEND);
 
             retUrl = loginForm.retUrl;
             if (ValueTool.isEmpty(retUrl)) {

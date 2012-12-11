@@ -10,6 +10,7 @@ import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserEquipmentFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserSkillFilter;
+import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
 import cz.clovekvtisni.coordinator.server.service.OrganizationService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
@@ -43,8 +44,11 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     @Autowired
     private OrganizationInEventService organizationInEventService;
 
+    @Autowired
+    private AuthorizationTool authorizationTool;
+
     @Override
-    public UserEntity login(String email, String password) {
+    public UserEntity login(String email, String password, String... hasRoles) {
         Key<UserEntity> userKey = systemService.findUniqueValueOwner(ofy(), UniqueIndexEntity.Property.EMAIL, ValueTool.normalizeEmail(email));
         if (userKey == null) {
             throw MaPermissionDeniedException.wrongCredentials();
@@ -55,7 +59,17 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             throw MaPermissionDeniedException.wrongCredentials();
         }
 
-        createAuthKey(userEntity);
+        if (hasRoles != null && hasRoles.length > 0) {
+            boolean isPermited = false;
+            for (String hasRole : hasRoles) {
+                if (authorizationTool.hasRole(hasRole, userEntity)) {
+                    isPermited = true;
+                    break;
+                }
+            }
+            if (!isPermited)
+                throw MaPermissionDeniedException.permissionDenied();
+        }
 
         appContext.setLoggedUser(userEntity);
 
@@ -69,6 +83,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         populateUsers(Arrays.asList(new UserEntity[]{userEntity}), flags);
 
         return userEntity;
+
     }
 
     private void populateUsers(Collection<UserEntity> entities, long flags) {
@@ -269,7 +284,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         if (!organization.isAllowsPreRegistration())
             throw MaPermissionDeniedException.registrationNotAllowed();
 
-        return createUser(newUser);
+        return newUser;
     }
 
     @Override
@@ -296,7 +311,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         return ofy().transact(new Work<UserInEventEntity>() {
             @Override
             public UserInEventEntity run() {
-                UserEntity connectedUser = user.isNew() ? createUser(user) : user;
+                UserEntity connectedUser = user;
 
                 inEvent.setParentKey(connectedUser.getKey());
                 inEvent.setUserId(connectedUser.getId());

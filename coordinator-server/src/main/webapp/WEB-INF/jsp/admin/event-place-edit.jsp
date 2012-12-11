@@ -86,6 +86,12 @@
                 </tags:input>
 
                 <div>
+                    <tags:input field="longitude" modelAttribute="form" captionCode="PoiEntity.longitude">
+                        <sf:input id="longitudeInput" path="longitude"/>
+                    </tags:input>
+                </div>
+
+                <div>
                     <tags:input field="latitude" modelAttribute="form" captionCode="PoiEntity.latitude">
                         <sf:input id="latitudeInput" path="latitude"/>
                     </tags:input>

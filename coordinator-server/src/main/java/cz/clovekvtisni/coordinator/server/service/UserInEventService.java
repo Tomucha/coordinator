@@ -13,7 +13,7 @@ public interface UserInEventService extends Service {
     public static final long FLAG_FETCH_USER = 2l;
 
     @FilterResult("#helper.canRead(#entity)")
-    UserInEventEntity findById(Long id, long flags);
+    UserInEventEntity findById(Long id, Long parentUserId, long flags);
 
     @FilterResult("#helper.canRead(#entity)")
     ResultList<UserInEventEntity> findByFilter(UserInEventFilter filter, int limit, String bookmark, long flags);

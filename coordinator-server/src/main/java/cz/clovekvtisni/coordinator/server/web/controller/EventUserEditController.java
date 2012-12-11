@@ -50,6 +50,8 @@ public class EventUserEditController extends AbstractEventController {
             if (inEvent != null)
                 form.setUserInEventId(inEvent.getId());
         } else {
+            form.setOrganizationId(getLoggedUser().getOrganizationId());
+            form.setRoleIdList(new String[] {AuthorizationTool.ANONYMOUS});
             form.setEventId(params.getEventId());
         }
 
