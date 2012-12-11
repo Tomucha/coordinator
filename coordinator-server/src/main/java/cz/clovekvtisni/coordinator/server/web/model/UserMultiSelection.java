@@ -1,5 +1,7 @@
 package cz.clovekvtisni.coordinator.server.web.model;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jka
@@ -9,17 +11,17 @@ public class UserMultiSelection {
 
     private Long eventId;
 
-    private Long[] selectedUsers;
+    private List<Long> selectedUsers;
 
     private String selectedAction;
 
     private Long selectedTaskId;
 
-    public Long[] getSelectedUsers() {
+    public List<Long> getSelectedUsers() {
         return selectedUsers;
     }
 
-    public void setSelectedUsers(Long[] selectedUsers) {
+    public void setSelectedUsers(List<Long> selectedUsers) {
         this.selectedUsers = selectedUsers;
     }
 

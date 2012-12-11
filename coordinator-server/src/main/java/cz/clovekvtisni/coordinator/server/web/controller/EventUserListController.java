@@ -17,10 +17,12 @@ import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,9 +38,6 @@ public class EventUserListController extends AbstractEventController {
 
     @Autowired
     private UserInEventService userInEventService;
-
-    @Autowired
-    private PoiService poiService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String listUsers(@ModelAttribute("params") EventFilterParams params, Model model) {
@@ -68,15 +67,16 @@ public class EventUserListController extends AbstractEventController {
         poiFilter.setEventIdVal(params.getEventId());
         poiFilter.setWorkflowIdVal(0l);
         poiFilter.setWorkflowIdOp(Filter.Operator.NOT_EQ);
-        model.addAttribute("tasks", poiService.findByFilter(poiFilter, 0, null, PoiService.FLAG_FETCH_FROM_CONFIG));
+        model.addAttribute("tasks", poiService.findByFilter(poiFilter, 0, null, PoiService.FLAG_FETCH_FROM_CONFIG).getResult());
 
         populateEventModel(model, params);
 
         return "admin/event-users";
     }
-    @RequestMapping(method = RequestMethod.POST, params = "selectedUsers")
-    public String onSelectedAction(@ModelAttribute UserMultiSelection selection) {
-        if (selection.getSelectedUsers() != null && selection.getSelectedUsers().length > 0)  {
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String onSelectedAction(@ModelAttribute("selectionForm") @Valid UserMultiSelection selection, BindingResult bindingResult) {
+        if (selection.getSelectedUsers() != null && selection.getSelectedUsers().size() > 0)  {
             String selectedAction = selection.getSelectedAction();
             Long selectedPlaceId = selection.getSelectedTaskId();
 

@@ -79,22 +79,11 @@
                 <sf:hidden path="id"/>
                 <sf:hidden path="eventId"/>
                 <sf:hidden path="organizationId"/>
+                <sf:hidden path="confirmed"/>
 
                 <tags:input field="poiCategoryId" modelAttribute="form" captionCode="PoiEntity.poiCategory">
                     <sf:select path="poiCategoryId" items="${config.poiCategoryMap}" itemLabel="name"/>
                 </tags:input>
-
-                <div>
-                    <tags:input field="confirmed" modelAttribute="form" captionCode="PoiEntity.confirmed">
-                        <sf:checkbox path="confirmed"/>
-                    </tags:input>
-                </div>
-
-                <div>
-                    <tags:input field="longitude" modelAttribute="form" captionCode="PoiEntity.longitude">
-                        <sf:input id="longitudeInput" path="longitude"/>
-                    </tags:input>
-                </div>
 
                 <div>
                     <tags:input field="latitude" modelAttribute="form" captionCode="PoiEntity.latitude">

@@ -4,6 +4,7 @@
     taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
     taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
     taglib prefix="can" uri="/WEB-INF/permissions.tld" %><%@
+    taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %><%@
     taglib prefix="tags" tagdir="/WEB-INF/tags"
 %>
 <h2><s:message code="header.userList"/></h2>
@@ -19,9 +20,9 @@
 
     <c:choose>
         <c:when test="${!empty userInEvents}">
-            <sf:form action="${root}/admin/event/users" method="post">
+            <sf:form action="${root}/admin/event/users" method="post" modelAttribute="selectionForm">
                 <div class="eventListTable">
-                    <sf:hidden path="${params.eventId}"/>
+                    <sf:hidden path="eventId"/>
 
                     <table>
                         <thead>
@@ -35,9 +36,9 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <c:forEach items="${userInEvents}" var="userInEvent">
+                        <c:forEach items="${userInEvents}" var="userInEvent" begin="0" step="1" varStatus="i">
                             <tr>
-                                <td><sf:checkbox path="selectedUsers" /></td>
+                                <td><input type="checkbox" name="selectedUsers[${i.index}]" value="${userInEvent.userId}"/></td>
                                 <td><c:out value="${userInEvent.userEntity.fullName}"/></td>
                                 <td><c:out value="${userInEvent.userEntity.phone}"/></td>
                                 <td><c:out value="${userInEvent.status}"/></td>
@@ -50,21 +51,30 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div>
+                    <sf:select path="selectedAction" onchange="$('#selectedTaskIdSelect').toggle(this.value=='registerToTask')">
+                        <sf:option value="delete"><s:message code="label.delete"/></sf:option>
+                        <sf:option value="suspend"><s:message code="label.suspend"/></sf:option>
+                        <sf:option value="registerToTask"><s:message code="label.registerToTask"/></sf:option>
+                    </sf:select>
+
+                    <c:choose>
+                        <c:when test="${empty tasks or fn:length(tasks) == 0}">
+                            <span id="selectedTaskIdSelect" style="display: none"><s:message code="msg.noTasksFound"/></span>
+                        </c:when>
+                        <c:otherwise>
+                            <sf:select path="selectedTaskId" id="selectedTaskIdSelect" cssStyle="display: none">
+                                <c:forEach items="${tasks}" var="task">
+                                    <sf:option value="${task.id}"><c:out value="${task.poiCategory.name}"/> - <c:out value="${task.createdDate}"/></sf:option>
+                                </c:forEach>
+                            </sf:select>
+                        </c:otherwise>
+                    </c:choose>
+
+                    <button type="submit"><s:message code="button.submit"/></button>
+                </div>
             </sf:form>
-
-            <div>
-                <sf:select path="selectedAction" onchange="$('selectedTaskId').toggle(this.value=='registerToAsk')">
-                    <sf:option value="delete"><s:message code="label.delete"/></sf:option>
-                    <sf:option value="suspend"><s:message code="label.suspend"/></sf:option>
-                    <sf:option value="registerToTask"><s:message code="label.registerToTask"/></sf:option>
-                </sf:select>
-
-                <sf:select path="selectedTaskId" id="selectedTaskIdSelect" cssStyle="display: none;">
-                    <c:forEach items="${tasks}" var="task">
-                        <sf:option value="${task.id}"><c:out value="${task.poiCategory.name}"/> - <c:out value="${task.createdDate}"/></sf:option>
-                    </c:forEach>
-                </sf:select>
-            </div>
 
         </c:when>
         <c:otherwise>
