@@ -28,6 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.OrganizationActivity" />
+        <activity android:name=".event.EventActivity" />
         <activity
             android:name=".register.RegisterActivity"
             android:label="Předregistrace" />

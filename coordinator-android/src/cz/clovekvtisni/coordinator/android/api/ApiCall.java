@@ -1,129 +1,93 @@
 package cz.clovekvtisni.coordinator.android.api;
 
-import java.net.HttpURLConnection;
-
 import com.github.kevinsawicki.http.HttpRequest;
-import com.google.common.base.Objects;
+import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
-import cz.clovekvtisni.coordinator.android.util.CommonTool;
-import cz.clovekvtisni.coordinator.android.util.GsonTool;
+import cz.clovekvtisni.coordinator.android.workers.Worker;
 import cz.clovekvtisni.coordinator.api.request.ApiRequest;
-import cz.clovekvtisni.coordinator.api.response.ApiResponse;
+import cz.clovekvtisni.coordinator.api.request.RequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse.Status;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
-import cz.clovekvtisni.coordinator.exception.ErrorCode;
 
-/**
- * Tohle je jedno HTTP / JSON / API volani. Vezme objekt, zabali do Json obalky,
- * POSTne na server, ziska odpoved a odevzda jako {@link ApiResponse}. Je nutne
- * spustet ho asychronne, aby neblokovalo UI.
- * 
- * Pouziva https://github.com/kevinsawicki/http-request wrapper nad
- * {@link HttpURLConnection}.
- * 
- * Nevytvarejte instance teto tridy, pouzivejte {@link ApiCallFactory}, ne ze by
- * to necemu vadilo, ale vytvari to bordel v kodu.
- * 
- * @author tomucha
- */
-public final class ApiCall<REQUEST, RESPONSE extends ApiResponseData> {
+public class ApiCall<S extends RequestParams, T extends ApiResponseData> extends
+		Worker<ApiCall.Listener<T>> {
 
-	public static final String SERVER = CommonTool.getEnvironment().getApiHost();
-	public static final int PORT = CommonTool.getEnvironment().getApiPort();
-	public static final String API_VERSION = CommonTool.getEnvironment().getApiVersion();
-	public static final String HTTP_BASE = "https://" + ApiCall.SERVER + ":" + ApiCall.PORT;
+	private static final String API_RESPONSE_STATUS = "status";
+	private static final String API_RESPONSE_DATA = "data";
+	private static final String URL_PREFIX = "https://coordinator-test.appspot.com/api/v1/";
 
-	private String apiUrl;
-	private Class<? extends RESPONSE> responseDataType;
+	private final S requestParams;
+	private final Class<? extends T> resultClass;
+	private final String url;
 
-	/**
-	 * Vygeneruje adresu: http://host:port/metis/api/VERSION/ENTITY/OPERATION
-	 * 
-	 * Host a port se bere z {@link DeployEnvironment}.
-	 * 
-	 * @param entity
-	 * @param operation
-	 * @param responseDataType
-	 */
-	ApiCall(final String entity, final String operation, Class<? extends RESPONSE> responseDataType) {
-		apiUrl = HTTP_BASE + "/api/" + API_VERSION + "/" + entity + "/" + operation;
-		this.responseDataType = responseDataType;
+	public ApiCall(String entity, String operation, S requestParams, Class<? extends T> resultClass) {
+		this.url = URL_PREFIX + entity + "/" + operation;
+		this.requestParams = requestParams;
+		this.resultClass = resultClass;
 	}
 
-	/**
-	 * Method builds {@link ApiRequest}, executes {@link HttpRequest} and
-	 * returns {@link ApiResponse}.
-	 * 
-	 * MUST NOT be called from UI thread, communicates over the network.
-	 * 
-	 * @param requestData
-	 * @param authKey
-	 * @return
-	 */
-	public ApiResponse<RESPONSE> doRequest(REQUEST requestData, String authKey) {
-		// FIXME: sessionId, token apod.
+	private String createRequestBody() {
 		ApiRequest request = new ApiRequest();
-		request.setData(requestData);
-
-		CommonTool.logI(getClass().getSimpleName(), "Calling API: " + apiUrl);
-
-		String requestBody = GsonTool.toJson(request).toString();
-		String responseBody = HttpRequest.post(apiUrl).send(requestBody).body();
-		JsonObject responseJson = (JsonObject) GsonTool.parse(responseBody);
-		CommonTool.logI(getClass().getSimpleName(), "API response: " + responseJson);
-
-		return buildApiResponse(responseJson);
+		request.setData(requestParams);
+		return ApiUtils.GSON.toJsonTree(request).toString();
 	}
 
-	/**
-	 * This method takes JSON response and create an {@link ApiResponse} object,
-	 * depending on obtained response {@link Status}.
-	 * 
-	 * @param responseJson
-	 * @return
-	 */
-	private ApiResponse<RESPONSE> buildApiResponse(JsonObject responseJson) {
-		ApiResponse<RESPONSE> response = null;
-		Status status = GsonTool.fromJson(responseJson.get(ApiConstants.API_RESPONSE_STATUS),
-				Status.class);
+	private void doRequest() throws HttpRequestException, ApiResponseException {
+		String responseBody = HttpRequest.post(url).send(createRequestBody()).body();
+		JsonObject json = (JsonObject) ApiUtils.PARSER.parse(responseBody);
+
+		Status status = ApiUtils.GSON.fromJson(json.get(API_RESPONSE_STATUS), Status.class);
 		if (status == Status.OK) {
-			// everything ok, let's parse response data
-			return new ApiResponse<RESPONSE>(GsonTool.fromJson(
-					responseJson.get(ApiConstants.API_RESPONSE_DATA), responseDataType));
+			JsonElement resultJson = json.get(API_RESPONSE_DATA);
+			T result = ApiUtils.GSON.fromJson(resultJson, resultClass);
+			sendSuccess(result);
 		} else {
-			// something is wrong, return error response
-			ErrorCode code = GsonTool.fromJson(
-					responseJson.get(ApiConstants.API_RESPONSE_ERROR_CODE), ErrorCode.class);
-			String message = null;
-			if (responseJson.has(ApiConstants.API_RESPONSE_ERROR_MESSAGE)) {
-				message = responseJson.get(ApiConstants.API_RESPONSE_ERROR_MESSAGE).getAsString();
+			throw new ApiResponseException();
+		}
+	}
+
+	@Override
+	protected void doInBackground() {
+		try {
+			doRequest();
+		} catch (HttpRequestException e) {
+			sendException(e);
+		} catch (ApiResponseException e) {
+			sendException(e);
+		} catch (JsonParseException e) {
+			sendException(e);
+		}
+	}
+
+	protected void sendException(final Exception e) {
+		send(new Runnable() {
+			@Override
+			public void run() {
+				getListener().onException(e);
 			}
-			return new ApiResponse<RESPONSE>(code, message);
-		}
+		});
 	}
 
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this).addValue(apiUrl).toString();
+	protected void sendSuccess(final T result) {
+		send(new Runnable() {
+			@Override
+			public void run() {
+				getListener().onResult(result);
+			}
+		});
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(apiUrl);
+	public static interface Listener<T> {
+		public void onResult(T result);
+
+		public void onException(Exception e);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == this) return true;
-		if (obj == null) return false;
-
-		if (getClass().equals(obj.getClass())) {
-			final ApiCall<?, ?> other = (ApiCall<?, ?>) obj;
-			return Objects.equal(apiUrl, other.apiUrl);
-		}
-
-		return false;
+	@SuppressWarnings("serial")
+	public static class ApiResponseException extends Exception {
 	}
 
 }

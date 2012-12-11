@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.android.register;
 
+import java.io.Serializable;
 import java.util.List;
 
 import android.app.Dialog;
@@ -9,34 +10,33 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
 import cz.clovekvtisni.coordinator.android.R;
-import cz.clovekvtisni.coordinator.android.api.ApiCallAsyncLoader;
-import cz.clovekvtisni.coordinator.android.api.ApiCallFactory;
+import cz.clovekvtisni.coordinator.android.api.ConfigCall;
+import cz.clovekvtisni.coordinator.android.api.UserRegisterCall;
 import cz.clovekvtisni.coordinator.android.register.wizard.model.ModelCallbacks;
 import cz.clovekvtisni.coordinator.android.register.wizard.model.Page;
 import cz.clovekvtisni.coordinator.android.register.wizard.model.WizardModel;
 import cz.clovekvtisni.coordinator.android.register.wizard.ui.PageFragmentCallbacks;
 import cz.clovekvtisni.coordinator.android.register.wizard.ui.ReviewFragment;
-import cz.clovekvtisni.coordinator.android.util.CommonTool;
+import cz.clovekvtisni.coordinator.android.workers.Workers;
 import cz.clovekvtisni.coordinator.api.request.RegisterRequestParams;
+import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.api.response.RegisterResponseData;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 
-public class RegisterActivity extends FragmentActivity implements PageFragmentCallbacks,
+public class RegisterActivity extends SherlockFragmentActivity implements PageFragmentCallbacks,
 		ReviewFragment.Callbacks, ModelCallbacks {
-	private static final int LOADER_REGISTER = 0;
-
 	private ViewPager mPager;
 	private MyPagerAdapter mPagerAdapter;
 
@@ -46,33 +46,38 @@ public class RegisterActivity extends FragmentActivity implements PageFragmentCa
 
 	private boolean mConsumePageSelectedEvent;
 
-	private Button mNextButton;
-	private Button mPrevButton;
+	private Button nextButton;
+	private Button prevButton;
 
 	private List<Page> mCurrentPageSequence;
 
 	private Organization organization;
 
-	private void initWizardList(Bundle state) {
-		mWizardModel = new WizardModel(this, organization);
+	private ConfigResponse config;
+	private Workers workers;
+
+	private UserRegisterCall.Listener registerCallListener = new UserRegisterCall.Listener() {
+		@Override
+		public void onResult(RegisterResponseData result) {
+			finish();
+		}
+
+		@Override
+		public void onException(Exception e) {
+		}
+	};
+
+	private void initWizardModel(Bundle state) {
+		mWizardModel = new WizardModel(this, organization, config);
 		if (state != null) mWizardModel.load(state.getBundle("model"));
 		mWizardModel.registerListener(this);
+		mCurrentPageSequence = mWizardModel.getCurrentPageSequence();
 	}
 
-	public void onCreate(Bundle state) {
-		super.onCreate(state);
-		setContentView(R.layout.activity_register);
-
-		organization = IntentHelper.getOrganization(getIntent());
-
-		initWizardList(state);
-
+	private void initPager() {
 		mPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
 		mPager = (ViewPager) findViewById(R.id.pager);
 		mPager.setAdapter(mPagerAdapter);
-
-		mNextButton = (Button) findViewById(R.id.next_button);
-		mPrevButton = (Button) findViewById(R.id.prev_button);
 
 		mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 			@Override
@@ -86,8 +91,13 @@ public class RegisterActivity extends FragmentActivity implements PageFragmentCa
 				updateBottomBar();
 			}
 		});
+	}
 
-		mNextButton.setOnClickListener(new View.OnClickListener() {
+	private void initBottomBar() {
+		nextButton = (Button) findViewById(R.id.next_button);
+		prevButton = (Button) findViewById(R.id.prev_button);
+
+		nextButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				if (mPager.getCurrentItem() == mCurrentPageSequence.size()) {
@@ -102,15 +112,52 @@ public class RegisterActivity extends FragmentActivity implements PageFragmentCa
 			}
 		});
 
-		mPrevButton.setOnClickListener(new View.OnClickListener() {
+		prevButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				mPager.setCurrentItem(mPager.getCurrentItem() - 1);
 			}
 		});
+	}
 
+	public void onCreate(Bundle state) {
+		super.onCreate(state);
+		setContentView(R.layout.activity_register);
+
+		organization = IntentHelper.getOrganization(getIntent());
+
+		workers = new Workers(this);
+
+		if (state != null && state.containsKey("config")) {
+			config = ((ConfigSerializableWrapper) state.getSerializable("config")).config;
+			initWizard(state);
+		} else {
+			loadConfig();
+		}
+
+		workers.connectIfRunning(UserRegisterCall.class, registerCallListener);
+	}
+
+	private void initWizard(Bundle state) {
+		initWizardModel(state);
+		initBottomBar();
+		initPager();
 		onPageTreeChanged();
 		updateBottomBar();
+	}
+
+	private void loadConfig() {
+		workers.startOrConnect(new ConfigCall(), new ConfigCall.Listener() {
+			@Override
+			public void onResult(ConfigResponse config) {
+				RegisterActivity.this.config = config;
+				initWizard(null);
+			}
+
+			@Override
+			public void onException(Exception e) {
+			}
+		});
 	}
 
 	@Override
@@ -124,19 +171,19 @@ public class RegisterActivity extends FragmentActivity implements PageFragmentCa
 	private void updateBottomBar() {
 		int position = mPager.getCurrentItem();
 		if (position == mCurrentPageSequence.size()) {
-			mNextButton.setText(R.string.finish);
-			mNextButton.setBackgroundResource(R.drawable.btn_register);
-			mNextButton.setTextColor(0xffffffff);
+			nextButton.setText(R.string.finish);
+			nextButton.setBackgroundResource(R.drawable.btn_register);
+			nextButton.setTextColor(0xffffffff);
 		} else {
-			mNextButton.setText(mEditingAfterReview ? R.string.review : R.string.next);
-			mNextButton.setBackgroundResource(R.drawable.selectable_item_background);
+			nextButton.setText(mEditingAfterReview ? R.string.review : R.string.next);
+			nextButton.setBackgroundResource(R.drawable.selectable_item_background);
 			TypedValue v = new TypedValue();
 			getTheme().resolveAttribute(android.R.attr.textAppearanceMedium, v, true);
-			mNextButton.setTextAppearance(this, v.resourceId);
-			mNextButton.setEnabled(position != mPagerAdapter.getCutOffPage());
+			nextButton.setTextAppearance(this, v.resourceId);
+			nextButton.setEnabled(position != mPagerAdapter.getCutOffPage());
 		}
 
-		mPrevButton.setVisibility(position <= 0 ? View.INVISIBLE : View.VISIBLE);
+		prevButton.setVisibility(position <= 0 ? View.INVISIBLE : View.VISIBLE);
 	}
 
 	@Override
@@ -149,6 +196,9 @@ public class RegisterActivity extends FragmentActivity implements PageFragmentCa
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putBundle("model", mWizardModel.save());
+		if (config != null) {
+			outState.putSerializable("config", new ConfigSerializableWrapper(config));
+		}
 	}
 
 	@Override
@@ -208,40 +258,15 @@ public class RegisterActivity extends FragmentActivity implements PageFragmentCa
 		user.setOrganizationId(organization.getId());
 		mWizardModel.saveToUser(user);
 
-		Bundle b = new Bundle();
-		b.putSerializable("user", user);
-		getSupportLoaderManager().initLoader(LOADER_REGISTER, b, registerCallbacks);
+		RegisterRequestParams params = new RegisterRequestParams();
+		params.setNewUser(user);
+		UserRegisterCall call = new UserRegisterCall(params);
+		workers.start(call, registerCallListener);
 
 		new RegisteringDialog().show(getSupportFragmentManager(), null);
 	}
 
-	private LoaderCallbacks<RegisterResponseData> registerCallbacks = new LoaderCallbacks<RegisterResponseData>() {
-		@Override
-		public Loader<RegisterResponseData> onCreateLoader(int id, Bundle args) {
-			RegisterRequestParams params = new RegisterRequestParams();
-			params.setNewUser((User) args.getSerializable("user"));
-
-			return new ApiCallAsyncLoader<RegisterRequestParams, RegisterResponseData>(
-					getApplicationContext(), ApiCallFactory.register(), params);
-		}
-
-		@Override
-		public void onLoadFinished(Loader<RegisterResponseData> loader, RegisterResponseData result) {
-			ApiCallAsyncLoader apiLoader = (ApiCallAsyncLoader) loader;
-			Exception e = apiLoader.getException();
-			if (e != null) {
-				CommonTool.showToast(RegisterActivity.this, e.toString());
-			} else {
-				finish();
-			}
-		}
-
-		@Override
-		public void onLoaderReset(Loader<RegisterResponseData> loader) {
-		}
-	};
-
-	public class MyPagerAdapter extends FragmentStatePagerAdapter {
+	private class MyPagerAdapter extends FragmentStatePagerAdapter {
 		private int mCutOffPage;
 		private Fragment mPrimaryItem;
 
@@ -255,7 +280,6 @@ public class RegisterActivity extends FragmentActivity implements PageFragmentCa
 				return new ReviewFragment();
 			}
 
-			System.out.println(mCurrentPageSequence.get(i).getClass());
 			return mCurrentPageSequence.get(i).createFragment();
 		}
 
@@ -290,6 +314,15 @@ public class RegisterActivity extends FragmentActivity implements PageFragmentCa
 
 		public int getCutOffPage() {
 			return mCutOffPage;
+		}
+	}
+
+	@SuppressWarnings("serial")
+	private static class ConfigSerializableWrapper implements Serializable {
+		private ConfigResponse config;
+
+		public ConfigSerializableWrapper(ConfigResponse config) {
+			this.config = config;
 		}
 	}
 
