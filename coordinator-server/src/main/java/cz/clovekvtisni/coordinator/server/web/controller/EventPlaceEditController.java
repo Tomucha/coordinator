@@ -72,6 +72,6 @@ public class EventPlaceEditController extends AbstractEventController {
         else
             poiEntity = poiService.updatePoi(poiEntity);
 
-        return "redirect:/admin/event/places?eventId=" + poiEntity.getEventId();
+        return "redirect:/admin/event/place/list?eventId=" + poiEntity.getEventId();
     }
 }

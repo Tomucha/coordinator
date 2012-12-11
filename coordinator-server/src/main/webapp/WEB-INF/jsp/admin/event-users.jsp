@@ -20,7 +20,7 @@
 
     <c:choose>
         <c:when test="${!empty userInEvents}">
-            <sf:form action="${root}/admin/event/users" method="post" modelAttribute="selectionForm">
+            <sf:form action="${root}/admin/event/user/list" method="post" modelAttribute="selectionForm">
                 <div class="eventListTable">
                     <sf:hidden path="eventId"/>
 

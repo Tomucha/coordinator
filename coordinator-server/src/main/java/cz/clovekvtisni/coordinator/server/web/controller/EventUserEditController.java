@@ -83,7 +83,7 @@ public class EventUserEditController extends AbstractEventController {
                 userInEventService.create(form.buildUserInEventEntity());
             }
 
-            return "redirect:/admin/event/users?eventId=" + form.getEventId();
+            return "redirect:/admin/event/user/list?eventId=" + form.getEventId();
 
         } catch (UniqueKeyViolation e) {
             addFieldError(bindingResult, "form", e.getProperty().toString().toLowerCase(), form.getEmail(), "error.UNIQUE_KEY_VIOLATION");
@@ -114,6 +114,6 @@ public class EventUserEditController extends AbstractEventController {
     }
 
     public static Breadcrumb getBreadcrumb(FilterParams params) {
-        return new Breadcrumb(params, "/admin/event/users", "breadcrumb.eventUsers");
+        return new Breadcrumb(params, "/admin/event/user/list", "breadcrumb.eventUsers");
     }
 }

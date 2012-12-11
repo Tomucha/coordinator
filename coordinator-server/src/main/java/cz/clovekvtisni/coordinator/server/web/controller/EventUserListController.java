@@ -33,7 +33,7 @@ import java.util.Set;
  * Date: 19.11.12
  */
 @Controller
-@RequestMapping("/admin/event/users")
+@RequestMapping("/admin/event/user/list")
 public class EventUserListController extends AbstractEventController {
 
     @Autowired
@@ -98,10 +98,10 @@ public class EventUserListController extends AbstractEventController {
             }
         }
 
-        return "redirect:/admin/event/users?eventId=" + selection.getEventId();
+        return "redirect:/admin/event/user/list?eventId=" + selection.getEventId();
     }
 
     public static Breadcrumb getBreadcrumb(FilterParams params) {
-        return new Breadcrumb(params, "/admin/event/users", "breadcrumb.eventUsers");
+        return new Breadcrumb(params, "/admin/event/user/list", "breadcrumb.eventUsers");
     }
 }

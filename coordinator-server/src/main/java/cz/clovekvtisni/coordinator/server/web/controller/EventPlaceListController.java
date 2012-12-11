@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * Date: 19.11.12
  */
 @Controller
-@RequestMapping("/admin/event/places")
+@RequestMapping("/admin/event/place/list")
 public class EventPlaceListController extends AbstractEventController {
 
     @Autowired
@@ -45,7 +45,7 @@ public class EventPlaceListController extends AbstractEventController {
     }
 
     public static Breadcrumb getBreadcrumb(FilterParams params) {
-        return new Breadcrumb(params, "/admin/event/places", "breadcrumb.eventPlaces");
+        return new Breadcrumb(params, "/admin/event/place/list", "breadcrumb.eventPlaces");
     }
 
 }
