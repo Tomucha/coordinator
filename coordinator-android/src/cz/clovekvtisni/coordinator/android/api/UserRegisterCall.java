@@ -6,7 +6,7 @@ import cz.clovekvtisni.coordinator.api.response.RegisterResponseData;
 public class UserRegisterCall extends ApiCall<RegisterRequestParams, RegisterResponseData> {
 
 	public UserRegisterCall(RegisterRequestParams requestParams) {
-		super("user", "register", requestParams, RegisterResponseData.class);
+		super("user/register", requestParams, RegisterResponseData.class);
 	}
 	
 	public static interface Listener extends ApiCall.Listener<RegisterResponseData> {

@@ -6,7 +6,7 @@ import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 public class ConfigCall extends ApiCall<EmptyRequestParams, ConfigResponse> {
 
 	public ConfigCall() {
-		super("config", "", new EmptyRequestParams(), ConfigResponse.class);
+		super("config", new EmptyRequestParams(), ConfigResponse.class);
 	}
 	
 	public static interface Listener extends ApiCall.Listener<ConfigResponse> {

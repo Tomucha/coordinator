@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android.event;
+package cz.clovekvtisni.coordinator.android.event.tasks;
 
 import com.actionbarsherlock.app.SherlockFragment;
 

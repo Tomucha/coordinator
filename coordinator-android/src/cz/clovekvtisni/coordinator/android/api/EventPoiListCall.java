@@ -3,10 +3,10 @@ package cz.clovekvtisni.coordinator.android.api;
 import cz.clovekvtisni.coordinator.api.request.OrganizationEventsRequestParams;
 import cz.clovekvtisni.coordinator.api.response.OrganizationEventsResponseData;
 
-public class OrganizationEventsCall extends
+public class EventPoiListCall extends
 		ApiCall<OrganizationEventsRequestParams, OrganizationEventsResponseData> {
 
-	public OrganizationEventsCall(OrganizationEventsRequestParams requestParams) {
+	public EventPoiListCall(OrganizationEventsRequestParams requestParams) {
 		super("organization/events", requestParams, OrganizationEventsResponseData.class);
 	}
 	

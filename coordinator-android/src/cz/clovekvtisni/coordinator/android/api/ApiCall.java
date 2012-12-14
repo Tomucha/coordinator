@@ -23,8 +23,8 @@ public class ApiCall<S extends RequestParams, T extends ApiResponseData> extends
 	private final Class<? extends T> resultClass;
 	private final String url;
 
-	public ApiCall(String entity, String operation, S requestParams, Class<? extends T> resultClass) {
-		this.url = URL_PREFIX + entity + "/" + operation;
+	public ApiCall(String urlSuffix, S requestParams, Class<? extends T> resultClass) {
+		this.url = URL_PREFIX + urlSuffix;
 		this.requestParams = requestParams;
 		this.resultClass = resultClass;
 	}
