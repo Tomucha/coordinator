@@ -284,7 +284,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         if (!organization.isAllowsPreRegistration())
             throw MaPermissionDeniedException.registrationNotAllowed();
 
-        return newUser;
+        return createUser(newUser);
     }
 
     @Override
@@ -311,7 +311,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         return ofy().transact(new Work<UserInEventEntity>() {
             @Override
             public UserInEventEntity run() {
-                UserEntity connectedUser = user;
+                UserEntity connectedUser = user.isNew() ? createUser(user) : user;
 
                 inEvent.setParentKey(connectedUser.getKey());
                 inEvent.setUserId(connectedUser.getId());
