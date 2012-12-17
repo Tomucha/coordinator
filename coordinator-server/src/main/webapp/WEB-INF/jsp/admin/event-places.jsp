@@ -9,7 +9,7 @@
     <div class="buttonPanel">
         <c:choose>
             <c:when test="${can:hasRole('BACKEND')}">
-                <a href="<s:url value="/admin/event/place/edit?eventId=${params.eventId}"/>"><s:message code="button.addNew"/></a>
+                <a class="btn" href="<s:url value="/admin/event/place/edit?eventId=${params.eventId}"/>"><s:message code="button.addNew"/></a>
             </c:when>
         </c:choose>
     </div>
@@ -17,7 +17,7 @@
     <c:choose>
         <c:when test="${!empty placeList}">
             <div class="dataList poiListTable">
-                <table>
+                <table class="table table-striped">
                     <thead>
                     <tr>
                         <th><s:message code="PoiEntity.poiCategory"/></th>
@@ -33,7 +33,7 @@
                             <td><tags:gps longitude="${poi.longitude}" latitude="${poi.latitude}"/></td>
                             <td><c:out value="${poi.userCount}"/></td>
                             <td>
-                                <a href="<s:url value="${root}/admin/event/place/edit?eventId=${poi.eventId}&placeId=${poi.id}"/>"><s:message code="button.edit"/></a>
+                                <a class="btn" href="<s:url value="${root}/admin/event/place/edit?eventId=${poi.eventId}&placeId=${poi.id}"/>"><s:message code="button.edit"/></a>
                             </td>
                         </tr>
                     </c:forEach>

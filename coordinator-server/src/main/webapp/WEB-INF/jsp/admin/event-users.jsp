@@ -13,7 +13,7 @@
     <div class="buttonPanel">
         <c:choose>
             <c:when test="${can:hasRole('BACKEND')}">
-                <a href="<s:url value="/admin/event/user/edit?eventId=${params.eventId}"/>"><s:message code="button.addNew"/></a>
+                <a class="btn" href="<s:url value="/admin/event/user/edit?eventId=${params.eventId}"/>"><s:message code="button.addNew"/></a>
             </c:when>
         </c:choose>
     </div>
@@ -24,7 +24,7 @@
                 <div class="eventListTable">
                     <sf:hidden path="eventId"/>
 
-                    <table>
+                    <table class="table table-striped">
                         <thead>
                         <tr>
                             <th></th>
@@ -39,12 +39,12 @@
                         <c:forEach items="${userInEvents}" var="userInEvent" begin="0" step="1" varStatus="i">
                             <tr>
                                 <td><input type="checkbox" name="selectedUsers[${i.index}]" value="${userInEvent.userId}"/></td>
-                                <td><c:out value="${userInEvent.userEntity.fullName}"/></td>
+                                <th><c:out value="${userInEvent.userEntity.fullName}"/></th>
                                 <td><c:out value="${userInEvent.userEntity.phone}"/></td>
                                 <td><c:out value="${userInEvent.status}"/></td>
                                 <td><c:out value="${userInEvent.userEntity.fullAddress}"/></td>
                                 <td>
-                                    <a href="<s:url value="${root}/admin/event/user/edit?eventId=${params.eventId}&userId=${userInEvent.userId}"/>"><s:message code="button.detail"/></a>
+                                    <a class="btn" href="<s:url value="${root}/admin/event/user/edit?eventId=${params.eventId}&userId=${userInEvent.userId}"/>"><s:message code="button.detail"/></a>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -54,8 +54,11 @@
 
                 <div>
                     <sf:select path="selectedAction" onchange="$('#selectedTaskIdSelect').toggle(this.value=='registerToTask')">
+                        <sf:option value=""/>
+                        <!--
                         <sf:option value="delete"><s:message code="label.delete"/></sf:option>
                         <sf:option value="suspend"><s:message code="label.suspend"/></sf:option>
+                        -->
                         <sf:option value="registerToTask"><s:message code="label.registerToTask"/></sf:option>
                     </sf:select>
 
@@ -72,7 +75,7 @@
                         </c:otherwise>
                     </c:choose>
 
-                    <button type="submit"><s:message code="button.submit"/></button>
+                    <button type="submit" class="btn"><s:message code="button.submit"/></button>
                 </div>
             </sf:form>
 

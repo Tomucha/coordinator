@@ -1,10 +1,27 @@
-.pageContentLeft {
-    width: 300px;
-    float: left;
-    margin-right: 12px;
-    margin-bottom: 12px;
+body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+}
+.sidebar-nav {
+    padding: 9px 0;
+}
+.buttonPanel {
+    margin-bottom: 2ex;
+}
+.pagesNavPanel {
+    text-align: right;
+}
+.checkboxList span label {
+    display: inline;
+    margin-left: 1em;
+}
+.checkboxList span {
+    display: block;
+    margin-bottom: 1ex;
+}
+#ui-datepicker-div {
     background-color: #eee;
 }
-.pageContentMain {
-    padding-left: 320px;
+#mapContainer img {
+    max-width: none !important;
 }

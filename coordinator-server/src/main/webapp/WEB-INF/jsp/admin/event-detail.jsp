@@ -13,6 +13,7 @@
                 $( "#dateClosedRegistrationInput" ).datepicker({dateFormat: "dd.mm.yy"});
             });
         </script>
+
         <sf:form method="POST" modelAttribute="form">
 
             <sf:errors />
@@ -31,9 +32,9 @@
                         </tags:input>
                     </c:when>
                     <c:otherwise>
-                        <p>
+                        <p class="lead">
                             <sf:hidden path="eventId"/>
-                            <c:out value="${form.eventEntity.name}"/>
+                            <b><s:message code="label.event"/>:</b> <c:out value="${form.eventEntity.name}"/>
                         </p>
                     </c:otherwise>
                 </c:choose>
@@ -79,12 +80,12 @@
                 </tags:input>
             </div>
 
-            <div class="panel">
+            <div class="panel checkboxList">
                 <h3><s:message code="header.equipmentList"/></h3>
                 <sf:checkboxes path="registrationEquipment" items="${config.equipmentList}" itemLabel="name" itemValue="id"/>
             </div>
 
-            <div class="panel">
+            <div class="panel checkboxList">
                 <h3><s:message code="header.skillList"/></h3>
                 <sf:checkboxes path="registrationSkills" items="${config.skillList}" itemLabel="name" itemValue="id"/>
             </div>

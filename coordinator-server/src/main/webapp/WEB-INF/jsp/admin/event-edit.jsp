@@ -90,7 +90,7 @@
 
             <div>
                 <tags:input field="description" modelAttribute="form" captionCode="label.description">
-                    <sf:textarea path="description" cols="72" rows="7"/>
+                    <sf:textarea path="description" cols="142" rows="7"/>
                 </tags:input>
             </div>
 

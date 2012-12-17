@@ -52,8 +52,10 @@
 </script>
 
 <div>
-    <h1><c:out value="${event.name}"/></h1>
+    <p class="lead"><b><s:message code="label.event"/>:</b> <c:out value="${event.name}"/></p>
+
     <p><c:out value="${event.description}"/></p>
+
     <div>
     <tags:osm
             width="90%"
@@ -66,9 +68,11 @@
 </div>
 
 <div id="locationPopup" style="display: none;">
+    <p><b><s:message code="label.eventLocation"/></b></p>
     <input type="hidden" name="id"/>
     <div>
-        <input name="radius" size="4" readonly="readonly"/> km</div>
+        Radius:<br/>
+        <input name="radius" size="2" readonly="readonly"/> km</div>
     <div>
         <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
     </div>

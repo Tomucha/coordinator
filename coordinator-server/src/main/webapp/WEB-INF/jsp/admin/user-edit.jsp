@@ -114,12 +114,12 @@
                 </div>
             </div>
 
-            <div class="panel">
+            <div class="panel checkboxList">
                 <h3><s:message code="header.equipmentList"/></h3>
                 <sf:checkboxes path="selectedEquipment" items="${config.equipmentList}" itemLabel="name" itemValue="id"/>
             </div>
 
-            <div class="panel">
+            <div class="panel checkboxList">
                 <h3><s:message code="header.skillList"/></h3>
                 <sf:checkboxes path="selectedSkill" items="${config.skillList}" itemLabel="name" itemValue="id"/>
             </div>

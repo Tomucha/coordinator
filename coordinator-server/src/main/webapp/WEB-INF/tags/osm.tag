@@ -96,7 +96,7 @@
                         popup = new OpenLayers.Popup(
                                 "Rozsah místa",
                                 marker.lonlat,
-                                new OpenLayers.Size(125, 100),
+                                new OpenLayers.Size(125, 150),
                                 win.html()
                         );
                         map.addPopup(popup);
@@ -332,8 +332,11 @@
 </script>
 <div id="mapContainer"></div>
 <div id="locationEditForm" style="display: none;">
-    <div><input type="hidden" name="id"/>
-    <input name="radius" size="4"/> km</div>
+    <div>
+        <p><b><s:message code="label.eventLocation"/></b></p>
+        <input type="hidden" name="id"/>
+        <input name="radius" size="4"/> km
+    </div>
     <div>
         <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
         <button type="button" onclick="CoordinatorMap.closeAndSavePopup()"><s:message code="button.ok"/></button>
@@ -342,8 +345,9 @@
 
 <div id="userForm" style="display: none;">
     <div>
+        <p><b><s:message code="label.userLastLocation"/></b></p>
         <input type="hidden" name="id"/>
-        <input name="name" readonly="readonly"/>
+        <input name="name" readonly="readonly" size="4"/>
         <form action="${root}/admin/event/user/edit">
             <div>
                 <input type="hidden" name="userId"/>
@@ -357,6 +361,7 @@
 
 <div id="poiForm" style="display: none;">
     <div>
+        <p><b><s:message code="label.poi"/></b></p>
         <input type="hidden" name="id"/>
         <input name="description" readonly="readonly"/>
         <form action="${root}/admin/event/place/edit">

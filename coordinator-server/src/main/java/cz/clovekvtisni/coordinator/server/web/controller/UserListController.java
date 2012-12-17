@@ -28,7 +28,7 @@ public class UserListController extends AbstractController {
         UserFilter filter = new UserFilter();
         filter.setOrganizationIdVal(admin.getOrganizationId());
 
-        model.addAttribute("userResult", userService.findByFilter(filter, 20, bookmark, 0l));
+        model.addAttribute("userResult", userService.findByFilter(filter, DEFAULT_LIST_LENGTH, bookmark, 0l));
 
         return "admin/user-list";
     }
