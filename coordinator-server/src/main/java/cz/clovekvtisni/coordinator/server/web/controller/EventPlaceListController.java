@@ -31,8 +31,8 @@ public class EventPlaceListController extends AbstractEventController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String list(@ModelAttribute("params") EventFilterParams params, @RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
-        if (params.getEventId() == null)
-            throw NotFoundException.idNotExist();
+        EventEntity event = loadEventById(params.getEventId());
+        model.addAttribute("event", event);
 
         PoiFilter filter = new PoiFilter();
         filter.setEventIdVal(params.getEventId());

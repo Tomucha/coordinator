@@ -2,6 +2,7 @@ package cz.clovekvtisni.coordinator.server.web.controller;
 
 import cz.clovekvtisni.coordinator.exception.MaException;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
+import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
@@ -39,8 +40,12 @@ public class EventUserEditController extends AbstractEventController {
     @RequestMapping(method = RequestMethod.GET)
     public String edit(@ModelAttribute("params") EventFilterParams params, @RequestParam(value = "userId", required = false) Long userId, Model model) {
 
+        EventEntity event = loadEventById(params.getEventId());
+        model.addAttribute("event", event);
+
         EventUserForm form = new EventUserForm();
         form.injectConfigValues(appContext, authorizationTool, config);
+
 
         if (userId != null) {
             UserEntity user = loadUserById(userId, 0l);

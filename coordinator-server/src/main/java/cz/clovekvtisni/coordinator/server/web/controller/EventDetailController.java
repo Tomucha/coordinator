@@ -57,6 +57,7 @@ public class EventDetailController extends AbstractEventController {
             OrganizationInEventEntity registration = result.firstResult();
             model.addAttribute("form", new OrganizationInEventForm().populateFrom(registration));
             populateEventModel(model, new EventFilterParams(registration.getEventEntity()));
+            model.addAttribute("event", registration.getEventEntity());
 
         } else {
             OrganizationInEventForm form = new OrganizationInEventForm();

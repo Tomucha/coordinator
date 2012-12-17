@@ -1,6 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
-import cz.clovekvtisni.coordinator.exception.NotFoundException;
+import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
@@ -41,8 +41,8 @@ public class EventUserListController extends AbstractEventController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String listUsers(@ModelAttribute("params") EventFilterParams params, Model model) {
-        if (params.getEventId() == null)
-            throw NotFoundException.idNotExist();
+        EventEntity event = loadEventById(params.getEventId());
+        model.addAttribute("event", event);
 
         UserInEventFilter inEventFilter = new UserInEventFilter();
         inEventFilter.setEventIdVal(params.getEventId());

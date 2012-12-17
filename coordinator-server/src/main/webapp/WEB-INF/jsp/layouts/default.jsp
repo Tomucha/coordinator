@@ -12,7 +12,7 @@
 <%--@elvariable id="root" type="java.lang.String"--%>
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <title>Coordinator</title>
+        <title>Coordinator<c:if test="${!empty event}"> - <c:out value="${event.name}"/></c:if></title>
 
         <link type="text/css" href="${root}/css/coordinator.css" rel="stylesheet"/>
         <link href="${root}/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -31,7 +31,7 @@
         <div class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container-fluid">
-                    <a href="${root}/" class="brand">Coordinator - Člověk v tísni</a>
+                    <a href="${root}/" class="brand">Coordinator - Člověk v tísni<c:if test="${!empty event}"> - <c:out value="${event.name}"/></c:if></a>
                     <div class="nav-collapse collapse">
                         <p class="navbar-text pull-right">
                             <c:if test="${!empty loggedUser}">

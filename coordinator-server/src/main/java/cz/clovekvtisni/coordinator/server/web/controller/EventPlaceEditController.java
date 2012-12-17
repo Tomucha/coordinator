@@ -36,9 +36,11 @@ public class EventPlaceEditController extends AbstractEventController {
             @RequestParam(value = "placeId", required = false) Long placeId,
             Model model) {
 
+        EventEntity event = loadEventById(params.getEventId());
+        model.addAttribute("event", event);
+
         PoiForm form;
         if (placeId == null) {
-            EventEntity event = loadEventById(params.getEventId());
             UserEntity user = getLoggedUser();
             form = new PoiForm();
             form.setEventId(event.getId());

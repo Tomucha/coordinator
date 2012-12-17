@@ -39,6 +39,7 @@ public class EventMapController extends AbstractEventController {
         if (params.getEventId() == null)
             throw NotFoundException.idNotExist();
         EventEntity event = loadEventById(params.getEventId());
+        model.addAttribute("event", event);
         populateEventModel(model, params);
 
         UserInEventFilter userInEventFilter = new UserInEventFilter();
@@ -50,8 +51,6 @@ public class EventMapController extends AbstractEventController {
         poiFilter.setEventIdVal(event.getId());
         ResultList<PoiEntity> places = poiService.findByFilter(poiFilter, 0, null, PoiService.FLAG_FETCH_FROM_CONFIG);
         model.addAttribute("placeList", places.getResult());
-
-        model.addAttribute("event", event);
 
         return "admin/event-map";
     }

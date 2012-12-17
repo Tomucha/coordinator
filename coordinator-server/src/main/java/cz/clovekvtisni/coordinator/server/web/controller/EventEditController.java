@@ -29,8 +29,11 @@ public class EventEditController extends AbstractEventController {
     public String edit(@ModelAttribute("params") EventFilterParams params, Model model) {
         EventForm form = new EventForm();
 
-        if (params.getEventId() != null)
-            form.populateFrom(loadEventById(params.getEventId()));
+        if (params.getEventId() != null) {
+            EventEntity eventEntity = loadEventById(params.getEventId());
+            model.addAttribute("event", eventEntity);
+            form.populateFrom(eventEntity);
+        }
 
         populateEventModel(model, params);
         model.addAttribute("form", form);
