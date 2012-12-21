@@ -14,6 +14,7 @@ import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.UserMultiSelection;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
+import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,13 +47,13 @@ public class EventUserListController extends AbstractEventController {
 
         UserInEventFilter inEventFilter = new UserInEventFilter();
         inEventFilter.setEventIdVal(params.getEventId());
-        if (params.getUserFulltext() != null) {
-            final String fullText = params.getUserFulltext();
+        if (!ValueTool.isEmpty(params.getUserFulltext())) {
+            final String fullText = params.getUserFulltext().trim().toLowerCase();
             inEventFilter.addAfterLoadCallback(new Filter.AfterLoadCallback<UserInEventEntity>() {
                 @Override
                 public boolean accept(UserInEventEntity entity) {
                     UserEntity user = entity.getUserEntity();
-                    return user.getFullName() != null && user.getFullName().contains(fullText);
+                    return user != null && user.getFullName() != null && user.getFullName().toLowerCase().contains(fullText);
                 }
             });
         }

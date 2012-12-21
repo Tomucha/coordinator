@@ -18,6 +18,14 @@
         </c:choose>
     </div>
 
+    <sf:form action="" modelAttribute="params" method="get">
+        <div class="searchFormPanel">
+            <sf:hidden path="eventId"/>
+            <label><s:message code="label.name"/>: <sf:input path="userFulltext"/></label>
+            <button type="submit" class="btn"><s:message code="button.filterList"/></button>
+        </div>
+    </sf:form>
+
     <c:choose>
         <c:when test="${!empty userInEvents}">
             <sf:form action="${root}/admin/event/user/list" method="post" modelAttribute="selectionForm">
