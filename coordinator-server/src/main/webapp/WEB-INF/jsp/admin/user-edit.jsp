@@ -21,7 +21,7 @@
     <div class="userForm">
         <sf:form method="POST" action="${root}/admin/user/edit" modelAttribute="form">
 
-            <sf:errors />
+            <sf:errors cssClass="alert alert-error" element="div" />
 
             <div class="formPanel">
                 <c:if test="${can:isSuperadmin() and empty form.id}">
