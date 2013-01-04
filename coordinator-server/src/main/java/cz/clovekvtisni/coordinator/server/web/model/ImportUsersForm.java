@@ -13,32 +13,34 @@ public class ImportUsersForm {
 
     private String organizationId;
 
-    private String[] typ;
+    private List<String> typ;
 
-    private String[][] val;
+    private List<List<String>> val;
 
-    public String[] getTyp() {
+    private List<Integer> checked;
+
+    public List<String> getTyp() {
         return typ;
     }
 
-    public void setTyp(String[] typ) {
+    public void setTyp(List<String> typ) {
         this.typ = typ;
     }
 
-    public String[][] getVal() {
+    public List<List<String>> getVal() {
         return val;
     }
 
-    public void setVal(String[][] val) {
+    public void setVal(List<List<String>> val) {
         this.val = val;
     }
 
     public int getRowCount() {
-        return val != null ? val.length : 0;
+        return val != null ? val.size() : 0;
     }
 
     public int getColCount() {
-        return val != null && val[0] != null ? val[0].length : 0;
+        return val != null && val.get(0) != null ? val.get(0).size() : 0;
     }
 
     public Long getEventId() {
@@ -55,5 +57,13 @@ public class ImportUsersForm {
 
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    public List<Integer> getChecked() {
+        return checked;
+    }
+
+    public void setChecked(List<Integer> checked) {
+        this.checked = checked;
     }
 }

@@ -4,17 +4,23 @@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags"
 
-%><h2><s:message code="header.importUsers"/></h2>
+%><script type="text/javascript">
+    function disableInputs(checkbox) {
+        $(checkbox).parent().parent().find("input[type=text]").attr("disabled", !checkbox.checked);
+    }
+</script>
+<h2><s:message code="header.importUsers"/></h2>
 
 <c:if test="${form.rowCount > 0}">
-    <sf:form modelAttribute="form">
+    <sf:form modelAttribute="form" action="${root}/admin/import/data">
         <div class="importTablePanel">
 
             <sf:errors />
 
             <table class="table">
                 <thead>
-                    <c:forEach step="1" begin="0" end="${form.colCount}" var="colIndex">
+                    <th style="width:2em"></th>
+                    <c:forEach step="1" begin="0" end="${form.colCount - 1}" var="colIndex">
                         <th>
                             <sf:select path="typ[${colIndex}]" items="${colTypes}"/>
                         </th>
@@ -23,9 +29,12 @@
                 <tbody>
                     <c:forEach begin="0" step="1" end="${form.rowCount - 1}" varStatus="rowIndex">
                         <tr>
-                            <c:forEach begin="0" step="1" end="${form.colCount}" varStatus="cellIndex">
+                            <td>
+                                <sf:checkbox path="checked[${rowIndex.index}]" value="${rowIndex.index}" onclick="disableInputs(this)"/>
+                            </td>
+                            <c:forEach begin="0" step="1" end="${form.colCount - 1}" varStatus="cellIndex">
                                 <td>
-                                    <sf:input path="val[${rowIndex.index}][${cellIndex.index}"/>
+                                    <sf:input path="val[${rowIndex.index}][${cellIndex.index}]"/>
                                 </td>
                             </c:forEach>
                         </tr>

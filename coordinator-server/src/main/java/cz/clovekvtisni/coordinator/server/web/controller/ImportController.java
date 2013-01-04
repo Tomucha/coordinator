@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
 import au.com.bytecode.opencsv.CSVReader;
+import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.web.model.ImportFileForm;
 import cz.clovekvtisni.coordinator.server.web.model.ImportUsersForm;
 import org.apache.commons.fileupload.FileItemIterator;
@@ -9,19 +10,15 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -39,19 +36,31 @@ public class ImportController extends AbstractController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String onFormSubmit(HttpServletRequest request, Model model) {
+    public String onPostCsvFile(@ModelAttribute("importFileForm") ImportFileForm fileForm, HttpServletRequest request, BindingResult bindingResult, Model model) {
 
         ImportUsersForm form = new ImportUsersForm();
         populateForm(form, request);
 
         if (form.getRowCount() == 0) {
-            //bindingResult.addError(new ObjectError("global", "empty csv file"));
+            addFormError(bindingResult, "error.emptyCsvFile");
+
+        } else if (form.getOrganizationId() == null) {
+            throw NotFoundException.idNotExist("organization", null);
 
         } else {
             model.addAttribute("form", form);
         }
 
         return "admin/import-data-form";
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/data")
+    public String onPostData(@ModelAttribute("importUsersForm") @Valid ImportUsersForm usersForm, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            return "admin/import-data-form";
+        }
+
+        return "admin/user/list";
     }
 
     @ModelAttribute("colTypes")
@@ -82,7 +91,16 @@ public class ImportController extends AbstractController {
 
                 if (!item.isFormField() && name.equals("csvFile")) {
                     CSVReader reader = new CSVReader(new InputStreamReader(inputStream), ';', '"');
-                    form.setVal(reader.readAll().toArray(new String[0][0]));
+                    List<String[]> data = reader.readAll();
+                    List<List<String>> vals = new ArrayList<List<String>>();
+                    for (String[] cells : data) {
+                        vals.add(Arrays.asList(cells));
+                    }
+                    form.setVal(vals);
+                    List<Integer> checked = new ArrayList<Integer>(vals.size());
+                    for (int i = 0 ; i < vals.size() ; i++)
+                        checked.add(i);
+                    form.setChecked(checked);
 
                 } else if (name.equals("organizationId")) {
                     form.setOrganizationId(readStream(inputStream));
