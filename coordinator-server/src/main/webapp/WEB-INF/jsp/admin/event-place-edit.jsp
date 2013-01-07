@@ -5,10 +5,6 @@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %><script type="text/javascript">
-    CoordinatorMap.clickHandlers[TYPE_POI] = function(point) {
-        return null;
-    };
-
     function onNewPoint(point) {
        $("#latitudeInput").val(point.latitude);
        $("#longitudeInput").val(point.longitude);
@@ -39,14 +35,18 @@
 
 
     function initialize() {
-    <c:if test="${!empty form.latitude and !empty form.longitude}">
+        CoordinatorMap.clickHandlers[TYPE_POI] = function(point) {
+            return null;
+        };
+
+        <c:if test="${!empty form.latitude and !empty form.longitude}">
         CoordinatorMap.addPoint({
             type: TYPE_POI,
             placeId: <c:out value="${form.id}"/>,
             longitude: <c:out value="${form.longitude}"/>,
             latitude: <c:out value="${form.latitude}"/>
         });
-    </c:if>
+        </c:if>
     }
 
 </script>
@@ -115,7 +115,7 @@
                 </div>
 
                 <div id="workflowStateBox">
-                    <tags:input field="workflowStateId" modelAttribute="form" caption="PoiEntity.workflowState">
+                    <tags:input field="workflowStateId" modelAttribute="form" captionCode="PoiEntity.workflowState">
                         <sf:select id="workflowStateSelect" path="workflowStateId">
                             <sf:option value=""></sf:option>
                             <c:forEach items="${config.workflowList}" var="workflow">
@@ -139,6 +139,7 @@
 </div>
 <script type="text/javascript">
     $(function() {
-        showWorkflowStates();
+        if ($("#workflowSelect").val() == "")
+            $("#workflowStateBox").hide();
     });
 </script>

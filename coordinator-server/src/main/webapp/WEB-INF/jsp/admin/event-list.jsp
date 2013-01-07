@@ -37,19 +37,16 @@
                         <tr>
                             <th><c:out value="${event.name}"/></th>
                             <td>
-                                <c:if test="${!empty event.eventLocationEntityList}">
-                                    <c:forEach items="${event.eventLocationEntityList}" var="location">
-                                        <div><tags:gps longitude="${location.longitude}" latitude="${location.latitude}"/></div>
-                                    </c:forEach>
+                                <c:if test="${!empty event.firstEventLocation}">
+                                    <c:set value="${event.firstEventLocation}" var="location"/>
+                                    <div>
+                                        <tags:gps longitude="${location.longitude}" latitude="${location.latitude}"/>
+                                    </div>
                                 </c:if>
                             </td>
                             <td>
-                                <c:if test="${!empty event.eventLocationEntityList}">
-                                    <c:forEach items="${event.eventLocationEntityList}" var="location">
-                                        <c:if test="${!empty location.radius}">
-                                            <div><c:out value="${location.radius}"/> km</div>
-                                        </c:if>
-                                    </c:forEach>
+                                <c:if test="${!empty location.radius}">
+                                    <div><c:out value="${location.radius}"/> km</div>
                                 </c:if>
                             </td>
                             <td>
