@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.model;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -15,6 +16,7 @@ public class ImportUsersForm {
 
     private List<String> typ;
 
+    @NotNull
     private List<List<String>> val;
 
     private List<Integer> checked;

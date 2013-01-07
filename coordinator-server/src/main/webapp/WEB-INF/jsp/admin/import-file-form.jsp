@@ -6,16 +6,23 @@
 
 %><h2><s:message code="header.importUsers"/></h2>
 
-<sf:form enctype="multipart/form-data" action="${root}/admin/import" modelAttribute="importFileForm">
+<c:choose>
+    <c:when test="${isValid}">
+        <sf:form enctype="multipart/form-data" action="${root}/admin/import" modelAttribute="importFileForm">
 
-    <sf:errors cssClass="alert alert-error" element="div" />
+            <sf:errors cssClass="alert alert-error" element="div" />
 
-    <div class="importTablePanel">
-        <sf:hidden path="eventId"/>
-        <sf:hidden path="organizationId"/>
-        <input type="file" name="csvFile"/>
-    </div>
-    <div>
-        <button class="btn" type="submit"><s:message code="button.submit"/></button>
-    </div>
-</sf:form>
+            <div class="importTablePanel">
+                <sf:hidden path="eventId"/>
+                <sf:hidden path="organizationId"/>
+                <input type="file" name="csvFile"/>
+            </div>
+            <div>
+                <button class="btn" type="submit"><s:message code="button.submit"/></button>
+            </div>
+        </sf:form>
+    </c:when>
+    <c:otherwise>
+        <p class="alert alert-error"><s:message code="error.NO_ORGANIZATION_OR_EVENT_ID"/></p>
+    </c:otherwise>
+</c:choose>

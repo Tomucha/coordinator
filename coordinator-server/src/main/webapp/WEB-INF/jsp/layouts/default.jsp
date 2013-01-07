@@ -31,7 +31,7 @@
         <div class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container-fluid">
-                    <a href="${root}/" class="brand">Coordinator - Člověk v tísni<c:if test="${!empty event}"> - <c:out value="${event.name}"/></c:if></a>
+                    <a href="${root}/admin" class="brand">Coordinator - Člověk v tísni<c:if test="${!empty event}"> - <c:out value="${event.name}"/></c:if></a>
                     <div class="nav-collapse collapse">
                         <p class="navbar-text pull-right">
                             <c:if test="${!empty loggedUser}">

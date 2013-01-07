@@ -14,6 +14,9 @@
         <c:choose>
             <c:when test="${can:hasRole('BACKEND')}">
                 <a class="btn" href="<s:url value="/admin/event/user/edit?eventId=${params.eventId}"/>"><s:message code="button.addNew"/></a>
+                <c:if test="${!empty loggedUser.organizationId}">
+                    <a class="btn" href="<s:url value="/admin/import?eventId=${params.eventId}&organizationId=${loggedUser.organizationId}"/>"><s:message code="button.import"/></a>
+                </c:if>
             </c:when>
         </c:choose>
     </div>

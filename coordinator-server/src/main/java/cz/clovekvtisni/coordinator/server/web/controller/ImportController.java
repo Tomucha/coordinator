@@ -2,6 +2,11 @@ package cz.clovekvtisni.coordinator.server.web.controller;
 
 import au.com.bytecode.opencsv.CSVReader;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
+import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
+import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.UniqueKeyViolation;
 import cz.clovekvtisni.coordinator.server.web.model.ImportFileForm;
 import cz.clovekvtisni.coordinator.server.web.model.ImportUsersForm;
 import org.apache.commons.fileupload.FileItemIterator;
@@ -32,6 +37,7 @@ public class ImportController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String showForm(@ModelAttribute("importFileForm") @Valid ImportFileForm form, BindingResult bindingResult, Model model) {
+        model.addAttribute("isValid", !bindingResult.hasErrors());
         return "admin/import-file-form";
     }
 
@@ -39,6 +45,8 @@ public class ImportController extends AbstractController {
     public String onPostCsvFile(@ModelAttribute("importFileForm") ImportFileForm fileForm, HttpServletRequest request, BindingResult bindingResult, Model model) {
 
         ImportUsersForm form = new ImportUsersForm();
+        form.setEventId(fileForm.getEventId());
+        form.setOrganizationId(fileForm.getOrganizationId());
         populateForm(form, request);
 
         if (form.getRowCount() == 0) {
@@ -55,12 +63,91 @@ public class ImportController extends AbstractController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/data")
-    public String onPostData(@ModelAttribute("importUsersForm") @Valid ImportUsersForm usersForm, BindingResult bindingResult, Model model) {
+    public String onPostData(@ModelAttribute("form") @Valid ImportUsersForm usersForm, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return "admin/import-data-form";
         }
 
-        return "admin/user/list";
+        List<String> types = usersForm.getTyp();
+        List<Integer> checked = usersForm.getChecked();
+        List<List<String>> vals = usersForm.getVal();
+        Map<Integer, String> errorMap = new HashMap<Integer, String>();
+        List<List<String>> errorVals = new ArrayList<List<String>>();
+        for (int i = 0; i < vals.size(); i++) {
+            if (!checked.contains(i))
+                continue;
+            List<String> row = vals.get(i);
+            UserEntity user = fetchUser(types, row);
+            user.setOrganizationId(usersForm.getOrganizationId());
+            UserInEventEntity inEvent = new UserInEventEntity();
+            inEvent.setEventId(usersForm.getEventId());
+            try {
+                userService.register(user, inEvent, UserService.FLAG_FORCE_REGISTRATION);
+
+            } catch (UniqueKeyViolation e) {
+                errorVals.add(row);
+                if (e.getProperty() == UniqueIndexEntity.Property.EMAIL) {
+                    errorMap.put(errorVals.size() - 1, "error.EMAIL_VIOLATION");
+
+                } else
+                    errorMap.put(errorVals.size() - 1, "error.UNIQUE_KEY_VIOLATION");
+
+            } catch (Exception e) {
+                errorVals.add(row);
+                errorMap.put(errorVals.size() - 1, "error.unknown");
+            }
+        }
+
+        if (errorMap.size() > 0) {
+            usersForm.setVal(errorVals);
+            checked = new ArrayList<Integer>(vals.size());
+            for (int i = 0 ; i < vals.size() ; i++)
+                checked.add(i);
+            usersForm.setChecked(checked);
+            model.addAttribute("errorMap", errorMap);
+            return "admin/import-data-form";
+
+        } else {
+            return "redirect: /admin/event/user/list?eventId=" + usersForm.getEventId();
+        }
+    }
+
+    private UserEntity fetchUser(List<String> types, List<String> row) {
+        if (types.size() != row.size())
+            return null;
+        UserEntity user = new UserEntity();
+        for (int i = 0; i < types.size(); i++) {
+            String typeName = types.get(i);
+            String value = row.get(i);
+            if ("UserEntity.firstName".equals(typeName)) {
+                user.setFirstName(value);
+
+            } else if ("UserEntity.lastName".equals(typeName)) {
+                user.setLastName(value);
+
+            } else if ("UserEntity.email".equals(typeName)) {
+                user.setEmail(value);
+
+            } else if ("UserEntity.phone".equals(typeName)) {
+                user.setPhone(value);
+
+            } else if ("UserEntity.birthday".equals(typeName)) {
+                // TODO
+
+            } else if ("UserEntity.addressLine".equals(typeName)) {
+                user.setAddressLine(value);
+
+            } else if ("UserEntity.city".equals(typeName)) {
+                user.setCity(value);
+
+            } else if ("UserEntity.zip".equals(typeName)) {
+                user.setZip(value);
+
+            } else if ("UserEntity.country".equals(typeName)) {
+                user.setCountry(value);
+            }
+        }
+        return user;
     }
 
     @ModelAttribute("colTypes")

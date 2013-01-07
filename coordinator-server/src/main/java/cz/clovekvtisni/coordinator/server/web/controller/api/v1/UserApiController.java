@@ -1,6 +1,9 @@
 package cz.clovekvtisni.coordinator.server.web.controller.api.v1;
 
-import cz.clovekvtisni.coordinator.api.request.*;
+import cz.clovekvtisni.coordinator.api.request.LoginRequestParams;
+import cz.clovekvtisni.coordinator.api.request.RegisterRequestParams;
+import cz.clovekvtisni.coordinator.api.request.UserByIdRequestParams;
+import cz.clovekvtisni.coordinator.api.request.UserListRequestParams;
 import cz.clovekvtisni.coordinator.api.response.*;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
@@ -10,7 +13,6 @@ import cz.clovekvtisni.coordinator.server.domain.UserAuthKey;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
-import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
@@ -71,11 +73,11 @@ public class UserApiController extends AbstractApiController {
         UserEntity user;
         if (inEvent != null) {
             UserInEventEntity inEventEntity = new UserInEventEntity().populateFrom(inEvent);
-            UserInEventEntity regResult = userService.register(newUserEntity, inEventEntity);
+            UserInEventEntity regResult = userService.register(newUserEntity, inEventEntity, 0l);
             user = regResult.getUserEntity();
 
         } else {
-            user = userService.preRegister(newUserEntity);
+            user = userService.preRegister(newUserEntity, 0l);
         }
 
         RegisterResponseData responseData = new RegisterResponseData(user.buildTargetEntity());

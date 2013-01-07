@@ -118,6 +118,11 @@ public abstract class AbstractController {
         return config;
     }
 
+    @ModelAttribute("loggedUser")
+    public UserEntity loggedUser() {
+        return getLoggedUser();
+    }
+
     protected UserEntity loadUserById(Long id, long flags) {
         UserEntity user = userService.findById(id, flags);
         if (user == null)

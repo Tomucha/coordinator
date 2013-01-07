@@ -275,7 +275,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     @Override
-    public UserEntity preRegister(UserEntity newUser) {
+    public UserEntity preRegister(UserEntity newUser, long flags) {
         Organization organization = organizationService.findById(newUser.getOrganizationId(), 0l);
 
         if (organization == null)
@@ -288,13 +288,14 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     @Override
-    public UserInEventEntity register(final UserEntity user, final UserInEventEntity inEvent) {
+    public UserInEventEntity register(final UserEntity user, final UserInEventEntity inEvent, long flags) {
         Organization organization = organizationService.findById(user.getOrganizationId(), 0l);
+        boolean isForceRegistration = (flags & FLAG_FORCE_REGISTRATION) != 0;
 
         if (organization == null)
             throw new IllegalArgumentException("Not existed organization id in " + user);
 
-        if (!organization.isAllowsRegistration())
+        if (!isForceRegistration && !organization.isAllowsRegistration())
             throw MaPermissionDeniedException.registrationNotAllowed();
 
         OrganizationInEventFilter filter = new OrganizationInEventFilter();
@@ -302,10 +303,10 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         filter.setEventIdVal(inEvent.getEventId());
         OrganizationInEventEntity info = organizationInEventService.findByFilter(filter, 1, null, 0l).firstResult();
 
-        if (info == null
+        if (!isForceRegistration && (info == null
             || (info.getDateClosedRegistration() != null && info.getDateClosedRegistration().compareTo(new Date()) < 0)
             || !user.getOrganizationId().equals(info.getOrganizationId())
-        )
+        ))
             throw MaPermissionDeniedException.registrationNotAllowed();
 
         return ofy().transact(new Work<UserInEventEntity>() {

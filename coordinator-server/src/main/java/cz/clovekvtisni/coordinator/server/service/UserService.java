@@ -24,6 +24,8 @@ public interface UserService extends Service {
 
     public static final long FLAG_FETCH_SKILLS = 2l;
 
+    public static final long FLAG_FORCE_REGISTRATION = 4l;
+
     @Anonymous
     UserEntity login(String login, String password, String... hasRoles) throws MaPermissionDeniedException;
 
@@ -55,8 +57,8 @@ public interface UserService extends Service {
     UserEntity getByAuthKey(String key);
 
     @Anonymous(Anonymous.Mode.PROPAGATE)
-    UserEntity preRegister(UserEntity newUser);
+    UserEntity preRegister(UserEntity newUser, long flags);
 
     @Anonymous(Anonymous.Mode.PROPAGATE)
-    UserInEventEntity register(UserEntity newUser, UserInEventEntity event);
+    UserInEventEntity register(UserEntity newUser, UserInEventEntity event, long flags);
 }

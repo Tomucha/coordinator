@@ -14,6 +14,8 @@
 <c:if test="${form.rowCount > 0}">
     <sf:form modelAttribute="form" action="${root}/admin/import/data">
         <div class="importTablePanel">
+            <sf:hidden path="eventId"/>
+            <sf:hidden path="organizationId"/>
 
             <sf:errors />
 
@@ -37,6 +39,9 @@
                                     <sf:input path="val[${rowIndex.index}][${cellIndex.index}]"/>
                                 </td>
                             </c:forEach>
+                            <c:if test="${!empty errorMap[rowIndex.index]}">
+                                <td><span class="alert alert-error"><s:message code="${errorMap[rowIndex.index]}"/></span></td>
+                            </c:if>
                         </tr>
                     </c:forEach>
                 </tbody>
