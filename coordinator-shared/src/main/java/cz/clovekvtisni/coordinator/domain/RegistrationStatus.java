@@ -6,5 +6,5 @@ package cz.clovekvtisni.coordinator.domain;
  * Date: 9.12.12
  */
 public enum RegistrationStatus {
-    INVITED, CONFIRMED, SUSPENDED
+    INVITED, CONFIRMED, EXPELLED
 }

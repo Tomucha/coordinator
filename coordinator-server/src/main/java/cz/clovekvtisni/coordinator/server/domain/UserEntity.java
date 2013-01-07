@@ -65,6 +65,10 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     public UserEntity() {
     }
 
+    public UserEntity(Long id) {
+        setId(id);
+    }
+
     @Override
     protected User createTargetEntity() {
         return new User();
@@ -282,6 +286,10 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
             str.append((str.length() == 0 ? "" : ", ") + country);
 
         return str.toString();
+    }
+
+    public boolean isSuspended() {
+        return dateSuspended != null;
     }
 
     @Override

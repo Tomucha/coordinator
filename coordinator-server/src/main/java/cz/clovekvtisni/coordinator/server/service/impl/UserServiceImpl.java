@@ -80,13 +80,13 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     public UserEntity findById(Long id, long flags) {
         UserEntity userEntity = ofy().load().key(Key.create(UserEntity.class, id)).get();
 
-        populateUsers(Arrays.asList(new UserEntity[]{userEntity}), flags);
+        populate(Arrays.asList(new UserEntity[]{userEntity}), flags);
 
         return userEntity;
 
     }
 
-    private void populateUsers(Collection<UserEntity> entities, long flags) {
+    private void populate(Collection<UserEntity> entities, long flags) {
         for (UserEntity userEntity : entities) {
             if ((flags & FLAG_FETCH_EQUIPMENT) != 0) {
                 UserEquipmentFilter filter = new UserEquipmentFilter();
@@ -340,8 +340,18 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         }
 
         Map<Key<UserEntity>, UserEntity> entityMap = ofy().get(keys);
-        populateUsers(entityMap.values(), flags);
+        populate(entityMap.values(), flags);
 
         return new ArrayList<UserEntity>(entityMap.values());
+    }
+
+    @Override
+    public UserEntity suspendUser(Long id, String reason, long flags) {
+        UserEntity user = findById(id, 0l);
+        if (user == null || user.getDateSuspended() != null)
+            return user;
+        user.setDateSuspended(new Date());
+        user.setReasonSuspended(reason);
+        return updateUser(user);
     }
 }

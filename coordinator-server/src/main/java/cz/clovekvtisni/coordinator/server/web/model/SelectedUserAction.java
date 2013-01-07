@@ -6,5 +6,5 @@ package cz.clovekvtisni.coordinator.server.web.model;
  * Date: 7.1.13
  */
 public enum SelectedUserAction {
-    DELETE, SUSPEND, REGISTER_TO_TASK
+    EXPEL, CONFIRM, SUSPEND, REGISTER_TO_TASK
 }

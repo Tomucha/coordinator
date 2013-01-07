@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
+import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
@@ -79,18 +80,29 @@ public class EventUserListController extends AbstractEventController {
 
     @RequestMapping(method = RequestMethod.POST)
     public String onSelectedAction(@ModelAttribute("selectionForm") @Valid UserMultiSelection selection, BindingResult bindingResult) {
-        List<Long> users = selection.getSelectedUsers();
+        List<Long> userIds = selection.getSelectedUsers();
         SelectedUserAction action = selection.getSelectedAction();
-        if (users != null && users.size() > 0 && action != null)  {
+        if (userIds != null && userIds.size() > 0 && action != null)  {
             Long placeId = selection.getSelectedTaskId();
 
             switch (action) {
-                case DELETE:
-                    // TODO
+                case EXPEL:
+                case CONFIRM:
+                    UserInEventFilter filter = new UserInEventFilter();
+                    filter.setEventIdVal(selection.getEventId());
+                    ResultList<UserInEventEntity> inEventEntities = userInEventService.findByFilter(filter, 0, null, 0l);
+                    RegistrationStatus status = action == SelectedUserAction.CONFIRM ? RegistrationStatus.CONFIRMED : RegistrationStatus.EXPELLED;
+                    for (UserInEventEntity inEventEntity : inEventEntities) {
+                        if (userIds.contains(inEventEntity.getUserId()))
+                            userInEventService.changeStatus(inEventEntity, status);
+                    }
                     break;
 
                 case SUSPEND:
-                    // TODO
+                    for (Long userId : userIds) {
+                        if (userId != null)
+                            userService.suspendUser(userId, selection.getSuspendReason(), 0l);
+                    }
                     break;
 
                 case REGISTER_TO_TASK:
@@ -100,7 +112,7 @@ public class EventUserListController extends AbstractEventController {
                         Long[] registered = place.getUserId();
                         if (registered != null)
                             updateList.addAll(Arrays.asList(registered));
-                        for (Long userId : users)
+                        for (Long userId : userIds)
                             updateList.add(userId);
                         place.setUserId(updateList.toArray(new Long[0]));
                         poiService.updatePoi(place);

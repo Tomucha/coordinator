@@ -6,7 +6,16 @@
     taglib prefix="can" uri="/WEB-INF/permissions.tld" %><%@
     taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %><%@
     taglib prefix="tags" tagdir="/WEB-INF/tags"
-%>
+%><script type="text/javascript">
+    function onDataSubmit() {
+        if ($("#inputSelectedAction").val() == "SUSPEND") {
+            $('#suspendReasonModal').modal({});
+            return false;
+
+        } else
+            return true;
+    }
+</script>
 <h2><s:message code="header.userList"/></h2>
 
 <div class="mainPanel">
@@ -52,7 +61,16 @@
                                 <td><input type="checkbox" name="selectedUsers[${i.index}]" value="${userInEvent.userId}"/></td>
                                 <th><c:out value="${userInEvent.userEntity.fullName}"/></th>
                                 <td><c:out value="${userInEvent.userEntity.phone}"/></td>
-                                <td><c:out value="${userInEvent.status}"/></td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${userInEvent.userEntity.suspended}">
+                                            <span class="alert alert-error" title="<c:out value="${userInEvent.userEntity.reasonSuspended}"/>"><s:message code="label.suspended"/></span>
+                                        </c:when>
+                                        <c:when test="${!empty userInEvent.status}">
+                                            <s:message code="RegistrationStatus.${userInEvent.status}"/>
+                                        </c:when>
+                                    </c:choose>
+                                </td>
                                 <td><c:out value="${userInEvent.userEntity.fullAddress}"/></td>
                                 <td>
                                     <a class="btn" href="<s:url value="${root}/admin/event/user/edit?eventId=${params.eventId}&userId=${userInEvent.userId}"/>"><s:message code="button.detail"/></a>
@@ -64,7 +82,7 @@
                 </div>
 
                 <div>
-                    <sf:select path="selectedAction" onchange="$('#selectedTaskIdSelect').toggle(this.value=='REGISTER_TO_TASK')">
+                    <sf:select id="inputSelectedAction" path="selectedAction" onchange="$('#selectedTaskIdSelect').toggle(this.value=='REGISTER_TO_TASK')">
                         <sf:option value=""/>
                         <c:forEach items="${selectedUserActions}" var="action">
                             <sf:option value="${action}"><s:message code="SelectedUserAction.${action}"/></sf:option>
@@ -84,7 +102,22 @@
                         </c:otherwise>
                     </c:choose>
 
-                    <button type="submit" class="btn"><s:message code="button.submit"/></button>
+                    <%-- Suspend reason modal --%>
+                    <div id="suspendReasonModal" class="modal hide fade">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h3><s:message code="modalTitle.writeSuspendReason"/></h3>
+                        </div>
+                        <div class="modal-body">
+                            <p><sf:textarea path="suspendReason" cols="74" rows="9" cssStyle="width:90%"/></p>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" onclick="return onDataSubmit()"><s:message code="button.submit"/></button>
                 </div>
             </sf:form>
 

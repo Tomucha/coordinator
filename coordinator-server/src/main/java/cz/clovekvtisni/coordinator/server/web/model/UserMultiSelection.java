@@ -15,6 +15,8 @@ public class UserMultiSelection {
 
     private SelectedUserAction selectedAction;
 
+    private String suspendReason;
+
     private Long selectedTaskId;
 
     public List<Long> getSelectedUsers() {
@@ -47,5 +49,13 @@ public class UserMultiSelection {
 
     public void setEventId(Long eventId) {
         this.eventId = eventId;
+    }
+
+    public String getSuspendReason() {
+        return suspendReason;
+    }
+
+    public void setSuspendReason(String suspendReason) {
+        this.suspendReason = suspendReason;
     }
 }

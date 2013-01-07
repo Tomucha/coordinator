@@ -44,8 +44,11 @@ public interface UserService extends Service {
     @CheckPermission("#helper.canUpdate(#p0)")
     UserEntity updateUser(UserEntity user);
 
-    @CheckPermission("#helper.canDelete(new cz.clovekvtisni.coordinator.server.domain.User(#p0))")
+    @CheckPermission("#helper.canDelete(new cz.clovekvtisni.coordinator.server.domain.UserEntity(#p0))")
     void deleteUser(Long id);
+
+    @CheckPermission("#helper.canDelete(new cz.clovekvtisni.coordinator.server.domain.UserEntity(#p0))")
+    UserEntity suspendUser(Long id, String reason, long flags);
 
     @CheckPermission("@appContext.loggedUser != null")
     void logout();
