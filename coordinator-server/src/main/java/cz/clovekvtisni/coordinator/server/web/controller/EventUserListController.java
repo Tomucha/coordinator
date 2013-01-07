@@ -12,6 +12,7 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
+import cz.clovekvtisni.coordinator.server.web.model.SelectedUserAction;
 import cz.clovekvtisni.coordinator.server.web.model.UserMultiSelection;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import cz.clovekvtisni.coordinator.util.ValueTool;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -77,25 +79,33 @@ public class EventUserListController extends AbstractEventController {
 
     @RequestMapping(method = RequestMethod.POST)
     public String onSelectedAction(@ModelAttribute("selectionForm") @Valid UserMultiSelection selection, BindingResult bindingResult) {
-        if (selection.getSelectedUsers() != null && selection.getSelectedUsers().size() > 0)  {
-            String selectedAction = selection.getSelectedAction();
-            Long selectedPlaceId = selection.getSelectedTaskId();
+        List<Long> users = selection.getSelectedUsers();
+        SelectedUserAction action = selection.getSelectedAction();
+        if (users != null && users.size() > 0 && action != null)  {
+            Long placeId = selection.getSelectedTaskId();
 
-            // TODO
-            if (selectedAction.equals("delete")) {
+            switch (action) {
+                case DELETE:
+                    // TODO
+                    break;
 
-            } else if (selectedAction.equals("suspend")) {
+                case SUSPEND:
+                    // TODO
+                    break;
 
-            } else if (selectedAction.equals("registerToTask") && selectedPlaceId != null) {
-                PoiEntity place = poiService.findById(selectedPlaceId, 0l);
-                Set<Long> updateList = new HashSet<Long>();
-                Long[] registered = place.getUserId();
-                if (registered != null)
-                    updateList.addAll(Arrays.asList(registered));
-                for (Long userId : selection.getSelectedUsers())
-                    updateList.add(userId);
-                place.setUserId(updateList.toArray(new Long[0]));
-                poiService.updatePoi(place);
+                case REGISTER_TO_TASK:
+                    if (placeId != null) {
+                        PoiEntity place = poiService.findById(placeId, 0l);
+                        Set<Long> updateList = new HashSet<Long>();
+                        Long[] registered = place.getUserId();
+                        if (registered != null)
+                            updateList.addAll(Arrays.asList(registered));
+                        for (Long userId : users)
+                            updateList.add(userId);
+                        place.setUserId(updateList.toArray(new Long[0]));
+                        poiService.updatePoi(place);
+                    }
+                    break;
             }
         }
 
@@ -104,5 +114,10 @@ public class EventUserListController extends AbstractEventController {
 
     public static Breadcrumb getBreadcrumb(FilterParams params) {
         return new Breadcrumb(params, "/admin/event/user/list", "breadcrumb.eventUsers");
+    }
+
+    @ModelAttribute("selectedUserActions")
+    public SelectedUserAction[] selectedUserActions() {
+        return SelectedUserAction.values();
     }
 }

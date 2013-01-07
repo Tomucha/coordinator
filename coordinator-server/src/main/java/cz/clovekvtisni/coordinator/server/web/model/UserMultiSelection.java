@@ -13,7 +13,7 @@ public class UserMultiSelection {
 
     private List<Long> selectedUsers;
 
-    private String selectedAction;
+    private SelectedUserAction selectedAction;
 
     private Long selectedTaskId;
 
@@ -25,11 +25,11 @@ public class UserMultiSelection {
         this.selectedUsers = selectedUsers;
     }
 
-    public String getSelectedAction() {
+    public SelectedUserAction getSelectedAction() {
         return selectedAction;
     }
 
-    public void setSelectedAction(String selectedAction) {
+    public void setSelectedAction(SelectedUserAction selectedAction) {
         this.selectedAction = selectedAction;
     }
 

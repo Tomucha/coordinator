@@ -64,13 +64,11 @@
                 </div>
 
                 <div>
-                    <sf:select path="selectedAction" onchange="$('#selectedTaskIdSelect').toggle(this.value=='registerToTask')">
+                    <sf:select path="selectedAction" onchange="$('#selectedTaskIdSelect').toggle(this.value=='REGISTER_TO_TASK')">
                         <sf:option value=""/>
-                        <!--
-                        <sf:option value="delete"><s:message code="label.delete"/></sf:option>
-                        <sf:option value="suspend"><s:message code="label.suspend"/></sf:option>
-                        -->
-                        <sf:option value="registerToTask"><s:message code="label.registerToTask"/></sf:option>
+                        <c:forEach items="${selectedUserActions}" var="action">
+                            <sf:option value="${action}"><s:message code="SelectedUserAction.${action}"/></sf:option>
+                        </c:forEach>
                     </sf:select>
 
                     <c:choose>
