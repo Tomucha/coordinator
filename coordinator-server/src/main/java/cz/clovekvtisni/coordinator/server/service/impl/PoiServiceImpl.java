@@ -96,7 +96,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     }
 
     @Override
-    public void deletePoi(PoiEntity entity) {
+    public void deletePoi(PoiEntity entity, long flags) {
         entity.setDeletedDate(new Date());
         updatePoi(entity);
     }

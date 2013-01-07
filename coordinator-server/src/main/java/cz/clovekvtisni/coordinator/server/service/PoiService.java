@@ -35,7 +35,7 @@ public interface PoiService extends Service {
 
     @CheckPermission("#helper.canDelete(#p0)")
     @CacheEvict(value = {"lastPoiList", "lastEventPoiList"}, allEntries = true)
-    void deletePoi(PoiEntity entity);
+    void deletePoi(PoiEntity entity, long flags);
 
     @FilterResult("#helper.canRead(#entity)")
     @Cacheable(value = "lastPoiList")

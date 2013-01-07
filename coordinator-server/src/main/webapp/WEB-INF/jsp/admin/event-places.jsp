@@ -16,34 +16,51 @@
 
     <c:choose>
         <c:when test="${!empty placeList}">
-            <div class="dataList poiListTable">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th><s:message code="PoiEntity.poiCategory"/></th>
-                        <th><s:message code="label.locality"/></th>
-                        <th><s:message code="PoiEntity.userCount"/></th>
-                        <th><s:message code="PoiEntity.workflow"/></th>
-                        <th><s:message code="PoiEntity.workflowState"/></th>
-                        <th><s:message code="label.action"/></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <c:forEach items="${placeList}" var="poi">
+            <sf:form action="" method="post" modelAttribute="selectionForm">
+                <div class="dataList poiListTable">
+                    <sf:hidden path="eventId"/>
+
+                    <table class="table table-striped">
+                        <thead>
                         <tr>
-                            <td><c:out value="${poi.poiCategory.name}"/></td>
-                            <td><tags:gps longitude="${poi.longitude}" latitude="${poi.latitude}"/></td>
-                            <td><c:out value="${poi.userCount}"/></td>
-                            <td><c:out value="${poi.workflow.name}"/></td>
-                            <td><c:out value="${poi.workflowState.name}"/></td>
-                            <td>
-                                <a class="btn" href="<s:url value="${root}/admin/event/place/edit?eventId=${poi.eventId}&placeId=${poi.id}"/>"><s:message code="button.edit"/></a>
-                            </td>
+                            <th></th>
+                            <th><s:message code="PoiEntity.poiCategory"/></th>
+                            <th><s:message code="label.locality"/></th>
+                            <th><s:message code="PoiEntity.userCount"/></th>
+                            <th><s:message code="PoiEntity.workflow"/></th>
+                            <th><s:message code="PoiEntity.workflowState"/></th>
+                            <th><s:message code="label.action"/></th>
                         </tr>
-                    </c:forEach>
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                        <c:forEach items="${placeList}" var="poi" varStatus="i">
+                            <tr>
+                                <td><input type="checkbox" name="selectedPois[${i.index}]" value="${poi.id}"/></td>
+                                <td><c:out value="${poi.poiCategory.name}"/></td>
+                                <td><tags:gps longitude="${poi.longitude}" latitude="${poi.latitude}"/></td>
+                                <td><c:out value="${poi.userCount}"/></td>
+                                <td><c:out value="${poi.workflow.name}"/></td>
+                                <td><c:out value="${poi.workflowState.name}"/></td>
+                                <td>
+                                    <a class="btn" href="<s:url value="${root}/admin/event/place/edit?eventId=${poi.eventId}&placeId=${poi.id}"/>"><s:message code="button.edit"/></a>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+
+                    <div>
+                        <sf:select path="selectedAction">
+                            <sf:option value=""/>
+                            <c:forEach items="${selectedPoiActions}" var="action">
+                                <sf:option value="${action}"><s:message code="SelectedPoiAction.${action}"/></sf:option>
+                            </c:forEach>
+                        </sf:select>
+
+                        <sf:button><s:message code="button.submit"/></sf:button>
+                    </div>
+                </div>
+            </sf:form>
 
         </c:when>
         <c:otherwise>
