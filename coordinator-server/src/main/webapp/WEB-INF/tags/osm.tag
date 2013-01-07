@@ -72,6 +72,12 @@
             return state;
         },
 
+        disablePopup: function(pointType) {
+            CoordinatorMap.clickHandlers[pointType] = function(point) {
+                return null;
+            };
+        },
+
         addPoint: function(point) {
             var lonLat = CoordinatorMap.position(point.longitude, point.latitude);
             var marker = new OpenLayers.Marker(lonLat, icons[point.type].clone());

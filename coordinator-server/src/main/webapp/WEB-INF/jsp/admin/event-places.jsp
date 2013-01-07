@@ -23,6 +23,8 @@
                         <th><s:message code="PoiEntity.poiCategory"/></th>
                         <th><s:message code="label.locality"/></th>
                         <th><s:message code="PoiEntity.userCount"/></th>
+                        <th><s:message code="PoiEntity.workflow"/></th>
+                        <th><s:message code="PoiEntity.workflowState"/></th>
                         <th><s:message code="label.action"/></th>
                     </tr>
                     </thead>
@@ -32,6 +34,8 @@
                             <td><c:out value="${poi.poiCategory.name}"/></td>
                             <td><tags:gps longitude="${poi.longitude}" latitude="${poi.latitude}"/></td>
                             <td><c:out value="${poi.userCount}"/></td>
+                            <td><c:out value="${poi.workflow.name}"/></td>
+                            <td><c:out value="${poi.workflowState.name}"/></td>
                             <td>
                                 <a class="btn" href="<s:url value="${root}/admin/event/place/edit?eventId=${poi.eventId}&placeId=${poi.id}"/>"><s:message code="button.edit"/></a>
                             </td>

@@ -35,17 +35,26 @@
 
 
     function initialize() {
-        CoordinatorMap.clickHandlers[TYPE_POI] = function(point) {
-            return null;
-        };
+        CoordinatorMap.disablePopup(TYPE_POI);
+        CoordinatorMap.disablePopup(TYPE_LOCATION);
 
         <c:if test="${!empty form.latitude and !empty form.longitude}">
-        CoordinatorMap.addPoint({
-            type: TYPE_POI,
-            placeId: <c:out value="${form.id}"/>,
-            longitude: <c:out value="${form.longitude}"/>,
-            latitude: <c:out value="${form.latitude}"/>
-        });
+            CoordinatorMap.addPoint({
+                type: TYPE_POI,
+                placeId: <c:out value="${form.id}"/>,
+                longitude: <c:out value="${form.longitude}"/>,
+                latitude: <c:out value="${form.latitude}"/>
+            });
+            </c:if>
+
+        <c:if test="${!empty event.eventLocationEntityList}">
+            <c:forEach items="${event.eventLocationEntityList}" var="location">
+                CoordinatorMap.addPoint({
+                    type: TYPE_LOCATION,
+                    longitude: <c:out value="${location.longitude}"/>,
+                    latitude: <c:out value="${location.latitude}"/>
+                });
+            </c:forEach>
         </c:if>
     }
 
@@ -59,8 +68,8 @@
     <tags:osm
             width="300px"
             height="300px"
-            longitude="${form.longitude}"
-            latitude="${form.latitude}"
+            longitude="${!empty form.longitude ? form.longitude : event.firstEventLocation.longitude}"
+            latitude="${!empty form.latitude ? form.latitude : event.firstEventLocation.latitude}"
             zoom="13"
             onLoad="initialize()"
             onNewPoint="onNewPoint"
