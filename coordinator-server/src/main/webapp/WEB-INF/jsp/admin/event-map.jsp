@@ -21,17 +21,17 @@
         </c:if>
 
         <c:if test="${!empty placeList}">
-        <c:forEach items="${placeList}" var="place">
-        <c:if test="${!empty place.id and !empty place.latitude and !empty place.longitude}">
-        CoordinatorMap.addPoint({
-            type: TYPE_POI,
-            placeId: <c:out value="${place.id}" />,
-            description: "<c:out value="${place.poiCategory.name}"/>",
-            longitude: <c:out value="${place.longitude}"/>,
-            latitude: <c:out value="${place.latitude}"/>
-        });
-        </c:if>
-        </c:forEach>
+            <c:forEach items="${placeList}" var="place">
+                <c:if test="${!empty place.id and !empty place.latitude and !empty place.longitude}">
+                CoordinatorMap.addPoint({
+                    type: TYPE_POI,
+                    placeId: <c:out value="${place.id}" />,
+                    description: "<c:out value="${place.poiCategory.name}"/>",
+                    longitude: <c:out value="${place.longitude}"/>,
+                    latitude: <c:out value="${place.latitude}"/>
+                });
+                </c:if>
+            </c:forEach>
         </c:if>
 
         <c:if test="${!empty event.eventLocationEntityList}">

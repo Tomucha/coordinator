@@ -373,6 +373,7 @@
         <form action="${root}/admin/event/place/edit">
             <div>
                 <input type="hidden" name="placeId"/>
+                <input type="hidden" name="eventId"/>
                 <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
                 <button type="submit"><s:message code="button.edit"/></button>
             </div>

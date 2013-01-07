@@ -5,7 +5,43 @@
     taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
     taglib prefix="can" uri="/WEB-INF/permissions.tld" %><%@
     taglib prefix="tags" tagdir="/WEB-INF/tags"
-%><div class="mainPanel">
+%><script type="text/javascript">
+    function initialize() {
+        <c:if test="${!empty placeList}">
+        <c:forEach items="${placeList}" var="place">
+        <c:if test="${!empty place.id and !empty place.latitude and !empty place.longitude}">
+        <c:if test="${empty defLatitude}">
+            <c:set var="defLatitude" value="${place.latitude}"/>
+            <c:set var="defLongitude" value="${place.longitude}"/>
+        </c:if>
+        CoordinatorMap.addPoint({
+            type: TYPE_POI,
+            placeId: <c:out value="${place.id}" />,
+            description: "<c:out value="${place.poiCategory.name}"/>",
+            longitude: <c:out value="${place.longitude}"/>,
+            latitude: <c:out value="${place.latitude}"/>
+        });
+        </c:if>
+        </c:forEach>
+        </c:if>
+    }
+</script>
+
+<h2><s:message code="header.poiList"/></h2>
+
+<div class="eastPanel" style="float:right;width: 300px;margin-left: 30px">
+    <tags:osm
+            width="300px"
+            height="300px"
+            longitude="${defLongitude}"
+            latitude="${defLatitude}"
+            zoom="13"
+            onLoad="initialize()"
+            />
+</div>
+
+<div class="mainPanel" style="padding-right: 330px">
+
     <div class="buttonPanel">
         <c:choose>
             <c:when test="${can:hasRole('BACKEND')}">
