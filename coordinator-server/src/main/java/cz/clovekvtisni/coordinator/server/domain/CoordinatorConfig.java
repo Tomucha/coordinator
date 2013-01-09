@@ -86,7 +86,7 @@ public class CoordinatorConfig {
 
         if (roleList != null) {
             for (Role role : roleList) {
-                checkEntityExist(roleMap, role.getExtendsRoleId());
+                checkEntityExist(roleMap, role, role.getExtendsRoleId());
             }
         }
         if (workflowList != null) {
