@@ -4,9 +4,11 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
+import cz.clovekvtisni.coordinator.server.util.EntityTool;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -51,13 +53,16 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     private Date lastPoiDate;
 
-    private Long[] groups;
+    private Long[] groupIdList;
 
     @Ignore
     private EventEntity eventEntity;
 
     @Ignore
     private UserEntity userEntity;
+
+    @Ignore
+    private List<UserGroupEntity> groupEntities;
 
     public UserInEventEntity() {
     }
@@ -74,6 +79,8 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
             inEvent.setEvent(eventEntity.buildTargetEntity());
         if (userEntity != null)
             inEvent.setUser(userEntity.buildTargetEntity());
+        if (groupEntities != null)
+            inEvent.setGroups(new EntityTool().buildTargetEntities(groupEntities));
 
         return inEvent;
     }
@@ -195,12 +202,12 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
         this.lastPoiDate = lastPoiDate;
     }
 
-    public Long[] getGroups() {
-        return groups;
+    public Long[] getGroupIdList() {
+        return groupIdList;
     }
 
-    public void setGroups(Long[] groups) {
-        this.groups = groups;
+    public void setGroupIdList(Long[] groupIdList) {
+        this.groupIdList = groupIdList;
     }
 
     public EventEntity getEventEntity() {
@@ -227,6 +234,14 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
         this.parentKey = parentKey;
     }
 
+    public List<UserGroupEntity> getGroupEntities() {
+        return groupEntities;
+    }
+
+    public void setGroupEntities(List<UserGroupEntity> groupEntities) {
+        this.groupEntities = groupEntities;
+    }
+
     @Override
     public String toString() {
         return "UserInEventEntity{" +
@@ -238,7 +253,7 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
                 ", validTo=" + validTo +
                 ", status='" + status + '\'' +
                 ", lastPoiDate=" + lastPoiDate +
-                ", groups=" + (groups == null ? null : Arrays.asList(groups)) +
+                ", groupIdList=" + (groupIdList == null ? null : Arrays.asList(groupIdList)) +
                 ", lastPoiId=" + lastPoiId +
                 '}';
     }

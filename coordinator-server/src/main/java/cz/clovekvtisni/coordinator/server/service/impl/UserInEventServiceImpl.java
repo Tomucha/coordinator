@@ -7,10 +7,13 @@ import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserGroupEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
+import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -22,6 +25,9 @@ import java.util.*;
  */
 @Service("userInEventService")
 public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements UserInEventService {
+
+    @Autowired
+    private UserGroupService userGroupService;
 
     @Override
     public UserInEventEntity findById(Long id, Long parentUserId, long flags) {
@@ -65,6 +71,14 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
             for (Map.Entry<Key<UserEntity>, UserEntity> entry : entityMap.entrySet()) {
                 if (entry.getValue().isDeleted()) continue;
                 inUserMap.get(entry.getKey()).setUserEntity(entry.getValue());
+            }
+        }
+
+        if ((flags & FLAG_FETCH_GROUPS) != 0) {
+            for (UserInEventEntity inUser : result) {
+                if (inUser.getGroupIdList() != null) {
+                    inUser.setGroupEntities(userGroupService.findByIds(0l, inUser.getGroupIdList()));
+                }
             }
         }
     }
@@ -131,5 +145,13 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
 
         return new ArrayList<UserInEventEntity>(entityMap.values());
 
+    }
+
+    @Override
+    public UserInEventEntity findByUser(Long userId, Long eventId, long flags) {
+        UserInEventFilter filter = new UserInEventFilter();
+        filter.setEventIdVal(eventId);
+        filter.setUserIdVal(userId);
+        return findByFilter(filter, 1, null, 0l).singleResult();
     }
 }

@@ -19,6 +19,8 @@ public class UserMultiSelection {
 
     private Long selectedTaskId;
 
+    private Long groupId;
+
     public List<Long> getSelectedUsers() {
         return selectedUsers;
     }
@@ -57,5 +59,13 @@ public class UserMultiSelection {
 
     public void setSuspendReason(String suspendReason) {
         this.suspendReason = suspendReason;
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
     }
 }

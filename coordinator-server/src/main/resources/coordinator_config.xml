@@ -4,7 +4,7 @@
     <role_list>
         <role id="ANONYMOUS" name="Anonymous">Anonymous</role>
         <role id="COORDINATOR" name="Coordinator" extends_role_id="ANONYMOUS">Koordinátor v terénu</role>
-        <role id="ZDRAVOTNIK" name="Coordinator" extends_role_id="ANONYMOUS">Zdravotník v terénu</role>
+        <role id="ZDRAVOTNIK" name="Medic" extends_role_id="ANONYMOUS">Zdravotník v terénu</role>
         <role id="BACKEND" name="Backend" extends_role_id="ANONYMOUS">Backend</role>
         <role id="ADMIN" name="Admin" extends_role_id="BACKEND">Admin</role>
         <role id="SUPERADMIN" name="SuperAdmin" extends_role_id="ADMIN">Super admin</role>

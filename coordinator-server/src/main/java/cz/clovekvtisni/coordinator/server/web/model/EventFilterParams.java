@@ -16,6 +16,8 @@ public class EventFilterParams implements FilterParams {
 
     private String userFulltext;
 
+    private Long groupId;
+
     public EventFilterParams() {
     }
 
@@ -41,6 +43,14 @@ public class EventFilterParams implements FilterParams {
 
     public void setEventId(Long eventId) {
         this.eventId = eventId;
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
     }
 
     @Override

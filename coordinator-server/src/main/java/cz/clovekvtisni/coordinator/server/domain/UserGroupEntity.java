@@ -4,7 +4,9 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Cache;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 import cz.clovekvtisni.coordinator.domain.UserGroup;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,13 +20,16 @@ public class UserGroupEntity extends AbstractPersistentEntity<UserGroup, UserGro
     @Id
     private Long id;
 
-    private String eventId;
+    @Index
+    private Long eventId;
 
+    @Index
     private String organizationId;
 
+    @Index
     private String name;
 
-    private String role;
+    private String roleId;
 
     private Long createdBy;
 
@@ -49,11 +54,11 @@ public class UserGroupEntity extends AbstractPersistentEntity<UserGroup, UserGro
         this.id = id;
     }
 
-    public String getEventId() {
+    public Long getEventId() {
         return eventId;
     }
 
-    public void setEventId(String eventId) {
+    public void setEventId(Long eventId) {
         this.eventId = eventId;
     }
 
@@ -73,12 +78,12 @@ public class UserGroupEntity extends AbstractPersistentEntity<UserGroup, UserGro
         this.name = name;
     }
 
-    public String getRole() {
-        return role;
+    public String getRoleId() {
+        return roleId;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
     }
 
     public Long getCreatedBy() {
@@ -96,7 +101,7 @@ public class UserGroupEntity extends AbstractPersistentEntity<UserGroup, UserGro
                 ", eventId='" + eventId + '\'' +
                 ", organizationId='" + organizationId + '\'' +
                 ", name='" + name + '\'' +
-                ", role='" + role + '\'' +
+                ", roleId='" + roleId + '\'' +
                 ", createdBy=" + createdBy +
                 '}';
     }

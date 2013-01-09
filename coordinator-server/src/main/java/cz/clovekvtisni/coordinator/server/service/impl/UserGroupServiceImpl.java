@@ -5,10 +5,15 @@ import com.googlecode.objectify.Work;
 import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserGroupEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserGroupFilter;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
+import cz.clovekvtisni.coordinator.server.service.UserInEventService;
+import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.util.CloneTool;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
@@ -17,7 +22,14 @@ import java.util.*;
  * User: jka
  * Date: 7.12.12
  */
+@Service("userGroupService")
 public class UserGroupServiceImpl extends AbstractEntityServiceImpl implements UserGroupService {
+
+    @Autowired
+    private UserInEventService userInEventService;
+
+    @Autowired
+    private UserService userService;
 
     @Override
     public UserGroupEntity findById(Long id, long flags) {
@@ -100,5 +112,33 @@ public class UserGroupServiceImpl extends AbstractEntityServiceImpl implements U
     @Override
     public void deleteUserGroup(UserGroupEntity entity) {
         // TODO
+    }
+
+    /** TODO cache? */
+    @Override
+    public List<UserGroupEntity> findByEventId(Long eventId, long flags) {
+        UserGroupFilter groupFilter = new UserGroupFilter();
+        groupFilter.setOrder("name");
+        groupFilter.setEventIdVal(eventId);
+        return findByFilter(groupFilter, 0, null, flags).getResult();
+    }
+
+    @Override
+    public void addUsersToGroup(UserGroupEntity entity, Long... userIds) {
+        List<UserEntity> users = userService.findByIds(0l, userIds);
+        for (UserEntity user : users) {
+            UserInEventEntity inEvent = userInEventService.findByUser(user.getId(), entity.getEventId(), 0l);
+            if (inEvent == null)
+                continue;
+            Set<Long> groupIdList = new HashSet<Long>();
+            if (inEvent.getGroupIdList() != null) {
+                groupIdList.addAll(Arrays.asList(inEvent.getGroupIdList()));
+            }
+            if (groupIdList.contains(entity.getId()))
+                continue;
+            groupIdList.add(entity.getId());
+            inEvent.setGroupIdList(groupIdList.toArray(new Long[0]));
+            userInEventService.update(inEvent);
+        }
     }
 }

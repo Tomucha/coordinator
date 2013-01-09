@@ -34,7 +34,7 @@ public class PoiSecurityPlugin extends SecurityPlugin {
         PermissionCommand<PoiEntity> isBackendCommand = new HasRoleCommand<PoiEntity>(appContext, authorizationTool, Arrays.asList(new String[]{AuthorizationTool.BACKEND}));
 
         registerPermissionCommand(PoiEntity.class, ReadPermission.class, permittedCommand);
-        registerPermissionCommand("poEntity", ReadPermission.class, permittedCommand);
+        registerPermissionCommand("poiEntity", ReadPermission.class, permittedCommand);
         registerPermissionCommand(PoiEntity.class, CreatePermission.class, isBackendCommand);
         registerPermissionCommand("poiEntity", CreatePermission.class, isBackendCommand);
         registerPermissionCommand(PoiEntity.class, UpdatePermission.class, isBackendCommand);

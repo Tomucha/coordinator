@@ -16,6 +16,8 @@ public interface UserInEventService extends Service {
 
     public static final long FLAG_FETCH_USER = 2l;
 
+    public static final long FLAG_FETCH_GROUPS = 4l;
+
     @FilterResult("#helper.canRead(#entity)")
     UserInEventEntity findById(Long id, Long parentUserId, long flags);
 
@@ -24,6 +26,9 @@ public interface UserInEventService extends Service {
 
     @FilterResult("#helper.canRead(#entity)")
     ResultList<UserInEventEntity> findByFilter(UserInEventFilter filter, int limit, String bookmark, long flags);
+
+    @FilterResult("#helper.canRead(#entity)")
+    UserInEventEntity findByUser(Long userId, Long eventId, long flags);
 
     @CheckPermission("#helper.canCreate(#p0)")
     UserInEventEntity create(UserInEventEntity inEvent);

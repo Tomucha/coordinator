@@ -72,7 +72,7 @@
             <url-pattern>/api/v1/secure/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
-            <role-name>admin</role-name>
+            <roleId-name>admin</roleId-name>
         </auth-constraint>
     </security-constraint>
 

@@ -3,6 +3,7 @@ package cz.clovekvtisni.coordinator.server.domain;
 import cz.clovekvtisni.coordinator.domain.config.*;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
+import org.simpleframework.xml.core.Commit;
 import org.simpleframework.xml.core.Validate;
 
 import java.util.*;
@@ -406,6 +407,50 @@ public class CoordinatorConfig {
         countryMap.put("ZW", "Zimbabwe");
 
         return countryMap;
+    }
+
+    @Commit
+    public void afterLoad() {
+        if (roleList != null) {
+            Collections.sort(roleList, new Comparator<Role>() {
+                @Override
+                public int compare(Role o1, Role o2) {
+                    return o1.getName() != null ? o1.getName().compareTo(o2.getName()) : -1;
+                }
+            });
+        }
+        if (skillList != null) {
+            Collections.sort(skillList, new Comparator<Skill>() {
+                @Override
+                public int compare(Skill o1, Skill o2) {
+                    return o1.getName() != null ? o1.getName().compareTo(o2.getName()) : -1;
+                }
+            });
+        }
+        if (equipmentList != null) {
+            Collections.sort(equipmentList, new Comparator<Equipment>() {
+                @Override
+                public int compare(Equipment o1, Equipment o2) {
+                    return o1.getName() != null ? o1.getName().compareTo(o2.getName()) : -1;
+                }
+            });
+        }
+        if (organizationList != null) {
+            Collections.sort(organizationList, new Comparator<Organization>() {
+                @Override
+                public int compare(Organization o1, Organization o2) {
+                    return o1.getName() != null ? o1.getName().compareTo(o2.getName()) : -1;
+                }
+            });
+        }
+        if (poiCategoryList != null) {
+            Collections.sort(poiCategoryList, new Comparator<PoiCategory>() {
+                @Override
+                public int compare(PoiCategory o1, PoiCategory o2) {
+                    return o1.getName() != null ? o1.getName().compareTo(o2.getName()) : -1;
+                }
+            });
+        }
     }
 
     @Override

@@ -8,12 +8,18 @@
     taglib prefix="tags" tagdir="/WEB-INF/tags"
 %><script type="text/javascript">
     function onDataSubmit() {
-        if ($("#inputSelectedAction").val() == "SUSPEND") {
-            $('#suspendReasonModal').modal({});
-            return false;
+        switch ($("#inputSelectedAction").val()) {
+            case "SUSPEND":
+                $('#suspendReasonModal').modal({});
+                return false;
 
-        } else
-            return true;
+            case "ADD_TO_GROUP":
+                $('#addToUserGroupModal').modal({});
+                return false;
+
+            default:
+                return true;
+        }
     }
 </script>
 <h2><s:message code="header.userList"/></h2>
@@ -22,7 +28,8 @@
     <div class="buttonPanel">
         <c:choose>
             <c:when test="${can:hasRole('BACKEND')}">
-                <a class="btn" href="<s:url value="/admin/event/user/edit?eventId=${params.eventId}"/>"><s:message code="button.addNew"/></a>
+                <a class="btn" href="<s:url value="/admin/event/user/edit?eventId=${params.eventId}"/>"><s:message code="button.addNewUser"/></a>
+                <a class="btn" href="<s:url value="/admin/event/user-group/edit?eventId=${params.eventId}"/>"><s:message code="button.addNewUserGroup"/></a>
                 <c:if test="${!empty loggedUser.organizationId}">
                     <a class="btn" href="<s:url value="/admin/import?eventId=${params.eventId}&organizationId=${loggedUser.organizationId}"/>"><s:message code="button.import"/></a>
                 </c:if>
@@ -33,6 +40,13 @@
     <sf:form action="" modelAttribute="params" method="get">
         <div class="searchFormPanel">
             <sf:hidden path="eventId"/>
+            <label>
+                <s:message code="label.group"/>:
+                <sf:select path="groupId">
+                    <sf:option value=""/>
+                    <sf:options items="${userGroups}" itemLabel="name" itemValue="id"/>
+                </sf:select>
+            </label>
             <label><s:message code="label.name"/>: <sf:input path="userFulltext"/></label>
             <button type="submit" class="btn"><s:message code="button.filterList"/></button>
         </div>
@@ -52,6 +66,7 @@
                             <th><s:message code="label.phone"/></th>
                             <th><s:message code="label.status"/></th>
                             <th><s:message code="label.address"/></th>
+                            <th><s:message code="label.userGroups"/></th>
                             <th><s:message code="label.action"/></th>
                         </tr>
                         </thead>
@@ -72,6 +87,13 @@
                                     </c:choose>
                                 </td>
                                 <td><c:out value="${userInEvent.userEntity.fullAddress}"/></td>
+                                <td>
+                                    <c:if test="${!empty userInEvent.groupEntities}">
+                                        <c:forEach items="${userInEvent.groupEntities}" var="group">
+                                            <span class="label"><c:out value="${group.name}"/></span>
+                                        </c:forEach>
+                                    </c:if>
+                                </td>
                                 <td>
                                     <a class="btn" href="<s:url value="${root}/admin/event/user/edit?eventId=${params.eventId}&userId=${userInEvent.userId}"/>"><s:message code="button.detail"/></a>
                                 </td>
@@ -103,19 +125,14 @@
                     </c:choose>
 
                     <%-- Suspend reason modal --%>
-                    <div id="suspendReasonModal" class="modal hide fade">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h3><s:message code="modalTitle.writeSuspendReason"/></h3>
-                        </div>
-                        <div class="modal-body">
-                            <p><sf:textarea path="suspendReason" cols="74" rows="9" cssStyle="width:90%"/></p>
-                        </div>
-                        <div class="modal-footer">
-                            <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </div>
+                    <tags:modal id="suspendReasonModal" titleCode="modalTitle.writeSuspendReason">
+                        <p><sf:textarea path="suspendReason" cols="74" rows="9" cssStyle="width:90%"/></p>
+                    </tags:modal>
+
+                    <%-- Add to user group modal --%>
+                    <tags:modal id="addToUserGroupModal" titleCode="modalTitle.addToUserGroup">
+                        <p><sf:select path="groupId" items="${userGroups}" itemLabel="name" itemValue="id"/></p>
+                    </tags:modal>
 
                     <button type="submit" class="btn" onclick="return onDataSubmit()"><s:message code="button.submit"/></button>
                 </div>
