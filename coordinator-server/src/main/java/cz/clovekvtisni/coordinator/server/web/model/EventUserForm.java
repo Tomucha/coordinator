@@ -5,6 +5,7 @@ import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,6 +18,8 @@ public class EventUserForm extends UserForm {
     private Long eventId;
 
     private Long userInEventId;
+
+    private List<Long> groupIdList;
 
     public Long getEventId() {
         return eventId;
@@ -39,7 +42,17 @@ public class EventUserForm extends UserForm {
         inEventEntity.setEventId(eventId);
         inEventEntity.setUserId(getId());
         inEventEntity.setParentKey(Key.create(UserEntity.class, getId()));
+        if (groupIdList != null)
+            inEventEntity.setGroupIdList(groupIdList.toArray(new Long[0]));
 
         return inEventEntity;
+    }
+
+    public List<Long> getGroupIdList() {
+        return groupIdList;
+    }
+
+    public void setGroupIdList(List<Long> groupIdList) {
+        this.groupIdList = groupIdList;
     }
 }

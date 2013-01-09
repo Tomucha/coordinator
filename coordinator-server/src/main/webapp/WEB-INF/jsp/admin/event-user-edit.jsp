@@ -129,6 +129,11 @@
                 <sf:checkboxes path="selectedSkill" items="${config.skillList}" itemLabel="name" itemValue="id"/>
             </div>
 
+            <div class="panel checkboxList">
+                <h3><s:message code="header.userGroupList"/></h3>
+                <sf:checkboxes path="groupIdList" items="${userGroups}" itemLabel="name" itemValue="id"/>
+            </div>
+
             <div class="buttonPanel">
                 <sf:button><s:message code="button.save"/></sf:button>
             </div>

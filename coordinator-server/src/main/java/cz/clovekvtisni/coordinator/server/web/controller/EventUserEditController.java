@@ -7,6 +7,7 @@ import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
+import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.UniqueKeyViolation;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,6 +39,9 @@ public class EventUserEditController extends AbstractEventController {
     @Autowired
     private UserInEventService userInEventService;
 
+    @Autowired
+    private UserGroupService userGroupService;
+
     @RequestMapping(method = RequestMethod.GET)
     public String edit(@ModelAttribute("params") EventFilterParams params, @RequestParam(value = "userId", required = false) Long userId, Model model) {
 
@@ -46,21 +51,24 @@ public class EventUserEditController extends AbstractEventController {
         EventUserForm form = new EventUserForm();
         form.injectConfigValues(appContext, authorizationTool, config);
 
-
         if (userId != null) {
             UserEntity user = loadUserById(userId, 0l);
             form.populateFrom(user);
             UserInEventEntity inEvent = fetchUserInEvent(params.getEventId(), userId);
             form.setEventId(inEvent.getEventId());
-            if (inEvent != null)
+            if (inEvent != null) {
                 form.setUserInEventId(inEvent.getId());
+                if (inEvent.getGroupIdList() != null)
+                    form.setGroupIdList(Arrays.asList(inEvent.getGroupIdList()));
+            }
         } else {
             form.setOrganizationId(getLoggedUser().getOrganizationId());
-            form.setRoleIdList(new String[] {AuthorizationTool.ANONYMOUS});
+            form.setRoleIdList(new String[]{AuthorizationTool.ANONYMOUS});
             form.setEventId(params.getEventId());
         }
 
         model.addAttribute("form", form);
+        model.addAttribute("userGroups", userGroupService.findByEventId(event.getId(), 0l));
         populateEventModel(model, params);
 
         return "admin/event-user-edit";
@@ -88,6 +96,11 @@ public class EventUserEditController extends AbstractEventController {
             if (form.getUserInEventId() == null) {
                 form.setId(user.getId());
                 userInEventService.create(form.buildUserInEventEntity());
+
+            } else {
+                UserInEventEntity inEvent = userInEventService.findById(form.getUserInEventId(), user.getId(), 0l);
+                inEvent.setGroupIdList(form.getGroupIdList() == null ? null : form.getGroupIdList().toArray(new Long[0]));
+                userInEventService.update(inEvent);
             }
 
             return "redirect:/admin/event/user/list?eventId=" + form.getEventId();
@@ -115,7 +128,7 @@ public class EventUserEditController extends AbstractEventController {
         filter.setEventIdVal(eventId);
         filter.setUserIdVal(userId);
 
-        UserInEventEntity inEventEntity = userInEventService.findByFilter(filter, 0, null, UserInEventService.FLAG_FETCH_USER).firstResult();
+        UserInEventEntity inEventEntity = userInEventService.findByFilter(filter, 0, null, UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS).firstResult();
 
         return inEventEntity;
     }
