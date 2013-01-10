@@ -49,7 +49,7 @@ public class EventMapController extends AbstractEventController {
 
         PoiFilter poiFilter = new PoiFilter();
         poiFilter.setEventIdVal(event.getId());
-        ResultList<PoiEntity> places = poiService.findByFilter(poiFilter, 0, null, PoiService.FLAG_FETCH_FROM_CONFIG);
+        ResultList<PoiEntity> places = poiService.findByFilter(poiFilter, 0, null, 0l);
         model.addAttribute("placeList", places.getResult());
 
         return "admin/event-map";

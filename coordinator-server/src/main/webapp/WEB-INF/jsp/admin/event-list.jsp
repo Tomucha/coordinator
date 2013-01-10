@@ -50,7 +50,7 @@
                                 </c:if>
                             </td>
                             <td>
-                                <c:if test="${can:create('organizationInEventEntity')}">
+                                <c:if test="${can:read('organizationInEventEntity')}">
                                     <a class="btn" href="/admin/event/map?eventId=<c:out value="${event.id}"/>"><s:message code="button.detail"/></a>
                                 </c:if>
                                 <c:if test="${can:create('eventEntity')}">

@@ -36,22 +36,20 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     }
 
     private void populate(Collection<PoiEntity> entities, long flags) {
-        if ((flags & FLAG_FETCH_FROM_CONFIG) != 0l) {
-            Map<String,PoiCategory> categoryMap = config.getPoiCategoryMap();
-            for (PoiEntity poi : entities) {
-                if (poi.getPoiCategoryId() != null) {
-                    poi.setPoiCategory(categoryMap.get(poi.getPoiCategoryId()));
-                }
+        Map<String,PoiCategory> categoryMap = config.getPoiCategoryMap();
+        for (PoiEntity poi : entities) {
+            if (poi.getPoiCategoryId() != null) {
+                poi.setPoiCategory(categoryMap.get(poi.getPoiCategoryId()));
             }
+        }
 
-            Map<String,Workflow> workflowMap = config.getWorkflowMap();
-            for (PoiEntity poi : entities) {
-                if (poi.getWorkflowId() != null) {
-                    Workflow workflow = workflowMap.get(poi.getWorkflowId());
-                    poi.setWorkflow(workflow);
-                    if (workflow != null && poi.getWorkflowStateId() != null) {
-                        poi.setWorkflowState(workflow.getStateMap().get(poi.getWorkflowStateId()));
-                    }
+        Map<String,Workflow> workflowMap = config.getWorkflowMap();
+        for (PoiEntity poi : entities) {
+            if (poi.getWorkflowId() != null) {
+                Workflow workflow = workflowMap.get(poi.getWorkflowId());
+                poi.setWorkflow(workflow);
+                if (workflow != null && poi.getWorkflowStateId() != null) {
+                    poi.setWorkflowState(workflow.getStateMap().get(poi.getWorkflowStateId()));
                 }
             }
         }
@@ -106,7 +104,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
         PoiFilter filter = new PoiFilter();
         filter.setOrganizationIdVal(organizationId);
         filter.setOrder("-createdDate");
-        return findByFilter(filter, LAST_POI_LIST_LENGTH, null, PoiService.FLAG_FETCH_FROM_CONFIG);
+        return findByFilter(filter, LAST_POI_LIST_LENGTH, null, 0l);
     }
 
     @Override
@@ -114,6 +112,6 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
         PoiFilter filter = new PoiFilter();
         filter.setEventIdVal(eventId);
         filter.setOrder("-createdDate");
-        return findByFilter(filter, LAST_POI_LIST_LENGTH, null, PoiService.FLAG_FETCH_FROM_CONFIG);
+        return findByFilter(filter, LAST_POI_LIST_LENGTH, null, 0l);
     }
 }

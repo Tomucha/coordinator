@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cz.clovekvtisni.coordinator.server.security.AppContext;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -65,6 +66,9 @@ public abstract class AbstractApiController {
 
     @Autowired
     protected CoordinatorConfig config;
+
+    @Autowired
+    protected AppContext appContext;
 
     protected <PARAMS extends RequestParams> UserRequest<PARAMS> parseRequestAnonymous(HttpServletRequest request, final Class<PARAMS> paramClass) {
         return parseParams(request, true, paramClass);
@@ -132,6 +136,7 @@ public abstract class AbstractApiController {
                     logger.error("unknown auth key {}", authKey);
                     throw MaPermissionDeniedException.permissionDenied();
                 }
+                appContext.setLoggedUser(req.user);
             }
 
         } catch (IOException e) {

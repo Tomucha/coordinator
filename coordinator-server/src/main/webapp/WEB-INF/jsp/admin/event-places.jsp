@@ -6,6 +6,40 @@
     taglib prefix="can" uri="/WEB-INF/permissions.tld" %><%@
     taglib prefix="tags" tagdir="/WEB-INF/tags"
 %><script type="text/javascript">
+
+    var trans = {
+        <c:if test="${!empty placeList}">
+            <c:forEach items="${placeList}" var="poi" varStatus="st">
+                "poi_${poi.id}": {
+                    isStarted: ${!empty poi.workflowStateId ? 'true' : 'false'},
+                    firstStateName: "<c:out value="${poi.workflow.startState.name}"/>",
+                    transitions:
+                        [<c:if test="${!empty poi.workflowState and !empty poi.workflowState.transitionsList}">
+                            <c:forEach items="${poi.workflowState.transitionsList}" var="transition" varStatus="st2">
+                                <c:set var="nextState" value="${config.workflowMap[poi.workflowId].stateMap[transition.toStateId]}"/>
+                                {
+                                    name: '<c:out value="${transition.name}"/>',
+                                    <c:choose>
+                                        <c:when test="${!empty nextState and nextState.requiresAssignment and poi.userCount == 0}">
+                                            disabled: true,
+                                            disableMsg: "<s:message code="msg.needAssignUsers"/>",
+                                        </c:when>
+                                        <c:otherwise>
+                                            disabled: false,
+                                            disableMsg: "",
+                                        </c:otherwise>
+                                    </c:choose>
+                                    transitionId: '<c:out value="${transition.id}"/>'
+                                }<c:if test="${!st2.last}">,</c:if>
+                            </c:forEach>
+                        </c:if>]
+
+                }<c:if test="${!st.last}">,</c:if>
+            </c:forEach>
+        </c:if>
+    };
+
+
     function initialize() {
         <c:if test="${!empty placeList}">
         <c:forEach items="${placeList}" var="place">
@@ -24,6 +58,20 @@
         </c:if>
         </c:forEach>
         </c:if>
+    }
+
+    function openChangeStateModal(placeId) {
+        if (!placeId || !trans["poi_" + placeId]) return;
+        var inf = trans["poi_" + placeId];
+        $("#changeWorkflowStateModal").modal({});
+        var select = $("#cwInputStateId");
+        if (inf.isStarted) {
+            $.each(inf.transitions, function (i, val) {
+                select.append($('<option></option>').attr("value", val.id).text(val.name).prop("disabled", val.disabled));
+            });
+        } else {
+            select.append($('<option></option>').val("").text(inf.firstStateName));
+        }
     }
 </script>
 
@@ -76,7 +124,20 @@
                                 <td><tags:gps longitude="${poi.longitude}" latitude="${poi.latitude}"/></td>
                                 <td><c:out value="${poi.userCount}"/></td>
                                 <td><c:out value="${poi.workflow.name}"/></td>
-                                <td><c:out value="${poi.workflowState.name}"/></td>
+                                <td>
+                                    <c:if test="${!empty poi.workflowId}">
+                                        <a href="javascript:openChangeStateModal(<c:out value='${poi.id}'/>)">
+                                            <c:choose>
+                                                <c:when test="${!empty poi.workflowStateId}">
+                                                    <c:out value="${poi.workflowState.name}"/>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <s:message code="label.startWorkflow"/>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </a>
+                                    </c:if>
+                                </td>
                                 <td>
                                     <a class="btn" href="<s:url value="${root}/admin/event/place/edit?eventId=${poi.eventId}&placeId=${poi.id}"/>"><s:message code="button.edit"/></a>
                                 </td>
@@ -88,6 +149,7 @@
                     <div>
                         <sf:select path="selectedAction">
                             <sf:option value=""/>
+                            <sf:option value="" disabled="true">foo</sf:option>
                             <c:forEach items="${selectedPoiActions}" var="action">
                                 <sf:option value="${action}"><s:message code="SelectedPoiAction.${action}"/></sf:option>
                             </c:forEach>
@@ -97,6 +159,17 @@
                     </div>
                 </div>
             </sf:form>
+
+            <tags:modal id="changeWorkflowStateModal" titleCode="modalTitle.changeWorkflowState">
+                <form action="${root}/admin/event/place/edit/change-workflow-state" method="post">
+                    <div>
+                        <input id="cwInputPlaceId" type="hidden" name="placeId"/>
+                        <label>
+                            <select id="cwInputStateId" name="transitionId"></select>
+                        </label>
+                    </div>
+                </form>
+            </tags:modal>
 
         </c:when>
         <c:otherwise>

@@ -61,7 +61,7 @@ public class EventUserListController extends AbstractEventController {
         poiFilter.setEventIdVal(params.getEventId());
         poiFilter.setWorkflowIdVal(0l);
         poiFilter.setWorkflowIdOp(Filter.Operator.NOT_EQ);
-        model.addAttribute("tasks", poiService.findByFilter(poiFilter, 0, null, PoiService.FLAG_FETCH_FROM_CONFIG).getResult());
+        model.addAttribute("tasks", poiService.findByFilter(poiFilter, 0, null, 0l).getResult());
 
         model.addAttribute("userGroups", userGroupService.findByEventId(event.getId(), 0l));
 
@@ -127,12 +127,12 @@ public class EventUserListController extends AbstractEventController {
                     if (placeId != null) {
                         PoiEntity place = poiService.findById(placeId, 0l);
                         Set<Long> updateList = new HashSet<Long>();
-                        Long[] registered = place.getUserId();
+                        Long[] registered = place.getUserIdList();
                         if (registered != null)
                             updateList.addAll(Arrays.asList(registered));
                         for (Long userId : userIds)
                             updateList.add(userId);
-                        place.setUserId(updateList.toArray(new Long[0]));
+                        place.setUserIdList(updateList.toArray(new Long[0]));
                         poiService.updatePoi(place);
                     }
                     break;

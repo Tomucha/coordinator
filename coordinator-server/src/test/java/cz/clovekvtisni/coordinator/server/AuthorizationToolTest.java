@@ -1,5 +1,8 @@
 package cz.clovekvtisni.coordinator.server;
 
+import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
+import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import junit.framework.Assert;
 import org.junit.Test;
@@ -46,5 +49,14 @@ public class AuthorizationToolTest extends AbstractTest {
                 Arrays.asList(new String[] {"BACKEND"}),
                 Arrays.asList(new String[] {"ANONYMOUS"})
         ));
+    }
+
+    @Test
+    public void testIsVisible() throws Exception {
+        WorkflowState state = new WorkflowState();
+        UserEntity user = new UserEntity();
+        PoiEntity poi = new PoiEntity();
+        poi.setWorkflowState(state);
+        Assert.assertTrue("no restrictions", authorizationTool.isVisibleFor(poi, user));
     }
 }

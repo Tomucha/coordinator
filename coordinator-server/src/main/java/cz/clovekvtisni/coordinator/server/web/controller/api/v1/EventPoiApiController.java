@@ -38,7 +38,7 @@ public class EventPoiApiController extends AbstractApiController {
         }
         filter.setOrder("modifiedDate");
 
-        ResultList<PoiEntity> result = poiService.findByFilter(filter, 0, null, PoiService.FLAG_FETCH_FROM_CONFIG);
+        ResultList<PoiEntity> result = poiService.findByFilter(filter, 0, null, 0l);
         List<Poi> pois = new EntityTool().buildTargetEntities(result.getResult());
 
         return okResult(new EventPoiFilterResponseData(pois));

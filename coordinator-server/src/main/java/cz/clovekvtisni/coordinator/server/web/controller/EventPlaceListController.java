@@ -39,7 +39,7 @@ public class EventPlaceListController extends AbstractEventController {
 
         PoiFilter filter = new PoiFilter();
         filter.setEventIdVal(params.getEventId());
-        ResultList<PoiEntity> result = poiService.findByFilter(filter, DEFAULT_LIST_LENGTH, bookmark, PoiService.FLAG_FETCH_FROM_CONFIG);
+        ResultList<PoiEntity> result = poiService.findByFilter(filter, DEFAULT_LIST_LENGTH, bookmark, 0l);
 
         model.addAttribute("placeList", result.getResult());
         populateEventModel(model, params);

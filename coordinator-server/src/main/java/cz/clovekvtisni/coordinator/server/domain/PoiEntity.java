@@ -3,7 +3,6 @@ package cz.clovekvtisni.coordinator.server.domain;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.Poi;
-
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
@@ -40,7 +39,7 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     private String workflowStateId;
 
     @Index
-    private Long[] userId;
+    private Long[] userIdList;
 
     @NotNull
     private Double latitude;
@@ -117,12 +116,12 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
         this.workflowStateId = workflowStateId;
     }
 
-    public Long[] getUserId() {
-        return userId;
+    public Long[] getUserIdList() {
+        return userIdList;
     }
 
-    public void setUserId(Long[] userId) {
-        this.userId = userId;
+    public void setUserIdList(Long[] userIdList) {
+        this.userIdList = userIdList;
     }
 
     public Double getLatitude() {
@@ -187,7 +186,7 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     }
 
     public int getUserCount() {
-        return userId != null ? userId.length : 0;
+        return userIdList != null ? userIdList.length : 0;
     }
     @Override
     public String toString() {
@@ -196,7 +195,7 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
                 ", poiCategoryId=" + poiCategoryId +
                 ", workflowId=" + workflowId +
                 ", workflowStateId=" + workflowStateId +
-                ", userId=" + (userId == null ? null : Arrays.asList(userId)) +
+                ", userId=" + (userIdList == null ? null : Arrays.asList(userIdList)) +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", precission=" + precission +

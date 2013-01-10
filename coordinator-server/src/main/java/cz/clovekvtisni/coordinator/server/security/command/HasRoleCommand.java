@@ -9,12 +9,6 @@ import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: tomas
- * Date: 9/7/11
- * Time: 12:52 PM
- */
 public class HasRoleCommand<E extends CoordinatorEntity> extends AbstractPermissionCommand<E> {
 
     private AuthorizationTool authorizationTool;

@@ -51,7 +51,8 @@ public class LoginController extends AbstractController {
                     loginForm.password,
                     AuthorizationTool.SUPERADMIN,
                     AuthorizationTool.ADMIN,
-                    AuthorizationTool.BACKEND);
+                    AuthorizationTool.BACKEND,
+                    "COORDINATOR");
 
             retUrl = loginForm.retUrl;
             if (ValueTool.isEmpty(retUrl)) {
