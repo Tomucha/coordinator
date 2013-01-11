@@ -110,6 +110,13 @@ public class AuthorizationTool {
         String[] editableForRole = state.getEditableForRole();
         if (editableForRole != null && isAuthorized(editableForRole, user))
             return true;
-        return isAuthorized(visibleForRole, user);
+        return isAuthorized(new String[] {BACKEND, ADMIN}, user) || isAuthorized(visibleForRole, user);
+    }
+
+    public boolean isCanBeStartedBy(PoiEntity poi, UserEntity user) {
+        Workflow workflow = poi.getWorkflow();
+        if (workflow == null)
+            return true;
+        return  isAuthorized(workflow.getCanBeStartedBy(), user);
     }
 }

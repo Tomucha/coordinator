@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
+import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
@@ -81,12 +82,21 @@ public class EventPlaceEditController extends AbstractEventController {
 
         PoiEntity poiEntity = new PoiEntity().populateFrom(form);
 
-        if (poiEntity.isNew())
-            poiEntity = poiService.createPoi(poiEntity);
-        else
-            poiEntity = poiService.updatePoi(poiEntity);
+        try {
+            if (poiEntity.isNew())
+                poiEntity = poiService.createPoi(poiEntity);
+            else
+                poiEntity = poiService.updatePoi(poiEntity);
 
-        return "redirect:/admin/event/place/list?eventId=" + poiEntity.getEventId();
+            return "redirect:/admin/event/place/list?eventId=" + poiEntity.getEventId();
+
+        } catch (MaPermissionDeniedException e) {
+            addFormError(bindingResult, e);
+            EventEntity event = loadEventById(form.getEventId());
+            model.addAttribute("event", event);
+            populateEventModel(model, new EventFilterParams(form.getEventId()));
+            return "admin/event-place-edit";
+        }
     }
 
     @Override

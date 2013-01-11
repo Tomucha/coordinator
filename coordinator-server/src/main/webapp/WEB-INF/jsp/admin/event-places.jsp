@@ -13,6 +13,7 @@
                 "poi_${poi.id}": {
                     isStarted: ${!empty poi.workflowStateId ? 'true' : 'false'},
                     firstStateName: "<c:out value="${poi.workflow.startState.name}"/>",
+                    canBeStarted: ${can:beStarted(poi) ? 'true' : 'false'},
                     transitions:
                         [<c:if test="${!empty poi.workflowState and !empty poi.workflowState.transitions}">
                             <c:forEach items="${poi.workflowState.transitions}" var="transition" varStatus="st2">
@@ -71,6 +72,9 @@
             $.each(inf.transitions, function (i, val) {
                 select.append($('<option></option>').attr("value", val.transitionId).text(val.name + (val.disableMsg ? " (" + val.disableMsg + ")" : "")).prop("disabled", val.disabled));
             });
+        } else if (!inf.canBeStarted) {
+            select.append($('<option></option>').val("").text(inf.firstStateName + " (<s:message code='msg.noPermissions'/>)").prop("disabled", true));
+
         } else {
             select.append($('<option></option>').val("").text(inf.firstStateName));
         }

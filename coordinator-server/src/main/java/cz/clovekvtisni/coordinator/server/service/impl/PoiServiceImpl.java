@@ -6,9 +6,11 @@ import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowTransition;
+import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
+import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
     @Autowired
     private CoordinatorConfig config;
+
+    @Autowired
+    private AuthorizationTool authorizationTool;
 
     @Override
     public PoiEntity findById(Long id, long flags) {
@@ -122,7 +127,8 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
         Workflow workflow = entity.getWorkflow();
         if (workflow == null)
             return entity;
-        // TODO kontroly
+        if (!authorizationTool.isCanBeStartedBy(entity, getLoggedUser()))
+            throw MaPermissionDeniedException.permissionDenied();
         WorkflowState startState = workflow.getStartState();
         entity.setWorkflowStateId(startState != null ? startState.getId() : null);
         entity.setWorkflowState(startState);
