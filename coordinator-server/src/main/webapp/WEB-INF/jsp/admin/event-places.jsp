@@ -14,8 +14,8 @@
                     isStarted: ${!empty poi.workflowStateId ? 'true' : 'false'},
                     firstStateName: "<c:out value="${poi.workflow.startState.name}"/>",
                     transitions:
-                        [<c:if test="${!empty poi.workflowState and !empty poi.workflowState.transitionsList}">
-                            <c:forEach items="${poi.workflowState.transitionsList}" var="transition" varStatus="st2">
+                        [<c:if test="${!empty poi.workflowState and !empty poi.workflowState.transitions}">
+                            <c:forEach items="${poi.workflowState.transitions}" var="transition" varStatus="st2">
                                 <c:set var="nextState" value="${config.workflowMap[poi.workflowId].stateMap[transition.toStateId]}"/>
                                 {
                                     name: '<c:out value="${transition.name}"/>',
@@ -63,11 +63,13 @@
     function openChangeStateModal(placeId) {
         if (!placeId || !trans["poi_" + placeId]) return;
         var inf = trans["poi_" + placeId];
+        $("#cwInputPlaceId").val(placeId);
         $("#changeWorkflowStateModal").modal({});
         var select = $("#cwInputStateId");
+        select.empty();
         if (inf.isStarted) {
             $.each(inf.transitions, function (i, val) {
-                select.append($('<option></option>').attr("value", val.id).text(val.name).prop("disabled", val.disabled));
+                select.append($('<option></option>').attr("value", val.transitionId).text(val.name + (val.disableMsg ? " (" + val.disableMsg + ")" : "")).prop("disabled", val.disabled));
             });
         } else {
             select.append($('<option></option>').val("").text(inf.firstStateName));
@@ -160,16 +162,18 @@
                 </div>
             </sf:form>
 
-            <tags:modal id="changeWorkflowStateModal" titleCode="modalTitle.changeWorkflowState">
-                <form action="${root}/admin/event/place/edit/change-workflow-state" method="post">
-                    <div>
-                        <input id="cwInputPlaceId" type="hidden" name="placeId"/>
-                        <label>
-                            <select id="cwInputStateId" name="transitionId"></select>
-                        </label>
-                    </div>
-                </form>
-            </tags:modal>
+            <form action="${root}/admin/event/place/list/change-workflow-state" method="post">
+                <tags:modal id="changeWorkflowStateModal" titleCode="modalTitle.changeWorkflowState">
+                        <div>
+                            <input type="hidden" name="eventId" value="${event.id}"/>
+                            <input id="cwInputPlaceId" type="hidden" name="placeId"/>
+                            <label>
+                                <s:message code="label.changeStateTo"/>
+                                <select id="cwInputStateId" name="transitionId"></select>
+                            </label>
+                        </div>
+                </tags:modal>
+            </form>
 
         </c:when>
         <c:otherwise>

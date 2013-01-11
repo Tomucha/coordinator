@@ -4,7 +4,9 @@ import org.simpleframework.xml.*;
 import org.simpleframework.xml.core.Commit;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -85,6 +87,18 @@ public class WorkflowState extends AbstractStaticEntity {
      */
     void setWorkflowId(String workflowId) {
         this.workflowId = workflowId;
+    }
+
+    public Map<String, WorkflowTransition> getTransitionMap() {
+        if (transitions == null)
+            return new HashMap<String, WorkflowTransition>(0);
+
+        Map<String, WorkflowTransition> map = new HashMap<String, WorkflowTransition>(transitions.length);
+        for (WorkflowTransition transition : transitions) {
+            map.put(transition.getId(), transition);
+        }
+
+        return map;
     }
 
     @Override

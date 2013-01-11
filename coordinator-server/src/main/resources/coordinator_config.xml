@@ -16,7 +16,7 @@
         <skill id="skill2" name="Psychosociální pomoc ČČK" must_verify="true">Psychosociální pomoc ČČK</skill>
         <skill id="zdravotnik" name="Zdravotník" must_verify="true">Zdravotník</skill>
         <skill id="psycholog" name="Psycholog" must_verify="true">Psycholog</skill>
-        <skill id="krizovy_intervet" name="Krizovy intervent" must_verify="true">Krizový intervent - s výcvikem v psychologické první pomoci nebo krizové intervenci</skill>
+        <skill id="krizovy_intervent" name="Krizovy intervent" must_verify="true">Krizový intervent - s výcvikem v psychologické první pomoci nebo krizové intervenci</skill>
         <skill id="socialni_pracovnik" name="Sociální pracovník">Sociání pracovník</skill>
         <skill id="pedagog" name="Pedagog">Učitel, pedagog, práce s dětmi</skill>
         <skill id="statik" name="Statik" must_verify="true">Statik</skill>
@@ -34,10 +34,10 @@
         
         <workflow id="wkfl_zdravotnik" name="Zdravotnické úkoly" can_be_started_by="ANONYMOUS">
             <description>Zdravotnické úkoly</description>
-            <state id="wkfl_prace_state1" name="Nový zdravotnický úkol" visible_for_role="COORDINATOR, ZDRAVOTNIK"
+            <state id="wkfl_zdrv_state1" name="Nový zdravotnický úkol" visible_for_role="COORDINATOR, ZDRAVOTNIK"
                    editable_for_role="COORDINATOR, ZDRAVOTNIK">
                 <description>Nový zdravotnický úkol</description>
-                <transition id="wkfl_zdrv_state1_trans1" name="Transition 1" to_state_id="state1"
+                <transition id="wkfl_zdrv_state1_trans1" name="Přidělit" to_state_id="wkfl_zdrv_state2"
                             allowed_for_role="COORDINATOR, ZDRAVOTNIK">
                     Přidělit
                 </transition>
@@ -72,7 +72,7 @@
             <state id="wkfl_prace_state1" name="Nový úkol" visible_for_role="COORDINATOR, BACKEND"
                    editable_for_role="COORDINATOR, BACKEND">
                 <description>Nově vytvořený úkol</description>
-                <transition id="wkfl_prace_state1_trans1" name="Transition 1" to_state_id="state1"
+                <transition id="wkfl_prace_state1_trans1" name="Přidělit" to_state_id="wkfl_prace_state2"
                             allowed_for_role="COORDINATOR, BACKEND">
                     Přidělit
                 </transition>
@@ -125,7 +125,7 @@
                 allows_registration="true"
                 allows_pre_registration="false"
                 pre_registration_equipment="eq1, eq2"
-                pre_registration_skill="general, stavr, statitk, krizovy_intervent, socialni_pracovnik, pedagog"
+                pre_registration_skill="general, stavar, statik, krizovy_intervent, socialni_pracovnik, pedagog"
                 >
             ADRA pomáhá jak při mimořádných událostech (živelné pohromy, jako jsou povodně či zemětřesení, válečné konflikty apod.), tak při realizaci dlouhodobých rozvojových projektů (podpora vzdělání, zaměstnanosti, zemědělství atd.).  ADRA realizovala nebo realizuje projekty v Bangladéši, Barmě, Bosně a  Hercegovině, Číně, Bulharsku, Indii, Indonésii, Kambodži, Keni, Libanonu, Moldavsku, Mongolsku, Nepálu, Pákistánu, Rusku, Řecku, Srbsku, Srí Lance, Thajsku, Vietnamu, USA, Uzbekistánu, Zambii a v řadě dalších zemí.
         </organization>

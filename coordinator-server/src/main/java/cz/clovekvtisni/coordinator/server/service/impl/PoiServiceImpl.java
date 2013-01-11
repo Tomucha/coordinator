@@ -4,6 +4,8 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
+import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
+import cz.clovekvtisni.coordinator.domain.config.WorkflowTransition;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
@@ -113,5 +115,30 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
         filter.setEventIdVal(eventId);
         filter.setOrder("-createdDate");
         return findByFilter(filter, LAST_POI_LIST_LENGTH, null, 0l);
+    }
+
+    @Override
+    public PoiEntity startWorkflow(PoiEntity entity) {
+        Workflow workflow = entity.getWorkflow();
+        if (workflow == null)
+            return entity;
+        // TODO kontroly
+        WorkflowState startState = workflow.getStartState();
+        entity.setWorkflowState(startState);
+        return updatePoi(entity);
+    }
+
+    @Override
+    public PoiEntity transitWorkflowState(PoiEntity entity, String transitionId) {
+        if (entity == null || transitionId == null)
+            return entity;
+        if (entity.getWorkflowStateId() == null || entity.getWorkflowState().getTransitions() == null)
+            throw new IllegalArgumentException("no transition=" + transitionId + " in workflow state=" + entity.getWorkflowStateId());
+        WorkflowTransition transition = entity.getWorkflowState().getTransitionMap().get(transitionId);
+        if (transition == null)
+            throw new IllegalArgumentException("no transition=" + transitionId + " in workflow state=" + entity.getWorkflowStateId());
+        entity.setWorkflowState(null);
+        entity.setWorkflowStateId(transition.getToStateId());
+        return updatePoi(entity);
     }
 }

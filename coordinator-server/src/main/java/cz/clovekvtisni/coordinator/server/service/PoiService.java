@@ -42,4 +42,12 @@ public interface PoiService extends Service {
     @FilterResult("#helper.canRead(#entity)")
     @Cacheable(value = "lastEventPoiList")
     ResultList<PoiEntity> findLastByEventId(Long eventId);
+
+    @CheckPermission("#helper.canUpdate(#p0)")
+    @CacheEvict(value = {"lastPoiList", "lastEventPoiList"}, allEntries = true)
+    PoiEntity startWorkflow(PoiEntity entity);
+
+    @CheckPermission("#helper.canUpdate(#p0)")
+    @CacheEvict(value = {"lastPoiList", "lastEventPoiList"}, allEntries = true)
+    PoiEntity transitWorkflowState(PoiEntity entity, String transitionId);
 }

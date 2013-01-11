@@ -41,7 +41,7 @@ public class CoordinatorConfig {
     }
 
     public Map<String, Role> getRoleMap() {
-        if (roleList == null) return new HashMap<String, Role>();
+        if (roleList == null) return new HashMap<String, Role>(0);
         Map<String, Role> map = new HashMap<String, Role>(roleList.size());
         for (Role role : roleList) {
             map.put(role.getId(), role);
@@ -51,7 +51,7 @@ public class CoordinatorConfig {
     }
 
     public Map<String, Workflow> getWorkflowMap() {
-        if (workflowList == null) return new HashMap<String, Workflow>();
+        if (workflowList == null) return new HashMap<String, Workflow>(0);
         Map<String, Workflow> map = new HashMap<String, Workflow>(workflowList.size());
         for (Workflow workflow : workflowList) {
             map.put(workflow.getId(), workflow);
@@ -64,8 +64,28 @@ public class CoordinatorConfig {
         return skillList;
     }
 
+    public Map<String, Skill> getSkillMap() {
+        if (skillList == null) return new HashMap<String, Skill>(0);
+        Map<String, Skill> map = new HashMap<String, Skill>(skillList.size());
+        for (Skill skill : skillList) {
+            map.put(skill.getId(), skill);
+        }
+
+        return map;
+    }
+
     public List<Equipment> getEquipmentList() {
         return equipmentList;
+    }
+
+    public Map<String, Equipment> getEquipmentMap() {
+        if (equipmentList == null) return new HashMap<String, Equipment>(0);
+        Map<String, Equipment> map = new HashMap<String, Equipment>(equipmentList.size());
+        for (Equipment equipment : equipmentList) {
+            map.put(equipment.getId(), equipment);
+        }
+
+        return map;
     }
 
     public List<Organization> getOrganizationList() {
@@ -87,16 +107,25 @@ public class CoordinatorConfig {
 
         if (roleList != null) {
             for (Role role : roleList) {
-                checkEntityExist(roleMap, role, role.getExtendsRoleId());
+                checkKeysExist(roleMap, role.getExtendsRoleId());
             }
         }
         if (workflowList != null) {
             for (Workflow workflow : workflowList) {
-                checkEntityExist(roleMap, workflow.getCanBeStartedBy());
+                checkKeysExist(roleMap, workflow.getCanBeStartedBy());
                 if (workflow.getStates() != null) {
                     for (WorkflowState state : workflow.getStates()) {
-                        checkEntityExist(roleMap, state, state.getEditableForRole());
-                        checkEntityExist(roleMap, state, state.getVisibleForRole());
+                        checkKeysExist(roleMap, state.getEditableForRole());
+                        checkKeysExist(roleMap, state.getVisibleForRole());
+
+                        WorkflowTransition[] transitions = state.getTransitions();
+                        if (transitions != null) {
+                            Map<String, WorkflowState> stateMap = workflow.getStateMap();
+                            for (WorkflowTransition transition : transitions) {
+                               checkKeysExist(stateMap, transition.getFromStateId(), transition.getToStateId());
+                               checkKeysExist(roleMap, transition.getAllowedForRole());
+                            }
+                        }
                     }
                 }
             }
@@ -104,16 +133,25 @@ public class CoordinatorConfig {
         
         if (poiCategoryList != null) {
             for (PoiCategory poiCategory : poiCategoryList) {
-                checkEntityExist(workflowMap, poiCategory, poiCategory.getWorkflowId());
+                checkKeysExist(workflowMap, poiCategory.getWorkflowId());
+            }
+        }
+        
+        if (organizationList != null) {
+            Map<String, Skill> skillMap = getSkillMap();
+            Map<String, Equipment> equipmentMap = getEquipmentMap();
+            for (Organization organization : organizationList) {
+                checkKeysExist(skillMap, organization.getPreRegistrationSkills());
+                checkKeysExist(equipmentMap, organization.getPreRegistrationEquipment());
             }
         }
     }
 
-    private <T extends AbstractStaticEntity> void checkEntityExist(Map<String, T> roleMap, Object source, String... roles) {
-        if (roles == null) return;
-        for (String roleId : roles) {
-            if (roleId != null && !roleMap.containsKey(roleId)) {
-                throw new IllegalStateException("Inconsistent configuration. Reference to nonexistent entity in " + source);
+    private <T extends AbstractStaticEntity> void checkKeysExist(Map<String, T> map, String... keys) {
+        if (keys == null) return;
+        for (String key : keys) {
+            if (key != null && !map.containsKey(key)) {
+                throw new IllegalStateException("Inconsistent configuration. Key=" + key + " does not exist.");
             }
         }
     }
