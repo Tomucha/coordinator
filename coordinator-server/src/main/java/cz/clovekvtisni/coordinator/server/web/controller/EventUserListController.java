@@ -131,7 +131,8 @@ public class EventUserListController extends AbstractEventController {
                         if (registered != null)
                             updateList.addAll(Arrays.asList(registered));
                         for (Long userId : userIds)
-                            updateList.add(userId);
+                            if (userId != null)
+                                updateList.add(userId);
                         place.setUserIdList(updateList.toArray(new Long[0]));
                         poiService.updatePoi(place);
                     }

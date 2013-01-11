@@ -44,8 +44,8 @@ public class EventMapController extends AbstractEventController {
 
         UserInEventFilter userInEventFilter = new UserInEventFilter();
         userInEventFilter.setEventIdVal(event.getId());
-        ResultList<UserInEventEntity> users = userInEventService.findByFilter(userInEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER);
-        model.addAttribute("userInEventList", users.getResult());
+        ResultList<UserInEventEntity> inEvents = userInEventService.findByFilter(userInEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER);
+        model.addAttribute("userInEventList", inEvents.getResult());
 
         PoiFilter poiFilter = new PoiFilter();
         poiFilter.setEventIdVal(event.getId());

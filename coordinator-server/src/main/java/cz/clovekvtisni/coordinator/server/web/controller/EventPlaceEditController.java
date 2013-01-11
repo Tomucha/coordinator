@@ -4,8 +4,13 @@ import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
+import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
+import cz.clovekvtisni.coordinator.server.service.UserInEventService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
+import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.PoiForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,6 +36,9 @@ public class EventPlaceEditController extends AbstractEventController {
 
     @Autowired
     private PoiService poiService;
+
+    @Autowired
+    private UserInEventService userInEventService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String edit(
@@ -63,6 +73,8 @@ public class EventPlaceEditController extends AbstractEventController {
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid PoiForm form, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
+            EventEntity event = loadEventById(form.getEventId());
+            model.addAttribute("event", event);
             populateEventModel(model, new EventFilterParams(form.getEventId()));
             return "admin/event-place-edit";
         }
@@ -75,5 +87,19 @@ public class EventPlaceEditController extends AbstractEventController {
             poiEntity = poiService.updatePoi(poiEntity);
 
         return "redirect:/admin/event/place/list?eventId=" + poiEntity.getEventId();
+    }
+
+    @Override
+    protected void populateEventModel(Model model, FilterParams params) {
+        super.populateEventModel(model, params);
+        UserInEventFilter filter = new UserInEventFilter();
+        filter.setEventIdVal(((EventFilterParams) params).getEventId());
+        ResultList<UserInEventEntity> result = userInEventService.findByFilter(filter, 0, null, UserInEventService.FLAG_FETCH_USER);
+        List<UserEntity> users = new ArrayList<UserEntity>(result.getResultSize());
+        for (UserInEventEntity inEvent : result) {
+            users.add(inEvent.getUserEntity());
+        }
+
+        model.addAttribute("users", users);
     }
 }

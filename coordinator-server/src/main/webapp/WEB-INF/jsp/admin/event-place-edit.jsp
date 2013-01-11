@@ -64,6 +64,7 @@
                 <sf:hidden path="id"/>
                 <sf:hidden path="eventId"/>
                 <sf:hidden path="organizationId"/>
+                <sf:hidden path="workflowStateId"/>
                 <sf:hidden path="confirmed"/>
 
                 <tags:input field="poiCategoryId" modelAttribute="form" captionCode="PoiEntity.poiCategory">
@@ -96,6 +97,12 @@
                                 <sf:option value="${entry.key}" label="${entry.value.name}"/>
                             </c:forEach>
                         </sf:select>
+                    </tags:input>
+                </div>
+
+                <div>
+                    <tags:input field="assignedUsers" modelAttribute="form" captionCode="label.assignedUsers">
+                        <sf:checkboxes path="assignedUsers" items="${users}" itemValue="id" itemLabel="fullName"/>
                     </tags:input>
                 </div>
             </div>

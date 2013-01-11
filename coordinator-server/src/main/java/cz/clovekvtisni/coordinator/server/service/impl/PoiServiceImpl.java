@@ -124,6 +124,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
             return entity;
         // TODO kontroly
         WorkflowState startState = workflow.getStartState();
+        entity.setWorkflowStateId(startState != null ? startState.getId() : null);
         entity.setWorkflowState(startState);
         return updatePoi(entity);
     }
