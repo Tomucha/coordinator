@@ -38,14 +38,14 @@ public class OrganizationApiController extends AbstractApiController {
 
     @RequestMapping("/events")
     public @ResponseBody ApiResponse organizationEvents(HttpServletRequest request) {
-        UserRequest<OrganizationEventsRequestParams> req = parseRequestAnonymous(request, OrganizationEventsRequestParams.class);
+        OrganizationEventsRequestParams params = parseRequestAnonymous(request, OrganizationEventsRequestParams.class);
 
         OrganizationInEventFilter filter = new OrganizationInEventFilter();
-        if (req.params.getOrganizationId() != null)
-            filter.setOrganizationIdVal(req.params.getOrganizationId());
+        if (params.getOrganizationId() != null)
+            filter.setOrganizationIdVal(params.getOrganizationId());
 
-        else if (req.user != null)
-            filter.setOrganizationIdVal(req.user.getOrganizationId());
+        else if (getLoggedUser() != null)
+            filter.setOrganizationIdVal(getLoggedUser().getOrganizationId());
 
         List<OrganizationInEventEntity> found = organizationInEventService.findByFilter(filter, 0, null, OrganizationInEventService.FLAG_FETCH_EVENT).getResult();
         List<OrganizationInEvent> result = new EntityTool().buildTargetEntities(found);

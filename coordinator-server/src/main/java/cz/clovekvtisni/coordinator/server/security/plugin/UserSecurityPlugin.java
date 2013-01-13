@@ -31,7 +31,7 @@ public class UserSecurityPlugin extends SecurityPlugin {
         //TODO: realni prava
         PermissionCommand<UserEntity> permittedCommand = new PermittedCommand<UserEntity>();
         PermissionCommand<UserEntity> userLoggedCommand = new UserLoggedCommand<UserEntity>(appContext);
-        HasRoleCommand<UserEntity> isAdmin = new HasRoleCommand<UserEntity>(appContext, authorizationTool, Arrays.asList(new String[]{"ADMIN"}));
+        HasRoleCommand<UserEntity> isAdmin = new HasRoleCommand<UserEntity>(appContext, authorizationTool, Arrays.asList(new String[]{"BACKEND"}));
 
         registerPermissionCommand(UserEntity.class, ReadPermission.class, permittedCommand);
         registerPermissionCommand("userEntity", ReadPermission.class, permittedCommand);

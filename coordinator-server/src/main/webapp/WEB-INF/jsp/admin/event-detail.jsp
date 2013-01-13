@@ -23,6 +23,7 @@
             </c:if>
 
             <div>
+                <sf:hidden path="id"/>
                 <sf:hidden path="organizationId"/>
 
                 <c:choose>

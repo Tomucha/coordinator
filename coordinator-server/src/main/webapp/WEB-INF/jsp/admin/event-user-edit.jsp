@@ -4,6 +4,7 @@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags" %><%@
+        taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %><%@
         taglib prefix="can" uri="/WEB-INF/permissions.tld"
 %><script>
     $(function() {
@@ -21,7 +22,7 @@
     <div class="userForm">
         <sf:form method="POST" action="${root}/admin/event/user/edit" modelAttribute="form">
 
-            <sf:errors />
+            <sf:errors cssClass="alert alert-error" />
 
             <div class="formPanel">
 
@@ -111,9 +112,7 @@
                     <tags:input field="country" modelAttribute="form" captionCode="UserEntity.country">
                         <sf:select path="country">
                             <sf:option value=""><s:message code="label.emptyCountry"/></sf:option>
-                            <c:forEach items="${config.countryMap}" var="entry">
-                                <sf:option value="${entry.key}" label="${entry.value}"/>
-                            </c:forEach>
+                            <sf:options items="${config.countryMap}"/>
                         </sf:select>
                     </tags:input>
                 </div>
@@ -121,12 +120,18 @@
 
             <div class="panel checkboxList">
                 <h3><s:message code="header.equipmentList"/></h3>
-                <sf:checkboxes path="selectedEquipment" items="${config.equipmentList}" itemLabel="name" itemValue="id"/>
+                <sf:checkboxes path="selectedEquipment" items="${equipmentList}" itemLabel="name" itemValue="id"/>
+                <c:if test="${empty equipmentList or fn:length(equipmentList) == 0}">
+                    <p class="label label-inf"><s:message code="msg.noItemsAreRequired"/></p>
+                </c:if>
             </div>
 
             <div class="panel checkboxList">
                 <h3><s:message code="header.skillList"/></h3>
-                <sf:checkboxes path="selectedSkill" items="${config.skillList}" itemLabel="name" itemValue="id"/>
+                <sf:checkboxes path="selectedSkill" items="${skillList}" itemLabel="name" itemValue="id"/>
+                <c:if test="${empty skillList or fn:length(skillList) == 0}">
+                    <p class="label label-inf"><s:message code="msg.noItemsAreRequired"/></p>
+                </c:if>
             </div>
 
             <div class="panel checkboxList">

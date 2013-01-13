@@ -1,15 +1,21 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
+import cz.clovekvtisni.coordinator.domain.config.Equipment;
+import cz.clovekvtisni.coordinator.domain.config.Skill;
 import cz.clovekvtisni.coordinator.exception.MaException;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
+import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
+import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.tool.objectify.UniqueKeyViolation;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.EventUserForm;
@@ -25,7 +31,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,14 +51,13 @@ public class EventUserEditController extends AbstractEventController {
     @Autowired
     private UserGroupService userGroupService;
 
+    @Autowired
+    private OrganizationInEventService organizationInEventService;
+
     @RequestMapping(method = RequestMethod.GET)
     public String edit(@ModelAttribute("params") EventFilterParams params, @RequestParam(value = "userId", required = false) Long userId, Model model) {
 
-        EventEntity event = loadEventById(params.getEventId());
-        model.addAttribute("event", event);
-
         EventUserForm form = new EventUserForm();
-        form.injectConfigValues(appContext, authorizationTool, config);
 
         if (userId != null) {
             UserEntity user = loadUserById(userId, 0l);
@@ -67,11 +75,45 @@ public class EventUserEditController extends AbstractEventController {
             form.setEventId(params.getEventId());
         }
 
-        model.addAttribute("form", form);
-        model.addAttribute("userGroups", userGroupService.findByEventId(event.getId(), 0l));
-        populateEventModel(model, params);
+        populateEventModel(model, params, form);
 
         return "admin/event-user-edit";
+    }
+
+    private void populateEventModel(Model model, EventFilterParams params, EventUserForm form) {
+        super.populateEventModel(model, params);
+        EventFilterParams eventParams = (EventFilterParams) params;
+        EventEntity event = loadEventById(eventParams.getEventId());
+        model.addAttribute("event", event);
+        form.injectConfigValues(appContext, authorizationTool, config);
+
+        if (getLoggedUser().getOrganizationId() != null) {
+            OrganizationInEventFilter inEventFilter = new OrganizationInEventFilter();
+            inEventFilter.setOrganizationIdVal(getLoggedUser().getOrganizationId());
+            inEventFilter.setEventIdVal(params.getEventId());
+            OrganizationInEventEntity inEventEntity = organizationInEventService.findByFilter(inEventFilter, 0, null, 0l).singleResult();
+
+            Map<String,Equipment> equipmentMap = config.getEquipmentMap();
+            List<Equipment> equipmentList = new ArrayList<Equipment>(config.getEquipmentList().size());
+            for (String equipmentId : inEventEntity.getRegistrationEquipment())
+                if (equipmentMap.containsKey(equipmentId))
+                    equipmentList.add(equipmentMap.get(equipmentId));
+            model.addAttribute("equipmentList", equipmentList);
+
+            Map<String, Skill> skillMap = config.getSkillMap();
+            List<Skill> skillList = new ArrayList<Skill>(config.getSkillList().size());
+            for (String skillId : inEventEntity.getRegistrationSkills())
+                if (skillMap.containsKey(skillId))
+                    skillList.add(skillMap.get(skillId));
+            model.addAttribute("skillList", skillList);
+
+        } else {
+            model.addAttribute("equipmentList", config.getEquipmentList());
+            model.addAttribute("skillList", config.getSkillList());
+        }
+
+        model.addAttribute("userGroups", userGroupService.findByEventId(params.getEventId(), 0l));
+        model.addAttribute("form", form);
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -80,7 +122,7 @@ public class EventUserEditController extends AbstractEventController {
         form.postValidate(bindingResult, messageSource, appContext.getLocale());
 
         if (bindingResult.hasErrors()) {
-            populateEventModel(model, new EventFilterParams(form.getEventId()));
+            populateEventModel(model, new EventFilterParams(form.getEventId()), form);
             return "admin/event-user-edit";
         }
 
@@ -107,12 +149,12 @@ public class EventUserEditController extends AbstractEventController {
 
         } catch (UniqueKeyViolation e) {
             addFieldError(bindingResult, "form", e.getProperty().toString().toLowerCase(), form.getEmail(), "error.UNIQUE_KEY_VIOLATION");
-            populateEventModel(model, new EventFilterParams(form.getEventId()));
+            populateEventModel(model, new EventFilterParams(form.getEventId()), form);
             return "admin/event-user-edit";
 
         } catch (MaException e) {
             addFormError(bindingResult, e);
-            populateEventModel(model, new EventFilterParams(form.getEventId()));
+            populateEventModel(model, new EventFilterParams(form.getEventId()), form);
             return "admin/event-user-edit";
         }
     }

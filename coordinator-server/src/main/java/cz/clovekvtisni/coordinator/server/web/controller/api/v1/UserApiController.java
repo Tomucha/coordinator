@@ -43,8 +43,8 @@ public class UserApiController extends AbstractApiController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody ApiResponse login(HttpServletRequest request) {
-        UserRequest<LoginRequestParams> req = parseRequestAnonymous(request, LoginRequestParams.class);
-        UserEntity user = userService.login(req.params.getLogin(), req.params.getPassword());
+        LoginRequestParams params = parseRequestAnonymous(request, LoginRequestParams.class);
+        UserEntity user = userService.login(params.getLogin(), params.getPassword());
         if (user == null) {
             throw MaPermissionDeniedException.wrongCredentials();
         }
@@ -56,8 +56,8 @@ public class UserApiController extends AbstractApiController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public @ResponseBody ApiResponse register(HttpServletRequest request) {
-        UserRequest<RegisterRequestParams> req = parseRequestAnonymous(request, RegisterRequestParams.class);
-        User newUser = req.params.getNewUser();
+        RegisterRequestParams params = parseRequestAnonymous(request, RegisterRequestParams.class);
+        User newUser = params.getNewUser();
         if (newUser == null)
             throw MaParseException.wrongRequestParams();
 
@@ -68,7 +68,7 @@ public class UserApiController extends AbstractApiController {
             throw MaPermissionDeniedException.registrationNotAllowed();
 
         newUserEntity.setRoleIdList(new String[] {AuthorizationTool.ANONYMOUS});
-        UserInEvent inEvent = req.params.getUserInEvent();
+        UserInEvent inEvent = params.getUserInEvent();
 
         UserEntity user;
         if (inEvent != null) {
@@ -89,12 +89,12 @@ public class UserApiController extends AbstractApiController {
 
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     public @ResponseBody ApiResponse filter(HttpServletRequest request) {
-        UserRequest<UserListRequestParams> req = parseRequest(request, UserListRequestParams.class);
+        UserListRequestParams params = parseRequest(request, UserListRequestParams.class);
 
         UserFilter filter = new UserFilter(true);
-        filter.setOrganizationIdVal(req.user.getOrganizationId());
-        if (req.params.getModifiedFrom() != null) {
-            filter.setModifiedDateVal(req.params.getModifiedFrom());
+        filter.setOrganizationIdVal(getLoggedUser().getOrganizationId());
+        if (params.getModifiedFrom() != null) {
+            filter.setModifiedDateVal(params.getModifiedFrom());
             filter.setModifiedDateOp(Filter.Operator.GT);
         }
         filter.setOrder("modifiedDate");
@@ -107,14 +107,13 @@ public class UserApiController extends AbstractApiController {
 
     @RequestMapping(value = "/by-id", method = RequestMethod.POST)
     public @ResponseBody ApiResponse byId(HttpServletRequest request) {
-        UserRequest<UserByIdRequestParams> req = parseRequest(request, UserByIdRequestParams.class);
+        UserByIdRequestParams params = parseRequest(request, UserByIdRequestParams.class);
 
-        if (req.params.getById() == null)
+        if (params.getById() == null)
             return okResult(new UserByIdResponseData(new User[0]));
 
-        List<User> result = new EntityTool().buildTargetEntities(userService.findByIds(0l, req.params.getById()));
+        List<User> result = new EntityTool().buildTargetEntities(userService.findByIds(0l, params.getById()));
 
         return okResult(new UserByIdResponseData(result));
     }
-
 }

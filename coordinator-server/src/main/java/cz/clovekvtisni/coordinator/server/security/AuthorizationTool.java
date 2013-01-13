@@ -97,6 +97,7 @@ public class AuthorizationTool {
         return false;
     }
 
+    // TODO zohlednit userGroup
     public boolean isVisibleFor(PoiEntity poi, UserEntity user) {
         if (ValueTool.isEmpty(poi.getWorkflowStateId()))
             return true;

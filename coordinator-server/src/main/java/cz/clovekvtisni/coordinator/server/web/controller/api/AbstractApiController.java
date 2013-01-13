@@ -1,20 +1,5 @@
 package cz.clovekvtisni.coordinator.server.web.controller.api;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import cz.clovekvtisni.coordinator.server.security.AppContext;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonToken;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import cz.clovekvtisni.coordinator.api.request.RequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
@@ -24,8 +9,21 @@ import cz.clovekvtisni.coordinator.exception.MaParseException;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.UserService;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,13 +32,6 @@ import cz.clovekvtisni.coordinator.server.service.UserService;
  * Time: 3:48 PM
  */
 public abstract class AbstractApiController {
-
-    protected class UserRequest<T extends RequestParams> {
-
-        public UserEntity user;
-
-        public T params;
-    }
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -70,15 +61,15 @@ public abstract class AbstractApiController {
     @Autowired
     protected AppContext appContext;
 
-    protected <PARAMS extends RequestParams> UserRequest<PARAMS> parseRequestAnonymous(HttpServletRequest request, final Class<PARAMS> paramClass) {
+    protected <PARAMS extends RequestParams> PARAMS parseRequestAnonymous(HttpServletRequest request, final Class<PARAMS> paramClass) {
         return parseParams(request, true, paramClass);
     }
 
-    protected <PARAMS extends RequestParams> UserRequest<PARAMS> parseRequest(HttpServletRequest request, final Class<PARAMS> paramClass) {
+    protected <PARAMS extends RequestParams> PARAMS parseRequest(HttpServletRequest request, final Class<PARAMS> paramClass) {
         return parseParams(request, false, paramClass);
     }
 
-    protected <PARAMS extends RequestParams> UserRequest<PARAMS> parseParams(HttpServletRequest request, boolean isAnonymous, final Class<PARAMS> paramClass) {
+    protected <PARAMS extends RequestParams> PARAMS parseParams(HttpServletRequest request, boolean isAnonymous, final Class<PARAMS> paramClass) {
         return parseParams(request, isAnonymous, new ParseParamsCallback<PARAMS>() {
             @Override
             public PARAMS parse(JsonParser jsonParser) {
@@ -91,13 +82,12 @@ public abstract class AbstractApiController {
         });
     }
 
-    protected <PARAMS extends RequestParams> UserRequest<PARAMS> parseParams(HttpServletRequest request, boolean isAnonymous, ParseParamsCallback<PARAMS> parseCallback) {
+    protected <PARAMS extends RequestParams> PARAMS parseParams(HttpServletRequest request, boolean isAnonymous, ParseParamsCallback<PARAMS> parseCallback) {
 
         String signature = null;
         PARAMS params = null;
         String token = null;
         String authKey = null;
-        UserRequest<PARAMS> req = new UserRequest<PARAMS>();
 
         try {
             JsonParser jp = objectMapper.getJsonFactory().createJsonParser(request.getInputStream());
@@ -131,21 +121,18 @@ public abstract class AbstractApiController {
                 throw MaPermissionDeniedException.permissionDenied();
 
             } else if (authKey != null) {
-                req.user = userService.getByAuthKey(authKey);
-                if (req.user == null) {
+                appContext.setLoggedUser(userService.getByAuthKey(authKey));
+                if (appContext.getLoggedUser() == null) {
                     logger.error("unknown auth key {}", authKey);
                     throw MaPermissionDeniedException.permissionDenied();
                 }
-                appContext.setLoggedUser(req.user);
             }
 
         } catch (IOException e) {
             throw MaParseException.wrongRequestParams();
         }
 
-        req.params = params;
-
-        return req;
+        return params;
     }
 
     private String getSecret() {
@@ -177,4 +164,9 @@ public abstract class AbstractApiController {
         }
         return errorResult(ErrorCode.INTERNAL, ex.getMessage());
     }
+
+    protected UserEntity getLoggedUser() {
+        return appContext.getLoggedUser();
+    }
+
 }

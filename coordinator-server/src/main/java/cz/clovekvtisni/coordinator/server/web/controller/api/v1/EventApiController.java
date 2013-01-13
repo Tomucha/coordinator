@@ -8,6 +8,7 @@ import cz.clovekvtisni.coordinator.domain.Event;
 import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
@@ -44,18 +45,19 @@ public class EventApiController extends AbstractApiController {
 
     @RequestMapping(value = "/registered", method = RequestMethod.POST)
     public @ResponseBody ApiResponse filter(HttpServletRequest request) {
-        UserRequest<EventFilterRequestParams> req = parseRequestAnonymous(request, EventFilterRequestParams.class);
+        EventFilterRequestParams params = parseRequestAnonymous(request, EventFilterRequestParams.class);
         EventFilterResponseData responseData = new EventFilterResponseData();
 
         Set<Long> eventIds = new HashSet<Long>();
 
-        if (req.params.getOrganizationId() == null)
+        if (params.getOrganizationId() == null)
             throw new IllegalArgumentException("organization id cannot be null");
 
-        if (req.user != null) {
-            responseData.setOrganizationInEvents(getEventsByOrganizationId(req.params.getOrganizationId(), eventIds));
+        UserEntity user = getLoggedUser();
+        if (user != null) {
+            responseData.setOrganizationInEvents(getEventsByOrganizationId(params.getOrganizationId(), eventIds));
             UserInEventFilter filter = new UserInEventFilter();
-            filter.setUserIdVal(req.user.getId());
+            filter.setUserIdVal(user.getId());
             ResultList<UserInEventEntity> eventsByUser = userInEventService.findByFilter(filter, 0, null, 0l);
             List<UserInEventEntity> byOrganization = new ArrayList<UserInEventEntity>();
             for (UserInEventEntity entity : eventsByUser) {
@@ -64,8 +66,8 @@ public class EventApiController extends AbstractApiController {
             }
             responseData.setUserInEvents(new EntityTool().buildTargetEntities(byOrganization));
 
-        } else if (req.params.getOrganizationId() != null) {
-            responseData.setOrganizationInEvents(getEventsByOrganizationId(req.params.getOrganizationId(), eventIds));
+        } else if (params.getOrganizationId() != null) {
+            responseData.setOrganizationInEvents(getEventsByOrganizationId(params.getOrganizationId(), eventIds));
         }
 
         if (eventIds.size() > 0) {
