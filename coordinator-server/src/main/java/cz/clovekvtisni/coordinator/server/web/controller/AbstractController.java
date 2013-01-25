@@ -11,6 +11,7 @@ import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,7 @@ public abstract class AbstractController {
     protected UserService userService;
 
     @Autowired
-    private EventService eventService;
+    protected EventService eventService;
 
     @ModelAttribute
     public void loggedUser(Model model) {
@@ -74,6 +75,11 @@ public abstract class AbstractController {
     @ModelAttribute("now")
     public Long now() {
         return System.currentTimeMillis();
+    }
+
+    @ModelAttribute("rootBreadcrumb")
+    public Breadcrumb rootBreadcrumb() {
+        return new Breadcrumb("/admin", "breadcrumb.admin");
     }
 
     protected void addFormError(BindingResult errors, MaException exception) {

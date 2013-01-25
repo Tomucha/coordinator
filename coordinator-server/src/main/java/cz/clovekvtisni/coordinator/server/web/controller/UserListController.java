@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.Resource;
 
 @Controller
-@RequestMapping("/admin/user/list")
-public class UserListController extends AbstractController {
+@RequestMapping("/superadmin/user/list")
+public class UserListController extends AbstractSuperadminController {
 
     @Autowired
     private UserService userService;
@@ -30,11 +30,11 @@ public class UserListController extends AbstractController {
 
         model.addAttribute("userResult", userService.findByFilter(filter, DEFAULT_LIST_LENGTH, bookmark, 0l));
 
-        return "admin/user-list";
+        return "superadmin/user-list";
     }
 
     public static Breadcrumb getBreadcrumb() {
-        return new Breadcrumb("/admin/user/list", "breadcrumb.userList");
+        return new Breadcrumb("/superadmin/user/list", "breadcrumb.userList");
     }
 
     @ModelAttribute("breadcrumbs")

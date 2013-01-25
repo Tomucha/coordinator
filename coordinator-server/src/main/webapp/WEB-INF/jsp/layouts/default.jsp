@@ -10,38 +10,15 @@
 <html lang="en">
 <%--@elvariable id="loggedUser" type="cz.clovekvtisni.coordinator.server.domain.UserEntity"--%>
 <%--@elvariable id="root" type="java.lang.String"--%>
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <title>Coordinator<c:if test="${!empty event}"> - <c:out value="${event.name}"/></c:if></title>
 
-        <link type="text/css" href="${root}/css/coordinator.css" rel="stylesheet"/>
-        <link href="${root}/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <jsp:include page="inc_head.jsp"/>
 
-        <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-        <!--[if lt IE 9]>
-        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
-
-        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
-        <script src="${root}/bootstrap/js/bootstrap.min.js"></script>
-    </head>
     <body class="<tiles:getAsString name="extraClass"/>">
+    
+        <tags:navbar inverse="true">
+            <tags:loggedNavbar/>
+        </tags:navbar>
 
-        <div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="navbar-inner">
-                <div class="container-fluid">
-                    <a href="${root}/admin" class="brand">Coordinator - Člověk v tísni<c:if test="${!empty event}"> - <c:out value="${event.name}"/></c:if></a>
-                    <div class="nav-collapse collapse">
-                        <p class="navbar-text pull-right">
-                            <c:if test="${!empty loggedUser}">
-                                <c:out value="${loggedUser.email}" /> <a href="<s:url value="/logout"/>">(<s:message code="logout"/>)</a>
-                            </c:if>
-                        </p>
-                    </div><!--/.nav-collapse -->
-                </div>
-            </div>
-        </div>
 
         <div class="container-fluid">
             <div class="row-fluid">

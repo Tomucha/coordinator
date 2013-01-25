@@ -17,6 +17,6 @@
         <sf:password path="password" />
     </tags:input>
 
-    <input type="submit" value="login" />
+    <input type="submit" value="<s:message code="button.login"/>" class="btn btn-large btn-primary"/>
 
 </sf:form>

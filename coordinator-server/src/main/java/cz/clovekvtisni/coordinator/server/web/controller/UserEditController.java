@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/admin/user/edit")
-public class UserEditController extends AbstractController {
+@RequestMapping("/superadmin/user/edit")
+public class UserEditController extends AbstractSuperadminController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String edit(@RequestParam(value = "id", required = false) Long userId, Model model) {
@@ -42,7 +42,7 @@ public class UserEditController extends AbstractController {
 
         model.addAttribute("form", form);
 
-        return "admin/user-edit";
+        return "superadmin/user-edit";
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -51,7 +51,7 @@ public class UserEditController extends AbstractController {
         form.postValidate(bindingResult, messageSource, appContext.getLocale());
 
         if (bindingResult.hasErrors()) {
-            return "admin/user-edit";
+            return "superadmin/user-edit";
         }
 
         try {
@@ -63,14 +63,14 @@ public class UserEditController extends AbstractController {
 
         } catch (UniqueKeyViolation e) {
             addFieldError(bindingResult, "form", e.getProperty().toString().toLowerCase(), form.getEmail(), "error.UNIQUE_KEY_VIOLATION");
-            return "admin/user-edit";
+            return "superadmin/user-edit";
 
         } catch (MaException e) {
             addFormError(bindingResult, e);
-            return "admin/user-edit";
+            return "superadmin/user-edit";
         }
 
-        return "redirect:/admin/user/list";
+        return "redirect:/superadmin/user/list";
     }
 
     @ModelAttribute("breadcrumbs")

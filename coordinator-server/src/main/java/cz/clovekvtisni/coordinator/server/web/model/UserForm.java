@@ -25,7 +25,7 @@ public class UserForm extends UserEntity {
 
     private String confirmPassword;
 
-    private Map<String, String> organizationMap;
+    private String organizationId;
 
     private Map<String, String> acceptableRoleMap;
 
@@ -58,10 +58,6 @@ public class UserForm extends UserEntity {
 
     public List<Equipment> getAllEquipmentList() {
         return allEquipmentList;
-    }
-
-    public Map<String, String> getOrganizationMap() {
-        return organizationMap;
     }
 
     public Map<String, String> getAcceptableRoleMap() {
@@ -133,4 +129,13 @@ public class UserForm extends UserEntity {
         }
         setSkillEntityList(skillEntityList.toArray(new UserSkillEntity[0]));
     }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
 }

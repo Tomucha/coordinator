@@ -19,7 +19,7 @@
 
 <div class="mainPanel">
     <div class="userForm">
-        <sf:form method="POST" action="${root}/admin/user/edit" modelAttribute="form">
+        <sf:form method="POST" action="${root}/superadmin/user/edit" modelAttribute="form">
 
             <sf:errors cssClass="alert alert-error" element="div" />
 
@@ -33,7 +33,7 @@
                 </c:if>
 
                 <div>
-                    <tags:input field="roleIdList" modelAttribute="" captionCode="">
+                    <tags:input field="roleIdList" modelAttribute="" captionCode="UserEntity.roles">
                         <sf:select path="roleIdList" multiple="true" items="${form.acceptableRoleMap}"/>
                     </tags:input>
                 </div>

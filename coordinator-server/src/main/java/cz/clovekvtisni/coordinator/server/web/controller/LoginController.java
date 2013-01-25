@@ -56,7 +56,7 @@ public class LoginController extends AbstractController {
 
             retUrl = loginForm.retUrl;
             if (ValueTool.isEmpty(retUrl)) {
-                retUrl = "/admin/event/list";
+                retUrl = SuperadminController.getBreadcrumb().getUrl();
             }
         } catch (MaPermissionDeniedException ex) {
             addFormError(errors, ex);

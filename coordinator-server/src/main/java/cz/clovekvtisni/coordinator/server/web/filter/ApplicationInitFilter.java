@@ -121,7 +121,7 @@ public class ApplicationInitFilter implements Filter {
         return uri;
     }
 
-    private Pattern withoutLoginPattern = Pattern.compile("^/(?:login|logout|api|_ah)(?:/|$)");
+    private Pattern withoutLoginPattern = Pattern.compile("^/(?:login|logout|api|_ah|css|js|bootstrap|images)(?:/|$)");
 
     private boolean isWithoutLoginRequest(HttpServletRequest hr) {
         return isUriMatch(hr, withoutLoginPattern);

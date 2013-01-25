@@ -24,8 +24,10 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     @Id
     private Long id;
 
+    @NotEmpty
     private String firstName;
 
+    @NotEmpty
     private String lastName;
 
     @Index
