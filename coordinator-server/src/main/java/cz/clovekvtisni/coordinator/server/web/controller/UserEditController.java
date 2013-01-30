@@ -73,12 +73,5 @@ public class UserEditController extends AbstractSuperadminController {
         return "redirect:/superadmin/user/list";
     }
 
-    @ModelAttribute("breadcrumbs")
-    public Breadcrumb[] breadcrumbs() {
-        return new Breadcrumb[] {
-                UserListController.getBreadcrumb(),
-                EventListController.getBreadcrumb()
-        };
-    }
 
 }

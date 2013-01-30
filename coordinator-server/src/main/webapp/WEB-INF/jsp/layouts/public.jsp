@@ -25,7 +25,7 @@
         ================================================== -->
         <div class="row">
             <div class="span3 bs-docs-sidebar">
-                O projektu, la la la.
+                <s:message code="application.public.info"/>
             </div>
             <div class="span6">
                 <div id="page-content">
@@ -33,7 +33,7 @@
                 </div>
             </div>
             <div class="span3">
-                 Download here.
+                <s:message code="application.public.info2"/>
             </div>
         </div>
     </body>

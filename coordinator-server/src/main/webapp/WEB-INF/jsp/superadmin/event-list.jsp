@@ -12,10 +12,10 @@
     <div class="buttonPanel">
         <c:choose>
             <c:when test="${can:create('eventEntity')}">
-                <a class="btn" href="<s:url value="/admin/event/edit"/>"><s:message code="button.createEvent"/></a>
+                <a class="btn" href="<s:url value="/superadmin/event/edit"/>"><s:message code="button.createEvent"/></a>
             </c:when>
             <c:when test="${can:hasRole('ADMIN')}">
-                <a class="btn" href="<s:url value="/admin/event/detail"/>"><s:message code="button.registerToEvent"/></a>
+                <a class="btn" href="<s:url value="/superadmin/event/detail"/>"><s:message code="button.registerToEvent"/></a>
             </c:when>
         </c:choose>
     </div>
@@ -54,7 +54,7 @@
                                     <a class="btn" href="/admin/event/map?eventId=<c:out value="${event.id}"/>"><s:message code="button.detail"/></a>
                                 </c:if>
                                 <c:if test="${can:create('eventEntity')}">
-                                    <a class="btn" href="/admin/event/edit?eventId=<c:out value="${event.id}"/>"><s:message code="button.edit"/></a>
+                                    <a class="btn" href="/superadmin/event/edit?eventId=<c:out value="${event.id}"/>"><s:message code="button.edit"/></a>
                                 </c:if>
                             </td>
                         </tr>

@@ -6,7 +6,7 @@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form"
 %>
 
-<a href="${root}${rootBreadcrumb.linkUrl}" class="brand"><s:message code="application.name"/><c:if test="${!empty event}"> - <c:out value="${event.name}"/></c:if></a>
+<a href="${root}${rootBreadcrumb.linkUrl}<c:if test="${!empty event}">?eventId=<c:out value="${event.id}"/></c:if>" class="brand"><s:message code="application.name"/><c:if test="${!empty event}"> - <c:out value="${event.name}"/></c:if></a>
 
 <div class="nav-collapse collapse">
     <p class="navbar-text pull-right">

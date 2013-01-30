@@ -18,11 +18,4 @@ public class SuperadminController extends AbstractSuperadminController {
         return new Breadcrumb("/superadmin", "breadcrumb.home");
     }
 
-    @ModelAttribute("breadcrumbs")
-    public Breadcrumb[] breadcrumbs() {
-        return new Breadcrumb[] {
-                UserListController.getBreadcrumb(),
-                EventListController.getBreadcrumb()
-        };
-    }
 }

@@ -20,7 +20,9 @@
     <tags:loggedNavbar/>
 </tags:navbar>
 
+
 <div class="container-fluid">
+
     <div class="row-fluid">
 
         <div class="span3">
@@ -31,11 +33,10 @@
                         <p><s:message code="msg.noCurrentEvents"/></p>
                     </c:when>
                     <c:otherwise>
-                        <div class="btn-group btn-group-vertical">
                             <c:forEach items="${currentEvents}" var="event">
-                                <button class="btn"><c:out value="${event.name}"/></button>
+                                <p><a href="${root}/admin/event/map?eventId=${event.id}"><c:out value="${event.name}"/></a><br/>
+                                   <c:out value="${event.description}"/></p>
                             </c:forEach>
-                        </div>
                     </c:otherwise>
                 </c:choose>
             </div>

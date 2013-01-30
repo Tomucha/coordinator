@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/admin/event/edit")
-public class EventEditController extends AbstractEventController {
+@RequestMapping("/superadmin/event/edit")
+public class EventEditController extends AbstractSuperadminController {
 
     @Autowired
     private EventService eventService;
@@ -35,17 +35,17 @@ public class EventEditController extends AbstractEventController {
             form.populateFrom(eventEntity);
         }
 
-        populateEventModel(model, params);
+        //populateEventModel(model, params);
         model.addAttribute("form", form);
 
-        return "admin/event-edit";
+        return "superadmin/event-edit";
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid EventForm form, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            populateEventModel(model, new EventFilterParams(form));
-            return "admin/event-edit";
+            //populateEventModel(model, new EventFilterParams(form));
+            return "superadmin/event-edit";
         }
 
         EventEntity event = new EventEntity().populateFrom(form);
@@ -57,15 +57,15 @@ public class EventEditController extends AbstractEventController {
                 eventService.updateEvent(event);
             }
         } catch (MaException e) {
-            populateEventModel(model, new EventFilterParams(form));
+            //populateEventModel(model, new EventFilterParams(form));
             addFormError(bindingResult, e);
-            return "admin/event-edit";
+            return "superadmin/event-edit";
         }
 
-        return "redirect:/admin/event/list";
+        return "redirect:/superadmin/event/list";
     }
 
     public static Breadcrumb getBreadcrumb(FilterParams params) {
-        return new Breadcrumb(params, "/admin/event/edit", "breadcrumb.eventEdit", AuthorizationTool.SUPERADMIN);
+        return new Breadcrumb(params, "/superadmin/event/edit", "breadcrumb.eventEdit", AuthorizationTool.SUPERADMIN);
     }
 }

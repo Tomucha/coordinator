@@ -10,7 +10,8 @@
         attribute name="maxPoints" required="false" %><%@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags"
-%><style type="text/css">
+%>
+<style type="text/css">
     #mapContainer {
         width: ${!empty width ? width : "100%"};
         height: ${!empty height ? height : "100%"};
@@ -336,6 +337,16 @@
         </c:if>
     });
 </script>
+
+<%--
+
+TODO: hledani adresy
+
+<p>
+    <s:message code="label.search"/> <input type="text" class="search-query"/>
+</p>
+--%>
+
 <div id="mapContainer"></div>
 <div id="locationEditForm" style="display: none;">
     <div>
