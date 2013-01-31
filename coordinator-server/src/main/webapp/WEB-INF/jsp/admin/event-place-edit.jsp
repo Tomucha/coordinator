@@ -52,8 +52,7 @@
             onNewPoint="onNewPoint"
             maxPoints="poi=1"
             buttons="addPlace"
-            />
-
+     />
 </div>
 
 
@@ -65,7 +64,7 @@
 
             <div>
                 <sf:hidden path="id"/>
-                <sf:hidden path="eventId"/>
+                <tags:hiddenEvent/>
                 <sf:hidden path="organizationId"/>
                 <sf:hidden path="workflowStateId"/>
                 <sf:hidden path="confirmed"/>
@@ -126,7 +125,7 @@
             </div>
 
             <div class="buttonPanel">
-                <sf:button><s:message code="button.save"/></sf:button>
+                <sf:button class="btn"><s:message code="button.save"/></sf:button>
             </div>
 
 

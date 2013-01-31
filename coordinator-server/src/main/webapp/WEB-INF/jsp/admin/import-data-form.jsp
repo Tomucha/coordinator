@@ -14,7 +14,7 @@
 <c:if test="${form.rowCount > 0}">
     <sf:form modelAttribute="form" action="${root}/admin/import/data">
         <div class="importTablePanel">
-            <sf:hidden path="eventId"/>
+            <tags:hiddenEvent/>
             <sf:hidden path="organizationId"/>
 
             <sf:errors />

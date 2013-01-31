@@ -59,10 +59,10 @@ public class EventUserEditController extends AbstractEventController {
         if (userId != null) {
             UserEntity user = loadUserById(userId, 0l);
             form.populateFrom(user);
+            form.setUserId(user.getId());
             UserInEventEntity inEvent = fetchUserInEvent(params.getEventId(), userId);
             form.setEventId(inEvent.getEventId());
             if (inEvent != null) {
-                form.setUserInEventId(inEvent.getId());
                 if (inEvent.getGroupIdList() != null)
                     form.setGroupIdList(Arrays.asList(inEvent.getGroupIdList()));
             }
@@ -126,18 +126,21 @@ public class EventUserEditController extends AbstractEventController {
         try {
             // TODO begin transaction ?
             UserEntity user = new UserEntity().populateFrom(form);
-            if (form.isNew()) {
+            if (form.getUserId() == null) {
                 form.setRoleIdList(new String[] {AuthorizationTool.ANONYMOUS});
                 user = userService.createUser(user);
-            } else
+            } else {
+                user.setId(form.getUserId());
                 user = userService.updateUser(user);
+            }
 
-            if (form.getUserInEventId() == null) {
+            // FIXME: tohle je neprt, puvodne to poznaval podle ID
+            if (form.getCreatedDate() == null) {
                 form.setId(user.getId());
                 userInEventService.create(form.buildUserInEventEntity());
 
             } else {
-                UserInEventEntity inEvent = userInEventService.findById(form.getUserInEventId(), user.getId(), 0l);
+                UserInEventEntity inEvent = userInEventService.findById(form.getEventId(), user.getId(), 0l);
                 inEvent.setGroupIdList(form.getGroupIdList() == null ? null : form.getGroupIdList().toArray(new Long[0]));
                 userInEventService.update(inEvent);
             }

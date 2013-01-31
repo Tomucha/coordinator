@@ -63,7 +63,7 @@ public class LoginController extends AbstractSuperadminController {
             return "public/login";
         }
 
-        return "redirect:" + retUrl;
+        return "redirect:/superadmin";
     }
 
 

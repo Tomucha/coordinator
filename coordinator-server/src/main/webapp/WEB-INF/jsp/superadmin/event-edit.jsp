@@ -71,7 +71,7 @@
             </div>
 
             <div id="hiddenInputContainer">
-                <sf:hidden path="id"/>
+                <tags:hiddenEvent/>
                 <tags:input field="name" modelAttribute="form" captionCode="label.name">
                     <sf:input path="name"/>
                 </tags:input>

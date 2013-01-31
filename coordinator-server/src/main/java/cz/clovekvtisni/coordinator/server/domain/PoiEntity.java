@@ -10,6 +10,8 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,7 +50,7 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     private String workflowStateId;
 
     @Index
-    private Long[] userIdList;
+    private Set<Long> userIdList;
 
     @NotNull
     private Double latitude;
@@ -125,11 +127,12 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
         this.workflowStateId = workflowStateId;
     }
 
-    public Long[] getUserIdList() {
+    public Set<Long> getUserIdList() {
+        if (userIdList == null) userIdList = new HashSet<Long>();
         return userIdList;
     }
 
-    public void setUserIdList(Long[] userIdList) {
+    public void setUserIdList(Set<Long> userIdList) {
         this.userIdList = userIdList;
     }
 
@@ -203,7 +206,7 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     }
 
     public int getUserCount() {
-        return userIdList != null ? userIdList.length : 0;
+        return userIdList != null ? userIdList.size() : 0;
     }
 
     public String getName() {

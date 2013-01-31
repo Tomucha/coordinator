@@ -14,7 +14,7 @@
 
             <div>
                 <sf:hidden path="id"/>
-                <sf:hidden path="eventId"/>
+                <tags:hiddenEvent/>
                 <sf:hidden path="organizationId"/>
             </div>
                 

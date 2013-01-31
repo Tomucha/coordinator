@@ -50,4 +50,11 @@ public interface PoiService extends Service {
     @CheckPermission("#helper.canUpdate(#p0)")
     @CacheEvict(value = {"lastPoiList", "lastEventPoiList"}, allEntries = true)
     PoiEntity transitWorkflowState(PoiEntity entity, String transitionId);
+
+    @CheckPermission("#helper.canUpdate(#p0)")
+    PoiEntity assignUser(PoiEntity poi, Long userId);
+
+    @CheckPermission("#helper.canUpdate(#p0)")
+    PoiEntity unassignUser(PoiEntity poi, Long userInEventId);
+
 }

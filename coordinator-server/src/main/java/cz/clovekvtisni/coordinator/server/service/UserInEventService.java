@@ -9,6 +9,7 @@ import cz.clovekvtisni.coordinator.server.security.FilterResult;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 
 import java.util.List;
+import java.util.Set;
 
 public interface UserInEventService extends Service {
 
@@ -19,16 +20,13 @@ public interface UserInEventService extends Service {
     public static final long FLAG_FETCH_GROUPS = 4l;
 
     @FilterResult("#helper.canRead(#entity)")
-    UserInEventEntity findById(Long id, Long parentUserId, long flags);
+    UserInEventEntity findById(long eventId, long userId, long flags);
 
     @FilterResult("#helper.canRead(#entity)")
-    List<UserInEventEntity> findByIds(long flags, Long... ids);
+    List<UserInEventEntity> findByIds(long eventId, Set<Long> userIds, long flags);
 
     @FilterResult("#helper.canRead(#entity)")
     ResultList<UserInEventEntity> findByFilter(UserInEventFilter filter, int limit, String bookmark, long flags);
-
-    @FilterResult("#helper.canRead(#entity)")
-    UserInEventEntity findByUser(Long userId, Long eventId, long flags);
 
     @CheckPermission("#helper.canCreate(#p0)")
     UserInEventEntity create(UserInEventEntity inEvent);

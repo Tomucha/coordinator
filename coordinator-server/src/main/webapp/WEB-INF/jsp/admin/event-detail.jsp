@@ -27,25 +27,23 @@
             <div>
                 <sf:hidden path="id"/>
                 <sf:hidden path="organizationId"/>
+                <tags:hiddenEvent/>
 
                 <c:choose>
                     <c:when test="${form.new}">
                         <p class="lead">
-                            <sf:hidden path="eventId" />
+                            <tags:hiddenEvent/>
                             <b><s:message code="label.event"/>:</b> <c:out value="${event.name}"/>
                         </p>
                     </c:when>
                     <c:otherwise>
                         <p class="lead">
-                            <sf:hidden path="eventId"/>
+                            <tags:hiddenEvent/>
                             <b><s:message code="label.event"/>:</b> <c:out value="${form.eventEntity.name}"/>
                         </p>
                     </c:otherwise>
                 </c:choose>
 
-                <c:if test="${!form.new}">
-                    <sf:hidden path="eventId"/>
-                </c:if>
             </div>
 
             <div>

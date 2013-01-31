@@ -9,12 +9,13 @@ import cz.clovekvtisni.coordinator.domain.config.WorkflowTransition;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
+import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -32,6 +33,9 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
     @Autowired
     private AuthorizationTool authorizationTool;
+
+    @Autowired
+    private UserInEventService userInEventService;
 
     @Override
     public PoiEntity findById(Long id, long flags) {
@@ -114,6 +118,38 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     }
 
     @Override
+    public PoiEntity assignUser(final PoiEntity poi, final Long userId) {
+        return ofy().transact(new Work<PoiEntity>() {
+            @Override
+            public PoiEntity run() {
+                PoiEntity old = ofy().get(poi.getKey());
+                UserInEventEntity user = ofy().get(UserInEventEntity.createKey(userId, old.getEventId()));
+                if (user == null) throw new IllegalStateException("No such user in event: "+userId);
+                old.getUserIdList().add(user.getUserId());
+                updateSystemFields(old, old);
+                ofy().put(old);
+                return old;
+            }
+        });
+    }
+
+    @Override
+    public PoiEntity unassignUser(final PoiEntity poi, final Long userId) {
+        return ofy().transact(new Work<PoiEntity>() {
+            @Override
+            public PoiEntity run() {
+                PoiEntity old = ofy().get(poi.getKey());
+                UserInEventEntity user = ofy().get(UserInEventEntity.createKey(userId, old.getEventId()));
+                if (user == null) throw new IllegalStateException("No such user in event: "+userId);
+                old.getUserIdList().remove(user.getUserId());
+                updateSystemFields(old, old);
+                ofy().put(old);
+                return old;
+            }
+        });
+    }
+
+    @Override
     public void deletePoi(PoiEntity entity, long flags) {
         entity.setDeletedDate(new Date());
         updatePoi(entity);
@@ -161,4 +197,5 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
         entity.setWorkflowStateId(transition.getToStateId());
         return updatePoi(entity);
     }
+
 }

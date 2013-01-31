@@ -28,3 +28,6 @@ body {
 div.dropdown-menu {
     padding: 0.5em;
 }
+#changeWorkflowStateModal {
+    width: 800px;
+}

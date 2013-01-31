@@ -17,7 +17,7 @@ public class EventUserForm extends UserForm {
     @NotNull
     private Long eventId;
 
-    private Long userInEventId;
+    private Long userId;
 
     private List<Long> groupIdList;
 
@@ -27,14 +27,6 @@ public class EventUserForm extends UserForm {
 
     public void setEventId(Long eventId) {
         this.eventId = eventId;
-    }
-
-    public Long getUserInEventId() {
-        return userInEventId;
-    }
-
-    public void setUserInEventId(Long userInEventId) {
-        this.userInEventId = userInEventId;
     }
 
     public UserInEventEntity buildUserInEventEntity() {
@@ -55,4 +47,13 @@ public class EventUserForm extends UserForm {
     public void setGroupIdList(List<Long> groupIdList) {
         this.groupIdList = groupIdList;
     }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
 }

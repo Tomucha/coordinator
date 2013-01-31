@@ -5,6 +5,7 @@ import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
+import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.web.model.*;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
@@ -33,6 +34,9 @@ public class EventPlaceListController extends AbstractEventController {
     @Autowired
     private PoiService poiService;
 
+    @Autowired
+    private UserGroupService userGroupService;
+
     @RequestMapping(method = RequestMethod.GET)
     public String list(@ModelAttribute("params") EventFilterParams params, @RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
         PoiFilter filter = new PoiFilter();
@@ -44,6 +48,8 @@ public class EventPlaceListController extends AbstractEventController {
         PoiMultiSelection selectionForm = new PoiMultiSelection();
         selectionForm.setEventId(appContext.getActiveEvent().getId());
         model.addAttribute("selectionForm", selectionForm);
+
+        model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
 
         return "admin/event-places";
     }

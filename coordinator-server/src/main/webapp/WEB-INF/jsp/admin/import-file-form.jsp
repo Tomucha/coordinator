@@ -13,7 +13,7 @@
             <sf:errors cssClass="alert alert-error" element="div" />
 
             <div class="importTablePanel">
-                <sf:hidden path="eventId"/>
+                <tags:hiddenEvent/>
                 <sf:hidden path="organizationId"/>
                 <input type="file" name="csvFile"/>
             </div>

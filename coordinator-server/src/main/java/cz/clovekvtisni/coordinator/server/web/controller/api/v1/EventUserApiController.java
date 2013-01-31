@@ -52,21 +52,18 @@ public class EventUserApiController extends AbstractApiController {
     @RequestMapping(value = "/update-position", method = RequestMethod.POST)
     public @ResponseBody ApiResponse updatePosition(HttpServletRequest request) {
         UserUpdatePositionRequestParams params = parseRequest(request, UserUpdatePositionRequestParams.class);
-        UserInEventFilter filter = new UserInEventFilter();
-        filter.setEventIdVal(params.getEventId());
-        filter.setUserIdVal(getLoggedUser().getId());
-        ResultList<UserInEventEntity> found = userInEventService.findByFilter(filter, 1, null, 0l);
+        final UserInEventEntity found = userInEventService.findById(params.getEventId(), getLoggedUser().getId(), 0l);
 
-        if (found.getResultSize() == 0)
-            throw NotFoundException.idNotExist();
-        final UserInEventEntity userInEvent = found.firstResult();
-        userInEvent.setLastLocationLatitude(params.getLatitude());
-        userInEvent.setLastLocationLongitude(params.getLongitude());
+        if (found == null) throw NotFoundException.idNotExist();
+
+        found.setLastLocationLatitude(params.getLatitude());
+        found.setLastLocationLongitude(params.getLongitude());
 
         UserInEventEntity updated = securityTool.runWithAnonymousEnabled(new RunnableWithResult<UserInEventEntity>() {
             @Override
             public UserInEventEntity run() {
-                return userInEventService.update(userInEvent);
+                // FIXME: tyhle opicarny je potreba delat na servise v transakci kurvauz
+                return userInEventService.update(found);
             }
         });
 

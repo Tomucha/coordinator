@@ -61,12 +61,21 @@ public class EventUserListController extends AbstractEventController {
 
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
 
-        // FIXME: refaktoring
-
-        //populateEventModel(model, params);
-
         return "admin/event-users";
     }
+
+    @RequestMapping(method = RequestMethod.GET, params = "ajax")
+    public String listUsersAjax(@ModelAttribute("params") EventFilterParams params, Model model) {
+
+        UserInEventFilter inEventFilter = createFilterFromParams(params);
+        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS);
+        model.addAttribute("userInEvents", userInEvents.getResult());
+
+        model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
+
+        return "ajax/event-users";
+    }
+
 
     private UserInEventFilter createFilterFromParams(EventFilterParams params) {
         UserInEventFilter inEventFilter = new UserInEventFilter();
@@ -120,6 +129,9 @@ public class EventUserListController extends AbstractEventController {
                     }
                     break;
 
+/*
+                FIXME: takhle ten assign nemuze byt, delam ho jinak
+
                 case REGISTER_TO_TASK:
                     Long placeId = selection.getSelectedTaskId();
                     if (placeId != null) {
@@ -135,6 +147,7 @@ public class EventUserListController extends AbstractEventController {
                         poiService.updatePoi(place);
                     }
                     break;
+*/
 
                 case ADD_TO_GROUP:
                     Long groupId = selection.getGroupId();

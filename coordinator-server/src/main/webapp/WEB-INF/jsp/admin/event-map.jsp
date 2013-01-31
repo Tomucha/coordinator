@@ -8,7 +8,7 @@
     function init() {
         <c:if test="${!empty userInEventList}">
             <c:forEach items="${userInEventList}" var="userInEvent">
-                <c:if test="${!empty userInEvent.id and !empty userInEvent.lastLocationLatitude and !empty userInEvent.lastLocationLongitude}">
+                <c:if test="${!empty userInEvent.userId and !empty userInEvent.lastLocationLatitude and !empty userInEvent.lastLocationLongitude}">
                     CoordinatorMap.addPoint({
                         type: TYPE_USER,
                         userId: <c:out value="${userInEvent.userId}"/>,

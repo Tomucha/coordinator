@@ -42,10 +42,9 @@
                 </div>
 
                 <div>
-                    <sf:hidden path="id"/>
-                    <sf:hidden path="eventId"/>
-
-                    <sf:hidden path="userInEventId"/>
+                    <tags:hiddenEvent/>
+                    <sf:hidden path="userId"/>
+                    <sf:hidden path="createdDate"/>
 
                     <tags:input field="firstName" modelAttribute="form" captionCode="UserEntity.firstName">
                         <sf:input path="firstName" />

@@ -37,6 +37,9 @@
     <div class="btn-toolbar">
         <c:choose>
             <c:when test="${can:hasRole('BACKEND')}">
+
+                <button accesskey="f" class="btn" onclick="\$('#searchFormPanel').show();"><s:message code="button.filterList"/> <span class="caret"></span></button>
+
                 <a class="btn" href="<s:url value="/admin/event/user/edit?eventId=${params.eventId}"/>"><s:message
                         code="button.addNewUser"/></a>
                 <a class="btn" href="<s:url value="/admin/event/user-group/edit?eventId=${params.eventId}"/>"><s:message
@@ -48,52 +51,38 @@
                             code="button.import"/></a>
                 </c:if>
 
-                <div class="btn-group">
-
-                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                        <s:message code="button.filterList"/>
-                        <span class="caret"></span>
-                    </a>
-
-                    <div class="searchFormPanel dropdown-menu">
-                        <sf:form action="" modelAttribute="params" method="get">
-                            <sf:hidden path="eventId"/>
-                            <label>
-                                <s:message code="label.group"/>:
-                                <sf:select path="groupId">
-                                    <sf:option value=""/>
-                                    <sf:options items="${userGroups}" itemLabel="name" itemValue="id"/>
-                                </sf:select>
-                            </label>
-                            <label><s:message code="label.name"/>: <sf:input path="userFulltext"/></label>
-                            <button type="submit" class="btn"><s:message code="button.filterList"/></button>
-                        </sf:form>
-                    </div>
-
-                </div>
-
 
             </c:when>
         </c:choose>
 
     </div>
 
+    <div class="searchFormPanel" id="searchFormPanel" style="display: none;">
+        <sf:form action="" modelAttribute="params" method="get">
+            <tags:hiddenEvent/>
+            <label><s:message code="label.group"/>:</label>
+                <sf:select path="groupId">
+                    <sf:option value=""/>
+                    <sf:options items="${userGroups}" itemLabel="name" itemValue="id"/>
+                </sf:select>
+            <label><s:message code="label.name"/>:</label> <sf:input path="userFulltext"/>
+
+            <p><button type="submit" class="btn"><s:message code="button.filterList"/></button></p>
+        </sf:form>
+    </div>
+
+
     <c:choose>
         <c:when test="${!empty userInEvents}">
             <sf:form action="${root}/admin/event/user/list" method="post" modelAttribute="selectionForm">
                 <div class="eventListTable">
-                    <sf:hidden path="eventId"/>
+                    <tags:hiddenEvent/>
 
                     <table class="table table-striped">
                         <thead>
                         <tr>
                             <th></th>
-                            <th><s:message code="label.name"/></th>
-                            <th><s:message code="label.phone"/></th>
-                            <th><s:message code="label.status"/></th>
-                            <th><s:message code="label.address"/></th>
-                            <th><s:message code="label.roles"/></th>
-                            <th><s:message code="label.userGroups"/></th>
+                            <tags:eventUserList renderHeader="true"/>
                             <th><s:message code="label.action"/></th>
                         </tr>
                         </thead>
@@ -102,35 +91,7 @@
                             <tr>
                                 <td><input type="checkbox" name="selectedUsers[${i.index}]"
                                            value="${userInEvent.userId}"/></td>
-                                <th><c:out value="${userInEvent.userEntity.fullName}"/></th>
-                                <td><c:out value="${userInEvent.userEntity.phone}"/></td>
-                                <td>
-                                    <c:choose>
-                                        <c:when test="${userInEvent.userEntity.suspended}">
-                                            <span class="alert alert-error"
-                                                  title="<c:out value="${userInEvent.userEntity.reasonSuspended}"/>"><s:message
-                                                    code="label.suspended"/></span>
-                                        </c:when>
-                                        <c:when test="${!empty userInEvent.status}">
-                                            <s:message code="RegistrationStatus.${userInEvent.status}"/>
-                                        </c:when>
-                                    </c:choose>
-                                </td>
-                                <td><c:out value="${userInEvent.userEntity.fullAddress}"/></td>
-                                <td>
-                                    <c:if test="${!empty userInEvent.roles}">
-                                        <c:forEach items="${userInEvent.roles}" var="role">
-                                            <span class="label"><c:out value="${config.roleMap[role].name}"/></span>
-                                        </c:forEach>
-                                    </c:if>
-                                </td>
-                                <td>
-                                    <c:if test="${!empty userInEvent.groupEntities}">
-                                        <c:forEach items="${userInEvent.groupEntities}" var="group">
-                                            <span class="label"><c:out value="${group.name}"/></span>
-                                        </c:forEach>
-                                    </c:if>
-                                </td>
+                                <tags:eventUserList renderHeader="false" user="${userInEvent}"/>
                                 <td>
                                     <a class="btn"
                                        href="<s:url value="${root}/admin/event/user/edit?eventId=${params.eventId}&userId=${userInEvent.userId}"/>"><s:message

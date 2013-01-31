@@ -325,7 +325,6 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
                 inEvent.setParentKey(connectedUser.getKey());
                 inEvent.setUserId(connectedUser.getId());
-                inEvent.setId(null);
 
                 UserInEventEntity resultEvent = userInEventService.create(inEvent);
                 systemService.saveUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.USER_IN_EVENT, resultEvent.getUserId() + "~" + resultEvent.getEventId(), resultEvent.getKey());

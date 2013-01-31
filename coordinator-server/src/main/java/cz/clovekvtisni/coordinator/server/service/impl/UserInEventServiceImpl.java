@@ -7,7 +7,6 @@ import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserGroupEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
@@ -28,15 +27,6 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
 
     @Autowired
     private UserGroupService userGroupService;
-
-    @Override
-    public UserInEventEntity findById(Long id, Long parentUserId, long flags) {
-        UserInEventEntity inEvent = ofy().load().key(Key.create(Key.create(UserEntity.class, parentUserId), UserInEventEntity.class, id)).get();
-
-        populate(Arrays.asList(new UserInEventEntity[] {inEvent}), flags);
-
-        return inEvent;
-    }
 
     @Override
     public ResultList<UserInEventEntity> findByFilter(UserInEventFilter filter, int limit, String bookmark, long flags) {
@@ -89,7 +79,7 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
         return ofy().transact(new Work<UserInEventEntity>() {
             @Override
             public UserInEventEntity run() {
-                inEvent.setId(null);
+                // FIXME: pripadne vytvorit uzivatele
                 if  (inEvent.getStatus() == null)
                     inEvent.setStatus(RegistrationStatus.CONFIRMED);
                 updateSystemFields(inEvent, null);
@@ -104,7 +94,7 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
     @Override
     public UserInEventEntity update(final UserInEventEntity inEvent) {
         logger.debug("updating " + inEvent);
-        final UserInEventEntity old = findById(inEvent.getId(), inEvent.getUserId(), 0l);
+        final UserInEventEntity old = findById(inEvent.getEventId(), inEvent.getUserId(), 0l);
         if (old == null)
             throw NotFoundException.idNotExist(UserInEvent.class.getSimpleName(), inEvent.getId());
         return ofy().transact(new Work<UserInEventEntity>() {
@@ -130,14 +120,23 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
     }
 
     @Override
-    public List<UserInEventEntity> findByIds(long flags, Long... ids) {
-        if (ids == null)
-            return null;
+    public UserInEventEntity findById(long eventId, long userId, long flags) {
+        UserInEventEntity entity = ofy().get(UserInEventEntity.createKey(userId, eventId));
+        populate(Arrays.asList(entity), flags);
+        return entity;
+    }
 
-        Set<Key<UserInEventEntity>> keys = new HashSet<Key<UserInEventEntity>>(ids.length);
-        for (Long id : ids) {
-            if (id != null)
-                keys.add(Key.create(UserInEventEntity.class, id));
+    @Override
+    public List<UserInEventEntity> findByIds(long eventId, Set<Long> userIds, long flags) {
+        if (userIds == null || userIds.size() == 0) {
+            return Collections.EMPTY_LIST;
+        }
+
+        Set<Key<UserInEventEntity>> keys = new HashSet<Key<UserInEventEntity>>();
+        for (Long id : userIds) {
+            if (id != null) {
+                keys.add(UserInEventEntity.createKey(id, eventId));
+            }
         }
 
         Map<Key<UserInEventEntity>, UserInEventEntity> entityMap = ofy().get(keys);
@@ -147,11 +146,4 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
 
     }
 
-    @Override
-    public UserInEventEntity findByUser(Long userId, Long eventId, long flags) {
-        UserInEventFilter filter = new UserInEventFilter();
-        filter.setEventIdVal(eventId);
-        filter.setUserIdVal(userId);
-        return findByFilter(filter, 1, null, 0l).singleResult();
-    }
 }

@@ -105,9 +105,11 @@ public class AuthorizationTool {
         String[] visibleForRole = state.getVisibleForRole();
         if (visibleForRole == null)
             return true;
-        Long[] assignedUsers = poi.getUserIdList();
-        if (assignedUsers != null && Arrays.asList(assignedUsers).contains(user.getId()))
+
+        if (poi.getUserIdList().contains(user.getId())) {
+            // FIXME: to ze to na me assignovane, neznamena, ze to vidim
             return true;
+        }
         String[] editableForRole = state.getEditableForRole();
         if (editableForRole != null && isAuthorized(editableForRole, user))
             return true;

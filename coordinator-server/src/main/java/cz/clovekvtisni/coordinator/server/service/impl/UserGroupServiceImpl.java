@@ -127,7 +127,7 @@ public class UserGroupServiceImpl extends AbstractEntityServiceImpl implements U
     public void addUsersToGroup(UserGroupEntity entity, Long... userIds) {
         List<UserEntity> users = userService.findByIds(0l, userIds);
         for (UserEntity user : users) {
-            UserInEventEntity inEvent = userInEventService.findByUser(user.getId(), entity.getEventId(), 0l);
+            UserInEventEntity inEvent = userInEventService.findById(entity.getEventId(), user.getId(), 0l);
             if (inEvent == null)
                 continue;
             Set<Long> groupIdList = new HashSet<Long>();

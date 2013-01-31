@@ -3,7 +3,6 @@ package cz.clovekvtisni.coordinator.server.domain;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
-import cz.clovekvtisni.coordinator.domain.UserGroup;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.server.util.EntityTool;
 
@@ -21,14 +20,14 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     @Id
     private Long id;
 
+    @Index
+    private Long eventId;
+
     @Parent
     private Key<UserEntity> parentKey;
 
     @Index
     private Long userId;
-
-    @Index
-    private Long eventId;
 
     private boolean usesSmartphoneApp;
 
@@ -86,16 +85,25 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     }
 
     @Override
-    public Key<UserInEventEntity> getKey() {
-        return Key.create(UserInEventEntity.class, id);
-    }
-
     public Long getId() {
-        return id;
+        throw new IllegalStateException("Don't call this, I have no id");
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    @Override
+    public boolean isNew() {
+        // FIXME: zoufalost
+        return getCreatedDate() == null;
+    }
+
+    @Override
+    public Key<UserInEventEntity> getKey() {
+        return createKey(userId, eventId);
+    }
+
+    public static Key<UserInEventEntity> createKey(Long userId, Long eventId) {
+        return Key.create(
+                Key.create(UserEntity.class, userId), UserInEventEntity.class, eventId
+        );
     }
 
     public Long getUserId() {
@@ -112,6 +120,7 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     public void setEventId(Long eventId) {
         this.eventId = eventId;
+        this.id = eventId;
     }
 
     public boolean isUsesSmartphoneApp() {
@@ -232,6 +241,9 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     public void setParentKey(Key<UserEntity> parentKey) {
         this.parentKey = parentKey;
+        if (parentKey != null) {
+            this.userId = parentKey.getId();
+        }
     }
 
     public List<UserGroupEntity> getGroupEntities() {
@@ -261,8 +273,7 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     @Override
     public String toString() {
         return "UserInEventEntity{" +
-                "id=" + id +
-                ", userId=" + userId +
+                "userId=" + userId +
                 ", eventId='" + eventId + '\'' +
                 ", usesSmartphoneApp=" + usesSmartphoneApp +
                 ", validFrom=" + validFrom +
