@@ -26,15 +26,18 @@ public class UserListController extends AbstractSuperadminController {
     public String list(@RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
         UserEntity admin = getLoggedUser();
         UserFilter filter = new UserFilter();
-        filter.setOrganizationIdVal(admin.getOrganizationId());
 
-        model.addAttribute("userResult", userService.findByFilter(filter, DEFAULT_LIST_LENGTH, bookmark, 0l));
+        if (!isSuperAdmin(admin)) {
+            filter.setOrganizationIdVal(admin.getOrganizationId());
+        }
+
+        model.addAttribute("userResult", userService.findByFilter(filter, DEFAULT_LIST_LENGTH, bookmark, UserService.FLAG_FETCH_EQUIPMENT | UserService.FLAG_FETCH_SKILLS));
 
         return "superadmin/user-list";
     }
 
     public static Breadcrumb getBreadcrumb() {
-        return new Breadcrumb("/superadmin/user/list", "breadcrumb.userList");
+        return new Breadcrumb(null, "/superadmin/user/list", "breadcrumb.userList");
     }
 
 }

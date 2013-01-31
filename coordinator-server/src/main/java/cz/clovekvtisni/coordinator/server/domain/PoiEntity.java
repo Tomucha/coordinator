@@ -6,6 +6,7 @@ import cz.clovekvtisni.coordinator.domain.Poi;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
@@ -25,6 +26,14 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     @Index
     @NotNull
     private Long eventId;
+
+    @Index
+    @NotNull
+    @NotBlank
+    private String name;
+
+    @NotBlank
+    private String description;
 
     @Index
     @NotNull
@@ -175,6 +184,11 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
 
     public void setWorkflow(Workflow workflow) {
         this.workflow = workflow;
+        if (workflow != null) {
+            this.workflowId = workflow.getId();
+        } else {
+            this.workflowId = null;
+        }
     }
 
     public WorkflowState getWorkflowState() {
@@ -183,11 +197,31 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
 
     public void setWorkflowState(WorkflowState workflowState) {
         this.workflowState = workflowState;
+        if (workflowState != null) {
+            this.workflowStateId = workflowState.getId();
+        }
     }
 
     public int getUserCount() {
         return userIdList != null ? userIdList.length : 0;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "PoiEntity{" +

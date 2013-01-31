@@ -15,7 +15,7 @@ public class SuperadminController extends AbstractSuperadminController {
     }
 
     public static Breadcrumb getBreadcrumb() {
-        return new Breadcrumb("/superadmin", "breadcrumb.home");
+        return new Breadcrumb(null, "/superadmin", "breadcrumb.home");
     }
 
 }

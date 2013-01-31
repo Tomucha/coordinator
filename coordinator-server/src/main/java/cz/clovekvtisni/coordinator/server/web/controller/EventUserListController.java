@@ -4,13 +4,11 @@ import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
 import cz.clovekvtisni.coordinator.server.domain.*;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
-import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
-import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.SelectedUserAction;
 import cz.clovekvtisni.coordinator.server.web.model.UserMultiSelection;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
@@ -46,8 +44,6 @@ public class EventUserListController extends AbstractEventController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String listUsers(@ModelAttribute("params") EventFilterParams params, Model model) {
-        EventEntity event = loadEventById(params.getEventId());
-        model.addAttribute("event", event);
 
         UserInEventFilter inEventFilter = createFilterFromParams(params);
         ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS);
@@ -63,9 +59,11 @@ public class EventUserListController extends AbstractEventController {
         poiFilter.setWorkflowIdOp(Filter.Operator.NOT_EQ);
         model.addAttribute("tasks", poiService.findByFilter(poiFilter, 0, null, 0l).getResult());
 
-        model.addAttribute("userGroups", userGroupService.findByEventId(event.getId(), 0l));
+        model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
 
-        populateEventModel(model, params);
+        // FIXME: refaktoring
+
+        //populateEventModel(model, params);
 
         return "admin/event-users";
     }
@@ -153,8 +151,8 @@ public class EventUserListController extends AbstractEventController {
         return "redirect:/admin/event/user/list?eventId=" + selection.getEventId();
     }
 
-    public static Breadcrumb getBreadcrumb(FilterParams params) {
-        return new Breadcrumb(params, "/admin/event/user/list", "breadcrumb.eventUsers");
+    public static Breadcrumb getBreadcrumb(EventEntity activeEvent) {
+        return new Breadcrumb(activeEvent, "/admin/event/user/list", "breadcrumb.eventUsers");
     }
 
     @ModelAttribute("selectedUserActions")

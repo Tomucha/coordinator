@@ -1,15 +1,10 @@
 package cz.clovekvtisni.coordinator.server.web.util;
 
-import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
-import org.slf4j.LoggerFactory;
+import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,16 +19,10 @@ public class Breadcrumb {
 
     private String[] roles;
 
-    private FilterParams filterParams;
+    private EventEntity activeEvent;
 
-    public Breadcrumb(String url, String labelCode, String... roles) {
-        this.url = url;
-        this.labelCode = labelCode;
-        this.roles = roles;
-    }
-
-    public Breadcrumb(FilterParams params, String url, String labelCode, String... roles) {
-        this.filterParams = params;
+    public Breadcrumb(EventEntity event, String url, String labelCode, String... roles) {
+        this.activeEvent = event;
         this.url = url;
         this.labelCode = labelCode;
         this.roles = roles;
@@ -45,17 +34,9 @@ public class Breadcrumb {
 
     public String getLinkUrl() {
         String url = this.url;
-        if (filterParams != null) {
-            url = url + "?";
-            for (Map.Entry<String, String> entry : filterParams.toMap().entrySet()) {
-                try {
-                    url = url + URLEncoder.encode(entry.getKey(), "UTF-8") + "=" + URLEncoder.encode(entry.getValue(), "UTF-8") + "&";
-                } catch (UnsupportedEncodingException e) {
-                    LoggerFactory.getLogger(this.getClass()).error(e.getMessage());
-                }
-            }
+        if (activeEvent != null) {
+            url = url + "?eventId="+activeEvent.getId();
         }
-
         return url;
     }
 
@@ -79,11 +60,4 @@ public class Breadcrumb {
         this.roles = roles;
     }
 
-    public FilterParams getFilterParams() {
-        return filterParams;
-    }
-
-    public void setFilterParams(FilterParams filterParams) {
-        this.filterParams = filterParams;
-    }
 }

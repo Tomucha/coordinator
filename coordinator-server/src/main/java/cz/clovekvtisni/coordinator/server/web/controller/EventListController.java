@@ -46,7 +46,7 @@ public class EventListController extends AbstractSuperadminController {
     }
 
     public static Breadcrumb getBreadcrumb() {
-        return new Breadcrumb("/superadmin/event/list", "breadcrumb.eventList");
+        return new Breadcrumb(null, "/superadmin/event/list", "breadcrumb.eventList");
     }
 
 }

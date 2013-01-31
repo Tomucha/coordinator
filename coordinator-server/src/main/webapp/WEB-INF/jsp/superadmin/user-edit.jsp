@@ -27,7 +27,7 @@
                 <c:if test="${can:isSuperadmin() and (empty form.id or empty form.organizationId)}">
                     <div>
                         <tags:input field="organizationId" modelAttribute="form" captionCode="UserEntity.organization">
-                            <sf:select path="organizationId" items="${config.organizationMap}"/>
+                            <sf:select path="organizationId" items="${config.organizationMap}" itemLabel="name"/>
                         </tags:input>
                     </div>
                 </c:if>

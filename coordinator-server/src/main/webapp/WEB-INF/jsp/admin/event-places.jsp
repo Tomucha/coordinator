@@ -83,18 +83,7 @@
 
 <h2><s:message code="header.poiList"/></h2>
 
-<div class="eastPanel" style="float:right;width: 300px;margin-left: 30px">
-    <tags:osm
-            width="300px"
-            height="300px"
-            longitude="${defLongitude}"
-            latitude="${defLatitude}"
-            zoom="13"
-            onLoad="initialize()"
-            />
-</div>
-
-<div class="mainPanel" style="padding-right: 330px">
+<div class="mainPanel">
 
     <div class="buttonPanel">
         <c:choose>
@@ -115,6 +104,7 @@
                         <tr>
                             <th></th>
                             <th><s:message code="PoiEntity.poiCategory"/></th>
+                            <th><s:message code="PoiEntity.name"/></th>
                             <th><s:message code="label.locality"/></th>
                             <th><s:message code="PoiEntity.userCount"/></th>
                             <th><s:message code="PoiEntity.workflow"/></th>
@@ -126,16 +116,24 @@
                         <c:forEach items="${placeList}" var="poi" varStatus="i">
                             <tr>
                                 <td><input type="checkbox" name="selectedPois[${i.index}]" value="${poi.id}"/></td>
-                                <td><c:out value="${poi.poiCategory.name}"/></td>
+                                <td><c:out value="${poi.poiCategory.name}"/><br/>
+                                    <small><c:out value="${poi.poiCategory.description}"/></small>
+                                </td>
+                                <td><b><c:out value="${poi.name}"/></b><br/>
+                                    <small><c:out value="${poi.description}"/></small>
+                                </td>
                                 <td><tags:gps longitude="${poi.longitude}" latitude="${poi.latitude}"/></td>
                                 <td><c:out value="${poi.userCount}"/></td>
-                                <td><c:out value="${poi.workflow.name}"/></td>
+                                <td><c:out value="${poi.workflow.name}"/><br/>
+                                    <small><c:out value="${poi.workflow.description}"/></small>
+                                </td>
                                 <td>
                                     <c:if test="${!empty poi.workflowId}">
                                         <a href="javascript:openChangeStateModal(<c:out value='${poi.id}'/>)">
                                             <c:choose>
                                                 <c:when test="${!empty poi.workflowStateId}">
-                                                    <c:out value="${poi.workflowState.name}"/>
+                                                    <c:out value="${poi.workflowState.name}"/><br/>
+                                                    <small><c:out value="${poi.workflowState.description}"/></small>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <s:message code="label.startWorkflow"/>
@@ -161,7 +159,7 @@
                             </c:forEach>
                         </sf:select>
 
-                        <sf:button><s:message code="button.submit"/></sf:button>
+                        <sf:button class="btn"><s:message code="button.submit"/></sf:button>
                     </div>
                 </div>
             </sf:form>

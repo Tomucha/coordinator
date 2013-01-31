@@ -3,12 +3,11 @@ package cz.clovekvtisni.coordinator.server.domain;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
+import cz.clovekvtisni.coordinator.domain.UserGroup;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.server.util.EntityTool;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -63,6 +62,7 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     @Ignore
     private List<UserGroupEntity> groupEntities;
+
 
     public UserInEventEntity() {
     }
@@ -240,6 +240,22 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     public void setGroupEntities(List<UserGroupEntity> groupEntities) {
         this.groupEntities = groupEntities;
+    }
+
+
+    public String[] getRoles() {
+        Set<String> roles = new HashSet<String>();
+        if (userEntity != null && userEntity.getRoleIdList() != null) {
+            for (String role : userEntity.getRoleIdList()) {
+                roles.add(role);
+            }
+        }
+        if (groupEntities != null) {
+            for (UserGroupEntity group : groupEntities) {
+                roles.add(group.getRoleId());
+            }
+        }
+        return roles.toArray(new String[0]);
     }
 
     @Override

@@ -35,18 +35,14 @@ public class EventPlaceListController extends AbstractEventController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String list(@ModelAttribute("params") EventFilterParams params, @RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
-        EventEntity event = loadEventById(params.getEventId());
-        model.addAttribute("event", event);
-
         PoiFilter filter = new PoiFilter();
         filter.setEventIdVal(params.getEventId());
         ResultList<PoiEntity> result = poiService.findByFilter(filter, DEFAULT_LIST_LENGTH, bookmark, 0l);
 
         model.addAttribute("placeList", result.getResult());
-        populateEventModel(model, params);
 
         PoiMultiSelection selectionForm = new PoiMultiSelection();
-        selectionForm.setEventId(event.getId());
+        selectionForm.setEventId(appContext.getActiveEvent().getId());
         model.addAttribute("selectionForm", selectionForm);
 
         return "admin/event-places";
@@ -90,7 +86,7 @@ public class EventPlaceListController extends AbstractEventController {
 
     }
 
-    public static Breadcrumb getBreadcrumb(FilterParams params) {
+    public static Breadcrumb getBreadcrumb(EventEntity params) {
         return new Breadcrumb(params, "/admin/event/place/list", "breadcrumb.eventPlaces");
     }
 

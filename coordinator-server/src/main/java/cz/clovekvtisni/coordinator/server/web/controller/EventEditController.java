@@ -6,7 +6,6 @@ import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.EventForm;
-import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,16 +27,8 @@ public class EventEditController extends AbstractSuperadminController {
     @RequestMapping(method = RequestMethod.GET)
     public String edit(@ModelAttribute("params") EventFilterParams params, Model model) {
         EventForm form = new EventForm();
-
-        if (params.getEventId() != null) {
-            EventEntity eventEntity = loadEventById(params.getEventId());
-            model.addAttribute("event", eventEntity);
-            form.populateFrom(eventEntity);
-        }
-
-        //populateEventModel(model, params);
+        form.populateFrom(appContext.getActiveEvent());
         model.addAttribute("form", form);
-
         return "superadmin/event-edit";
     }
 
@@ -65,7 +56,7 @@ public class EventEditController extends AbstractSuperadminController {
         return "redirect:/superadmin/event/list";
     }
 
-    public static Breadcrumb getBreadcrumb(FilterParams params) {
+    public static Breadcrumb getBreadcrumb(EventEntity params) {
         return new Breadcrumb(params, "/superadmin/event/edit", "breadcrumb.eventEdit", AuthorizationTool.SUPERADMIN);
     }
 }

@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
+import cz.clovekvtisni.coordinator.domain.config.Organization;
 import cz.clovekvtisni.coordinator.exception.MaException;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
@@ -77,10 +78,32 @@ public abstract class AbstractController {
         return System.currentTimeMillis();
     }
 
+    @ModelAttribute("event")
+    public EventEntity activeEvent() {
+        return appContext.getActiveEvent();
+    }
+
     @ModelAttribute("rootBreadcrumb")
     public Breadcrumb rootBreadcrumb() {
-        return new Breadcrumb("/admin", "breadcrumb.admin");
+        return new Breadcrumb(appContext.getActiveEvent(), "/admin", "breadcrumb.admin");
     }
+
+    @ModelAttribute("config")
+    public CoordinatorConfig config() {
+        return config;
+    }
+
+    @ModelAttribute("loggedUser")
+    public UserEntity loggedUser() {
+        return getLoggedUser();
+    }
+
+    @ModelAttribute("organization")
+    public Organization organization() {
+        if (getLoggedUser() == null) return null;
+        return config.getOrganizationMap().get(getLoggedUser().getOrganizationId());
+    }
+
 
     protected void addFormError(BindingResult errors, MaException exception) {
         errors.addError(new ObjectError("globalErrors", exception.getMessage()));
@@ -119,16 +142,6 @@ public abstract class AbstractController {
         return authorizationTool.hasRole(AuthorizationTool.BACKEND, user);
     }
 
-    @ModelAttribute("config")
-    public CoordinatorConfig config() {
-        return config;
-    }
-
-    @ModelAttribute("loggedUser")
-    public UserEntity loggedUser() {
-        return getLoggedUser();
-    }
-
     protected UserEntity loadUserById(Long id, long flags) {
         UserEntity user = userService.findById(id, flags);
         if (user == null)
@@ -136,6 +149,7 @@ public abstract class AbstractController {
         return user;
     }
 
+/*
     protected EventEntity loadEventById(Long eventId) {
         if (eventId == null) throw NotFoundException.idNotExist();
         EventEntity event = eventService.findById(eventId, EventService.FLAG_FETCH_LOCATIONS);
@@ -144,7 +158,9 @@ public abstract class AbstractController {
 
         return event;
     }
+*/
 
+/*
     @ModelAttribute("lastPoiList")
     public List<PoiEntity> populateLastPoiList(HttpServletRequest request) {
         UserEntity loggedUser = getLoggedUser();
@@ -164,4 +180,6 @@ public abstract class AbstractController {
 
         return result.getResult();
     }
+*/
+
 }

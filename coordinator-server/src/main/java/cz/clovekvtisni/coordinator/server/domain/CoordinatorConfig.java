@@ -156,15 +156,14 @@ public class CoordinatorConfig {
         }
     }
 
-    public Map<String, String> getOrganizationMap() {
+    public Map<String, Organization> getOrganizationMap() {
         List<Organization> organizations = getOrganizationList();
-        HashMap<String, String> organizationMap = new HashMap<String, String>(organizations.size());
+        HashMap<String, Organization> organizationMap = new HashMap<String, Organization>(organizations.size());
         if (organizations != null) {
             for (Organization organization : organizations) {
-                organizationMap.put(organization.getId(), organization.getName());
+                organizationMap.put(organization.getId(), organization);
             }
         };
-
         return organizationMap;
     }
 

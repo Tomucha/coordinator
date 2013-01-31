@@ -24,7 +24,7 @@ import javax.validation.Valid;
  */
 @Controller
 @RequestMapping("/login")
-public class LoginController extends AbstractController {
+public class LoginController extends AbstractSuperadminController {
 
     @Autowired
     private UserService userService;

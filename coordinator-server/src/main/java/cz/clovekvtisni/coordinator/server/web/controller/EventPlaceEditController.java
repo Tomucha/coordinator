@@ -11,7 +11,6 @@ import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
-import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.PoiForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,14 +46,11 @@ public class EventPlaceEditController extends AbstractEventController {
             @RequestParam(value = "placeId", required = false) Long placeId,
             Model model) {
 
-        EventEntity event = loadEventById(params.getEventId());
-        model.addAttribute("event", event);
-
         PoiForm form;
         if (placeId == null) {
             UserEntity user = getLoggedUser();
             form = new PoiForm();
-            form.setEventId(event.getId());
+            form.setEventId(appContext.getActiveEvent().getId());
             form.setOrganizationId(user.getOrganizationId());
         } else {
             PoiEntity poiEntity = poiService.findById(placeId, 0l);
@@ -66,7 +62,6 @@ public class EventPlaceEditController extends AbstractEventController {
         }
 
         model.addAttribute("form", form);
-        populateEventModel(model, params);
 
         return "admin/event-place-edit";
     }
@@ -74,9 +69,10 @@ public class EventPlaceEditController extends AbstractEventController {
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid PoiForm form, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            EventEntity event = loadEventById(form.getEventId());
-            model.addAttribute("event", event);
-            populateEventModel(model, new EventFilterParams(form.getEventId()));
+
+            // FIXME: refaktoring
+
+            // populateEventModel(model, new EventFilterParams(form.getEventId()));
             return "admin/event-place-edit";
         }
 
@@ -92,17 +88,16 @@ public class EventPlaceEditController extends AbstractEventController {
 
         } catch (MaPermissionDeniedException e) {
             addFormError(bindingResult, e);
-            EventEntity event = loadEventById(form.getEventId());
-            model.addAttribute("event", event);
-            populateEventModel(model, new EventFilterParams(form.getEventId()));
+
+            // FIXME: refaktoring
+            // populateEventModel(model, new EventFilterParams(form.getEventId()));
             return "admin/event-place-edit";
         }
     }
 
-    @Override
-    protected void populateEventModel(Model model, FilterParams params) {
-        super.populateEventModel(model, params);
-        UserInEventFilter filter = new UserInEventFilter();
+    protected void populateEventModel(Model model) {
+        // FIXME: refaktoring
+/*        UserInEventFilter filter = new UserInEventFilter();
         filter.setEventIdVal(((EventFilterParams) params).getEventId());
         ResultList<UserInEventEntity> result = userInEventService.findByFilter(filter, 0, null, UserInEventService.FLAG_FETCH_USER);
         List<UserEntity> users = new ArrayList<UserEntity>(result.getResultSize());
@@ -110,6 +105,6 @@ public class EventPlaceEditController extends AbstractEventController {
             users.add(inEvent.getUserEntity());
         }
 
-        model.addAttribute("users", users);
+        model.addAttribute("users", users);*/
     }
 }

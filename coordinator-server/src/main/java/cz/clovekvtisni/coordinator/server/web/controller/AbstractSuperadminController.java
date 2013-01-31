@@ -24,7 +24,7 @@ public abstract class AbstractSuperadminController extends AbstractController {
 
     @ModelAttribute("rootBreadcrumb")
     public Breadcrumb rootBreadcrumb() {
-        return new Breadcrumb("/superadmin", "breadcrumb.superadmin");
+        return new Breadcrumb(null, "/superadmin", "breadcrumb.superadmin");
     }
 
     @ModelAttribute("currentEvents")

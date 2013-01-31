@@ -18,9 +18,11 @@
 
             <sf:errors />
 
+<%--
             <c:if test="${empty form.organizationId}">
                 <div><s:message code="msg.notEventsDueEmptyOrganizationId"/></div>
             </c:if>
+--%>
 
             <div>
                 <sf:hidden path="id"/>
@@ -28,9 +30,10 @@
 
                 <c:choose>
                     <c:when test="${form.new}">
-                        <tags:input field="eventId" modelAttribute="form" captionCode="OrganizationInEventEntity.eventId">
-                            <sf:select path="eventId" disabled="${!form.new}" items="${eventList}" itemLabel="name" itemValue="id"/>
-                        </tags:input>
+                        <p class="lead">
+                            <sf:hidden path="eventId" />
+                            <b><s:message code="label.event"/>:</b> <c:out value="${event.name}"/>
+                        </p>
                     </c:when>
                     <c:otherwise>
                         <p class="lead">

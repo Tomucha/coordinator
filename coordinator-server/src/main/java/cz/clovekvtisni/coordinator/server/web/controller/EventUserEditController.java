@@ -14,12 +14,9 @@ import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
-import cz.clovekvtisni.coordinator.server.service.UserService;
-import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.tool.objectify.UniqueKeyViolation;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.EventUserForm;
-import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -81,10 +78,10 @@ public class EventUserEditController extends AbstractEventController {
     }
 
     private void populateEventModel(Model model, EventFilterParams params, EventUserForm form) {
-        super.populateEventModel(model, params);
+
+        // FIXME: refaktoring
+
         EventFilterParams eventParams = (EventFilterParams) params;
-        EventEntity event = loadEventById(eventParams.getEventId());
-        model.addAttribute("event", event);
         form.injectConfigValues(appContext, authorizationTool, config);
 
         if (getLoggedUser().getOrganizationId() != null) {
@@ -175,7 +172,7 @@ public class EventUserEditController extends AbstractEventController {
         return inEventEntity;
     }
 
-    public static Breadcrumb getBreadcrumb(FilterParams params) {
-        return new Breadcrumb(params, "/admin/event/user/list", "breadcrumb.eventUsers");
+    public static Breadcrumb getBreadcrumb(EventEntity event) {
+        return new Breadcrumb(event, "/admin/event/user/list", "breadcrumb.eventUsers");
     }
 }

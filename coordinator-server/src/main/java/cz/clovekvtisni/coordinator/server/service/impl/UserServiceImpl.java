@@ -158,6 +158,15 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     public UserEntity updateUser(final UserEntity updated) {
         final UserEntity user = CloneTool.deepClone(updated);
         final UserEntity old = findById(user.getId(), UserService.FLAG_FETCH_EQUIPMENT | UserService.FLAG_FETCH_SKILLS);
+        user.setOrganizationId(old.getOrganizationId());
+
+        if (authorizationTool.hasRole(AuthorizationTool.SUPERADMIN, getLoggedUser())) {
+            // superadmin is allowed to change organization
+           if (updated.getOrganizationId() != null) {
+               user.setOrganizationId(updated.getOrganizationId());
+           }
+        }
+
         logger.debug("updating " + user);
         return ofy().transact(new Work<UserEntity>() {
             @Override

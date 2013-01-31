@@ -10,7 +10,7 @@ import java.util.Map;
  * User: jka
  * Date: 28.11.12
  */
-public class EventFilterParams implements FilterParams {
+public class EventFilterParams {
 
     private Long eventId;
 
@@ -53,7 +53,6 @@ public class EventFilterParams implements FilterParams {
         this.groupId = groupId;
     }
 
-    @Override
     public Map<String, String> toMap() {
         Map<String, String> map = new HashMap<String, String>(2);
         if (eventId != null)

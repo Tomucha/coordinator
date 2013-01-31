@@ -38,14 +38,11 @@ public class EventUserGroupEditController extends AbstractEventController {
             @RequestParam(value = "groupId", required = false) Long groupId,
             Model model) {
 
-        EventEntity event = loadEventById(params.getEventId());
-        model.addAttribute("event", event);
-
         UserGroupForm form;
         if (groupId == null) {
             UserEntity user = getLoggedUser();
             form = new UserGroupForm();
-            form.setEventId(event.getId());
+            form.setEventId(appContext.getActiveEvent().getId());
             form.setOrganizationId(user.getOrganizationId());
         } else {
             UserGroupEntity userGroupEntity = userGroupService.findById(groupId, 0l);
@@ -57,7 +54,6 @@ public class EventUserGroupEditController extends AbstractEventController {
         }
 
         model.addAttribute("form", form);
-        populateEventModel(model, params);
 
         return "admin/event-usergroup-edit";
     }
@@ -65,7 +61,9 @@ public class EventUserGroupEditController extends AbstractEventController {
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid UserGroupForm form, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            populateEventModel(model, new EventFilterParams(form.getEventId()));
+            // FIXME: refaktoring
+
+            // populateEventModel(model, new EventFilterParams(form.getEventId()));
             return "admin/event-group-edit";
         }
 

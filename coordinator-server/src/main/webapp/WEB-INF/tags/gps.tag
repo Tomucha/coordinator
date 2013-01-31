@@ -5,4 +5,4 @@
         taglib prefix="app" uri="/WEB-INF/www.tld" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags" %><%@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form"
-%><app:format value="${latitude}" pattern="#.###"/>N <app:format value="${longitude}" pattern="#.###"/>E
+%><app:format value="${latitude}" pattern="#.####"/> <br/> <app:format value="${longitude}" pattern="#.####"/>

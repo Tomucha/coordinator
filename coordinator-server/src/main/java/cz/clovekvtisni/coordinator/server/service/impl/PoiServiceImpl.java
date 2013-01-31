@@ -79,7 +79,19 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
             public PoiEntity run() {
                 entity.setId(null);
                 updateSystemFields(entity, null);
+
+                // let's enforce workflow
+
+                PoiCategory c = config.getPoiCategoryMap().get(entity.getPoiCategoryId());
+                Workflow w = config.getWorkflowMap().get(c.getWorkflowId());
+                entity.setWorkflow(w);
+                if (w != null) {
+                    entity.setWorkflowState(w.getStartState());
+                }
+
                 ofy().put(entity);
+
+                // FIXME: visibility, workflow state, assigned
 
                 return entity;
             }
@@ -93,6 +105,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
             public PoiEntity run() {
                 PoiEntity old = ofy().get(entity.getKey());
                 updateSystemFields(entity, old);
+                entity.setWorkflowId(old.getWorkflowId());
                 ofy().put(entity);
 
                 return entity;

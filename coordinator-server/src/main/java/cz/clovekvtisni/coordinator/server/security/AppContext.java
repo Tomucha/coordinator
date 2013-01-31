@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.security;
 
 import cz.clovekvtisni.coordinator.domain.User;
+import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 
 import java.util.Locale;
@@ -12,6 +13,7 @@ import java.util.Locale;
  * Time: 12:03 AM
  */
 public interface AppContext {
+
     void setLoggedUser(UserEntity loggedUser);
 
     UserEntity getLoggedUser();
@@ -19,4 +21,9 @@ public interface AppContext {
     Locale getLocale();
 
     void setLocale(Locale locale);
+
+    EventEntity getActiveEvent();
+
+    void setActiveEvent(EventEntity event);
+
 }
