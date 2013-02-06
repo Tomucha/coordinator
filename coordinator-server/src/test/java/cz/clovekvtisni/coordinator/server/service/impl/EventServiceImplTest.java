@@ -38,7 +38,7 @@ public class EventServiceImplTest extends LocalDatastoreTest {
         locationEntity.setRadius(3l);
         locationList.add(locationEntity);
 
-        event.setEventId(testEventId);
+        event.setEventKey(testEventId);
         event.setDescription(testDescription);
         event.setEventLocationEntityList(locationList.toArray(new EventLocationEntity[0]));
 
@@ -46,10 +46,10 @@ public class EventServiceImplTest extends LocalDatastoreTest {
             @Override
             public Object run() {
                 EventEntity res = eventService.createEvent(event);
-                res = eventService.findByEventId(res.getEventId(), EventService.FLAG_FETCH_LOCATIONS);
+                res = eventService.findByEventId(res.getEventKey(), EventService.FLAG_FETCH_LOCATIONS);
                 assertNotNull(res);
                 assertEquals(testDescription, res.getDescription());
-                assertEquals(testEventId, res.getEventId());
+                assertEquals(testEventId, res.getEventKey());
                 assertNotNull(res.getEventLocationEntityList());
                 assertEquals(1, res.getEventLocationEntityList().length);
                 return null;

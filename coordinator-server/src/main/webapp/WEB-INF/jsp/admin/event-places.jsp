@@ -11,86 +11,6 @@
 <%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
         %>
-<script type="text/javascript">
-
-    var trans = {
-        <c:if test="${!empty placeList}">
-        <c:forEach items="${placeList}" var="poi" varStatus="st">
-        "poi_${poi.id}": {
-            isStarted: ${!empty poi.workflowStateId ? 'true' : 'false'},
-            firstStateName: "<c:out value="${poi.workflow.startState.name}"/>",
-            canBeStarted: ${can:beStarted(poi) ? 'true' : 'false'},
-            transitions: [
-                <c:if test="${!empty poi.workflowState and !empty poi.workflowState.transitions}">
-                <c:forEach items="${poi.workflowState.transitions}" var="transition" varStatus="st2">
-                <c:set var="nextState" value="${config.workflowMap[poi.workflowId].stateMap[transition.toStateId]}"/>
-                {
-                    name: '<c:out value="${transition.name}"/>',
-                    <c:choose>
-                    <c:when test="${!empty nextState and nextState.requiresAssignment and poi.userCount == 0}">
-                    disabled: true,
-                    disableMsg: "<s:message code="msg.needAssignUsers"/>",
-                    </c:when>
-                    <c:otherwise>
-                    disabled: false,
-                    disableMsg: "",
-                    </c:otherwise>
-                    </c:choose>
-                    transitionId: '<c:out value="${transition.id}"/>'
-                }<c:if test="${!st2.last}">,
-                </c:if>
-                </c:forEach>
-                </c:if>
-            ]
-
-        }<c:if test="${!st.last}">, </c:if>
-        </c:forEach>
-        </c:if>
-    };
-
-
-    function initialize() {
-        <c:if test="${!empty placeList}">
-        <c:forEach items="${placeList}" var="place">
-        <c:if test="${!empty place.id and !empty place.latitude and !empty place.longitude}">
-        <c:if test="${empty defLatitude}">
-        <c:set var="defLatitude" value="${place.latitude}"/>
-        <c:set var="defLongitude" value="${place.longitude}"/>
-        </c:if>
-        CoordinatorMap.addPoint({
-            type: TYPE_POI,
-            placeId: <c:out value="${place.id}" />,
-            description: "<c:out value="${place.poiCategory.name}"/>",
-            longitude: <c:out value="${place.longitude}"/>,
-            latitude: <c:out value="${place.latitude}"/>
-        });
-        </c:if>
-        </c:forEach>
-        </c:if>
-    }
-
-    function openChangeStateModal(placeId) {
-        if (!placeId || !trans["poi_" + placeId]) return;
-        var inf = trans["poi_" + placeId];
-        $("#cwInputPlaceId").val(placeId);
-        $("#changeWorkflowStateModal").modal({});
-        $("#ajaxBody").load("${root}/admin/event/user/list?eventId=${event.id}&ajax=true");
-        $("#assignedUsers").load("${root}/admin/event/user/assigned?eventId=${event.id}&poiId="+placeId+"&ajax=true");
-
-        var select = $("#cwInputStateId");
-        select.empty();
-        if (inf.isStarted) {
-            $.each(inf.transitions, function (i, val) {
-                select.append($('<option></option>').attr("value", val.transitionId).text(val.name + (val.disableMsg ? " (" + val.disableMsg + ")" : "")).prop("disabled", val.disabled));
-            });
-        } else if (!inf.canBeStarted) {
-            select.append($('<option></option>').val("").text(inf.firstStateName + " (<s:message code='msg.noPermissions'/>)").prop("disabled", true));
-
-        } else {
-            select.append($('<option></option>').val("").text(inf.firstStateName));
-        }
-    }
-</script>
 
 <h2><s:message code="header.poiList"/></h2>
 
@@ -141,16 +61,9 @@
                                 </td>
                                 <td>
                                     <c:if test="${!empty poi.workflowId}">
-                                        <a href="javascript:openChangeStateModal(<c:out value='${poi.id}'/>)">
-                                            <c:choose>
-                                                <c:when test="${!empty poi.workflowStateId}">
-                                                    <c:out value="${poi.workflowState.name}"/><br/>
-                                                    <small><c:out value="${poi.workflowState.description}"/></small>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <s:message code="label.startWorkflow"/>
-                                                </c:otherwise>
-                                            </c:choose>
+                                        <a href="${root}/admin/event/place/workflow?poiId=<c:out value='${poi.id}'/>&eventId=${event.id}">
+                                           <c:out value="${poi.workflowState.name}"/><br/>
+                                           <small><c:out value="${poi.workflowState.description}"/></small>
                                         </a>
                                     </c:if>
                                 </td>
@@ -178,52 +91,6 @@
                 </div>
             </sf:form>
 
-            <tags:modal id="changeWorkflowStateModal" titleCode="modalTitle.changeWorkflowState">
-
-                <form action="${root}/admin/event/place/list/change-workflow-state" method="post">
-                    <div>
-                        <input type="hidden" name="eventId" value="${event.id}"/>
-                        <input id="cwInputPlaceId" type="hidden" name="placeId"/>
-                        <label>
-                            <s:message code="label.changeStateTo"/>
-                            <select id="cwInputStateId" name="transitionId"></select>
-                        </label>
-                    </div>
-                </form>
-
-
-                <div class="row-fluid">
-
-                    <div id="assignedUsers" class="pull-right" style="width: 50%">
-                        Loading ...
-                    </div>
-
-                    <div class="searchFormPanel" id="searchFormPanel">
-                        <sf:form action="javascript:void(0);" modelAttribute="params" method="get">
-                            <tags:hiddenEvent/>
-                            <label><s:message code="label.group"/>:</label>
-                            <sf:select path="groupId">
-                                <sf:option value=""/>
-                                <sf:options items="${userGroups}" itemLabel="name" itemValue="id"/>
-                            </sf:select>
-                            <label><s:message code="label.name"/>:</label> <sf:input path="userFulltext"/>
-
-                            <p>
-                                <button onclick="
-                                        \$('#ajaxBody').load('${root}/admin/event/user/list?eventId=${event.id}&ajax=true'); return false;
-                                        " class="btn"><s:message code="button.filterList"/></button>
-                            </p>
-                        </sf:form>
-                    </div>
-
-                </div>
-
-
-                <div id="ajaxBody">
-                    Loading ...
-                </div>
-
-            </tags:modal>
 
         </c:when>
         <c:otherwise>

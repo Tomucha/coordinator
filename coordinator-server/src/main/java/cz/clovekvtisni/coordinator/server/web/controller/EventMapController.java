@@ -40,7 +40,7 @@ public class EventMapController extends AbstractEventController {
 
 
 /*
-        EventEntity event = loadEventById(params.getEventId());
+        EventEntity event = loadEventById(params.getEventKey());
         model.addAttribute("event", event);
 */
 

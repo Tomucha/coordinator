@@ -17,7 +17,10 @@
            http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
     <context:annotation-config/>
+
+    <!--
     <cache:annotation-driven />
+    -->
 
     <context:component-scan base-package="cz.clovekvtisni.coordinator">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
@@ -88,6 +91,7 @@
         <property name="configFilePath" value="coordinator_config.xml"/>
     </bean>
 
+    <!--
     <bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
         <property name="caches">
             <set>
@@ -96,5 +100,6 @@
             </set>
         </property>
     </bean>
+    -->
 
 </beans>

@@ -72,7 +72,7 @@ public class EventPlaceEditController extends AbstractEventController {
 
             // FIXME: refaktoring
 
-            // populateEventModel(model, new EventFilterParams(form.getEventId()));
+            // populateEventModel(model, new EventFilterParams(form.getEventKey()));
             return "admin/event-place-edit";
         }
 
@@ -90,7 +90,7 @@ public class EventPlaceEditController extends AbstractEventController {
             addFormError(bindingResult, e);
 
             // FIXME: refaktoring
-            // populateEventModel(model, new EventFilterParams(form.getEventId()));
+            // populateEventModel(model, new EventFilterParams(form.getEventKey()));
             return "admin/event-place-edit";
         }
     }
@@ -98,7 +98,7 @@ public class EventPlaceEditController extends AbstractEventController {
     protected void populateEventModel(Model model) {
         // FIXME: refaktoring
 /*        UserInEventFilter filter = new UserInEventFilter();
-        filter.setEventIdVal(((EventFilterParams) params).getEventId());
+        filter.setEventIdVal(((EventFilterParams) params).getEventKey());
         ResultList<UserInEventEntity> result = userInEventService.findByFilter(filter, 0, null, UserInEventService.FLAG_FETCH_USER);
         List<UserEntity> users = new ArrayList<UserEntity>(result.getResultSize());
         for (UserInEventEntity inEvent : result) {

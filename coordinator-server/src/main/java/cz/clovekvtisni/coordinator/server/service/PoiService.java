@@ -24,31 +24,24 @@ public interface PoiService extends Service {
     ResultList<PoiEntity> findByFilter(PoiFilter filter, int limit, String bookmark, long flags);
 
     @CheckPermission("#helper.canCreate(#p0)")
-    @CacheEvict(value = {"lastPoiList", "lastEventPoiList"}, allEntries = true)
     PoiEntity createPoi(PoiEntity entity);
 
     @CheckPermission("#helper.canUpdate(#p0)")
-    @CacheEvict(value = {"lastPoiList", "lastEventPoiList"}, allEntries = true)
     PoiEntity updatePoi(PoiEntity entity);
 
     @CheckPermission("#helper.canDelete(#p0)")
-    @CacheEvict(value = {"lastPoiList", "lastEventPoiList"}, allEntries = true)
     void deletePoi(PoiEntity entity, long flags);
 
     @FilterResult("#helper.canRead(#entity)")
-    @Cacheable(value = "lastPoiList")
     ResultList<PoiEntity> findLast(String organizationId);
 
     @FilterResult("#helper.canRead(#entity)")
-    @Cacheable(value = "lastEventPoiList")
     ResultList<PoiEntity> findLastByEventId(Long eventId);
 
     @CheckPermission("#helper.canUpdate(#p0)")
-    @CacheEvict(value = {"lastPoiList", "lastEventPoiList"}, allEntries = true)
     PoiEntity startWorkflow(PoiEntity entity);
 
     @CheckPermission("#helper.canUpdate(#p0)")
-    @CacheEvict(value = {"lastPoiList", "lastEventPoiList"}, allEntries = true)
     PoiEntity transitWorkflowState(PoiEntity entity, String transitionId);
 
     @CheckPermission("#helper.canUpdate(#p0)")

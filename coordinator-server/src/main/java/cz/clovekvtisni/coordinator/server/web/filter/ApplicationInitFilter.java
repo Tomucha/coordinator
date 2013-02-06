@@ -65,10 +65,11 @@ public class ApplicationInitFilter implements Filter {
         String root = hRequest.getContextPath();
         hRequest.setAttribute(RequestKeys.ROOT, root);
 
-        if (hRequest.getParameter("eventId") != null) {
+        String eventId = hRequest.getParameter("eventId");
+        if (!ValueTool.isEmpty(eventId)) {
             // we have an active event in URL
-            Long eventId = Long.parseLong(hRequest.getParameter("eventId"));
-            EventEntity e = eventService.findById(eventId, 0);
+            Long eventIdNum = Long.parseLong(eventId);
+            EventEntity e = eventService.findById(eventIdNum, 0);
             appContext.setActiveEvent(e);
         }
 

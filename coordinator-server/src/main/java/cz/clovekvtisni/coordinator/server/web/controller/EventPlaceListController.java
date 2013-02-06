@@ -76,22 +76,6 @@ public class EventPlaceListController extends AbstractEventController {
         return "redirect: /admin/event/place/list?eventId=" + selection.getEventId();
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/change-workflow-state")
-    public String onChangeWorkflowState(@ModelAttribute @Valid ChangeWorkflowStateForm form, BindingResult bindingResult) {
-        if (!bindingResult.hasErrors()) {
-            PoiEntity poi = poiService.findById(form.getPlaceId(), 0l);
-            if (poi != null) {
-                if (ValueTool.isEmpty(form.getTransitionId())) {
-                    poiService.startWorkflow(poi);
-                } else {
-                    poiService.transitWorkflowState(poi, form.getTransitionId());
-                }
-            }
-        }
-        return "redirect: /admin/event/place/list?eventId=" + form.getEventId();
-
-    }
-
     public static Breadcrumb getBreadcrumb(EventEntity params) {
         return new Breadcrumb(params, "/admin/event/place/list", "breadcrumb.eventPlaces");
     }

@@ -79,7 +79,7 @@ public class EventDetailController extends AbstractEventController {
         if (bindingResult.hasErrors()) {
 
             //
-            // populateEventModel(model, new EventFilterParams(loadEventById(form.getEventId())));
+            // populateEventModel(model, new EventFilterParams(loadEventById(form.getEventKey())));
             populateModel(model);
             return "admin/event-detail";
         }
@@ -93,7 +93,7 @@ public class EventDetailController extends AbstractEventController {
 
         } catch (MaException e) {
             // FIXME: refaktoring
-            //populateEventModel(model, new EventFilterParams(loadEventById(form.getEventId())));
+            //populateEventModel(model, new EventFilterParams(loadEventById(form.getEventKey())));
             addFormError(bindingResult, e);
             populateModel(model);
             return "admin/event-detail";
