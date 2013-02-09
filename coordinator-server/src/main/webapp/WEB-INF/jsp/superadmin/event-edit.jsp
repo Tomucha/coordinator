@@ -57,21 +57,10 @@
     <s:message code="${form.new ? 'header.eventCreate' : 'header.eventEdit'}"/>
 </h2>
 
-<div class="eastPanel" style="float:right;width: 300px;margin-left: 30px">
-    <tags:osm
-            width="300px"
-            height="300px"
-            longitude="${!empty form.firstEventLocation and form.firstEventLocation.longitude > 0.0 ? form.firstEventLocation.longitude : null}"
-            latitude="${!empty form.firstEventLocation and form.firstEventLocation.latitude > 0.0 ? form.firstEventLocation.latitude : null}"
-            zoom="13"
-            onLoad="initialize()"
-            buttons="addLocation"
-            />
-</div>
-
 <div class="mainPanel">
+
     <div class="eventForm">
-        <sf:form method="POST" action="${root}/admin/event/edit" modelAttribute="form" onsubmit="return fetchLocations()">
+        <sf:form method="POST" action="${root}/superadmin/event/edit" modelAttribute="form" onsubmit="return fetchLocations()">
 
             <sf:errors />
 
@@ -82,7 +71,7 @@
             </div>
 
             <div id="hiddenInputContainer">
-                <sf:hidden path="id"/>
+                <tags:hiddenEvent/>
                 <tags:input field="name" modelAttribute="form" captionCode="label.name">
                     <sf:input path="name"/>
                 </tags:input>
@@ -90,7 +79,7 @@
 
             <div>
                 <tags:input field="description" modelAttribute="form" captionCode="label.description">
-                    <sf:textarea path="description" cols="72" rows="7"/>
+                    <sf:textarea path="description" cols="142" rows="7" cssStyle="width:50%"/>
                 </tags:input>
             </div>
 
@@ -100,5 +89,16 @@
 
         </sf:form>
     </div>
+
+    <tags:osm
+            width="100%"
+            height="400px"
+            longitude="${!empty form.firstEventLocation and form.firstEventLocation.longitude > 0.0 ? form.firstEventLocation.longitude : null}"
+            latitude="${!empty form.firstEventLocation and form.firstEventLocation.latitude > 0.0 ? form.firstEventLocation.latitude : null}"
+            zoom="13"
+            onLoad="initialize()"
+            buttons="addLocation"
+            />
+
 </div>
 

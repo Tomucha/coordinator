@@ -1,13 +1,10 @@
 package cz.clovekvtisni.coordinator.server.web.model;
 
-import java.util.Map;
-
 /**
  * Created with IntelliJ IDEA.
  * User: jka
- * Date: 28.11.12
+ * Date: 7.1.13
  */
-public interface FilterParams {
-
-    Map<String, String> toMap();
+public enum SelectedUserAction {
+    EXPEL, CONFIRM, SUSPEND, REGISTER_TO_TASK, ADD_TO_GROUP
 }

@@ -5,6 +5,7 @@ import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import cz.clovekvtisni.coordinator.server.domain.AbstractPersistentEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.service.Service;
 import cz.clovekvtisni.coordinator.server.tool.objectify.MaObjectify;
 import org.slf4j.Logger;
@@ -24,6 +25,9 @@ public class AbstractServiceImpl implements Service {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
+    protected AppContext appContext;
+
+    @Autowired
     public void setObjectifyFactory(ObjectifyFactory objectifyFactory) {
         ObjectifyService.setFactory(objectifyFactory);
     }
@@ -41,5 +45,9 @@ public class AbstractServiceImpl implements Service {
             entity.setCreatedDate(old.getCreatedDate());
         }
         entity.setModifiedDate(now);
+    }
+
+    protected UserEntity getLoggedUser() {
+        return appContext.getLoggedUser();
     }
 }

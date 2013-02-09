@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.Resource;
 
 @Controller
-@RequestMapping("/admin/user/list")
-public class UserListController extends AbstractController {
+@RequestMapping("/superadmin/user/list")
+public class UserListController extends AbstractSuperadminController {
 
     @Autowired
     private UserService userService;
@@ -26,22 +26,18 @@ public class UserListController extends AbstractController {
     public String list(@RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
         UserEntity admin = getLoggedUser();
         UserFilter filter = new UserFilter();
-        filter.setOrganizationIdVal(admin.getOrganizationId());
 
-        model.addAttribute("userResult", userService.findByFilter(filter, 20, bookmark, 0l));
+        if (!isSuperAdmin(admin)) {
+            filter.setOrganizationIdVal(admin.getOrganizationId());
+        }
 
-        return "admin/user-list";
+        model.addAttribute("userResult", userService.findByFilter(filter, DEFAULT_LIST_LENGTH, bookmark, UserService.FLAG_FETCH_EQUIPMENT | UserService.FLAG_FETCH_SKILLS));
+
+        return "superadmin/user-list";
     }
 
     public static Breadcrumb getBreadcrumb() {
-        return new Breadcrumb("/admin/user/list", "breadcrumb.userList");
+        return new Breadcrumb(null, "/superadmin/user/list", "breadcrumb.userList");
     }
 
-    @ModelAttribute("breadcrumbs")
-    public Breadcrumb[] breadcrumbs() {
-        return new Breadcrumb[] {
-                UserListController.getBreadcrumb(),
-                EventListController.getBreadcrumb()
-        };
-    }
 }

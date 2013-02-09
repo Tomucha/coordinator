@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<datastore-indexes autoGenerate="true">
+
+    <datastore-index kind="Poi" ancestor="false" source="manual">
+        <property name="eventId" direction="asc"/>
+        <property name="modifiedDate" direction="asc"/>
+    </datastore-index>
+
+</datastore-indexes>

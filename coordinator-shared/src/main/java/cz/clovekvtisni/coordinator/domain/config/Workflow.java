@@ -94,6 +94,13 @@ public class Workflow extends AbstractStaticEntity {
         }
     }
 
+    public WorkflowState getStartState() {
+        if (states == null || states[0] == null)
+            return null;
+
+        return states[0];
+    }
+
     @Override
     public String toString() {
         return "Workflow{" +

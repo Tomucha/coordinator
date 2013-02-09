@@ -24,8 +24,10 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     @Id
     private Long id;
 
+    @NotEmpty
     private String firstName;
 
+    @NotEmpty
     private String lastName;
 
     @Index
@@ -63,6 +65,10 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     private UserSkillEntity[] skillEntityList;
 
     public UserEntity() {
+    }
+
+    public UserEntity(Long id) {
+        setId(id);
     }
 
     @Override
@@ -282,6 +288,10 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
             str.append((str.length() == 0 ? "" : ", ") + country);
 
         return str.toString();
+    }
+
+    public boolean isSuspended() {
+        return dateSuspended != null;
     }
 
     @Override

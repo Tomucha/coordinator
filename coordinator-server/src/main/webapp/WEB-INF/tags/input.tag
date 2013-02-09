@@ -23,7 +23,7 @@
     </label>
     <div class="input-field">
         <jsp:doBody />
-        <sf:errors path="${field}" delimiter="; " cssClass="error field-error" />
+        <sf:errors path="${field}" delimiter="; " cssClass="alert alert-error" />
     </div>
     <div class="clear" ></div>
 </div>

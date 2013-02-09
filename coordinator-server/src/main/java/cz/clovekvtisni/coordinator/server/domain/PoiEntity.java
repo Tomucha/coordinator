@@ -3,13 +3,15 @@ package cz.clovekvtisni.coordinator.server.domain;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.Poi;
-
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,6 +31,14 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
 
     @Index
     @NotNull
+    @NotBlank
+    private String name;
+
+    @NotBlank
+    private String description;
+
+    @Index
+    @NotNull
     private String organizationId;
 
     @NotNull
@@ -40,7 +50,7 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     private String workflowStateId;
 
     @Index
-    private Long[] userId;
+    private Set<Long> userIdList;
 
     @NotNull
     private Double latitude;
@@ -117,12 +127,13 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
         this.workflowStateId = workflowStateId;
     }
 
-    public Long[] getUserId() {
-        return userId;
+    public Set<Long> getUserIdList() {
+        if (userIdList == null) userIdList = new HashSet<Long>();
+        return userIdList;
     }
 
-    public void setUserId(Long[] userId) {
-        this.userId = userId;
+    public void setUserIdList(Set<Long> userIdList) {
+        this.userIdList = userIdList;
     }
 
     public Double getLatitude() {
@@ -176,6 +187,11 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
 
     public void setWorkflow(Workflow workflow) {
         this.workflow = workflow;
+        if (workflow != null) {
+            this.workflowId = workflow.getId();
+        } else {
+            this.workflowId = null;
+        }
     }
 
     public WorkflowState getWorkflowState() {
@@ -184,11 +200,31 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
 
     public void setWorkflowState(WorkflowState workflowState) {
         this.workflowState = workflowState;
+        if (workflowState != null) {
+            this.workflowStateId = workflowState.getId();
+        }
     }
 
     public int getUserCount() {
-        return userId != null ? userId.length : 0;
+        return userIdList != null ? userIdList.size() : 0;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "PoiEntity{" +
@@ -196,7 +232,7 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
                 ", poiCategoryId=" + poiCategoryId +
                 ", workflowId=" + workflowId +
                 ", workflowStateId=" + workflowStateId +
-                ", userId=" + (userId == null ? null : Arrays.asList(userId)) +
+                ", userId=" + (userIdList == null ? null : Arrays.asList(userIdList)) +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", precission=" + precission +

@@ -36,10 +36,10 @@ public class EventUserApiController extends AbstractApiController {
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     public @ResponseBody ApiResponse filter(HttpServletRequest request) {
 
-        UserRequest<EventUserListRequestParams> req = parseRequest(request, EventUserListRequestParams.class);
+        EventUserListRequestParams params = parseRequest(request, EventUserListRequestParams.class);
         UserInEventFilter filter = new UserInEventFilter();
-        filter.setEventIdVal(req.params.getEventId());
-        filter.setModifiedDateVal(req.params.getModifiedFrom());
+        filter.setEventIdVal(params.getEventId());
+        filter.setModifiedDateVal(params.getModifiedFrom());
         filter.setModifiedDateOp(Filter.Operator.GT);
         filter.setOrder("modifiedDate");
         ResultList<UserInEventEntity> result = userInEventService.findByFilter(filter, 0, null, UserInEventService.FLAG_FETCH_USER);
@@ -51,22 +51,19 @@ public class EventUserApiController extends AbstractApiController {
 
     @RequestMapping(value = "/update-position", method = RequestMethod.POST)
     public @ResponseBody ApiResponse updatePosition(HttpServletRequest request) {
-        UserRequest<UserUpdatePositionRequestParams> req = parseRequest(request, UserUpdatePositionRequestParams.class);
-        UserInEventFilter filter = new UserInEventFilter();
-        filter.setEventIdVal(req.params.getEventId());
-        filter.setUserIdVal(req.user.getId());
-        ResultList<UserInEventEntity> found = userInEventService.findByFilter(filter, 1, null, 0l);
+        UserUpdatePositionRequestParams params = parseRequest(request, UserUpdatePositionRequestParams.class);
+        final UserInEventEntity found = userInEventService.findById(params.getEventId(), getLoggedUser().getId(), 0l);
 
-        if (found.getResultSize() == 0)
-            throw NotFoundException.idNotExist();
-        final UserInEventEntity userInEvent = found.firstResult();
-        userInEvent.setLastLocationLatitude(req.params.getLatitude());
-        userInEvent.setLastLocationLongitude(req.params.getLongitude());
+        if (found == null) throw NotFoundException.idNotExist();
+
+        found.setLastLocationLatitude(params.getLatitude());
+        found.setLastLocationLongitude(params.getLongitude());
 
         UserInEventEntity updated = securityTool.runWithAnonymousEnabled(new RunnableWithResult<UserInEventEntity>() {
             @Override
             public UserInEventEntity run() {
-                return userInEventService.update(userInEvent);
+                // FIXME: tyhle opicarny je potreba delat na servise v transakci kurvauz
+                return userInEventService.update(found);
             }
         });
 

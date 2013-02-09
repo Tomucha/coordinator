@@ -19,21 +19,21 @@
 
 <div class="mainPanel">
     <div class="userForm">
-        <sf:form method="POST" action="${root}/admin/user/edit" modelAttribute="form">
+        <sf:form method="POST" action="${root}/superadmin/user/edit" modelAttribute="form">
 
-            <sf:errors />
+            <sf:errors cssClass="alert alert-error" element="div" />
 
             <div class="formPanel">
-                <c:if test="${can:isSuperadmin() and empty form.id}">
+                <c:if test="${can:isSuperadmin() and (empty form.id or empty form.organizationId)}">
                     <div>
                         <tags:input field="organizationId" modelAttribute="form" captionCode="UserEntity.organization">
-                            <sf:select path="organizationId" items="${config.organizationMap}"/>
+                            <sf:select path="organizationId" items="${config.organizationMap}" itemLabel="name"/>
                         </tags:input>
                     </div>
                 </c:if>
 
                 <div>
-                    <tags:input field="roleIdList" modelAttribute="" captionCode="">
+                    <tags:input field="roleIdList" modelAttribute="" captionCode="UserEntity.roles">
                         <sf:select path="roleIdList" multiple="true" items="${form.acceptableRoleMap}"/>
                     </tags:input>
                 </div>
@@ -114,12 +114,12 @@
                 </div>
             </div>
 
-            <div class="panel">
+            <div class="panel checkboxList">
                 <h3><s:message code="header.equipmentList"/></h3>
                 <sf:checkboxes path="selectedEquipment" items="${config.equipmentList}" itemLabel="name" itemValue="id"/>
             </div>
 
-            <div class="panel">
+            <div class="panel checkboxList">
                 <h3><s:message code="header.skillList"/></h3>
                 <sf:checkboxes path="selectedSkill" items="${config.skillList}" itemLabel="name" itemValue="id"/>
             </div>

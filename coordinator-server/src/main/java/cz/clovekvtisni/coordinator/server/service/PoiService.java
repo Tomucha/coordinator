@@ -17,8 +17,6 @@ public interface PoiService extends Service {
 
     public static final int LAST_POI_LIST_LENGTH = 30;
 
-    public static final long FLAG_FETCH_FROM_CONFIG = 1l;
-
     @FilterResult("#helper.canRead(#entity)")
     PoiEntity findById(Long id, long flags);
 
@@ -35,7 +33,7 @@ public interface PoiService extends Service {
 
     @CheckPermission("#helper.canDelete(#p0)")
     @CacheEvict(value = {"lastPoiList", "lastEventPoiList"}, allEntries = true)
-    void deletePoi(PoiEntity entity);
+    void deletePoi(PoiEntity entity, long flags);
 
     @FilterResult("#helper.canRead(#entity)")
     @Cacheable(value = "lastPoiList")
@@ -44,4 +42,19 @@ public interface PoiService extends Service {
     @FilterResult("#helper.canRead(#entity)")
     @Cacheable(value = "lastEventPoiList")
     ResultList<PoiEntity> findLastByEventId(Long eventId);
+
+    @CheckPermission("#helper.canUpdate(#p0)")
+    @CacheEvict(value = {"lastPoiList", "lastEventPoiList"}, allEntries = true)
+    PoiEntity startWorkflow(PoiEntity entity);
+
+    @CheckPermission("#helper.canUpdate(#p0)")
+    @CacheEvict(value = {"lastPoiList", "lastEventPoiList"}, allEntries = true)
+    PoiEntity transitWorkflowState(PoiEntity entity, String transitionId);
+
+    @CheckPermission("#helper.canUpdate(#p0)")
+    PoiEntity assignUser(PoiEntity poi, Long userId);
+
+    @CheckPermission("#helper.canUpdate(#p0)")
+    PoiEntity unassignUser(PoiEntity poi, Long userInEventId);
+
 }

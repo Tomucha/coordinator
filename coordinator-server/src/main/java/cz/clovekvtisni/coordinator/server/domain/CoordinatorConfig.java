@@ -3,6 +3,7 @@ package cz.clovekvtisni.coordinator.server.domain;
 import cz.clovekvtisni.coordinator.domain.config.*;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
+import org.simpleframework.xml.core.Commit;
 import org.simpleframework.xml.core.Validate;
 
 import java.util.*;
@@ -40,7 +41,7 @@ public class CoordinatorConfig {
     }
 
     public Map<String, Role> getRoleMap() {
-        if (roleList == null) return new HashMap<String, Role>();
+        if (roleList == null) return new HashMap<String, Role>(0);
         Map<String, Role> map = new HashMap<String, Role>(roleList.size());
         for (Role role : roleList) {
             map.put(role.getId(), role);
@@ -50,7 +51,7 @@ public class CoordinatorConfig {
     }
 
     public Map<String, Workflow> getWorkflowMap() {
-        if (workflowList == null) return new HashMap<String, Workflow>();
+        if (workflowList == null) return new HashMap<String, Workflow>(0);
         Map<String, Workflow> map = new HashMap<String, Workflow>(workflowList.size());
         for (Workflow workflow : workflowList) {
             map.put(workflow.getId(), workflow);
@@ -63,8 +64,28 @@ public class CoordinatorConfig {
         return skillList;
     }
 
+    public Map<String, Skill> getSkillMap() {
+        if (skillList == null) return new HashMap<String, Skill>(0);
+        Map<String, Skill> map = new HashMap<String, Skill>(skillList.size());
+        for (Skill skill : skillList) {
+            map.put(skill.getId(), skill);
+        }
+
+        return map;
+    }
+
     public List<Equipment> getEquipmentList() {
         return equipmentList;
+    }
+
+    public Map<String, Equipment> getEquipmentMap() {
+        if (equipmentList == null) return new HashMap<String, Equipment>(0);
+        Map<String, Equipment> map = new HashMap<String, Equipment>(equipmentList.size());
+        for (Equipment equipment : equipmentList) {
+            map.put(equipment.getId(), equipment);
+        }
+
+        return map;
     }
 
     public List<Organization> getOrganizationList() {
@@ -86,16 +107,25 @@ public class CoordinatorConfig {
 
         if (roleList != null) {
             for (Role role : roleList) {
-                checkEntityExist(roleMap, role.getExtendsRoleId());
+                checkKeysExist(roleMap, role.getExtendsRoleId());
             }
         }
         if (workflowList != null) {
             for (Workflow workflow : workflowList) {
-                checkEntityExist(roleMap, workflow.getCanBeStartedBy());
+                checkKeysExist(roleMap, workflow.getCanBeStartedBy());
                 if (workflow.getStates() != null) {
                     for (WorkflowState state : workflow.getStates()) {
-                        checkEntityExist(roleMap, state, state.getEditableForRole());
-                        checkEntityExist(roleMap, state, state.getVisibleForRole());
+                        checkKeysExist(roleMap, state.getEditableForRole());
+                        checkKeysExist(roleMap, state.getVisibleForRole());
+
+                        WorkflowTransition[] transitions = state.getTransitions();
+                        if (transitions != null) {
+                            Map<String, WorkflowState> stateMap = workflow.getStateMap();
+                            for (WorkflowTransition transition : transitions) {
+                               checkKeysExist(stateMap, transition.getFromStateId(), transition.getToStateId());
+                               checkKeysExist(roleMap, transition.getAllowedForRole());
+                            }
+                        }
                     }
                 }
             }
@@ -103,29 +133,37 @@ public class CoordinatorConfig {
         
         if (poiCategoryList != null) {
             for (PoiCategory poiCategory : poiCategoryList) {
-                checkEntityExist(workflowMap, poiCategory, poiCategory.getWorkflowId());
+                checkKeysExist(workflowMap, poiCategory.getWorkflowId());
+            }
+        }
+        
+        if (organizationList != null) {
+            Map<String, Skill> skillMap = getSkillMap();
+            Map<String, Equipment> equipmentMap = getEquipmentMap();
+            for (Organization organization : organizationList) {
+                checkKeysExist(skillMap, organization.getPreRegistrationSkills());
+                checkKeysExist(equipmentMap, organization.getPreRegistrationEquipment());
             }
         }
     }
 
-    private <T extends AbstractStaticEntity> void checkEntityExist(Map<String, T> roleMap, Object source, String... roles) {
-        if (roles == null) return;
-        for (String roleId : roles) {
-            if (roleId != null && !roleMap.containsKey(roleId)) {
-                throw new IllegalStateException("Inconsistent configuration. Reference to nonexistent entity in " + source);
+    private <T extends AbstractStaticEntity> void checkKeysExist(Map<String, T> map, String... keys) {
+        if (keys == null) return;
+        for (String key : keys) {
+            if (key != null && !map.containsKey(key)) {
+                throw new IllegalStateException("Inconsistent configuration. Key=" + key + " does not exist.");
             }
         }
     }
 
-    public Map<String, String> getOrganizationMap() {
+    public Map<String, Organization> getOrganizationMap() {
         List<Organization> organizations = getOrganizationList();
-        HashMap<String, String> organizationMap = new HashMap<String, String>(organizations.size());
+        HashMap<String, Organization> organizationMap = new HashMap<String, Organization>(organizations.size());
         if (organizations != null) {
             for (Organization organization : organizations) {
-                organizationMap.put(organization.getId(), organization.getName());
+                organizationMap.put(organization.getId(), organization);
             }
         };
-
         return organizationMap;
     }
 
@@ -406,6 +444,50 @@ public class CoordinatorConfig {
         countryMap.put("ZW", "Zimbabwe");
 
         return countryMap;
+    }
+
+    @Commit
+    public void afterLoad() {
+        if (roleList != null) {
+            Collections.sort(roleList, new Comparator<Role>() {
+                @Override
+                public int compare(Role o1, Role o2) {
+                    return o1.getName() != null ? o1.getName().compareTo(o2.getName()) : -1;
+                }
+            });
+        }
+        if (skillList != null) {
+            Collections.sort(skillList, new Comparator<Skill>() {
+                @Override
+                public int compare(Skill o1, Skill o2) {
+                    return o1.getName() != null ? o1.getName().compareTo(o2.getName()) : -1;
+                }
+            });
+        }
+        if (equipmentList != null) {
+            Collections.sort(equipmentList, new Comparator<Equipment>() {
+                @Override
+                public int compare(Equipment o1, Equipment o2) {
+                    return o1.getName() != null ? o1.getName().compareTo(o2.getName()) : -1;
+                }
+            });
+        }
+        if (organizationList != null) {
+            Collections.sort(organizationList, new Comparator<Organization>() {
+                @Override
+                public int compare(Organization o1, Organization o2) {
+                    return o1.getName() != null ? o1.getName().compareTo(o2.getName()) : -1;
+                }
+            });
+        }
+        if (poiCategoryList != null) {
+            Collections.sort(poiCategoryList, new Comparator<PoiCategory>() {
+                @Override
+                public int compare(PoiCategory o1, PoiCategory o2) {
+                    return o1.getName() != null ? o1.getName().compareTo(o2.getName()) : -1;
+                }
+            });
+        }
     }
 
     @Override

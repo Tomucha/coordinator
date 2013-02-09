@@ -2,20 +2,20 @@ package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
+import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
+import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,14 +25,8 @@ import java.util.Map;
 @Service("userInEventService")
 public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements UserInEventService {
 
-    @Override
-    public UserInEventEntity findById(Long id, Long parentUserId, long flags) {
-        UserInEventEntity inEvent = ofy().load().key(Key.create(Key.create(UserEntity.class, parentUserId), UserInEventEntity.class, id)).get();
-
-        populate(Arrays.asList(new UserInEventEntity[] {inEvent}), flags);
-
-        return inEvent;
-    }
+    @Autowired
+    private UserGroupService userGroupService;
 
     @Override
     public ResultList<UserInEventEntity> findByFilter(UserInEventFilter filter, int limit, String bookmark, long flags) {
@@ -43,7 +37,7 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
         return result;
     }
 
-    private void populate(List<UserInEventEntity> result, long flags) {
+    private void populate(Collection<UserInEventEntity> result, long flags) {
         if ((flags & FLAG_FETCH_EVENT) != 0) {
             Map<Key<EventEntity>, UserInEventEntity> inEventMap = new HashMap<Key<EventEntity>, UserInEventEntity>(result.size());
             for (UserInEventEntity inEvent : result) {
@@ -69,6 +63,14 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
                 inUserMap.get(entry.getKey()).setUserEntity(entry.getValue());
             }
         }
+
+        if ((flags & FLAG_FETCH_GROUPS) != 0) {
+            for (UserInEventEntity inUser : result) {
+                if (inUser.getGroupIdList() != null) {
+                    inUser.setGroupEntities(userGroupService.findByIds(0l, inUser.getGroupIdList()));
+                }
+            }
+        }
     }
 
     @Override
@@ -77,7 +79,9 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
         return ofy().transact(new Work<UserInEventEntity>() {
             @Override
             public UserInEventEntity run() {
-                inEvent.setId(null);
+                // FIXME: pripadne vytvorit uzivatele
+                if  (inEvent.getStatus() == null)
+                    inEvent.setStatus(RegistrationStatus.CONFIRMED);
                 updateSystemFields(inEvent, null);
 
                 ofy().put(inEvent);
@@ -90,7 +94,7 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
     @Override
     public UserInEventEntity update(final UserInEventEntity inEvent) {
         logger.debug("updating " + inEvent);
-        final UserInEventEntity old = findById(inEvent.getId(), inEvent.getUserId(), 0l);
+        final UserInEventEntity old = findById(inEvent.getEventId(), inEvent.getUserId(), 0l);
         if (old == null)
             throw NotFoundException.idNotExist(UserInEvent.class.getSimpleName(), inEvent.getId());
         return ofy().transact(new Work<UserInEventEntity>() {
@@ -108,4 +112,38 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
             }
         });
     }
+
+    @Override
+    public UserInEventEntity changeStatus(UserInEventEntity inEvent, RegistrationStatus status) {
+        inEvent.setStatus(status);
+        return update(inEvent);
+    }
+
+    @Override
+    public UserInEventEntity findById(long eventId, long userId, long flags) {
+        UserInEventEntity entity = ofy().get(UserInEventEntity.createKey(userId, eventId));
+        populate(Arrays.asList(entity), flags);
+        return entity;
+    }
+
+    @Override
+    public List<UserInEventEntity> findByIds(long eventId, Set<Long> userIds, long flags) {
+        if (userIds == null || userIds.size() == 0) {
+            return Collections.EMPTY_LIST;
+        }
+
+        Set<Key<UserInEventEntity>> keys = new HashSet<Key<UserInEventEntity>>();
+        for (Long id : userIds) {
+            if (id != null) {
+                keys.add(UserInEventEntity.createKey(id, eventId));
+            }
+        }
+
+        Map<Key<UserInEventEntity>, UserInEventEntity> entityMap = ofy().get(keys);
+        populate(entityMap.values(), flags);
+
+        return new ArrayList<UserInEventEntity>(entityMap.values());
+
+    }
+
 }

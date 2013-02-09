@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.security;
 
+import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 
 import java.util.Locale;
@@ -13,6 +14,8 @@ import java.util.Locale;
 public class AppContextSimpleBeanImpl implements AppContext {
 
     private UserEntity loggedUser;
+
+    private EventEntity activeEvent;
 
     private Locale locale;
 
@@ -34,6 +37,14 @@ public class AppContextSimpleBeanImpl implements AppContext {
     @Override
     public void setLocale(Locale locale) {
         this.locale = locale;
+    }
+
+    public EventEntity getActiveEvent() {
+        return activeEvent;
+    }
+
+    public void setActiveEvent(EventEntity activeEvent) {
+        this.activeEvent = activeEvent;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.web.tag;
 
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorEntity;
+import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
@@ -85,5 +86,12 @@ public class AuthorizationFunctions {
             return false;
         if (user == null || user.getRoleIdList() == null) return false;
         return authorizationTool.isAuthorized(Arrays.asList(new String[] {roleId}), Arrays.asList(user.getRoleIdList()));
+    }
+
+    public static boolean isCanBeStartedBy(PoiEntity poi) {
+        UserEntity user = appContext.getLoggedUser();
+        if (appContext == null )
+            return false;
+        return authorizationTool.isCanBeStartedBy(poi, user);
     }
 }

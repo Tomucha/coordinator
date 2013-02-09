@@ -1,7 +1,6 @@
 package cz.clovekvtisni.coordinator.domain;
 
-import java.util.Arrays;
-import java.util.Date;
+import java.util.*;
 
 public class UserInEvent extends AbstractModifiableEntity {
 
@@ -31,11 +30,13 @@ public class UserInEvent extends AbstractModifiableEntity {
 
     private Date lastPoiDate;
 
-    private Long[] groups;
+    private Long[] groupIdList;
 
     private Event event;
 
     private User user;
+
+    private List<UserGroup> groups;
 
     public Long getUserId() {
         return userId;
@@ -141,12 +142,12 @@ public class UserInEvent extends AbstractModifiableEntity {
         this.lastPoiDate = lastPoiDate;
     }
 
-    public Long[] getGroups() {
-        return groups;
+    public Long[] getGroupIdList() {
+        return groupIdList;
     }
 
-    public void setGroups(Long[] groups) {
-        this.groups = groups;
+    public void setGroupIdList(Long[] groups) {
+        this.groupIdList = groups;
     }
 
     public Event getEvent() {
@@ -163,6 +164,14 @@ public class UserInEvent extends AbstractModifiableEntity {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<UserGroup> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<UserGroup> groups) {
+        this.groups = groups;
     }
 
     @Override

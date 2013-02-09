@@ -5,4 +5,4 @@
         taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %>
-home page
+<p><s:message code="msg.superadmin"/></p>

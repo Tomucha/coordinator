@@ -2,21 +2,21 @@ package cz.clovekvtisni.coordinator.domain;
 
 public class UserGroup extends AbstractModifiableEntity {
 
-    private String eventId;
+    private Long eventId;
 
     private String organizationId;
 
     private String name;
 
-    private String role;
+    private String roleId;
 
     private Long createdBy;
 
-    public String getEventId() {
+    public Long getEventId() {
         return eventId;
     }
 
-    public void setEventId(String eventId) {
+    public void setEventId(Long eventId) {
         this.eventId = eventId;
     }
 
@@ -36,12 +36,12 @@ public class UserGroup extends AbstractModifiableEntity {
         this.name = name;
     }
 
-    public String getRole() {
-        return role;
+    public String getRoleId() {
+        return roleId;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
     }
 
     public Long getCreatedBy() {
@@ -58,7 +58,7 @@ public class UserGroup extends AbstractModifiableEntity {
                 ", eventId='" + eventId + '\'' +
                 ", organizationId='" + organizationId + '\'' +
                 ", name='" + name + '\'' +
-                ", role='" + role + '\'' +
+                ", roleId='" + roleId + '\'' +
                 ", createdBy=" + createdBy +
                 '}';
     }

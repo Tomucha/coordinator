@@ -12,10 +12,10 @@
     <div class="buttonPanel">
         <c:choose>
             <c:when test="${can:create('eventEntity')}">
-                <a href="<s:url value="/admin/event/edit"/>"><s:message code="button.createEvent"/></a>
+                <a class="btn" href="<s:url value="/superadmin/event/edit"/>"><s:message code="button.createEvent"/></a>
             </c:when>
             <c:when test="${can:hasRole('ADMIN')}">
-                <a href="<s:url value="/admin/event/detail"/>"><s:message code="button.registerToEvent"/></a>
+                <a class="btn" href="<s:url value="/superadmin/event/detail"/>"><s:message code="button.registerToEvent"/></a>
             </c:when>
         </c:choose>
     </div>
@@ -23,7 +23,7 @@
     <c:choose>
         <c:when test="${!empty events}">
             <div class="eventListTable">
-                <table>
+                <table class="table table-striped">
                     <thead>
                     <tr>
                         <th><s:message code="label.name"/></th>
@@ -35,29 +35,26 @@
                     <tbody>
                     <c:forEach items="${events}" var="event">
                         <tr>
+                            <th><c:out value="${event.name}"/></th>
                             <td>
-                                <c:out value="${event.name}"/>
-                            </td>
-                            <td>
-                                <c:if test="${!empty event.eventLocationEntityList}">
-                                    <c:forEach items="${event.eventLocationEntityList}" var="location">
-                                        <div><tags:gps longitude="${location.longitude}" latitude="${location.latitude}"/></div>
-                                    </c:forEach>
+                                <c:if test="${!empty event.firstEventLocation}">
+                                    <c:set value="${event.firstEventLocation}" var="location"/>
+                                    <div>
+                                        <tags:gps longitude="${location.longitude}" latitude="${location.latitude}"/>
+                                    </div>
                                 </c:if>
                             </td>
                             <td>
-                                <c:if test="${!empty event.eventLocationEntityList}">
-                                    <c:forEach items="${event.eventLocationEntityList}" var="location">
-                                        <div><c:out value="${location.radius}"/> km</div>
-                                    </c:forEach>
+                                <c:if test="${!empty location.radius}">
+                                    <div><c:out value="${location.radius}"/> km</div>
                                 </c:if>
                             </td>
                             <td>
-                                <c:if test="${can:create('organizationInEventEntity')}">
-                                    <a href="/admin/event/map?eventId=<c:out value="${event.id}"/>"><s:message code="button.detail"/></a>
+                                <c:if test="${can:read('organizationInEventEntity')}">
+                                    <a class="btn" href="/admin/event/map?eventId=<c:out value="${event.id}"/>"><s:message code="button.detail"/></a>
                                 </c:if>
                                 <c:if test="${can:create('eventEntity')}">
-                                    <a href="/admin/event/edit?eventId=<c:out value="${event.id}"/>"><s:message code="button.edit"/></a>
+                                    <a class="btn" href="/superadmin/event/edit?eventId=<c:out value="${event.id}"/>"><s:message code="button.edit"/></a>
                                 </c:if>
                             </td>
                         </tr>

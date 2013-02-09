@@ -24,7 +24,7 @@ import javax.validation.Valid;
  */
 @Controller
 @RequestMapping("/login")
-public class LoginController extends AbstractController {
+public class LoginController extends AbstractSuperadminController {
 
     @Autowired
     private UserService userService;
@@ -51,18 +51,19 @@ public class LoginController extends AbstractController {
                     loginForm.password,
                     AuthorizationTool.SUPERADMIN,
                     AuthorizationTool.ADMIN,
-                    AuthorizationTool.BACKEND);
+                    AuthorizationTool.BACKEND,
+                    "COORDINATOR");
 
             retUrl = loginForm.retUrl;
             if (ValueTool.isEmpty(retUrl)) {
-                retUrl = "/admin/event/list";
+                retUrl = SuperadminController.getBreadcrumb().getUrl();
             }
         } catch (MaPermissionDeniedException ex) {
             addFormError(errors, ex);
             return "public/login";
         }
 
-        return "redirect:" + retUrl;
+        return "redirect:/superadmin";
     }
 
 

@@ -8,7 +8,7 @@
     function init() {
         <c:if test="${!empty userInEventList}">
             <c:forEach items="${userInEventList}" var="userInEvent">
-                <c:if test="${!empty userInEvent.id and !empty userInEvent.lastLocationLatitude and !empty userInEvent.lastLocationLongitude}">
+                <c:if test="${!empty userInEvent.userId and !empty userInEvent.lastLocationLatitude and !empty userInEvent.lastLocationLongitude}">
                     CoordinatorMap.addPoint({
                         type: TYPE_USER,
                         userId: <c:out value="${userInEvent.userId}"/>,
@@ -21,17 +21,17 @@
         </c:if>
 
         <c:if test="${!empty placeList}">
-        <c:forEach items="${placeList}" var="place">
-        <c:if test="${!empty place.id and !empty place.latitude and !empty place.longitude}">
-        CoordinatorMap.addPoint({
-            type: TYPE_POI,
-            placeId: <c:out value="${place.id}" />,
-            description: "<c:out value="${place.poiCategory.name}"/>",
-            longitude: <c:out value="${place.longitude}"/>,
-            latitude: <c:out value="${place.latitude}"/>
-        });
-        </c:if>
-        </c:forEach>
+            <c:forEach items="${placeList}" var="place">
+                <c:if test="${!empty place.id and !empty place.latitude and !empty place.longitude}">
+                CoordinatorMap.addPoint({
+                    type: TYPE_POI,
+                    placeId: <c:out value="${place.id}" />,
+                    description: "<c:out value="${place.poiCategory.name}"/>",
+                    longitude: <c:out value="${place.longitude}"/>,
+                    latitude: <c:out value="${place.latitude}"/>
+                });
+                </c:if>
+            </c:forEach>
         </c:if>
 
         <c:if test="${!empty event.eventLocationEntityList}">
@@ -52,8 +52,10 @@
 </script>
 
 <div>
-    <h1><c:out value="${event.name}"/></h1>
+    <p class="lead"><b><s:message code="label.event"/>:</b> <c:out value="${event.name}"/></p>
+
     <p><c:out value="${event.description}"/></p>
+
     <div>
     <tags:osm
             width="90%"
@@ -66,9 +68,11 @@
 </div>
 
 <div id="locationPopup" style="display: none;">
+    <p><b><s:message code="label.eventLocation"/></b></p>
     <input type="hidden" name="id"/>
     <div>
-        <input name="radius" size="4" readonly="readonly"/> km</div>
+        Radius:<br/>
+        <input name="radius" size="2" readonly="readonly"/> km</div>
     <div>
         <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
     </div>

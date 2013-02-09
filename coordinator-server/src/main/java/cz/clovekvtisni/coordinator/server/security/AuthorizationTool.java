@@ -1,8 +1,12 @@
 package cz.clovekvtisni.coordinator.server.security;
 
 import cz.clovekvtisni.coordinator.domain.config.Role;
+import cz.clovekvtisni.coordinator.domain.config.Workflow;
+import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
+import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -59,9 +63,14 @@ public class AuthorizationTool {
         return true;
     }
 
+    // TODO prejmenovat na isAuthorized()
     public boolean hasRole(String roleId, UserEntity user) {
         if (user == null || user.getRoleIdList() == null) return roleId == null;
         return isAuthorized(Arrays.asList(new String[] {roleId}), Arrays.asList(user.getRoleIdList()));
+    }
+
+    public boolean isAuthorized(String[] roles, UserEntity user) {
+        return isAuthorized(Arrays.asList(roles), user != null && user.getRoleIdList() != null ? Arrays.asList(user.getRoleIdList()) : null);
     }
 
     public boolean isAuthorized(List<String> needOneOfRoles, List<String>... hasAllRoles) {
@@ -86,5 +95,31 @@ public class AuthorizationTool {
         }
 
         return false;
+    }
+
+    // TODO zohlednit userGroup
+    public boolean isVisibleFor(PoiEntity poi, UserEntity user) {
+        if (ValueTool.isEmpty(poi.getWorkflowStateId()))
+            return true;
+        WorkflowState state = poi.getWorkflowState();
+        String[] visibleForRole = state.getVisibleForRole();
+        if (visibleForRole == null)
+            return true;
+
+        if (poi.getUserIdList().contains(user.getId())) {
+            // FIXME: to ze to na me assignovane, neznamena, ze to vidim
+            return true;
+        }
+        String[] editableForRole = state.getEditableForRole();
+        if (editableForRole != null && isAuthorized(editableForRole, user))
+            return true;
+        return isAuthorized(new String[] {BACKEND, ADMIN}, user) || isAuthorized(visibleForRole, user);
+    }
+
+    public boolean isCanBeStartedBy(PoiEntity poi, UserEntity user) {
+        Workflow workflow = poi.getWorkflow();
+        if (workflow == null)
+            return true;
+        return  isAuthorized(workflow.getCanBeStartedBy(), user);
     }
 }

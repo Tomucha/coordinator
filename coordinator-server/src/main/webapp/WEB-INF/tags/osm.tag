@@ -10,7 +10,8 @@
         attribute name="maxPoints" required="false" %><%@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags"
-%><style type="text/css">
+%>
+<style type="text/css">
     #mapContainer {
         width: ${!empty width ? width : "100%"};
         height: ${!empty height ? height : "100%"};
@@ -72,6 +73,12 @@
             return state;
         },
 
+        disablePopup: function(pointType) {
+            CoordinatorMap.clickHandlers[pointType] = function(point) {
+                return null;
+            };
+        },
+
         addPoint: function(point) {
             var lonLat = CoordinatorMap.position(point.longitude, point.latitude);
             var marker = new OpenLayers.Marker(lonLat, icons[point.type].clone());
@@ -96,7 +103,7 @@
                         popup = new OpenLayers.Popup(
                                 "Rozsah místa",
                                 marker.lonlat,
-                                new OpenLayers.Size(125, 100),
+                                new OpenLayers.Size(125, 150),
                                 win.html()
                         );
                         map.addPopup(popup);
@@ -330,10 +337,23 @@
         </c:if>
     });
 </script>
+
+<%--
+
+TODO: hledani adresy
+
+<p>
+    <s:message code="label.search"/> <input type="text" class="search-query"/>
+</p>
+--%>
+
 <div id="mapContainer"></div>
 <div id="locationEditForm" style="display: none;">
-    <div><input type="hidden" name="id"/>
-    <input name="radius" size="4"/> km</div>
+    <div>
+        <p><b><s:message code="label.eventLocation"/></b></p>
+        <input type="hidden" name="id"/>
+        <input name="radius" size="4"/> km
+    </div>
     <div>
         <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
         <button type="button" onclick="CoordinatorMap.closeAndSavePopup()"><s:message code="button.ok"/></button>
@@ -342,8 +362,9 @@
 
 <div id="userForm" style="display: none;">
     <div>
+        <p><b><s:message code="label.userLastLocation"/></b></p>
         <input type="hidden" name="id"/>
-        <input name="name" readonly="readonly"/>
+        <input name="name" readonly="readonly" size="4"/>
         <form action="${root}/admin/event/user/edit">
             <div>
                 <input type="hidden" name="userId"/>
@@ -357,11 +378,13 @@
 
 <div id="poiForm" style="display: none;">
     <div>
+        <p><b><s:message code="label.poi"/></b></p>
         <input type="hidden" name="id"/>
         <input name="description" readonly="readonly"/>
         <form action="${root}/admin/event/place/edit">
             <div>
                 <input type="hidden" name="placeId"/>
+                <input type="hidden" name="eventId"/>
                 <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
                 <button type="submit"><s:message code="button.edit"/></button>
             </div>

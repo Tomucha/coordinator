@@ -4,6 +4,7 @@ import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.NoDeletedFilter;
 
+import java.util.Collection;
 import java.util.Date;
 
 /**

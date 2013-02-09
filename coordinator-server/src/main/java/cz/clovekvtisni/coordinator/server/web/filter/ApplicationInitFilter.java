@@ -1,8 +1,10 @@
 package cz.clovekvtisni.coordinator.server.web.filter;
 
 
+import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
+import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.service.SystemService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.web.RequestKeys;
@@ -34,6 +36,9 @@ public class ApplicationInitFilter implements Filter {
     private UserService userService;
 
     @Autowired
+    private EventService eventService;
+
+    @Autowired
     private SystemService systemService;
 
     @Autowired
@@ -60,13 +65,20 @@ public class ApplicationInitFilter implements Filter {
         String root = hRequest.getContextPath();
         hRequest.setAttribute(RequestKeys.ROOT, root);
 
+        if (hRequest.getParameter("eventId") != null) {
+            // we have an active event in URL
+            Long eventId = Long.parseLong(hRequest.getParameter("eventId"));
+            EventEntity e = eventService.findById(eventId, 0);
+            appContext.setActiveEvent(e);
+        }
+
         try {
             if (loggedUserId == null && !isWithoutLoginRequest(hRequest)) {
                 Url url = new Url(hRequest.getRequestURL().toString());
                 String[] path = url.getPath();
                 String urlPath = root + "/login";
                 if (path != null && path.length > 0 && !ValueTool.isEmpty(path[0])) {
-                    urlPath += "?retUrl=" + Url.encode(hRequest.getRequestURL().toString());
+                    urlPath += "?retUrl=" + Url.encode(hRequest.getRequestURL().toString()+"?"+hRequest.getQueryString());
                 }
                 hResponse.sendRedirect(urlPath);
                 return;
@@ -121,7 +133,7 @@ public class ApplicationInitFilter implements Filter {
         return uri;
     }
 
-    private Pattern withoutLoginPattern = Pattern.compile("^/(?:login|logout|api|_ah)(?:/|$)");
+    private Pattern withoutLoginPattern = Pattern.compile("^/(?:login|logout|api|_ah|css|js|bootstrap|images)(?:/|$)");
 
     private boolean isWithoutLoginRequest(HttpServletRequest hr) {
         return isUriMatch(hr, withoutLoginPattern);

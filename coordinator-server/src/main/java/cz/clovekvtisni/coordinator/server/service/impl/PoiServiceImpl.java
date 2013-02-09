@@ -4,13 +4,18 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
+import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
+import cz.clovekvtisni.coordinator.domain.config.WorkflowTransition;
+import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
+import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
+import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,6 +31,12 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     @Autowired
     private CoordinatorConfig config;
 
+    @Autowired
+    private AuthorizationTool authorizationTool;
+
+    @Autowired
+    private UserInEventService userInEventService;
+
     @Override
     public PoiEntity findById(Long id, long flags) {
         PoiEntity poi = ofy().get(Key.create(PoiEntity.class, id));
@@ -36,22 +47,20 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     }
 
     private void populate(Collection<PoiEntity> entities, long flags) {
-        if ((flags & FLAG_FETCH_FROM_CONFIG) != 0l) {
-            Map<String,PoiCategory> categoryMap = config.getPoiCategoryMap();
-            for (PoiEntity poi : entities) {
-                if (poi.getPoiCategoryId() != null) {
-                    poi.setPoiCategory(categoryMap.get(poi.getPoiCategoryId()));
-                }
+        Map<String,PoiCategory> categoryMap = config.getPoiCategoryMap();
+        for (PoiEntity poi : entities) {
+            if (poi.getPoiCategoryId() != null) {
+                poi.setPoiCategory(categoryMap.get(poi.getPoiCategoryId()));
             }
+        }
 
-            Map<String,Workflow> workflowMap = config.getWorkflowMap();
-            for (PoiEntity poi : entities) {
-                if (poi.getWorkflowId() != null) {
-                    Workflow workflow = workflowMap.get(poi.getWorkflowId());
-                    poi.setWorkflow(workflow);
-                    if (workflow != null && poi.getWorkflowStateId() != null) {
-                        poi.setWorkflowState(workflow.getStateMap().get(poi.getWorkflowStateId()));
-                    }
+        Map<String,Workflow> workflowMap = config.getWorkflowMap();
+        for (PoiEntity poi : entities) {
+            if (poi.getWorkflowId() != null) {
+                Workflow workflow = workflowMap.get(poi.getWorkflowId());
+                poi.setWorkflow(workflow);
+                if (workflow != null && poi.getWorkflowStateId() != null) {
+                    poi.setWorkflowState(workflow.getStateMap().get(poi.getWorkflowStateId()));
                 }
             }
         }
@@ -74,7 +83,19 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
             public PoiEntity run() {
                 entity.setId(null);
                 updateSystemFields(entity, null);
+
+                // let's enforce workflow
+
+                PoiCategory c = config.getPoiCategoryMap().get(entity.getPoiCategoryId());
+                Workflow w = config.getWorkflowMap().get(c.getWorkflowId());
+                entity.setWorkflow(w);
+                if (w != null) {
+                    entity.setWorkflowState(w.getStartState());
+                }
+
                 ofy().put(entity);
+
+                // FIXME: visibility, workflow state, assigned
 
                 return entity;
             }
@@ -88,6 +109,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
             public PoiEntity run() {
                 PoiEntity old = ofy().get(entity.getKey());
                 updateSystemFields(entity, old);
+                entity.setWorkflowId(old.getWorkflowId());
                 ofy().put(entity);
 
                 return entity;
@@ -96,7 +118,39 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     }
 
     @Override
-    public void deletePoi(PoiEntity entity) {
+    public PoiEntity assignUser(final PoiEntity poi, final Long userId) {
+        return ofy().transact(new Work<PoiEntity>() {
+            @Override
+            public PoiEntity run() {
+                PoiEntity old = ofy().get(poi.getKey());
+                UserInEventEntity user = ofy().get(UserInEventEntity.createKey(userId, old.getEventId()));
+                if (user == null) throw new IllegalStateException("No such user in event: "+userId);
+                old.getUserIdList().add(user.getUserId());
+                updateSystemFields(old, old);
+                ofy().put(old);
+                return old;
+            }
+        });
+    }
+
+    @Override
+    public PoiEntity unassignUser(final PoiEntity poi, final Long userId) {
+        return ofy().transact(new Work<PoiEntity>() {
+            @Override
+            public PoiEntity run() {
+                PoiEntity old = ofy().get(poi.getKey());
+                UserInEventEntity user = ofy().get(UserInEventEntity.createKey(userId, old.getEventId()));
+                if (user == null) throw new IllegalStateException("No such user in event: "+userId);
+                old.getUserIdList().remove(user.getUserId());
+                updateSystemFields(old, old);
+                ofy().put(old);
+                return old;
+            }
+        });
+    }
+
+    @Override
+    public void deletePoi(PoiEntity entity, long flags) {
         entity.setDeletedDate(new Date());
         updatePoi(entity);
     }
@@ -106,7 +160,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
         PoiFilter filter = new PoiFilter();
         filter.setOrganizationIdVal(organizationId);
         filter.setOrder("-createdDate");
-        return findByFilter(filter, LAST_POI_LIST_LENGTH, null, PoiService.FLAG_FETCH_FROM_CONFIG);
+        return findByFilter(filter, LAST_POI_LIST_LENGTH, null, 0l);
     }
 
     @Override
@@ -114,6 +168,34 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
         PoiFilter filter = new PoiFilter();
         filter.setEventIdVal(eventId);
         filter.setOrder("-createdDate");
-        return findByFilter(filter, LAST_POI_LIST_LENGTH, null, PoiService.FLAG_FETCH_FROM_CONFIG);
+        return findByFilter(filter, LAST_POI_LIST_LENGTH, null, 0l);
     }
+
+    @Override
+    public PoiEntity startWorkflow(PoiEntity entity) {
+        Workflow workflow = entity.getWorkflow();
+        if (workflow == null)
+            return entity;
+        if (!authorizationTool.isCanBeStartedBy(entity, getLoggedUser()))
+            throw MaPermissionDeniedException.permissionDenied();
+        WorkflowState startState = workflow.getStartState();
+        entity.setWorkflowStateId(startState != null ? startState.getId() : null);
+        entity.setWorkflowState(startState);
+        return updatePoi(entity);
+    }
+
+    @Override
+    public PoiEntity transitWorkflowState(PoiEntity entity, String transitionId) {
+        if (entity == null || transitionId == null)
+            return entity;
+        if (entity.getWorkflowStateId() == null || entity.getWorkflowState().getTransitions() == null)
+            throw new IllegalArgumentException("no transition=" + transitionId + " in workflow state=" + entity.getWorkflowStateId());
+        WorkflowTransition transition = entity.getWorkflowState().getTransitionMap().get(transitionId);
+        if (transition == null)
+            throw new IllegalArgumentException("no transition=" + transitionId + " in workflow state=" + entity.getWorkflowStateId());
+        entity.setWorkflowState(null);
+        entity.setWorkflowStateId(transition.getToStateId());
+        return updatePoi(entity);
+    }
+
 }

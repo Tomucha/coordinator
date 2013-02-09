@@ -20,8 +20,8 @@ import java.util.Calendar;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin/event/list")
-public class EventListController extends AbstractController {
+@RequestMapping("/superadmin/event/list")
+public class EventListController extends AbstractSuperadminController {
 
     @Autowired
     private EventService eventService;
@@ -42,18 +42,11 @@ public class EventListController extends AbstractController {
 
         model.addAttribute("events", events.getResult());
 
-        return "admin/event-list";
+        return "superadmin/event-list";
     }
 
     public static Breadcrumb getBreadcrumb() {
-        return new Breadcrumb("/admin/event/list", "breadcrumb.eventList");
+        return new Breadcrumb(null, "/superadmin/event/list", "breadcrumb.eventList");
     }
 
-    @ModelAttribute("breadcrumbs")
-    public Breadcrumb[] breadcrumbs() {
-        return new Breadcrumb[] {
-                UserListController.getBreadcrumb(),
-                EventListController.getBreadcrumb()
-        };
-    }
 }

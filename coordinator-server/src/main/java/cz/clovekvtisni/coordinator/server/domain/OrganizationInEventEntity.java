@@ -158,6 +158,9 @@ public class OrganizationInEventEntity extends AbstractPersistentEntity<Organiza
 
     public void setEventEntity(EventEntity eventEntity) {
         this.eventEntity = eventEntity;
+        if (eventEntity != null) {
+            setEventId(eventEntity.getId());
+        }
     }
 
     @Override

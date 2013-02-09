@@ -13,9 +13,13 @@ public class UserMultiSelection {
 
     private List<Long> selectedUsers;
 
-    private String selectedAction;
+    private SelectedUserAction selectedAction;
+
+    private String suspendReason;
 
     private Long selectedTaskId;
+
+    private Long groupId;
 
     public List<Long> getSelectedUsers() {
         return selectedUsers;
@@ -25,11 +29,11 @@ public class UserMultiSelection {
         this.selectedUsers = selectedUsers;
     }
 
-    public String getSelectedAction() {
+    public SelectedUserAction getSelectedAction() {
         return selectedAction;
     }
 
-    public void setSelectedAction(String selectedAction) {
+    public void setSelectedAction(SelectedUserAction selectedAction) {
         this.selectedAction = selectedAction;
     }
 
@@ -47,5 +51,21 @@ public class UserMultiSelection {
 
     public void setEventId(Long eventId) {
         this.eventId = eventId;
+    }
+
+    public String getSuspendReason() {
+        return suspendReason;
+    }
+
+    public void setSuspendReason(String suspendReason) {
+        this.suspendReason = suspendReason;
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
     }
 }

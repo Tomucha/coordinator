@@ -29,16 +29,16 @@ public class EventPoiApiController extends AbstractApiController {
 
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody ApiResponse filter(HttpServletRequest request) {
-        UserRequest<EventPoiListRequestParams> req = parseRequest(request, EventPoiListRequestParams.class);
+        EventPoiListRequestParams params = parseRequest(request, EventPoiListRequestParams.class);
         PoiFilter filter = new PoiFilter();
-        filter.setEventIdVal(req.params.getEventId());
-        if (req.params.getModifiedFrom() != null) {
-            filter.setModifiedDateVal(req.params.getModifiedFrom());
+        filter.setEventIdVal(params.getEventId());
+        if (params.getModifiedFrom() != null) {
+            filter.setModifiedDateVal(params.getModifiedFrom());
             filter.setModifiedDateOp(Filter.Operator.GT);
         }
         filter.setOrder("modifiedDate");
 
-        ResultList<PoiEntity> result = poiService.findByFilter(filter, 0, null, PoiService.FLAG_FETCH_FROM_CONFIG);
+        ResultList<PoiEntity> result = poiService.findByFilter(filter, 0, null, 0l);
         List<Poi> pois = new EntityTool().buildTargetEntities(result.getResult());
 
         return okResult(new EventPoiFilterResponseData(pois));

@@ -10,11 +10,13 @@ import java.util.Map;
  * User: jka
  * Date: 28.11.12
  */
-public class EventFilterParams implements FilterParams {
+public class EventFilterParams {
 
     private Long eventId;
 
     private String userFulltext;
+
+    private Long groupId;
 
     public EventFilterParams() {
     }
@@ -43,7 +45,14 @@ public class EventFilterParams implements FilterParams {
         this.eventId = eventId;
     }
 
-    @Override
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
+    }
+
     public Map<String, String> toMap() {
         Map<String, String> map = new HashMap<String, String>(2);
         if (eventId != null)

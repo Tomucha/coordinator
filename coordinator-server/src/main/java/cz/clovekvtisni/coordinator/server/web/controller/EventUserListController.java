@@ -1,19 +1,18 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
-import cz.clovekvtisni.coordinator.exception.NotFoundException;
-import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
+import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
+import cz.clovekvtisni.coordinator.server.domain.*;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
-import cz.clovekvtisni.coordinator.server.service.PoiService;
+import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
-import cz.clovekvtisni.coordinator.server.web.model.FilterParams;
+import cz.clovekvtisni.coordinator.server.web.model.SelectedUserAction;
 import cz.clovekvtisni.coordinator.server.web.model.UserMultiSelection;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
+import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -39,24 +39,14 @@ public class EventUserListController extends AbstractEventController {
     @Autowired
     private UserInEventService userInEventService;
 
+    @Autowired
+    private UserGroupService userGroupService;
+
     @RequestMapping(method = RequestMethod.GET)
     public String listUsers(@ModelAttribute("params") EventFilterParams params, Model model) {
-        if (params.getEventId() == null)
-            throw NotFoundException.idNotExist();
 
-        UserInEventFilter inEventFilter = new UserInEventFilter();
-        inEventFilter.setEventIdVal(params.getEventId());
-        if (params.getUserFulltext() != null) {
-            final String fullText = params.getUserFulltext();
-            inEventFilter.addAfterLoadCallback(new Filter.AfterLoadCallback<UserInEventEntity>() {
-                @Override
-                public boolean accept(UserInEventEntity entity) {
-                    UserEntity user = entity.getUserEntity();
-                    return user.getFullName() != null && user.getFullName().contains(fullText);
-                }
-            });
-        }
-        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER);
+        UserInEventFilter inEventFilter = createFilterFromParams(params);
+        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS);
         model.addAttribute("userInEvents", userInEvents.getResult());
 
         UserMultiSelection selectionForm = new UserMultiSelection();
@@ -67,41 +57,119 @@ public class EventUserListController extends AbstractEventController {
         poiFilter.setEventIdVal(params.getEventId());
         poiFilter.setWorkflowIdVal(0l);
         poiFilter.setWorkflowIdOp(Filter.Operator.NOT_EQ);
-        model.addAttribute("tasks", poiService.findByFilter(poiFilter, 0, null, PoiService.FLAG_FETCH_FROM_CONFIG).getResult());
+        model.addAttribute("tasks", poiService.findByFilter(poiFilter, 0, null, 0l).getResult());
 
-        populateEventModel(model, params);
+        model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
 
         return "admin/event-users";
     }
 
+    @RequestMapping(method = RequestMethod.GET, params = "ajax")
+    public String listUsersAjax(@ModelAttribute("params") EventFilterParams params, Model model) {
+
+        UserInEventFilter inEventFilter = createFilterFromParams(params);
+        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS);
+        model.addAttribute("userInEvents", userInEvents.getResult());
+
+        model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
+
+        return "ajax/event-users";
+    }
+
+
+    private UserInEventFilter createFilterFromParams(EventFilterParams params) {
+        UserInEventFilter inEventFilter = new UserInEventFilter();
+        inEventFilter.setEventIdVal(params.getEventId());
+        if (!ValueTool.isEmpty(params.getUserFulltext())) {
+            final String fullText = params.getUserFulltext().trim().toLowerCase();
+            inEventFilter.addAfterLoadCallback(new Filter.AfterLoadCallback<UserInEventEntity>() {
+                @Override
+                public boolean accept(UserInEventEntity entity) {
+                    UserEntity user = entity.getUserEntity();
+                    return user != null && user.getFullName() != null && user.getFullName().toLowerCase().contains(fullText);
+                }
+            });
+        }
+        final Long groupId = params.getGroupId();
+        if (groupId != null) {
+            inEventFilter.addAfterLoadCallback(new Filter.AfterLoadCallback<UserInEventEntity>() {
+                @Override
+                public boolean accept(UserInEventEntity entity) {
+                    return entity.getGroupIdList() != null &&
+                            Arrays.asList(entity.getGroupIdList()).contains(groupId);
+                }
+            });
+        }
+        return inEventFilter;
+    }
+
     @RequestMapping(method = RequestMethod.POST)
     public String onSelectedAction(@ModelAttribute("selectionForm") @Valid UserMultiSelection selection, BindingResult bindingResult) {
-        if (selection.getSelectedUsers() != null && selection.getSelectedUsers().size() > 0)  {
-            String selectedAction = selection.getSelectedAction();
-            Long selectedPlaceId = selection.getSelectedTaskId();
+        List<Long> userIds = selection.getSelectedUsers();
+        SelectedUserAction action = selection.getSelectedAction();
+        if (userIds != null && userIds.size() > 0 && action != null)  {
 
-            // TODO
-            if (selectedAction.equals("delete")) {
+            switch (action) {
+                case EXPEL:
+                case CONFIRM:
+                    UserInEventFilter filter = new UserInEventFilter();
+                    filter.setEventIdVal(selection.getEventId());
+                    ResultList<UserInEventEntity> inEventEntities = userInEventService.findByFilter(filter, 0, null, 0l);
+                    RegistrationStatus status = action == SelectedUserAction.CONFIRM ? RegistrationStatus.CONFIRMED : RegistrationStatus.EXPELLED;
+                    for (UserInEventEntity inEventEntity : inEventEntities) {
+                        if (userIds.contains(inEventEntity.getUserId()))
+                            userInEventService.changeStatus(inEventEntity, status);
+                    }
+                    break;
 
-            } else if (selectedAction.equals("suspend")) {
+                case SUSPEND:
+                    for (Long userId : userIds) {
+                        if (userId != null)
+                            userService.suspendUser(userId, selection.getSuspendReason(), 0l);
+                    }
+                    break;
 
-            } else if (selectedAction.equals("registerToTask") && selectedPlaceId != null) {
-                PoiEntity place = poiService.findById(selectedPlaceId, 0l);
-                Set<Long> updateList = new HashSet<Long>();
-                Long[] registered = place.getUserId();
-                if (registered != null)
-                    updateList.addAll(Arrays.asList(registered));
-                for (Long userId : selection.getSelectedUsers())
-                    updateList.add(userId);
-                place.setUserId(updateList.toArray(new Long[0]));
-                poiService.updatePoi(place);
+/*
+                FIXME: takhle ten assign nemuze byt, delam ho jinak
+
+                case REGISTER_TO_TASK:
+                    Long placeId = selection.getSelectedTaskId();
+                    if (placeId != null) {
+                        PoiEntity place = poiService.findById(placeId, 0l);
+                        Set<Long> updateList = new HashSet<Long>();
+                        Long[] registered = place.getUserIdList();
+                        if (registered != null)
+                            updateList.addAll(Arrays.asList(registered));
+                        for (Long userId : userIds)
+                            if (userId != null)
+                                updateList.add(userId);
+                        place.setUserIdList(updateList.toArray(new Long[0]));
+                        poiService.updatePoi(place);
+                    }
+                    break;
+*/
+
+                case ADD_TO_GROUP:
+                    Long groupId = selection.getGroupId();
+                    if (groupId != null) {
+                        UserGroupEntity userGroup = userGroupService.findById(groupId, 0l);
+                        if (userGroup != null) {
+                            userGroupService.addUsersToGroup(userGroup, userIds.toArray(new Long[0]));
+                        }
+                    }
+                    break;
             }
         }
 
         return "redirect:/admin/event/user/list?eventId=" + selection.getEventId();
     }
 
-    public static Breadcrumb getBreadcrumb(FilterParams params) {
-        return new Breadcrumb(params, "/admin/event/user/list", "breadcrumb.eventUsers");
+    public static Breadcrumb getBreadcrumb(EventEntity activeEvent) {
+        return new Breadcrumb(activeEvent, "/admin/event/user/list", "breadcrumb.eventUsers");
+    }
+
+    @ModelAttribute("selectedUserActions")
+    public SelectedUserAction[] selectedUserActions() {
+        return SelectedUserAction.values();
     }
 }

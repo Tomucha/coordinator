@@ -3,6 +3,7 @@ package cz.clovekvtisni.coordinator.server.security.plugin;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
+import cz.clovekvtisni.coordinator.server.security.command.AbstractAuthorizationCommand;
 import cz.clovekvtisni.coordinator.server.security.command.HasRoleCommand;
 import cz.clovekvtisni.coordinator.server.security.command.PermissionCommand;
 import cz.clovekvtisni.coordinator.server.security.command.PermittedCommand;
@@ -30,11 +31,16 @@ public class PoiSecurityPlugin extends SecurityPlugin {
 
     @Override
     protected void register() {
-        PermissionCommand<PoiEntity> permittedCommand = new PermittedCommand<PoiEntity>();
+        PermissionCommand<PoiEntity> isVisibleCommand = new AbstractAuthorizationCommand<PoiEntity>(appContext, authorizationTool) {
+            @Override
+            public boolean isPermitted(PoiEntity entity, String entityName) {
+                return entity == null || authorizationTool.isVisibleFor(entity, loggedUser());
+            }
+        };
         PermissionCommand<PoiEntity> isBackendCommand = new HasRoleCommand<PoiEntity>(appContext, authorizationTool, Arrays.asList(new String[]{AuthorizationTool.BACKEND}));
 
-        registerPermissionCommand(PoiEntity.class, ReadPermission.class, permittedCommand);
-        registerPermissionCommand("poEntity", ReadPermission.class, permittedCommand);
+        registerPermissionCommand(PoiEntity.class, ReadPermission.class, isVisibleCommand);
+        registerPermissionCommand("poiEntity", ReadPermission.class, isVisibleCommand);
         registerPermissionCommand(PoiEntity.class, CreatePermission.class, isBackendCommand);
         registerPermissionCommand("poiEntity", CreatePermission.class, isBackendCommand);
         registerPermissionCommand(PoiEntity.class, UpdatePermission.class, isBackendCommand);
