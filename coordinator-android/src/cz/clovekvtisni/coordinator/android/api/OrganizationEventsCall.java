@@ -9,7 +9,7 @@ public class OrganizationEventsCall extends
 	public OrganizationEventsCall(OrganizationEventsRequestParams requestParams) {
 		super("organization/events", requestParams, OrganizationEventsResponseData.class);
 	}
-	
+
 	public static interface Listener extends ApiCall.Listener<OrganizationEventsResponseData> {
 	}
 

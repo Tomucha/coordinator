@@ -11,13 +11,12 @@ import android.os.Handler;
 import com.google.common.collect.Sets;
 
 public class DiskTileLoader implements TileLoadedListener {
+	private final DiskTileCache cache;
 	private final ExecutorService executor;
 	private final Handler handler;
 	private final NetworkTileLoader networkTileLoader;
 	private final TileLoadedListener listener;
 	private final Set<TileId> tileIds = Sets.newHashSet();
-
-	private final DiskTileCache cache;
 
 	public DiskTileLoader(DiskTileCache cache, TileLoadedListener listener, Handler handler) {
 		this.cache = cache;

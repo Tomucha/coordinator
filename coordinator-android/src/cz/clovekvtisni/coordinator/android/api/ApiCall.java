@@ -5,6 +5,7 @@ import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 
 import cz.clovekvtisni.coordinator.android.workers.Worker;
 import cz.clovekvtisni.coordinator.api.request.ApiRequest;
@@ -31,13 +32,17 @@ public class ApiCall<S extends RequestParams, T extends ApiResponseData> extends
 
 	private String createRequestBody() {
 		ApiRequest request = new ApiRequest();
+		request.setAuthKey("8e70c14f51a6c60407aec309d5b3ea31");
 		request.setData(requestParams);
 		return ApiUtils.GSON.toJsonTree(request).toString();
 	}
 
-	private void doRequest() throws HttpRequestException, ApiResponseException {
+	private void doRequest() throws HttpRequestException, JsonSyntaxException, ApiResponseException {
+		System.out.println(createRequestBody());
+		System.out.println("---------------");
 		String responseBody = HttpRequest.post(url).send(createRequestBody()).body();
 		JsonObject json = (JsonObject) ApiUtils.PARSER.parse(responseBody);
+		System.out.println(json);
 
 		Status status = ApiUtils.GSON.fromJson(json.get(API_RESPONSE_STATUS), Status.class);
 		if (status == Status.OK) {

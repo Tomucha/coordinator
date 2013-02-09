@@ -1,41 +1,84 @@
 package cz.clovekvtisni.coordinator.android.event.map;
 
 import java.io.IOException;
+import java.util.List;
 
 import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
+import android.graphics.Point;
 import android.os.Handler;
 import android.support.v4.util.LruCache;
+import android.util.AttributeSet;
 import android.view.View;
+
+import com.google.common.collect.Lists;
+
 import cz.clovekvtisni.coordinator.android.event.map.Projection.LatLon;
 import cz.clovekvtisni.coordinator.android.event.map.Projection.ProjectedTile;
+import cz.clovekvtisni.coordinator.android.event.map.TouchHelper.OnSingleTapListener;
+import cz.clovekvtisni.coordinator.android.util.Utils;
 
-public class OsmMapView extends View implements TileLoadedListener {
+public class OsmMapView extends View implements OnSingleTapListener, TileLoadedListener {
 
 	private static final int TILE_BITMAP_BYTES = 256 * 256 * 4;
 	private static final Paint BITMAP_PAINT = new Paint(Paint.FILTER_BITMAP_FLAG);
 
 	private DiskTileLoader tileLoader;
+	private List<MapOverlay> overlays = Lists.newArrayList();
 	private LruCache<TileId, Bitmap> bitmapCache;
 	private Projection projection;
 
-	public OsmMapView(Context context) {
-		super(context);
+	public OsmMapView(Context context, AttributeSet attrs) {
+		super(context, attrs);
 
 		initCache();
 		initProjection();
 		initTileLoader();
-		setOnTouchListener(new TouchListener(projection));
+		setOnTouchListener(new TouchHelper(context, projection, this));
 	}
-	
+
+	public void addOverlay(MapOverlay overlay) {
+		overlays.add(overlay);
+	}
+
 	@Override
 	public void onTileLoaded(TileId tileId, Bitmap bitmap) {
 		if (bitmap == null) return;
 		bitmapCache.put(tileId, bitmap);
+		invalidate();
+	}
+
+	public void onDestroy() {
+		tileLoader.shutDown();
+	}
+
+	@Override
+	public void onSingleTap(float x, float y) {
+		double nearestDp = Integer.MAX_VALUE;
+		MapOverlay nearestOverlay = null;
+		for (MapOverlay overlay : overlays) {
+			Point p = projection.latLonToPixels(overlay.getLatLon());
+			int distancePx = (int) Math.sqrt(Math.pow((x - p.x), 2) + Math.pow((y - p.y), 2));
+			int distanceDp = (int) Utils.pxToDp(getResources(), distancePx);
+			if (distanceDp < 40 && distanceDp < nearestDp) {
+				nearestOverlay = overlay;
+				nearestDp = distanceDp;
+			}
+		}
+
+		if (nearestOverlay != null) nearestOverlay.onTap();
+	}
+
+	public void setCenter(LatLon center) {
+		projection.setCenterLatLon(center);
+		invalidate();
+	}
+
+	public void setZoom(double zoom) {
+		projection.setZoom(zoom);
 		invalidate();
 	}
 
@@ -65,23 +108,37 @@ public class OsmMapView extends View implements TileLoadedListener {
 	private void initProjection() {
 		projection = new Projection(getResources().getDisplayMetrics().densityDpi);
 		projection.setCenterLatLon(new LatLon(50.083333, 14.416667));
-		projection.setZoom(10000);
+		projection.setZoom(100000);
 	}
 
-	public void onDestroy() {
-		tileLoader.shutDown();
+	private void drawOverlays(Canvas canvas) {
+		for (MapOverlay overlay : overlays) {
+			Point p = projection.latLonToPixels(overlay.getLatLon());
+			overlay.onDraw(canvas, p.x, p.y, projection.mapMetersToPixels(1));
+		}
 	}
 
-	@Override
-	protected void onDraw(Canvas canvas) {
+	private void drawTiles(Canvas canvas) {
 		for (ProjectedTile tile : projection.getTiles()) {
 			Bitmap bitmap = bitmapCache.get(tile.getTileId());
 			if (bitmap == null) {
 				tileLoader.requestTile(tile.getTileId());
-			} else {
+
+				ProjectedTile parentTile = tile.createCorrespondingTileWithOneLevelLowerZoom();
+				bitmap = bitmapCache.get(parentTile.getTileId());
+				tile = parentTile;
+			}
+
+			if (bitmap != null) {
 				canvas.drawBitmap(bitmap, tile.getSrcRect(), tile.getDstRect(), BITMAP_PAINT);
 			}
 		}
+	}
+
+	@Override
+	protected void onDraw(Canvas canvas) {
+		drawTiles(canvas);
+		drawOverlays(canvas);
 	}
 
 	@Override

@@ -1,20 +1,21 @@
-package cz.clovekvtisni.coordinator.android.ui;
+package cz.clovekvtisni.coordinator.android.organization;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.webkit.WebView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.OrganizationEventsCall;
+import cz.clovekvtisni.coordinator.android.event.EventActivity;
 import cz.clovekvtisni.coordinator.android.register.RegisterActivity;
 import cz.clovekvtisni.coordinator.android.workers.Workers;
 import cz.clovekvtisni.coordinator.api.request.OrganizationEventsRequestParams;
 import cz.clovekvtisni.coordinator.api.response.OrganizationEventsResponseData;
+import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 
 public class OrganizationActivity extends SherlockFragmentActivity {
@@ -22,6 +23,15 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 	private Organization organization;
 	private Workers workers;
 
+	private void initEvents() {
+		findViewById(R.id.event1).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(EventActivity.IntentHelper.create(OrganizationActivity.this));
+			}
+		});
+	}
+	
 	private void initPreregisterButton() {
 		findViewById(R.id.preregister).setOnClickListener(new OnClickListener() {
 			@Override
@@ -32,7 +42,7 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 	}
 
 	private void initWebView() {
-		WebView webView = (WebView) findViewById(R.id.webView);
+		// WebView webView = (WebView) findViewById(R.id.webView);
 	}
 
 	private void loadEvents() {
@@ -47,7 +57,9 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 
 			@Override
 			public void onResult(OrganizationEventsResponseData result) {
-				System.out.println(result.getOrganizationInEvents().size());
+				for(OrganizationInEvent event:result.getOrganizationInEvents()) {
+					System.out.println(event.getName());
+				}
 			}
 		});
 	}
@@ -63,6 +75,7 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 		getSupportActionBar().setTitle(organization.getName());
 
 		initWebView();
+		initEvents();
 		initPreregisterButton();
 
 		loadEvents();

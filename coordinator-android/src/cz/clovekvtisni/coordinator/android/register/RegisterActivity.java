@@ -17,6 +17,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
@@ -64,6 +65,9 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 
 		@Override
 		public void onException(Exception e) {
+			Toast.makeText(RegisterActivity.this, "Chyba", Toast.LENGTH_SHORT).show();
+			FragmentManager fm = getSupportFragmentManager();
+			((DialogFragment) fm.findFragmentByTag(RegisteringDialog.TAG)).dismiss();
 		}
 	};
 
@@ -189,7 +193,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mWizardModel.unregisterListener(this);
+		if (mWizardModel != null) mWizardModel.unregisterListener(this);
 	}
 
 	@Override
@@ -263,7 +267,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 		UserRegisterCall call = new UserRegisterCall(params);
 		workers.start(call, registerCallListener);
 
-		new RegisteringDialog().show(getSupportFragmentManager(), null);
+		new RegisteringDialog().show(getSupportFragmentManager(), RegisteringDialog.TAG);
 	}
 
 	private class MyPagerAdapter extends FragmentStatePagerAdapter {
@@ -327,6 +331,8 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 	}
 
 	public static class RegisteringDialog extends DialogFragment {
+		private static final String TAG = "registering-dialog";
+
 		@Override
 		public Dialog onCreateDialog(Bundle state) {
 			final ProgressDialog dialog = new ProgressDialog(getActivity());

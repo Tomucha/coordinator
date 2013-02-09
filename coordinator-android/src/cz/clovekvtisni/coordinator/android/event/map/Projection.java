@@ -50,8 +50,8 @@ public class Projection {
 				dstRect.right = (int) (pxOffsetX + (xIdx + 1) * tileSizePx);
 				dstRect.bottom = (int) (pxOffsetY + (yIdx + 1) * tileSizePx);
 
-				TileId tileId = new TileId(topLeftTileOsm.x + xIdx, topLeftTileOsm.y + yIdx, osmZoom);
-				
+				TileId tileId = new TileId(topLeftTileOsm.x + xIdx, topLeftTileOsm.y + yIdx,
+						osmZoom);
 				tiles.add(new ProjectedTile(srcRect, dstRect, tileId));
 			}
 		}
@@ -63,6 +63,18 @@ public class Projection {
 		return zoom;
 	}
 
+	public Point latLonToPixels(LatLon latLon) {
+		double xDiff = longitudesToPixels(latLon.getLon() - centerLatLon.getLon());
+		double yDiff = -latitudesToPixels(latLon.getLat() - centerLatLon.getLat());
+		int x = (int) (screenWidth / 2.0 + xDiff);
+		int y = (int) (screenHeight / 2.0 + yDiff);
+		return new Point(x, y);
+	}
+
+	public double mapMetersToPixels(double mapMeters) {
+		return mapMeters / zoom / onePixelInMeters;
+	}
+	
 	public double pixelsToLatitudes(double pixels) {
 		return pixelsToMapMeters(pixels) / ONE_LATITUDE_IN_METERS;
 	}
@@ -174,6 +186,17 @@ public class Projection {
 
 		public Rect getDstRect() {
 			return dstRect;
+		}
+
+		public ProjectedTile createCorrespondingTileWithOneLevelLowerZoom() {
+			Rect newSrcRect = new Rect();
+			newSrcRect.left = 128 * (tileId.getOsmX() % 2);
+			newSrcRect.top = 128 * (tileId.getOsmY() % 2);
+			newSrcRect.right = newSrcRect.left + 128;
+			newSrcRect.bottom = newSrcRect.top + 128;
+			TileId newTileId = new TileId(tileId.getOsmX() / 2, tileId.getOsmY() / 2,
+					tileId.getOsmZoom() - 1);
+			return new ProjectedTile(newSrcRect, dstRect, newTileId);
 		}
 	}
 }

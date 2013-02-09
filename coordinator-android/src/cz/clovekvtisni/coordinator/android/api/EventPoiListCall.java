@@ -1,16 +1,16 @@
 package cz.clovekvtisni.coordinator.android.api;
 
-import cz.clovekvtisni.coordinator.api.request.OrganizationEventsRequestParams;
-import cz.clovekvtisni.coordinator.api.response.OrganizationEventsResponseData;
+import cz.clovekvtisni.coordinator.api.request.EventPoiListRequestParams;
+import cz.clovekvtisni.coordinator.api.response.EventPoiFilterResponseData;
 
 public class EventPoiListCall extends
-		ApiCall<OrganizationEventsRequestParams, OrganizationEventsResponseData> {
+		ApiCall<EventPoiListRequestParams, EventPoiFilterResponseData> {
 
-	public EventPoiListCall(OrganizationEventsRequestParams requestParams) {
-		super("organization/events", requestParams, OrganizationEventsResponseData.class);
+	public EventPoiListCall(EventPoiListRequestParams requestParams) {
+		super("event/poi/list", requestParams, EventPoiFilterResponseData.class);
 	}
 	
-	public static interface Listener extends ApiCall.Listener<OrganizationEventsResponseData> {
+	public static interface Listener extends ApiCall.Listener<EventPoiFilterResponseData> {
 	}
 
 }

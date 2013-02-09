@@ -1,6 +1,5 @@
 package cz.clovekvtisni.coordinator.server.service;
 
-import com.sun.xml.internal.bind.v2.TODO;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.security.CheckPermission;

@@ -1,23 +1,32 @@
 package cz.clovekvtisni.coordinator.android.event.map;
 
+import android.content.Context;
 import android.graphics.PointF;
+import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import cz.clovekvtisni.coordinator.android.event.map.Projection.LatLon;
 
-class TouchListener implements OnTouchListener {
+class TouchHelper implements OnTouchListener {
+	private final GestureDetector gestureDetector;
+	private final OnSingleTapListener onSingleTapListener;
 	private final Projection projection;
 
 	private PinchTracker pinchTracker;
 	private ScrollTracker scrollTracker;
 
-	public TouchListener(Projection projection) {
+	public TouchHelper(Context context, Projection projection, OnSingleTapListener listener) {
 		this.projection = projection;
+		this.onSingleTapListener = listener;
+		gestureDetector = new GestureDetector(context, new GestureListener());
 	}
 
 	@Override
 	public boolean onTouch(View v, MotionEvent e) {
+		if (e.getPointerCount() == 1) gestureDetector.onTouchEvent(e);
+
 		double lat = projection.getCenterLatLon().getLat();
 		double lon = projection.getCenterLatLon().getLon();
 
@@ -84,6 +93,17 @@ class TouchListener implements OnTouchListener {
 					/ (calcDistance(new PointF(x1, y1), new PointF(x2, y2)) / startDistance);
 			projection.setZoom(newZoom);
 		}
+	}
 
+	private class GestureListener extends SimpleOnGestureListener {
+		@Override
+		public boolean onSingleTapConfirmed(MotionEvent e) {
+			onSingleTapListener.onSingleTap(e.getX(), e.getY());
+			return true;
+		}
+	}
+
+	public static interface OnSingleTapListener {
+		public void onSingleTap(float x, float y);
 	}
 }

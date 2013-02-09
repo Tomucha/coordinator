@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android.ui;
+package cz.clovekvtisni.coordinator.android.welcome;
 
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +14,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ConfigCall;
+import cz.clovekvtisni.coordinator.android.organization.OrganizationActivity;
 import cz.clovekvtisni.coordinator.android.workers.Workers;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.domain.config.Organization;

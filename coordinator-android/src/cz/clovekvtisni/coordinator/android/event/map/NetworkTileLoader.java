@@ -2,7 +2,6 @@ package cz.clovekvtisni.coordinator.android.event.map;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

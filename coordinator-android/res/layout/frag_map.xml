@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <cz.clovekvtisni.coordinator.android.event.map.OsmMapView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <Button
+        android:id="@+id/goToMyLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Moje poloha" />
+
+    <LinearLayout
+        android:id="@+id/poiInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#dd000000"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="DOPRAVNÍ NEHODA"
+                android:textColor="#f0f0f0"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/closeInfo"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/selectable_item_background"
+                android:gravity="center"
+                android:text="X"
+                android:textColor="#f0f0f0"
+                android:textSize="18dp" />
+        </LinearLayout>
+
+        <View
+            style="@style/Line"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="#ccc" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="10dp"
+            android:text="Popis popis popis popis popis popis popis popis popis popis popis"
+            android:textColor="#f0f0f0" />
+    </LinearLayout>
+
+</RelativeLayout>
