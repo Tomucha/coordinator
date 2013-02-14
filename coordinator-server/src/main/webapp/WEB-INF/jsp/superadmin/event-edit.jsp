@@ -38,11 +38,14 @@
     }
 
     function initialize() {
+        CoordinatorMap.startSetLocation(TYPE_LOCATION);
+
         <c:if test="${!empty form.eventLocationEntityList}">
             <c:forEach items="${form.eventLocationEntityList}" var="eventLocation">
                  <c:if test="${!empty eventLocation.longitude and !empty eventLocation.latitude}">
                      CoordinatorMap.addPoint({
                          type: TYPE_LOCATION,
+                         icon: ICON_GENERIC,
                          longitude: <c:out value="${eventLocation.longitude}"/>,
                          latitude: <c:out value="${eventLocation.latitude}"/>,
                          radius: <c:out value="${!empty eventLocation.radius ? eventLocation.radius : 'null'}"/>

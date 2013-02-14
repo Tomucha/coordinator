@@ -86,7 +86,7 @@ public class UserServiceImplTest extends LocalDatastoreTest {
                 for (Organization organization : config.getOrganizationList()) {
                     if (organization.isAllowsPreRegistration()) {
                         user.setOrganizationId(organization.getId());
-                        return userService.preRegister(user, 0l);
+                        return userService.preRegister(user, 0l, false);
                     }
                 }
                 return null;

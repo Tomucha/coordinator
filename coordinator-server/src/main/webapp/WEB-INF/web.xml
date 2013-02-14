@@ -15,6 +15,10 @@
     </context-param>
 
     <filter>
+        <filter-name>ObjectifyFilter</filter-name>
+        <filter-class>com.googlecode.objectify.ObjectifyFilter</filter-class>
+    </filter>
+    <filter>
         <display-name>Application init filter</display-name>
         <filter-name>applicationInitFilter</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -41,6 +45,10 @@
         <filter-class>cz.clovekvtisni.coordinator.server.web.filter.DisableUrlSessionFilter</filter-class>
     </filter>
 
+    <filter-mapping>
+        <filter-name>ObjectifyFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
     <filter-mapping>
         <filter-name>DisableUrlSessionFilter</filter-name>
         <url-pattern>/*</url-pattern>

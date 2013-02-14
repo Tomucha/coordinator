@@ -16,7 +16,7 @@ import java.util.*;
 
 @Controller
 @RequestMapping("/admin/event/user/assigned")
-public class EventUserAssignedToPlace extends AbstractEventController {
+public class EventUserAssignedToPoi extends AbstractEventController {
 
     @Autowired
     private UserInEventService userInEventService;

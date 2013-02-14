@@ -5,6 +5,7 @@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %><script type="text/javascript">
+
     function onNewPoint(point) {
        $("#latitudeInput").val(point.latitude);
        $("#longitudeInput").val(point.longitude);
@@ -14,24 +15,17 @@
         CoordinatorMap.disablePopup(TYPE_POI);
         CoordinatorMap.disablePopup(TYPE_LOCATION);
 
+        CoordinatorMap.startSetLocation(TYPE_POI);
+
         <c:if test="${!empty form.latitude and !empty form.longitude}">
             CoordinatorMap.addPoint({
                 type: TYPE_POI,
-                placeId: <c:out value="${form.id}"/>,
+                icon: ICON_GENERIC,
+                poiId: <c:out value="${form.id}"/>,
                 longitude: <c:out value="${form.longitude}"/>,
                 latitude: <c:out value="${form.latitude}"/>
             });
             </c:if>
-
-        <c:if test="${!empty event.eventLocationEntityList}">
-            <c:forEach items="${event.eventLocationEntityList}" var="location">
-                CoordinatorMap.addPoint({
-                    type: TYPE_LOCATION,
-                    longitude: <c:out value="${location.longitude}"/>,
-                    latitude: <c:out value="${location.latitude}"/>
-                });
-            </c:forEach>
-        </c:if>
     }
 
 </script>
@@ -51,14 +45,14 @@
             onLoad="initialize()"
             onNewPoint="onNewPoint"
             maxPoints="poi=1"
-            buttons="addPlace"
+            buttons="addPoi"
      />
 </div>
 
 
 <div class="mainPanel">
     <div class="eventForm">
-        <sf:form method="POST" action="${root}/admin/event/place/edit" modelAttribute="form">
+        <sf:form method="POST" action="${root}/admin/event/poi/edit" modelAttribute="form">
 
             <sf:errors />
 

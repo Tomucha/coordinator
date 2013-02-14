@@ -12,6 +12,8 @@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
         %>
 
+<%--@elvariable id="config" type="cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig"--%>
+
 <h2><s:message code="header.poiList"/></h2>
 
 <div class="mainPanel">
@@ -19,14 +21,37 @@
     <div class="buttonPanel">
         <c:choose>
             <c:when test="${can:hasRole('BACKEND')}">
-                <a class="btn" href="<s:url value="/admin/event/place/edit?eventId=${params.eventId}"/>"><s:message
+                <button accesskey="f" class="btn" onclick="\$('#searchFormPanel').show();"><s:message code="button.filterList"/> <span class="caret"></span></button>
+                <a class="btn" href="<s:url value="/admin/event/poi/edit?eventId=${params.eventId}"/>"><s:message
                         code="button.addNew"/></a>
             </c:when>
         </c:choose>
     </div>
 
+    <div class="searchFormPanel" id="searchFormPanel" style="display: none;">
+        <sf:form action="" modelAttribute="params" method="get">
+            <tags:hiddenEvent/>
+            <label><s:message code="label.workflow"/>:</label>
+            <sf:select path="workflowId">
+                <sf:option value=""/>
+                <sf:options items="${config.workflowList}" itemLabel="name" itemValue="id"/>
+            </sf:select>
+            <label><s:message code="label.workflowState"/>:</label>
+            <sf:select path="workflowStateId">
+                <sf:option value=""/>
+                <c:forEach items="${config.workflowList}" var="workflow">
+                    <c:forEach items="${workflow.states}" var="state">
+                        <sf:option value="${state.id}">${workflow.name} &gt; ${state.name}</sf:option>
+                    </c:forEach>
+                </c:forEach>
+            </sf:select>
+
+            <p><button type="submit" class="btn"><s:message code="button.filterList"/></button></p>
+        </sf:form>
+    </div>
+
     <c:choose>
-        <c:when test="${!empty placeList}">
+        <c:when test="${!empty poiList}">
             <sf:form action="" method="post" modelAttribute="selectionForm">
                 <div class="dataList poiListTable">
                     <tags:hiddenEvent/>
@@ -45,10 +70,13 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <c:forEach items="${placeList}" var="poi" varStatus="i">
+                        <c:forEach items="${poiList}" var="poi" varStatus="i">
                             <tr>
-                                <td><input type="checkbox" name="selectedPois[${i.index}]" value="${poi.id}"/></td>
-                                <td><c:out value="${poi.poiCategory.name}"/><br/>
+                                <td><input type="checkbox" name="selectedPois[${i.index}]" value="${poi.id}"/>
+
+                                </td>
+                                <td><img src="${root}${poi.poiCategory.icon}" class="pull-left"/>
+                                    <c:out value="${poi.poiCategory.name}"/><br/>
                                     <small><c:out value="${poi.poiCategory.description}"/></small>
                                 </td>
                                 <td><b><c:out value="${poi.name}"/></b><br/>
@@ -61,7 +89,7 @@
                                 </td>
                                 <td>
                                     <c:if test="${!empty poi.workflowId}">
-                                        <a href="${root}/admin/event/place/workflow?poiId=<c:out value='${poi.id}'/>&eventId=${event.id}">
+                                        <a href="${root}/admin/event/poi/workflow?poiId=<c:out value='${poi.id}'/>&eventId=${event.id}">
                                            <c:out value="${poi.workflowState.name}"/><br/>
                                            <small><c:out value="${poi.workflowState.description}"/></small>
                                         </a>
@@ -69,7 +97,7 @@
                                 </td>
                                 <td>
                                     <a class="btn"
-                                       href="<s:url value="${root}/admin/event/place/edit?eventId=${poi.eventId}&placeId=${poi.id}"/>"><s:message
+                                       href="<s:url value="${root}/admin/event/poi/edit?eventId=${poi.eventId}&poiId=${poi.id}"/>"><s:message
                                             code="button.edit"/></a>
                                 </td>
                             </tr>

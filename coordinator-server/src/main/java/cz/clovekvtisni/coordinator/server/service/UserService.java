@@ -60,7 +60,7 @@ public interface UserService extends Service {
     UserEntity getByAuthKey(String key);
 
     @Anonymous(Anonymous.Mode.PROPAGATE)
-    UserEntity preRegister(UserEntity newUser, long flags);
+    UserEntity preRegister(UserEntity newUser, long flags, boolean systemCall);
 
     @Anonymous(Anonymous.Mode.PROPAGATE)
     UserInEventEntity register(UserEntity newUser, UserInEventEntity event, long flags);

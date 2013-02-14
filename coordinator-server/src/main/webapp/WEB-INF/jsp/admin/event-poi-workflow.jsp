@@ -10,7 +10,7 @@
 <script type="text/javascript">
 
     function loadUsers() {
-        $('#userList').load('${root}/admin/event/user/list?eventId=${event.id}&ajax=true');
+        $('#userList').load('${root}/admin/event/user/list?eventId=${event.id}&ajax=true&groupId='+$("#groupId").val()+"&userFulltext="+$("#userFulltext").val());
         return false;
     }
 
@@ -46,15 +46,17 @@
         <p><c:out value="${poi.workflow.name}"/></p>
 
 
-        <p><c:out value="${poi.workflowState.name}"/></p>
+        <p><c:out value="${poi.workflowState.name}"/> <span class="icon-arrow-right"></span></p>
 
-        <ul>
+        <div style="padding-left: 9em;">
         <c:forEach items="${poi.workflowState.transitions}" var="trans">
-             <li>
-                <a class="btn" href="/admin/event/place/workflow?poiId=${poi.id}&eventId=${event.id}&transitionId=${trans.id}"><span class="icon-arrow-right"></span><c:out value="${trans.name}"/></a>
-             </li>
+           <p><span class="icon-arrow-right"></span> <a class="btn" href="/admin/event/poi/workflow/transition?poiId=${poi.id}&eventId=${event.id}&transitionId=${trans.id}"><c:out value="${trans.name}"/></a><br/>
+                <small><c:out value="${trans.description}"/></small>
+           </p>
         </c:forEach>
-        </ul>
+        </div>
+
+        <hr/>
 
         <!-- USER PICKER -->
 
@@ -62,8 +64,11 @@
 
         <div class="row-fluid">
 
-            <div id="assignedUsers" class="pull-right" style="width: 50%">
-                <tags:loading/>
+            <div class="pull-right well well-small" style="width: 50%; height: 10em;">
+                <h4><s:message code="label.assignedUsers"/></h4>
+                <div id="assignedUsers">
+                    <tags:loading/>
+                </div>
             </div>
 
             <div class="searchFormPanel" id="searchFormPanel">

@@ -8,6 +8,8 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jka
@@ -23,6 +25,9 @@ public interface PoiService extends Service {
     @FilterResult("#helper.canRead(#entity)")
     ResultList<PoiEntity> findByFilter(PoiFilter filter, int limit, String bookmark, long flags);
 
+    @FilterResult("#helper.canRead(#entity)")
+    List<PoiEntity> findByEventAndBox(long eventId, double latN, double lonE, double latS, double lonW, long flags);
+
     @CheckPermission("#helper.canCreate(#p0)")
     PoiEntity createPoi(PoiEntity entity);
 
@@ -37,9 +42,6 @@ public interface PoiService extends Service {
 
     @FilterResult("#helper.canRead(#entity)")
     ResultList<PoiEntity> findLastByEventId(Long eventId);
-
-    @CheckPermission("#helper.canUpdate(#p0)")
-    PoiEntity startWorkflow(PoiEntity entity);
 
     @CheckPermission("#helper.canUpdate(#p0)")
     PoiEntity transitWorkflowState(PoiEntity entity, String transitionId);

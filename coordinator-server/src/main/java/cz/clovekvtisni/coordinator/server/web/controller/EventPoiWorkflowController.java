@@ -2,11 +2,11 @@ package cz.clovekvtisni.coordinator.server.web.controller;
 
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
+import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,14 +17,17 @@ import org.springframework.web.bind.annotation.RequestParam;
  * Date: 5.12.12                                                                                                Ò
  */
 @Controller
-@RequestMapping("/admin/event/place/workflow")
-public class EventPlaceWorkflowController extends AbstractEventController {
+@RequestMapping("/admin/event/poi/workflow")
+public class EventPoiWorkflowController extends AbstractEventController {
 
     @Autowired
     private PoiService poiService;
 
     @Autowired
     private UserInEventService userInEventService;
+
+    @Autowired
+    private UserGroupService userGroupService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String edit(
@@ -35,20 +38,30 @@ public class EventPlaceWorkflowController extends AbstractEventController {
 
         PoiEntity poi = poiService.findById(poiId, 0);
         model.addAttribute("poi", poi);
+        model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
         return "admin/event-poi-workflow";
     }
 
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, value = "/transition")
     public String changeWorkflowState(
             @RequestParam(value = "eventId", required = true) Long eventId,
             @RequestParam(value = "poiId", required = true) Long poiId,
             @RequestParam(value = "transitionId", required = true) String transitionId,
-            Model model,
-            BindingResult bindingResult) {
+            Model model) {
         PoiEntity poi = poiService.findById(poiId, 0l);
+
+        String goingToState = poi.getWorkflowState().getTransitionMap().get(transitionId).getToStateId();
+        if (poi.getWorkflow().getStateMap().get(goingToState).isRequiresAssignment()) {
+            // new state requires assigned users
+            if (poi.getUserIdList().isEmpty())  {
+                setGlobalMessage(getMessage("label.missingAssignee"), model);
+                return edit(eventId, poiId, model);
+            }
+        }
+
         poiService.transitWorkflowState(poi, transitionId);
-        return "redirect: /admin/event/place/list?eventId=" + eventId;
+        return "redirect:/admin/event/poi/list?eventId=" + eventId;
 
     }
 

@@ -1,5 +1,7 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
+import com.beoui.geocell.GeocellManager;
+import com.beoui.geocell.model.Point;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
@@ -43,6 +45,9 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     private Double lastLocationLongitude;
 
+    @Index
+    private List<String> lastLocationGeoCells;
+
     private Long lastLocationPrecission;
 
     private Date lastLocationTimestamp;
@@ -84,9 +89,25 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
         return inEvent;
     }
 
+    @OnSave
+    public void countGeoCells() {
+        if (lastLocationLatitude != null && lastLocationLongitude != null) {
+
+            // Transform it to a point
+            Point p = new Point(lastLocationLatitude, lastLocationLongitude);
+
+            // Generates the list of GeoCells
+            List<String> cells = GeocellManager.generateGeoCell(p);
+            lastLocationGeoCells = cells;
+
+        } else {
+            lastLocationGeoCells = Collections.EMPTY_LIST;
+        }
+    }
+
     @Override
     public Long getId() {
-        throw new IllegalStateException("Don't call this, I have no id");
+        throw new IllegalStateException("Don't call this, I have no simple id");
     }
 
     @Override
@@ -268,6 +289,14 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
             }
         }
         return roles.toArray(new String[0]);
+    }
+
+    public List<String> getLastLocationGeoCells() {
+        return lastLocationGeoCells;
+    }
+
+    public void setLastLocationGeoCells(List<String> lastLocationGeoCells) {
+        this.lastLocationGeoCells = lastLocationGeoCells;
     }
 
     @Override

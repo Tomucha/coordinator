@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
+import com.google.appengine.api.datastore.ReadPolicy;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;

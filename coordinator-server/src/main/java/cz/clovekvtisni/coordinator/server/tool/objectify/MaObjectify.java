@@ -74,6 +74,7 @@ public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory>
         List<T> entities = new ArrayList<T>();
         while (iterator.hasNext()) {
             T entity = iterator.next();
+            logger.info("Entity in result: "+entity);
             if (!filter.accept(entity)) {
                 continue;
             }

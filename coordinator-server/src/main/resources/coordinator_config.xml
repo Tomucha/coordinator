@@ -144,23 +144,23 @@
     </organization_list>
 
     <poi_category_list>
-        <poi_category id="poiZdravotnik" name="Zdravotníka" icon="obrazek.png" workflow_id="wkfl_zdravotnik">
+        <poi_category id="poiZdravotnik" name="Zdravotníka" icon="/images/icons/firstaid.png" workflow_id="wkfl_zdravotnik">
             Práce pro zdravotníka
         </poi_category>
 
-        <poi_category id="poiPsychosoc" name="Psychosociálního šetření" icon="obrazek.png" workflow_id="wkfl_prace">
+        <poi_category id="poiPsychosoc" name="Psychosociálního šetření" icon="/images/icons/communitycentre.png" workflow_id="wkfl_prace">
             Úkol v rámci psychosociálního šetření
         </poi_category>
         
-        <poi_category id="poiPsycho" name="Psychologická první pomoc" icon="obrazek.png"  workflow_id="wkfl_prace">
+        <poi_category id="poiPsycho" name="Psychologická první pomoc" icon="/images/icons/sozialeeinrichtung.png"  workflow_id="wkfl_prace">
             Psychologická první pomoc
         </poi_category>
         
-        <poi_category id="poiPrace" name="Práce" icon="obrazek.png" workflow_id="wkfl_prace">
+        <poi_category id="poiPrace" name="Práce" icon="/images/icons/construction.png" workflow_id="wkfl_prace">
             Úkoly pro dobrovolníky
         </poi_category>
         
-        <poi_category id="general" name="POI" icon="obrazek.png" important="true">
+        <poi_category id="general" name="POI" icon="/images/icons/star-3.png" important="true">
             Důležitá místa
         </poi_category>
     </poi_category_list>

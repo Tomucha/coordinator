@@ -1117,7 +1117,7 @@
         , pos
         , actualWidth
         , actualHeight
-        , placement
+        , poiment
         , tp
 
       if (this.hasContent() && this.enabled) {
@@ -1128,11 +1128,11 @@
           $tip.addClass('fade')
         }
 
-        placement = typeof this.options.placement == 'function' ?
-          this.options.placement.call(this, $tip[0], this.$element[0]) :
-          this.options.placement
+        poiment = typeof this.options.poiment == 'function' ?
+          this.options.poiment.call(this, $tip[0], this.$element[0]) :
+          this.options.poiment
 
-        inside = /in/.test(placement)
+        inside = /in/.test(poiment)
 
         $tip
           .detach()
@@ -1144,7 +1144,7 @@
         actualWidth = $tip[0].offsetWidth
         actualHeight = $tip[0].offsetHeight
 
-        switch (inside ? placement.split(' ')[1] : placement) {
+        switch (inside ? poiment.split(' ')[1] : poiment) {
           case 'bottom':
             tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2}
             break
@@ -1161,7 +1161,7 @@
 
         $tip
           .offset(tp)
-          .addClass(placement)
+          .addClass(poiment)
           .addClass('in')
       }
     }
@@ -1282,7 +1282,7 @@
 
   $.fn.tooltip.defaults = {
     animation: true
-  , placement: 'top'
+  , poiment: 'top'
   , selector: false
   , template: '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
   , trigger: 'hover'
@@ -1398,7 +1398,7 @@
   $.fn.popover.Constructor = Popover
 
   $.fn.popover.defaults = $.extend({} , $.fn.tooltip.defaults, {
-    placement: 'right'
+    poiment: 'right'
   , trigger: 'click'
   , content: ''
   , template: '<div class="popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"></div></div></div>'
