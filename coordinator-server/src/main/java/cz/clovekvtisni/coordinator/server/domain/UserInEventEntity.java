@@ -7,6 +7,7 @@ import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.server.util.EntityTool;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import java.util.*;
 
@@ -26,6 +27,7 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     private Long eventId;
 
     @Parent
+    @JsonIgnore
     private Key<UserEntity> parentKey;
 
     @Index
@@ -106,6 +108,7 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     }
 
     @Override
+    @JsonIgnore
     public Long getId() {
         throw new IllegalStateException("Don't call this, I have no simple id");
     }
@@ -117,6 +120,7 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     }
 
     @Override
+    @JsonIgnore
     public Key<UserInEventEntity> getKey() {
         return createKey(userId, eventId);
     }
@@ -256,10 +260,12 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
         this.userEntity = userEntity;
     }
 
+    @JsonIgnore
     public Key<UserEntity> getParentKey() {
         return parentKey;
     }
 
+    @JsonIgnore
     public void setParentKey(Key<UserEntity> parentKey) {
         this.parentKey = parentKey;
         if (parentKey != null) {

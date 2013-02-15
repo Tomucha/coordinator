@@ -1,3 +1,4 @@
+<%--@elvariable id="poi" type="cz.clovekvtisni.coordinator.server.domain.PoiEntity"--%>
 <%@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@
@@ -13,8 +14,8 @@
 <%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
         %>
-<h4>${poi.name}</h4>
-<p><small>${poi.description}</small></p>
+<h4><img src="${root}${poi.poiCategory.icon}" style="width:1.2em;"/> ${poi.name}</h4>
+<p><small>${poi.description}<br/>${poi.poiCategory.name}</small></p>
 
 <c:if test="${not empty poi.workflow}">
 <p><a href="${root}/admin/event/poi/workflow?poiId=<c:out value='${poi.id}'/>&eventId=${poi.eventId}">

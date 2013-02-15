@@ -21,6 +21,10 @@ public class EventUserForm extends UserForm {
 
     private List<Long> groupIdList;
 
+    private Double lastLocationLatitude;
+
+    private Double lastLocationLongitude;
+
     public Long getEventId() {
         return eventId;
     }
@@ -56,4 +60,19 @@ public class EventUserForm extends UserForm {
         this.userId = userId;
     }
 
+    public Double getLastLocationLatitude() {
+        return lastLocationLatitude;
+    }
+
+    public void setLastLocationLatitude(Double lastLocationLatitude) {
+        this.lastLocationLatitude = lastLocationLatitude;
+    }
+
+    public Double getLastLocationLongitude() {
+        return lastLocationLongitude;
+    }
+
+    public void setLastLocationLongitude(Double lastLocationLongitude) {
+        this.lastLocationLongitude = lastLocationLongitude;
+    }
 }

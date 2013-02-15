@@ -6,6 +6,7 @@ import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserEquipment;
 import cz.clovekvtisni.coordinator.domain.UserSkill;
 import cz.clovekvtisni.coordinator.util.ValueTool;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -77,6 +78,7 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     }
 
     @Override
+    @JsonIgnore
     public Key<UserEntity> getKey() {
         return Key.create(UserEntity.class, id);
     }

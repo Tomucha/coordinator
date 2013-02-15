@@ -1,5 +1,8 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
+import com.google.appengine.api.urlfetch.HTTPResponse;
+import com.google.appengine.api.urlfetch.URLFetchService;
+import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
@@ -11,12 +14,17 @@ import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
+import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +46,17 @@ public class EventMapController extends AbstractEventController {
     @Autowired
     private ObjectMapper objectMapper;
 
+    //
+    @RequestMapping(method = RequestMethod.GET, value = "/api/address")
+    public String addressSearch(@RequestParam(value = "query") String query) throws UnsupportedEncodingException {
+/*
+        URLFetchService urlFetch = URLFetchServiceFactory.getURLFetchService();
+        String searchUrl = "http://nominatim.openstreetmap.org/search?q="+ URLEncoder.encode(query, "UTF-8")+"&format=json&limit=1";
+        HTTPResponse respose = urlFetch.fetch(searchUrl);
+        byte[] data = respose.getContent();
+*/
+        return "";
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public String map(@ModelAttribute("params") EventFilterParams params, Model model) {
@@ -76,8 +95,23 @@ public class EventMapController extends AbstractEventController {
         return poiService.findByEventAndBox(eventId, latN, lonE, latS, lonW, 0);
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/api/user")
+    public @ResponseBody List<UserInEventEntity> listUsers(
+            @RequestParam(required = true) long eventId,
+            @RequestParam(required = true) double latN,
+            @RequestParam(required = true) double lonE,
+            @RequestParam(required = true) double latS,
+            @RequestParam(required = true) double lonW
+    ) {
+        List<UserInEventEntity> byEventAndBox = userInEventService.findByEventAndBox(eventId, latN, lonE, latS, lonW, UserInEventService.FLAG_FETCH_USER);
+        log.info("Users: "+byEventAndBox);
+
+        return byEventAndBox;
+    }
+
+
     @RequestMapping(method = RequestMethod.GET, value = "/popup/poi")
-    public String popup(
+    public String popupPoi(
             @RequestParam(value = "eventId", required = false) Long eventId,
             @RequestParam(value = "poiId", required = false) Long poiId,
             Model model) {
@@ -90,6 +124,17 @@ public class EventMapController extends AbstractEventController {
         model.addAttribute("assignedUsers", assignedUsers);
 
         return "ajax/poi-popup";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/popup/user")
+    public String popupUser(
+            @RequestParam(value = "eventId", required = true) Long eventId,
+            @RequestParam(value = "userId", required = true) Long userId,
+            Model model) {
+
+        UserInEventEntity u = userInEventService.findById(eventId, userId, UserInEventService.FLAG_FETCH_USER);
+        model.addAttribute("userInEvent", u);
+        return "ajax/user-popup";
     }
 
 

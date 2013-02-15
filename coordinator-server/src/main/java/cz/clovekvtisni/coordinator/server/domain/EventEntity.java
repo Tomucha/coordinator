@@ -5,6 +5,7 @@ import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.Event;
 import cz.clovekvtisni.coordinator.domain.EventLocation;
 import cz.clovekvtisni.coordinator.server.util.EntityTool;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.Arrays;
@@ -37,6 +38,7 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
     }
 
     @Override
+    @JsonIgnore
     public Key<EventEntity> getKey() {
         return Key.create(EventEntity.class, id);
     }

@@ -41,8 +41,8 @@ public abstract class AbstractEventController extends AbstractController {
                 EventUserListController.getBreadcrumb(appContext.getActiveEvent()),
                 EventPoiListController.getBreadcrumb(appContext.getActiveEvent()),
                 EventMapController.getBreadcrumb(appContext.getActiveEvent()),
-                EventDetailController.getBreadcrumb(appContext.getActiveEvent()),
-                EventEditController.getBreadcrumb(appContext.getActiveEvent())
+                EventDetailController.getBreadcrumb(appContext.getActiveEvent())
+                // EventEditController.getBreadcrumb(appContext.getActiveEvent())
         };
     }
 

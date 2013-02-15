@@ -1,11 +1,15 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
+import com.beoui.geocell.GeocellManager;
+import com.beoui.geocell.model.BoundingBox;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
+import com.googlecode.objectify.cmd.Query;
 import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
@@ -117,6 +121,21 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
     public UserInEventEntity changeStatus(UserInEventEntity inEvent, RegistrationStatus status) {
         inEvent.setStatus(status);
         return update(inEvent);
+    }
+
+    @Override
+    public List<UserInEventEntity> findByEventAndBox(long eventId, double latN, double lonE, double latS, double lonW, long flags) {
+        // Transform this to a bounding box
+        BoundingBox bb = new BoundingBox(latN, lonE, latS, lonW);
+
+        // Calculate the geocells list to be used in the queries (optimize list of cells that complete the given bounding box)
+        List<String> cells = GeocellManager.bestBboxSearchCells(bb, null);
+
+        Query<UserInEventEntity> q = ofy().load().type(UserInEventEntity.class).filter("eventId", eventId).filter("lastLocationGeoCells IN", cells);
+        List<UserInEventEntity> result = q.list();
+
+        populate(result, flags);
+        return result;
     }
 
     @Override

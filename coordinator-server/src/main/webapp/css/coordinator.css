@@ -31,3 +31,9 @@ div.dropdown-menu {
 #changeWorkflowStateModal {
     width: 800px;
 }
+.light {
+    color: #888;
+}
+.light a {
+    color: #888;
+}

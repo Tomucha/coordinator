@@ -27,13 +27,37 @@
 
         $.getJSON(url, decodedRequest, function(response, txt) {
             $.each(response, function(i, item) {
-                item.popupUrl = "${root}/admin/event/map/popup/poi?poiId="+item.id+"&eventId=${eventId}",
+                item.popupUrl = "${root}/admin/event/map/popup/poi?poiId="+item.id+"&eventId=${event.id}",
                 item.type = TYPE_POI;
                 item.icon = ICON_POI[item.poiCategoryId];
                 CoordinatorMap.addPoint(item);
             });
         });
     }
+
+    function fillUserMarkers(bounds) {
+        var url = root+"/admin/event/map/api/user";
+        var arrBounds = bounds.toArray(); //array order: left, bottom, right, top
+        var request = {
+            eventId: eventId,
+            latS : arrBounds[1], latN : arrBounds[3],
+            lonW: arrBounds[0], lonE : arrBounds[2]
+        };
+        var decodedRequest = $.param(request);
+
+        $.getJSON(url, decodedRequest, function(response, txt) {
+            $.each(response, function(i, item) {
+                item.name = item.userEntity.fullName;
+                item.popupUrl = "${root}/admin/event/map/popup/user?userId="+item.userId+"&eventId=${event.id}",
+                item.type = TYPE_USER;
+                item.icon = ICON_USER;
+                item.latitude = item.lastLocationLatitude;
+                item.longitude = item.lastLocationLongitude;
+                CoordinatorMap.addPoint(item);
+            });
+        });
+    }
+
 
     function refreshMarkers() {
         CoordinatorMap.clearMarkers();
@@ -42,6 +66,7 @@
         bounds.transform(map.getProjectionObject(), proj);
 
         fillPoiMarkers(bounds);
+        fillUserMarkers(bounds);
 
     }
 </script>

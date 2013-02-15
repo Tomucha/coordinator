@@ -62,6 +62,8 @@ public class EventUserEditController extends AbstractEventController {
             form.setUserId(user.getId());
             UserInEventEntity inEvent = fetchUserInEvent(params.getEventId(), userId);
             form.setEventId(inEvent.getEventId());
+            form.setLastLocationLatitude(inEvent.getLastLocationLatitude());
+            form.setLastLocationLongitude(inEvent.getLastLocationLongitude());
             if (inEvent != null) {
                 if (inEvent.getGroupIdList() != null)
                     form.setGroupIdList(Arrays.asList(inEvent.getGroupIdList()));
@@ -78,8 +80,6 @@ public class EventUserEditController extends AbstractEventController {
     }
 
     private void populateEventModel(Model model, EventFilterParams params, EventUserForm form) {
-
-        // FIXME: refaktoring
 
         EventFilterParams eventParams = (EventFilterParams) params;
         form.injectConfigValues(appContext, authorizationTool, config);
@@ -142,6 +142,8 @@ public class EventUserEditController extends AbstractEventController {
             } else {
                 UserInEventEntity inEvent = userInEventService.findById(form.getEventId(), user.getId(), 0l);
                 inEvent.setGroupIdList(form.getGroupIdList() == null ? null : form.getGroupIdList().toArray(new Long[0]));
+                inEvent.setLastLocationLatitude(form.getLastLocationLatitude());
+                inEvent.setLastLocationLongitude(form.getLastLocationLongitude());
                 userInEventService.update(inEvent);
             }
 

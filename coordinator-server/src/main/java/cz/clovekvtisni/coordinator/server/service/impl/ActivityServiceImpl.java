@@ -56,13 +56,16 @@ public class ActivityServiceImpl extends AbstractEntityServiceImpl implements Ac
         List<ActivityEntity> result = q.list();
         logger.info("Found activity: "+result);
 
-        if ((FLAG_FETCH_ALL | flags) == 1l) {
+        if ((FLAG_FETCH_ALL & flags) != 0) {
             for (ActivityEntity a: result) {
                 if (a.getPoiId() != null) {
                    a.setPoiEntity(poiService.findById(a.getPoiId(), 0));
                 }
                 if (a.getUserId() != null) {
                    a.setUserEntity(userService.findById(a.getUserId(), 0));
+                }
+                if (a.getChangedBy() != null) {
+                    a.setChangedByEntity(userService.findById(a.getChangedBy(), 0));
                 }
             }
 

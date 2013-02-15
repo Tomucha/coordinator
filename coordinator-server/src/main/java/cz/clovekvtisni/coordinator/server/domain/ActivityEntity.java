@@ -15,14 +15,22 @@ import java.util.Date;
 @Entity(name = "Activity")
 public class ActivityEntity implements CoordinatorEntity<ActivityEntity> {
 
+    public UserEntity getChangedByEntity() {
+        return changedByEntity;
+    }
+
+    public void setChangedByEntity(UserEntity changedByEntity) {
+        this.changedByEntity = changedByEntity;
+    }
+
     public static enum ActivityType {
-        CREATED_POI,
-        MODIFIED,
         WORKFLOW_START,
         WORKFLOW_TRANSITION,
         ASSIGNED,
         UNASSIGNED,
-        DELETED
+        CREATED_POI,
+        MODIFIED_POI,
+        DELETED_POI;
     }
 
     @Id
@@ -54,6 +62,10 @@ public class ActivityEntity implements CoordinatorEntity<ActivityEntity> {
 
     @Ignore
     private UserEntity userEntity;
+
+    @Ignore
+    private UserEntity changedByEntity;
+
 
     public ActivityEntity() {
     }

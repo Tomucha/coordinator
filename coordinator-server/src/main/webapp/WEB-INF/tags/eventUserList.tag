@@ -22,7 +22,7 @@ Tag renders user list header or a line with detail.
         <th><s:message code="label.userGroups"/></th>
     </c:when>
     <c:otherwise>
-        <th><c:out value="${user.userEntity.fullName}"/></th>
+        <th><img src="${root}/images/icons/male-2.png" class="pull-left"/><c:out value="${user.userEntity.fullName}"/></th>
         <td><c:out value="${user.userEntity.phone}"/></td>
         <td>
             <c:choose>

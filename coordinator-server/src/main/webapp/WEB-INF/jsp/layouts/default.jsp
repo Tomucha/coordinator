@@ -28,11 +28,9 @@
                         <h3><s:message code="title.activityFeed"/></h3>
                         <c:if test="${not empty activity}">
                             <div class="activityList">
-                                <ul>
                                 <c:forEach items="${activity}" var="activityRow">
-                                    <li><tags:renderActivity activity="${activityRow}"/></li>
+                                    <p><tags:renderActivity activity="${activityRow}"/></p>
                                 </c:forEach>
-                                </ul>
                             </div>
                         </c:if>
                     </div>

@@ -36,4 +36,7 @@ public interface UserInEventService extends Service {
 
     @CheckPermission("#helper.canUpdate(#p0)")
     UserInEventEntity changeStatus(UserInEventEntity inEvent, RegistrationStatus status);
+
+    @FilterResult("#helper.canRead(#entity)")
+    List<UserInEventEntity> findByEventAndBox(long eventId, double latN, double lonE, double latS, double lonW, long flags);
 }

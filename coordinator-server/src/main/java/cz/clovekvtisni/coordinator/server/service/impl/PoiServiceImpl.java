@@ -147,6 +147,13 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 entity.setWorkflowId(old.getWorkflowId());
                 ofy().put(entity);
 
+                ActivityEntity a = new ActivityEntity();
+                a.setPoiId(entity.getId());
+                a.setEventId(entity.getEventId());
+                a.setType(ActivityEntity.ActivityType.MODIFIED_POI);
+                activityService.log(a);
+
+
                 return entity;
             }
         });
