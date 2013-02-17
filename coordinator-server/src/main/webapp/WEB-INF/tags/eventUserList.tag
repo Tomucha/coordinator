@@ -2,7 +2,8 @@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@
         taglib prefix="s" uri="http://www.springframework.org/tags" %>
-
+<%@     taglib prefix="tags" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ attribute name="user" type="cz.clovekvtisni.coordinator.server.domain.UserInEventEntity" %>
 <%@ attribute name="renderHeader" type="java.lang.Boolean" %>
 
@@ -17,7 +18,7 @@ Tag renders user list header or a line with detail.
         <th><s:message code="label.name"/></th>
         <th><s:message code="label.phone"/></th>
         <th><s:message code="label.status"/></th>
-        <th><s:message code="label.address"/></th>
+        <th><s:message code="label.lastTask"/></th>
         <th><s:message code="label.roles"/></th>
         <th><s:message code="label.userGroups"/></th>
     </c:when>
@@ -36,7 +37,16 @@ Tag renders user list header or a line with detail.
                 </c:when>
             </c:choose>
         </td>
-        <td><c:out value="${user.userEntity.fullAddress}"/></td>
+        <td>
+            <c:if test="${!empty user.lastPoiEntity}">
+                <a href="<s:url value="${root}/admin/event/poi/edit?eventId=${user.lastPoiEntity.eventId}&poiId=${user.lastPoiEntity.id}"/>"><c:out value="${user.lastPoiEntity.name}"/></a>
+                <tags:poiStatusIcon poi="${user.lastPoiEntity}"/>
+                <br/>
+                <small>
+                    <fmt:formatDate type="both" value="${user.lastPoiDate}" dateStyle="short" timeStyle="short"/>
+                </small>
+            </c:if>
+        </td>
         <td>
             <c:if test="${!empty user.roles}">
                 <c:forEach items="${user.roles}" var="role">

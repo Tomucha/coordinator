@@ -56,6 +56,9 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     private Long lastPoiId;
 
+    @Ignore
+    private PoiEntity lastPoiEntity;
+
     private Date lastPoiDate;
 
     private Long[] groupIdList;
@@ -110,7 +113,7 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     @Override
     @JsonIgnore
     public Long getId() {
-        throw new IllegalStateException("Don't call this, I have no simple id");
+        return id;
     }
 
     @Override
@@ -303,6 +306,14 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     public void setLastLocationGeoCells(List<String> lastLocationGeoCells) {
         this.lastLocationGeoCells = lastLocationGeoCells;
+    }
+
+    public PoiEntity getLastPoiEntity() {
+        return lastPoiEntity;
+    }
+
+    public void setLastPoiEntity(PoiEntity lastPoiEntity) {
+        this.lastPoiEntity = lastPoiEntity;
     }
 
     @Override

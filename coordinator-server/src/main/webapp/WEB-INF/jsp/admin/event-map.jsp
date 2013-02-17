@@ -65,26 +65,30 @@
         var proj = new OpenLayers.Projection("EPSG:4326");
         bounds.transform(map.getProjectionObject(), proj);
 
-        fillPoiMarkers(bounds);
-        fillUserMarkers(bounds);
+        if ($("#showpois").prop("checked")) {
+            fillPoiMarkers(bounds);
+        }
+        if ($("#showusers").prop("checked")) {
+            fillUserMarkers(bounds);
+        }
 
     }
 </script>
 
 <div>
-    <p class="lead"><b><s:message code="label.event"/>:</b> <c:out value="${event.name}"/></p>
-
-    <p><c:out value="${event.description}"/></p>
-
     <div>
     <tags:osm
             width="90%"
-            height="450px"
+            height="500px"
             latitude="${event.firstEventLocation.latitude}"
             longitude="${event.firstEventLocation.longitude}"
             onLoad="init()"
             onMapChange="refreshMarkers()"
             />
+    <form>
+        <label class="checkbox"><input type="checkbox" id="showusers" onchange="refreshMarkers()" checked="checked"/> <s:message code="label.showUsers"/></label>
+        <label class="checkbox"><input type="checkbox" id="showpois" onchange="refreshMarkers()" checked="checked"/> <s:message code="label.showPois"/></label>
+    </form>
     </div>
 </div>
 

@@ -13,6 +13,7 @@ import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
+import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
@@ -31,6 +32,9 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
 
     @Autowired
     private UserGroupService userGroupService;
+
+    @Autowired
+    private PoiService poiService;
 
     @Override
     public ResultList<UserInEventEntity> findByFilter(UserInEventFilter filter, int limit, String bookmark, long flags) {
@@ -75,6 +79,17 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
                 }
             }
         }
+
+        if ((flags & FLAG_FETCH_LAST_POI) != 0) {
+            for (UserInEventEntity inUser : result) {
+                if (inUser.getLastPoiId() != null) {
+                    inUser.setLastPoiEntity(poiService.findById(inUser.getLastPoiId(), 0));
+                }
+            }
+
+        }
+
+
     }
 
     @Override

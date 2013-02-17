@@ -6,4 +6,9 @@
         <property name="modifiedDate" direction="asc"/>
     </datastore-index>
 
+    <datastore-index kind="User" ancestor="false" source="manual">
+        <property name="organizationId" direction="asc"/>
+        <property name="modifiedDate" direction="asc"/>
+    </datastore-index>
+
 </datastore-indexes>

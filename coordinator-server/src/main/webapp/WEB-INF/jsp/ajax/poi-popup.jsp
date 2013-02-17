@@ -14,7 +14,7 @@
 <%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
         %>
-<h4><img src="${root}${poi.poiCategory.icon}" style="width:1.2em;"/> ${poi.name}</h4>
+<h4><img src="${root}${poi.poiCategory.icon}" style="width:1.2em;"/> ${poi.name} <tags:poiStatusIcon poi="${poi}"/></h4>
 <p><small>${poi.description}<br/>${poi.poiCategory.name}</small></p>
 
 <c:if test="${not empty poi.workflow}">

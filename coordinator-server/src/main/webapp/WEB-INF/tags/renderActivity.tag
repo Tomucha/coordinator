@@ -3,11 +3,13 @@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
         taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags" %><%@
-        taglib prefix="www" uri="/WEB-INF/www.tld"
+        taglib prefix="www" uri="/WEB-INF/www.tld" %><%@
+        taglib prefix="tags" tagdir="/WEB-INF/tags"
         %>
 
 <img src="${root}${activity.poiEntity.poiCategory.icon}" style="width:1em;"/>
 <a href="<s:url value="${root}/admin/event/poi/edit?eventId=${activity.poiEntity.eventId}&poiId=${activity.poiEntity.id}"/>"><c:out value="${activity.poiEntity.name}"/></a>
+<tags:poiStatusIcon poi="${activity.poiEntity}"/>
 
 <s:message code="activity.${activity.type}"/>
 

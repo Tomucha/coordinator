@@ -46,7 +46,9 @@ public class EventUserListController extends AbstractEventController {
     public String listUsers(@ModelAttribute("params") EventFilterParams params, Model model) {
 
         UserInEventFilter inEventFilter = createFilterFromParams(params);
-        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS);
+        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null,
+                UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS | UserInEventService.FLAG_FETCH_LAST_POI
+        );
         model.addAttribute("userInEvents", userInEvents.getResult());
 
         UserMultiSelection selectionForm = new UserMultiSelection();
@@ -71,7 +73,9 @@ public class EventUserListController extends AbstractEventController {
     public String listUsersAjax(@ModelAttribute("params") EventFilterParams params, Model model) {
 
         UserInEventFilter inEventFilter = createFilterFromParams(params);
-        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS);
+        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null,
+                UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS | UserInEventService.FLAG_FETCH_LAST_POI
+        );
         model.addAttribute("userInEvents", userInEvents.getResult());
 
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));

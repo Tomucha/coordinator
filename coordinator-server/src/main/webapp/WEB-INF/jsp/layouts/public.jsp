@@ -26,15 +26,7 @@
         <div class="row">
             <div class="span3 bs-docs-sidebar">
                 <s:message code="application.public.info"/>
-
-
-                License
-                The project “Map Icons Collection” was created by Nicolas Mollet under the Creative Commons Attribution-Share Alike 3.0 Unported license (CC BY SA 3.0).
-
-                This license lets you remix, tweak, and build upon our work even for commercial reasons, as long as you credit the project and license your new creations under the identical terms.
-
-                Please credit: Maps Icons Collection http://mapicons.nicolasmollet.com
-
+                <s:message code="application.public.attributions"/>
             </div>
             <div class="span6">
                 <div id="page-content">

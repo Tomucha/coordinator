@@ -327,20 +327,24 @@
             <c:out value="${onLoad}"/>;
         </c:if>
     });
+
+    function searchAddress(address) {
+        $.getJSON("${root}/admin/event/map/api/address?query="+address, function(response) {
+            map.setCenter(CoordinatorMap.position(response.longitude, response.latitude, 15));
+        });
+    }
+
 </script>
 
-<%--
-
-TODO: hledani adresy
-
 <p>
-    <s:message code="label.search"/> <input type="text" class="search-query"/>
+    <input type="text"
+           class="search-query" placeholder="<s:message code="label.searchAddress"/>"
+           onkeypress="if (event.keyCode == 13) searchAddress($(this).val())"/>
 </p>
---%>
 
 <div id="mapContainer"></div>
 <div id="mapPopupWindow" style="display: none;">
-<p><span class="icon-remove" onclick="CoordinatorMap.closePopup();"></span></p>
+<p style="background-color: #ccc;"><span class="icon-remove" onclick="CoordinatorMap.closePopup();"></span></p>
 <div id="mapPopupContainer">
 
 </div>

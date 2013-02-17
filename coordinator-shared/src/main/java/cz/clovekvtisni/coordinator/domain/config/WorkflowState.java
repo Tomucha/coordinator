@@ -27,6 +27,9 @@ public class WorkflowState extends AbstractStaticEntity {
     @Element(required = false)
     private String description;
 
+    @Attribute(name="type", required = true)
+    private WorkflowStateType workflowStateType;
+
     @Attribute(name = "requires_assignment", required = false)
     private boolean requiresAssignment;
 
@@ -99,6 +102,14 @@ public class WorkflowState extends AbstractStaticEntity {
         }
 
         return map;
+    }
+
+    public WorkflowStateType getWorkflowStateType() {
+        return workflowStateType;
+    }
+
+    public void setWorkflowStateType(WorkflowStateType workflowStateType) {
+        this.workflowStateType = workflowStateType;
     }
 
     @Override

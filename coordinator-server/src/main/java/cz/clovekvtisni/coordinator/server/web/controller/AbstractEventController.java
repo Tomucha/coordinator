@@ -38,9 +38,9 @@ public abstract class AbstractEventController extends AbstractController {
     @ModelAttribute("breadcrumbs")
     protected Breadcrumb[] breadcrumbs() {
         return new Breadcrumb[]{
+                EventMapController.getBreadcrumb(appContext.getActiveEvent()),
                 EventUserListController.getBreadcrumb(appContext.getActiveEvent()),
                 EventPoiListController.getBreadcrumb(appContext.getActiveEvent()),
-                EventMapController.getBreadcrumb(appContext.getActiveEvent()),
                 EventDetailController.getBreadcrumb(appContext.getActiveEvent())
                 // EventEditController.getBreadcrumb(appContext.getActiveEvent())
         };

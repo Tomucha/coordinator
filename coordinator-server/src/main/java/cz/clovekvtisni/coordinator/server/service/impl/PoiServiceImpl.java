@@ -178,6 +178,11 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 a.setEventId(poi.getEventId());
                 activityService.log(a);
 
+                UserInEventEntity u = userInEventService.findById(poi.getEventId(), userId, 0);
+                u.setLastPoiDate(new Date());
+                u.setLastPoiId(poi.getId());
+                ofy().put(u);
+
                 return old;
             }
         });

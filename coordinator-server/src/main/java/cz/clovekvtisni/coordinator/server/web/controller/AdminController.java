@@ -14,7 +14,7 @@ public class AdminController extends AbstractEventController {
 
     @RequestMapping
     public String show(@ModelAttribute("params") EventFilterParams params, Model model) {
-        return "admin/home";
+        return "redirect:/admin/event/map?eventId="+params.getEventId();
     }
 
     public static Breadcrumb getBreadcrumb(EventEntity event) {

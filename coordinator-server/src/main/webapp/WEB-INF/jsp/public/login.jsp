@@ -5,6 +5,7 @@
         taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %>
+<div class="well">
 <sf:form modelAttribute="user" method="POST">
 
     <sf:errors />
@@ -20,3 +21,4 @@
     <input type="submit" value="<s:message code="button.login"/>" class="btn btn-large btn-primary"/>
 
 </sf:form>
+</div>

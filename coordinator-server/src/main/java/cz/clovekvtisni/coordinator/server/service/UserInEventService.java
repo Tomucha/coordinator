@@ -19,6 +19,8 @@ public interface UserInEventService extends Service {
 
     public static final long FLAG_FETCH_GROUPS = 4l;
 
+    public static final long FLAG_FETCH_LAST_POI = 8l;
+
     @FilterResult("#helper.canRead(#entity)")
     UserInEventEntity findById(long eventId, long userId, long flags);
 

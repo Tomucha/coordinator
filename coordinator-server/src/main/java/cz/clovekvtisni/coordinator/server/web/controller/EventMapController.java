@@ -12,8 +12,10 @@ import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import cz.clovekvtisni.coordinator.server.util.Location;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Set;
@@ -46,16 +50,24 @@ public class EventMapController extends AbstractEventController {
     @Autowired
     private ObjectMapper objectMapper;
 
-    //
     @RequestMapping(method = RequestMethod.GET, value = "/api/address")
-    public String addressSearch(@RequestParam(value = "query") String query) throws UnsupportedEncodingException {
-/*
+    public @ResponseBody Location addressSearch(@RequestParam(value = "query") String query) throws IOException {
         URLFetchService urlFetch = URLFetchServiceFactory.getURLFetchService();
         String searchUrl = "http://nominatim.openstreetmap.org/search?q="+ URLEncoder.encode(query, "UTF-8")+"&format=json&limit=1";
-        HTTPResponse respose = urlFetch.fetch(searchUrl);
-        byte[] data = respose.getContent();
-*/
-        return "";
+        HTTPResponse response = urlFetch.fetch(new URL(searchUrl));
+        byte[] data = response.getContent();
+
+        JsonNode node = objectMapper.readTree(data);
+
+        // FIXME: empty results
+
+        double lat = Double.parseDouble(node.get(0).get("lat").getTextValue());
+        double lon = Double.parseDouble(node.get(0).get("lon").getTextValue());
+
+        Location l = new Location();
+        l.setLatitude(lat);
+        l.setLongitude(lon);
+        return l;
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -132,7 +144,9 @@ public class EventMapController extends AbstractEventController {
             @RequestParam(value = "userId", required = true) Long userId,
             Model model) {
 
-        UserInEventEntity u = userInEventService.findById(eventId, userId, UserInEventService.FLAG_FETCH_USER);
+        UserInEventEntity u = userInEventService.findById(eventId, userId,
+                UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_LAST_POI | UserInEventService.FLAG_FETCH_GROUPS
+        );
         model.addAttribute("userInEvent", u);
         return "ajax/user-popup";
     }

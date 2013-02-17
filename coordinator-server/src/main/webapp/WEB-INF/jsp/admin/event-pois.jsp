@@ -60,8 +60,8 @@
                         <thead>
                         <tr>
                             <th></th>
-                            <th><s:message code="PoiEntity.poiCategory"/></th>
                             <th><s:message code="PoiEntity.name"/></th>
+                            <th><s:message code="PoiEntity.poiCategory"/></th>
                             <th><s:message code="label.locality"/></th>
                             <th><s:message code="PoiEntity.userCount"/></th>
                             <th><s:message code="PoiEntity.workflow"/></th>
@@ -76,11 +76,15 @@
 
                                 </td>
                                 <td><img src="${root}${poi.poiCategory.icon}" class="pull-left"/>
-                                    <c:out value="${poi.poiCategory.name}"/><br/>
-                                    <small><c:out value="${poi.poiCategory.description}"/></small>
-                                </td>
-                                <td><b><c:out value="${poi.name}"/></b><br/>
+                                    <b><c:out value="${poi.name}"/></b>
+                                    <tags:poiStatusIcon poi="${poi}"/>
+                                    <br/>
                                     <small><c:out value="${poi.description}"/></small>
+                                </td>
+                                <td>
+                                    <c:out value="${poi.poiCategory.name}"/>
+                                    <br/>
+                                    <small><c:out value="${poi.poiCategory.description}"/></small>
                                 </td>
                                 <td><tags:gps longitude="${poi.longitude}" latitude="${poi.latitude}"/></td>
                                 <td><c:out value="${poi.userCount}"/></td>
