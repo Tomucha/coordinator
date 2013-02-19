@@ -1,14 +1,13 @@
 package cz.clovekvtisni.coordinator.server.web.controller.api.v1;
 
 import cz.clovekvtisni.coordinator.api.request.EventUserListRequestParams;
+import cz.clovekvtisni.coordinator.api.request.UserPushTokenRequestParams;
 import cz.clovekvtisni.coordinator.api.request.UserUpdatePositionRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse;
 import cz.clovekvtisni.coordinator.api.response.EventUserListResponseData;
 import cz.clovekvtisni.coordinator.api.response.UserUpdatePositionResponseData;
-import cz.clovekvtisni.coordinator.domain.AbstractModifiableEntity;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
-import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
@@ -69,4 +68,13 @@ public class EventUserApiController extends AbstractApiController {
 
         return okResult(new UserUpdatePositionResponseData(updated.buildTargetEntity()));
     }
+
+    @RequestMapping(value = "/register-push-token-android", method = RequestMethod.POST)
+    public @ResponseBody ApiResponse registerPushTokenAndroid(HttpServletRequest request) {
+        UserPushTokenRequestParams params = parseRequest(request, UserPushTokenRequestParams.class);
+        userService.registerPushTokenAndroid(params.getToken());
+        return okResult(null);
+    }
+
+
 }

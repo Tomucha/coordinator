@@ -59,6 +59,8 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     private String[] roleIdList;
 
+    private Set<String> pushTokensAndroid;
+
     @Ignore
     private UserEquipmentEntity[] equipmentEntityList;
 
@@ -294,6 +296,15 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     public boolean isSuspended() {
         return dateSuspended != null;
+    }
+
+    public Set<String> getPushTokensAndroid() {
+        if (pushTokensAndroid == null)  pushTokensAndroid = new HashSet<String>();
+        return pushTokensAndroid;
+    }
+
+    public void setPushTokensAndroid(Set<String> pushTokensAndroid) {
+        this.pushTokensAndroid = pushTokensAndroid;
     }
 
     @Override

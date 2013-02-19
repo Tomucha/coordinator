@@ -10,6 +10,10 @@ public class Poi extends AbstractModifiableEntity {
 
     private Long eventId;
 
+    private String name;
+
+    private String description;
+
     private String organizationId;
 
     private String poiCategoryId;
@@ -136,6 +140,22 @@ public class Poi extends AbstractModifiableEntity {
 
     public void setWorkflowState(WorkflowState workflowState) {
         this.workflowState = workflowState;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
