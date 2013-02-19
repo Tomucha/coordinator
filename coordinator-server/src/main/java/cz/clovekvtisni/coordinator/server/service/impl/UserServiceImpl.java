@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.VoidWork;
 import com.googlecode.objectify.Work;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
@@ -336,6 +337,20 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 return resultEvent;
             }
         });
+    }
+
+    @Override
+    public void registerPushTokenAndroid(final String token) {
+        ofy().transact(new VoidWork() {
+            @Override
+            public void vrun() {
+                UserEntity user = getLoggedUser();
+                user = ofy().load().key(user.getKey()).get();
+                user.getPushTokensAndroid().add(token);
+                ofy().save().entity(user).now();
+            }
+        });
+
     }
 
     @Override

@@ -1,8 +1,10 @@
 package cz.clovekvtisni.coordinator.server.web.controller.api.v1;
 
 import cz.clovekvtisni.coordinator.api.request.EventPoiListRequestParams;
+import cz.clovekvtisni.coordinator.api.request.EventPoiTransitionRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse;
 import cz.clovekvtisni.coordinator.api.response.EventPoiFilterResponseData;
+import cz.clovekvtisni.coordinator.api.response.EventPoiResponseData;
 import cz.clovekvtisni.coordinator.domain.Poi;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
@@ -21,13 +23,13 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
-@RequestMapping("/api/v1/event/poi/list")
+@RequestMapping("/api/v1/event/poi")
 public class EventPoiApiController extends AbstractApiController {
 
     @Autowired
     private PoiService poiService;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, value = "/list")
     public @ResponseBody ApiResponse filter(HttpServletRequest request) {
         EventPoiListRequestParams params = parseRequest(request, EventPoiListRequestParams.class);
         PoiFilter filter = new PoiFilter();
@@ -43,4 +45,15 @@ public class EventPoiApiController extends AbstractApiController {
 
         return okResult(new EventPoiFilterResponseData(pois));
     }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/transition")
+    public @ResponseBody ApiResponse workflow(HttpServletRequest request) {
+        EventPoiTransitionRequestParams params = parseRequest(request, EventPoiTransitionRequestParams.class);
+
+        PoiEntity poi = poiService.findById(params.getPoiId(), 0);
+        poi = poiService.transitWorkflowState(poi, params.getTransitionId());
+
+        return okResult(new EventPoiResponseData(poi.buildTargetEntity()));
+    }
+
 }

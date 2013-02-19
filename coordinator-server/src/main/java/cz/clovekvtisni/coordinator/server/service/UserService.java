@@ -64,4 +64,7 @@ public interface UserService extends Service {
 
     @Anonymous(Anonymous.Mode.PROPAGATE)
     UserInEventEntity register(UserEntity newUser, UserInEventEntity event, long flags);
+
+    void registerPushTokenAndroid(String token);
+
 }
