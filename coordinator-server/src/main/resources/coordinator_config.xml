@@ -16,7 +16,9 @@
         <skill id="skill2" name="Psychosociální pomoc ČČK" must_verify="true">Psychosociální pomoc ČČK</skill>
         <skill id="zdravotnik" name="Zdravotník" must_verify="true">Zdravotník</skill>
         <skill id="psycholog" name="Psycholog" must_verify="true">Psycholog</skill>
-        <skill id="krizovy_intervent" name="Krizovy intervent" must_verify="true">Krizový intervent - s výcvikem v psychologické první pomoci nebo krizové intervenci</skill>
+        <skill id="krizovy_intervent" name="Krizovy intervent" must_verify="true">Krizový intervent - s výcvikem v
+            psychologické první pomoci nebo krizové intervenci
+        </skill>
         <skill id="socialni_pracovnik" name="Sociální pracovník">Sociání pracovník</skill>
         <skill id="pedagog" name="Pedagog">Učitel, pedagog, práce s dětmi</skill>
         <skill id="statik" name="Statik" must_verify="true">Statik</skill>
@@ -26,24 +28,26 @@
 
     <equipment_list>
         <equipment id="eq1" name="Auto">Mám k dispozic auto a mohu ho používat</equipment>
-        <equipment id="eq2" name="Vysokotlaký čistič">Mám k dispozici WAPku (vysokotlaký čistič a můžu ho využívat)</equipment>
+        <equipment id="eq2" name="Vysokotlaký čistič">Mám k dispozici WAPku (vysokotlaký čistič a můžu ho využívat)
+        </equipment>
 
     </equipment_list>
 
     <workflow_list>
-        
+
         <workflow id="wkfl_zdravotnik" name="Zdravotnické úkoly" can_be_started_by="ANONYMOUS">
             <description>Zdravotnické úkoly</description>
             <state id="wkfl_zdrv_state1" name="Nový zdravotnický úkol" visible_for_role="COORDINATOR, ZDRAVOTNIK"
-                   editable_for_role="COORDINATOR, ZDRAVOTNIK">
+                   editable_for_role="COORDINATOR, ZDRAVOTNIK" type="STARTED">
                 <description>Nový zdravotnický úkol</description>
                 <transition id="wkfl_zdrv_state1_trans1" name="Přidělit" to_state_id="wkfl_zdrv_state2"
                             allowed_for_role="COORDINATOR, ZDRAVOTNIK">
                     Přidělit
                 </transition>
             </state>
-            <state id="wkfl_zdrv_state2" name="Přidělený úkol" requires_assignment="true" visible_for_role="ZDRAVOTNIK, BACKEND"
-                   editable_for_role="ZDRAVOTNIK, BACKEND">
+            <state id="wkfl_zdrv_state2" name="Přidělený úkol" requires_assignment="true"
+                   visible_for_role="ZDRAVOTNIK, BACKEND"
+                   editable_for_role="ZDRAVOTNIK, BACKEND" type="IN_PROGRESS">
                 <description>popis state</description>
                 <transition id="wkfl_zdrv_state1_trans2" name="Odmítnout" to_state_id="wkfl_zdrv_state1"
                             allowed_for_role="ZDRAVOTNIK, BACKEND">
@@ -58,27 +62,29 @@
                     Dokončit
                 </transition>
             </state>
-            <state id="wkfl_zdrv_state3" name="Vyřešený úkol" visible_for_role="BACKEND" editable_for_role="BACKEND">
+            <state id="wkfl_zdrv_state3" name="Vyřešený úkol" visible_for_role="BACKEND" editable_for_role="BACKEND"
+                   type="FINISHED">
                 <description>Vyřešený úkol</description>
-               <transition id="wkfl_zdrv_state1_trans3" name="Znovu přidělit" to_state_id="wkfl_zdrv_state2"
+                <transition id="wkfl_zdrv_state1_trans3" name="Znovu přidělit" to_state_id="wkfl_zdrv_state2"
                             allowed_for_role="BACKEND">
-                    Znovu přidělit 
+                    Znovu přidělit
                 </transition>
             </state>
         </workflow>
-        
+
         <workflow id="wkfl_prace" name="Běžné pracovní úkoly" can_be_started_by="BACKEND">
             <description>Běžné pracovní úkoly</description>
             <state id="wkfl_prace_state1" name="Nový úkol" visible_for_role="COORDINATOR, BACKEND"
-                   editable_for_role="COORDINATOR, BACKEND">
+                   editable_for_role="COORDINATOR, BACKEND" type="STARTED">
                 <description>Nově vytvořený úkol</description>
                 <transition id="wkfl_prace_state1_trans1" name="Přidělit" to_state_id="wkfl_prace_state2"
                             allowed_for_role="COORDINATOR, BACKEND">
                     Přidělit
                 </transition>
             </state>
-            <state id="wkfl_prace_state2" name="Přidělený úkol" requires_assignment="true" visible_for_role="ANONYMOUS, BACKEND"
-                   editable_for_role="ANONYMOUS">
+            <state id="wkfl_prace_state2" name="Přidělený úkol" requires_assignment="true"
+                   visible_for_role="ANONYMOUS, BACKEND"
+                   editable_for_role="ANONYMOUS" type="IN_PROGRESS">
                 <description>popis state</description>
                 <transition id="wkfl_prace_state1_trans2" name="Odmítnout" to_state_id="wkfl_prace_state1"
                             allowed_for_role="ANONYMOUS, BACKEND">
@@ -94,11 +100,11 @@
                 </transition>
             </state>
             <state id="wkfl_prace_state3" name="Vyřešený úkol" visible_for_role="BACKEND"
-                   editable_for_role="BACKEND">
+                   editable_for_role="BACKEND" type="FINISHED">
                 <description>Vyřešený úkol</description>
-               <transition id="wkfl_prace_state1_trans3" name="Znovu přidělit" to_state_id="wkfl_prace_state2"
+                <transition id="wkfl_prace_state1_trans3" name="Znovu přidělit" to_state_id="wkfl_prace_state2"
                             allowed_for_role="BACKEND">
-                    Znovu přidělit 
+                    Znovu přidělit
                 </transition>
             </state>
         </workflow>
@@ -115,7 +121,11 @@
                 pre_registration_equipment="eq1, eq2"
                 pre_registration_skill="general, zdravotnik, psycholog, krizovy_intervent, socialni_pracovnik, pedagog"
                 >
-            Člověk v tísni poskytuje okamžitou humanitární pomoc lidem v nouzi při přírodních katastrofách nebo ve válečných krizích. Zároveň se zaměřuje se na dlouhodobou pomoc lidem žijícím v chudobě a špatných životních podmínkách. V zemích Afriky, Asie a Evropy realizuje rozvojové programy, které se snaží zlepšit přístup obyvatel ke vzdělání, zdravotní péči, dostupnost pitné vody, dodržování hygieny, rozvoj místních zdrojů obživy i zapojení lidí do procesů ovlivňujících dění v jejich zemi.
+            Člověk v tísni poskytuje okamžitou humanitární pomoc lidem v nouzi při přírodních katastrofách nebo ve
+            válečných krizích. Zároveň se zaměřuje se na dlouhodobou pomoc lidem žijícím v chudobě a špatných životních
+            podmínkách. V zemích Afriky, Asie a Evropy realizuje rozvojové programy, které se snaží zlepšit přístup
+            obyvatel ke vzdělání, zdravotní péči, dostupnost pitné vody, dodržování hygieny, rozvoj místních zdrojů
+            obživy i zapojení lidí do procesů ovlivňujících dění v jejich zemi.
         </organization>
         <organization
                 id="org2"
@@ -127,7 +137,11 @@
                 pre_registration_equipment="eq1, eq2"
                 pre_registration_skill="general, stavar, statik, krizovy_intervent, socialni_pracovnik, pedagog"
                 >
-            ADRA pomáhá jak při mimořádných událostech (živelné pohromy, jako jsou povodně či zemětřesení, válečné konflikty apod.), tak při realizaci dlouhodobých rozvojových projektů (podpora vzdělání, zaměstnanosti, zemědělství atd.).  ADRA realizovala nebo realizuje projekty v Bangladéši, Barmě, Bosně a  Hercegovině, Číně, Bulharsku, Indii, Indonésii, Kambodži, Keni, Libanonu, Moldavsku, Mongolsku, Nepálu, Pákistánu, Rusku, Řecku, Srbsku, Srí Lance, Thajsku, Vietnamu, USA, Uzbekistánu, Zambii a v řadě dalších zemí.
+            ADRA pomáhá jak při mimořádných událostech (živelné pohromy, jako jsou povodně či zemětřesení, válečné
+            konflikty apod.), tak při realizaci dlouhodobých rozvojových projektů (podpora vzdělání, zaměstnanosti,
+            zemědělství atd.). ADRA realizovala nebo realizuje projekty v Bangladéši, Barmě, Bosně a Hercegovině, Číně,
+            Bulharsku, Indii, Indonésii, Kambodži, Keni, Libanonu, Moldavsku, Mongolsku, Nepálu, Pákistánu, Rusku,
+            Řecku, Srbsku, Srí Lance, Thajsku, Vietnamu, USA, Uzbekistánu, Zambii a v řadě dalších zemí.
         </organization>
         <organization
                 id="org3"
@@ -139,28 +153,32 @@
                 pre_registration_equipment="eq1, eq2"
                 pre_registration_skill="skill1, skill2"
                 >
-            ČČK působí v oblasti civilní obrany a ochrany obyvatelstva a poskytuje pomoc v případech katastrof a jiných mimořádných událostí; a poskytuje zdravotnické, záchranné, sociální a další humanitární služby;
+            ČČK působí v oblasti civilní obrany a ochrany obyvatelstva a poskytuje pomoc v případech katastrof a jiných
+            mimořádných událostí; a poskytuje zdravotnické, záchranné, sociální a další humanitární služby;
         </organization>
     </organization_list>
 
     <poi_category_list>
-        <poi_category id="poiZdravotnik" name="Zdravotníka" icon="obrazek.png" workflow_id="wkfl_zdravotnik">
+        <poi_category id="poiZdravotnik" name="Zdravotníka" icon="/images/icons/firstaid.png"
+                      workflow_id="wkfl_zdravotnik">
             Práce pro zdravotníka
         </poi_category>
 
-        <poi_category id="poiPsychosoc" name="Psychosociálního šetření" icon="obrazek.png" workflow_id="wkfl_prace">
+        <poi_category id="poiPsychosoc" name="Psychosociálního šetření" icon="/images/icons/communitycentre.png"
+                      workflow_id="wkfl_prace">
             Úkol v rámci psychosociálního šetření
         </poi_category>
-        
-        <poi_category id="poiPsycho" name="Psychologická první pomoc" icon="obrazek.png"  workflow_id="wkfl_prace">
+
+        <poi_category id="poiPsycho" name="Psychologická první pomoc" icon="/images/icons/sozialeeinrichtung.png"
+                      workflow_id="wkfl_prace">
             Psychologická první pomoc
         </poi_category>
-        
-        <poi_category id="poiPrace" name="Práce" icon="obrazek.png" workflow_id="wkfl_prace">
+
+        <poi_category id="poiPrace" name="Práce" icon="/images/icons/construction.png" workflow_id="wkfl_prace">
             Úkoly pro dobrovolníky
         </poi_category>
-        
-        <poi_category id="general" name="POI" icon="obrazek.png" important="true">
+
+        <poi_category id="general" name="POI" icon="/images/icons/star-3.png" important="true">
             Důležitá místa
         </poi_category>
     </poi_category_list>

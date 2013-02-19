@@ -1,17 +1,18 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
+import com.beoui.geocell.GeocellManager;
+import com.beoui.geocell.model.Point;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.Poi;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -47,6 +48,7 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     @Index
     private String workflowId;
 
+    @Index
     private String workflowStateId;
 
     @Index
@@ -57,6 +59,9 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
 
     @NotNull
     private Double longitude;
+
+    @Index
+    private List<String> geoCells;
 
     private Long precission;
 
@@ -74,6 +79,21 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     public PoiEntity() {
     }
 
+    @OnSave
+    public void countGeoCells() {
+        if (latitude != null && longitude != null) {
+
+            // Transform it to a point
+            Point p = new Point(latitude, longitude);
+
+            // Generates the list of GeoCells
+            List<String> cells = GeocellManager.generateGeoCell(p);
+            geoCells = cells;
+
+        } else {
+            geoCells = Collections.EMPTY_LIST;
+        }
+    }
     @Override
     protected Poi createTargetEntity() {
         return new Poi();
@@ -169,6 +189,7 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     }
 
     @Override
+    @JsonIgnore
     public Key<PoiEntity> getKey() {
         return Key.create(PoiEntity.class, id);
     }

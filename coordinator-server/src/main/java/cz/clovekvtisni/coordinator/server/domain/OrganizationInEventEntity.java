@@ -113,6 +113,7 @@ public class OrganizationInEventEntity extends AbstractPersistentEntity<Organiza
     }
 
     public String[] getRegistrationEquipment() {
+        if (registrationEquipment == null) return new String[0];
         return registrationEquipment;
     }
 

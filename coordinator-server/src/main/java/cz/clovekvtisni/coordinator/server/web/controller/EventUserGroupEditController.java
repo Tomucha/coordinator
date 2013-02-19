@@ -63,7 +63,7 @@ public class EventUserGroupEditController extends AbstractEventController {
         if (bindingResult.hasErrors()) {
             // FIXME: refaktoring
 
-            // populateEventModel(model, new EventFilterParams(form.getEventId()));
+            // populateEventModel(model, new EventFilterParams(form.getEventKey()));
             return "admin/event-group-edit";
         }
 

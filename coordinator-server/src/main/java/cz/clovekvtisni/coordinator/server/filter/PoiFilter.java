@@ -22,9 +22,13 @@ public class PoiFilter extends NoDeletedFilter<PoiEntity> {
 
     private Operator organizationIdOp = Operator.EQ;
 
-    private Long workflowIdVal;
+    private String workflowIdVal;
 
     private Operator workflowIdOp = Operator.EQ;
+
+    private String workflowStateIdVal;
+
+    private Operator workflowStateIdOp = Operator.EQ;
 
     private Date modifiedDateVal;
 
@@ -62,11 +66,11 @@ public class PoiFilter extends NoDeletedFilter<PoiEntity> {
         this.organizationIdOp = organizationIdOp;
     }
 
-    public Long getWorkflowIdVal() {
+    public String getWorkflowIdVal() {
         return workflowIdVal;
     }
 
-    public void setWorkflowIdVal(Long workflowIdVal) {
+    public void setWorkflowIdVal(String workflowIdVal) {
         this.workflowIdVal = workflowIdVal;
     }
 
@@ -92,6 +96,22 @@ public class PoiFilter extends NoDeletedFilter<PoiEntity> {
 
     public void setModifiedDateOp(Operator modifiedDateOp) {
         this.modifiedDateOp = modifiedDateOp;
+    }
+
+    public String getWorkflowStateIdVal() {
+        return workflowStateIdVal;
+    }
+
+    public void setWorkflowStateIdVal(String workflowStateIdVal) {
+        this.workflowStateIdVal = workflowStateIdVal;
+    }
+
+    public Operator getWorkflowStateIdOp() {
+        return workflowStateIdOp;
+    }
+
+    public void setWorkflowStateIdOp(Operator workflowStateIdOp) {
+        this.workflowStateIdOp = workflowStateIdOp;
     }
 
     @Override

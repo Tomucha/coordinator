@@ -6,6 +6,7 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import cz.clovekvtisni.coordinator.domain.UserGroup;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -42,6 +43,7 @@ public class UserGroupEntity extends AbstractPersistentEntity<UserGroup, UserGro
     }
 
     @Override
+    @JsonIgnore
     public Key<UserGroupEntity> getKey() {
         return Key.create(UserGroupEntity.class, id);
     }

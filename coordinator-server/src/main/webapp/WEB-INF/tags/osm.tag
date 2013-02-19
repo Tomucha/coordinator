@@ -4,6 +4,7 @@
         attribute name="zoom" required="false" type="java.lang.Integer" %><%@
         attribute name="longitude" required="false" %><%@
         attribute name="latitude" required="false" %><%@
+        attribute name="onMapChange" required="false" %><%@
         attribute name="onLoad" required="false" %><%@
         attribute name="onNewPoint" required="false" %><%@
         attribute name="buttons" required="false" %><%@
@@ -23,15 +24,19 @@
 </style>
 <!--<script type="text/javascript" src="${root}/js/osm/OpenLayers.js"></script>-->
 <script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
+<script type="text/javascript" src="${root}/js/openlayers-plugin.js"></script>
+
 <script>
     var map, mapLayer, markerLayer, fromProjection, toProjection;
+
+    var idCounter = 0;
 
     var STATE_BROWSE = 0;
     var STATE_SET_LOCATION = 1;
 
     var state = STATE_BROWSE;
 
-    size = new OpenLayers.Size(21, 25);
+    size = new OpenLayers.Size(25, 29);
 
     // TODO deprecated
     var icon = new OpenLayers.Icon('http://www.openstreetmap.org/openlayers/img/marker.png', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
@@ -40,10 +45,15 @@
     var TYPE_LOCATION = "loc";
     var TYPE_USER = "usr";
 
-    var icons = {};
-    icons[TYPE_LOCATION] = new OpenLayers.Icon('http://www.openstreetmap.org/openlayers/img/marker.png', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
-    icons[TYPE_USER] = new OpenLayers.Icon('http://www.openstreetmap.org/openlayers/img/marker-blue.png', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
-    icons[TYPE_POI] = new OpenLayers.Icon('http://www.openstreetmap.org/openlayers/img/marker-gold.png', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
+    var ICON_GENERIC = new OpenLayers.Icon('${root}/images/icons/shootingrange.png', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
+    var ICON_LOCATION = new OpenLayers.Icon('${root}/images/icons/shootingrange.png', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
+    var ICON_USER = new OpenLayers.Icon('${root}/images/icons/male-2.png', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
+    var ICON_POI = {};
+    <%--@elvariable id="config" type="cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig"--%>
+    <c:forEach items="${config.poiCategoryList}" var="category">
+    ICON_POI["${category.id}"] = new OpenLayers.Icon('${root}${category.icon}', size, new OpenLayers.Pixel(-(size.w / 2), -size.h));
+    </c:forEach>
+
 
     var popup = null;
     var editedLocationMarker = null;
@@ -81,34 +91,22 @@
 
         addPoint: function(point) {
             var lonLat = CoordinatorMap.position(point.longitude, point.latitude);
-            var marker = new OpenLayers.Marker(lonLat, icons[point.type].clone());
-            point.id = marker.id = "point" + Math.floor(Math.random() * 100000);
+            var marker = new OpenLayers.Marker(lonLat, point.icon.clone());
+            point.id = marker.id = "point" + (idCounter++);
 
-            if (CoordinatorMap.clickHandlers[point.type]) {
-                marker.events.register("click", marker, function(event) {
-                    selectedPointId = point.id;
-                    CoordinatorMap.setState(STATE_BROWSE);
+            if (point.popupUrl) {
+                marker.events.register("click", marker, function (event) {
                     CoordinatorMap.closePopup();
-
-                    var elementId = CoordinatorMap.clickHandlers[point.type](point);
-                    if (elementId != null) {
-                        var win = $(elementId);
-                        win.find("input, select, textarea").each(function(index, input) {
-                            var name = $(input).attr("name");
-                            if (name) {
-                                $(input).attr("value", point[name] ? point[name] : "");
-                            }
-                        });
-
+                    $("#mapPopupContainer").load(point.popupUrl, function () {
                         popup = new OpenLayers.Popup(
-                                "Rozsah místa",
+                                point.name,
                                 marker.lonlat,
-                                new OpenLayers.Size(125, 150),
-                                win.html()
+                                new OpenLayers.Size(250, 200),
+                                $("#mapPopupWindow").html()
                         );
                         map.addPopup(popup);
                         popup.show();
-                    }
+                    });
                 });
             }
 
@@ -123,30 +121,20 @@
             return point;
         },
 
+        clearMarkers: function() {
+            var length = markerLayer.markers.length;
+            var marker = null;
+            for (var i = 0 ; i < length ; i++) {
+                markerLayer.removeMarker(markerLayer.markers[0]);
+            }
+        },
+
         getPointById: function(id) {
             return points[id];
         },
 
         getPoints: function() {
             return points;
-        },
-
-        closeAndSavePopup: function() {
-            if (popup != null && popup.visible()) {
-                var data = {};
-                $(popup.div).find("input, select, textarea").each(function(index, input) {
-                    var input = $(input);
-                    var name = input.attr("name");
-                    if (name)
-                        data[name] = input.val() != "" ? input.val() : null;
-                });
-                if (data.id) {
-                    for (index in data) {
-                        points[data.id][index] = data[index];
-                    }
-                }
-            }
-            CoordinatorMap.closePopup();
         },
 
         removeLocation: function(id) {
@@ -208,26 +196,19 @@
             if (CoordinatorMap.getState() != STATE_SET_LOCATION) {
                 CoordinatorMap.setState(STATE_SET_LOCATION);
                 currentPointType = type;
-            } else {
-                CoordinatorMap.setState(STATE_BROWSE);
-                currentPointType = null;
             }
-        },
-
-        stopSetLocation: function() {
-            CoordinatorMap.setState(STATE_BROWSE);
         }
     };
 
-    CoordinatorMap.clickHandlers[TYPE_LOCATION] = function(point) {
-        return "#locationEditForm";
-    }
-    CoordinatorMap.clickHandlers[TYPE_USER] = function(point) {
-        return "#userForm";
-    }
-    CoordinatorMap.clickHandlers[TYPE_POI] = function(point) {
-        return "#poiForm";
-    }
+//    CoordinatorMap.clickHandlers[TYPE_LOCATION] = function(point) {
+//        return "#locationEditForm";
+//    }
+//    CoordinatorMap.clickHandlers[TYPE_USER] = function(point) {
+//        return "#userForm";
+//    }
+//    CoordinatorMap.clickHandlers[TYPE_POI] = function(point) {
+//        return "#poiForm";
+//    }
 
     <c:if test="${!empty maxPoints}">
     var tok = "<c:out value="${maxPoints}"/>".split(",");
@@ -265,7 +246,8 @@
                 var point = {
                     type: currentPointType,
                     latitude: lonLat.lat,
-                    longitude: lonLat.lon
+                    longitude: lonLat.lon,
+                    icon: ICON_GENERIC
                 };
                 CoordinatorMap.addPoint(point);
                 CoordinatorMap.trimLocations();
@@ -284,6 +266,13 @@
         map.addLayer(mapLayer);
         map.addLayer(markerLayer);
 
+        <c:if test="${not empty onMapChange}">
+        map.events.register('zoomend', null, function() { ${onMapChange} });
+        map.events.register('moveend', null, function() { ${onMapChange} });
+        </c:if>
+
+
+/*
         <c:if test="${!empty buttons}">
 
             var panel = new OpenLayers.Control.Panel({
@@ -301,7 +290,8 @@
             var buttons = "<c:out value="${buttons}"/>".split(",");
             for (var index in buttons) {
                 var buttonType = buttons[index];
-                switch (buttonType.replace(/\s*/, "")) {
+                switch (buttonType.replace(/\s*//*
+, "")) {
                     case "addLocation":
                         controls[controls.length] = new OpenLayers.Control.Button({
                             title: "+location",
@@ -311,9 +301,9 @@
                         });
                         break;
 
-                    case "addPlace":
+                    case "addPoi":
                         controls[controls.length] = new OpenLayers.Control.Button({
-                            title: "+place",
+                            title: "+poi",
                             trigger: function() {
                                 CoordinatorMap.startSetLocation(TYPE_POI);
                             }
@@ -325,6 +315,7 @@
             panel.addControls(controls);
             map.addControl(panel);
         </c:if>
+*/
 
         var click = new OpenLayers.Control.Click();
         map.addControl(click);
@@ -336,18 +327,30 @@
             <c:out value="${onLoad}"/>;
         </c:if>
     });
+
+    function searchAddress(address) {
+        $.getJSON("${root}/admin/event/map/api/address?query="+address, function(response) {
+            map.setCenter(CoordinatorMap.position(response.longitude, response.latitude, 15));
+        });
+    }
+
 </script>
 
-<%--
-
-TODO: hledani adresy
-
 <p>
-    <s:message code="label.search"/> <input type="text" class="search-query"/>
+    <input type="text"
+           class="search-query" placeholder="<s:message code="label.searchAddress"/>"
+           onkeypress="if (event.keyCode == 13) searchAddress($(this).val())"/>
 </p>
---%>
 
 <div id="mapContainer"></div>
+<div id="mapPopupWindow" style="display: none;">
+<p style="background-color: #ccc;"><span class="icon-remove" onclick="CoordinatorMap.closePopup();"></span></p>
+<div id="mapPopupContainer">
+
+</div>
+</div>
+
+<%--
 <div id="locationEditForm" style="display: none;">
     <div>
         <p><b><s:message code="label.eventLocation"/></b></p>
@@ -381,13 +384,13 @@ TODO: hledani adresy
         <p><b><s:message code="label.poi"/></b></p>
         <input type="hidden" name="id"/>
         <input name="description" readonly="readonly"/>
-        <form action="${root}/admin/event/place/edit">
+        <form action="${root}/admin/event/poi/edit">
             <div>
-                <input type="hidden" name="placeId"/>
+                <input type="hidden" name="poiId"/>
                 <input type="hidden" name="eventId"/>
                 <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
                 <button type="submit"><s:message code="button.edit"/></button>
             </div>
         </form>
     </div>
-</div>
+</div>--%>

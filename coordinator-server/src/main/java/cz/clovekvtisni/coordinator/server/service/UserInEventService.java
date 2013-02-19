@@ -19,6 +19,8 @@ public interface UserInEventService extends Service {
 
     public static final long FLAG_FETCH_GROUPS = 4l;
 
+    public static final long FLAG_FETCH_LAST_POI = 8l;
+
     @FilterResult("#helper.canRead(#entity)")
     UserInEventEntity findById(long eventId, long userId, long flags);
 
@@ -36,4 +38,7 @@ public interface UserInEventService extends Service {
 
     @CheckPermission("#helper.canUpdate(#p0)")
     UserInEventEntity changeStatus(UserInEventEntity inEvent, RegistrationStatus status);
+
+    @FilterResult("#helper.canRead(#entity)")
+    List<UserInEventEntity> findByEventAndBox(long eventId, double latN, double lonE, double latS, double lonW, long flags);
 }

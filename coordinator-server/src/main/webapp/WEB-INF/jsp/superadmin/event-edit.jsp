@@ -14,19 +14,19 @@
             if (location.type != TYPE_LOCATION) continue;
             $('<input>').attr({
                 <%-- TODO json --%>
-                eventId: "<c:out value="${form.eventId}" escapeXml="true"/>",
+                eventKey: "<c:out value="${form.eventKey}" escapeXml="true"/>",
                 type: 'hidden',
                 name: 'eventLocationEntityList[' + i + '].longitude',
                 value: location.longitude
             }).appendTo(cont);
             $('<input>').attr({
-                eventId: "<c:out value="${form.eventId}" escapeXml="true"/>",
+                eventKey: "<c:out value="${form.eventKey}" escapeXml="true"/>",
                 type: 'hidden',
                 name: 'eventLocationEntityList[' + i + '].latitude',
                 value: location.latitude
             }).appendTo(cont);
             $('<input>').attr({
-                eventId: "<c:out value="${form.eventId}" escapeXml="true"/>",
+                eventKey: "<c:out value="${form.eventKey}" escapeXml="true"/>",
                 type: 'hidden',
                 name: 'eventLocationEntityList[' + i + '].radius',
                 value: location.radius
@@ -38,11 +38,14 @@
     }
 
     function initialize() {
+        CoordinatorMap.startSetLocation(TYPE_LOCATION);
+
         <c:if test="${!empty form.eventLocationEntityList}">
             <c:forEach items="${form.eventLocationEntityList}" var="eventLocation">
                  <c:if test="${!empty eventLocation.longitude and !empty eventLocation.latitude}">
                      CoordinatorMap.addPoint({
                          type: TYPE_LOCATION,
+                         icon: ICON_GENERIC,
                          longitude: <c:out value="${eventLocation.longitude}"/>,
                          latitude: <c:out value="${eventLocation.latitude}"/>,
                          radius: <c:out value="${!empty eventLocation.radius ? eventLocation.radius : 'null'}"/>
@@ -64,14 +67,17 @@
 
             <sf:errors />
 
+            <tags:hiddenEvent/>
+
+            <sf:hidden path="id"/>
+
             <div style="display:${form.new ? 'block' : 'none'}">
-                <tags:input field="eventId" modelAttribute="form" captionCode="label.eventId">
-                    <sf:input path="eventId" />
+                <tags:input field="eventKey" modelAttribute="form" captionCode="label.eventKey">
+                    <sf:input path="eventKey" />
                 </tags:input>
             </div>
 
             <div id="hiddenInputContainer">
-                <tags:hiddenEvent/>
                 <tags:input field="name" modelAttribute="form" captionCode="label.name">
                     <sf:input path="name"/>
                 </tags:input>

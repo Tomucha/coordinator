@@ -104,6 +104,9 @@ public abstract class AbstractController {
         return config.getOrganizationMap().get(getLoggedUser().getOrganizationId());
     }
 
+    protected void setGlobalMessage(String message, Model model) {
+        model.addAttribute("globalMessage", message);
+    }
 
     protected void addFormError(BindingResult errors, MaException exception) {
         errors.addError(new ObjectError("globalErrors", exception.getMessage()));

@@ -25,20 +25,18 @@
 
                 <div class="span3">
                     <div class="well sidebar-nav">
-                        <h2><s:message code="title.activityFeed"/></h2>
-                        <div class="activityList">
-                            <table class="table">
-                                <c:forEach items="${lastPoiList}" var="poi">
-                                    <tr>
-                                        <td><c:out value="${poi.poiCategory.name}"/></td>
-                                        <td><tags:gps longitude="${poi.longitude}" latitude="${poi.latitude}"/></td>
-                                        <td><tags:humanago time="${poi.createdDate}" now="${now}"/></td>
-                                    </tr>
+                        <h3><s:message code="title.activityFeed"/></h3>
+                        <c:if test="${not empty activity}">
+                            <div class="activityList">
+                                <c:forEach items="${activity}" var="activityRow">
+                                    <p><tags:renderActivity activity="${activityRow}"/></p>
                                 </c:forEach>
-                            </table>
-                        </div>
-                    </div><!--/.well -->
-                </div><!--/span-->
+                            </div>
+                        </c:if>
+                    </div>
+                    <!--/.well -->
+                </div>
+                <!--/span-->
 
                 <div class="span9">
                     <ul class="nav nav-pills">
@@ -52,6 +50,11 @@
                     </ul>
 
                     <div class="tabContent">
+
+                        <c:if test="${not empty globalMessage}">
+                            <p class="well"><span class="icon-warning-sign"></span><c:out value="${globalMessage}"/></p>
+                        </c:if>
+
                         <tiles:insertAttribute name="content" />
                     </div>
 

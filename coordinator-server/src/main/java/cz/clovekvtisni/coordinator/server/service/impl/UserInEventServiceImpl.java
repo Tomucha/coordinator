@@ -1,14 +1,19 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
+import com.beoui.geocell.GeocellManager;
+import com.beoui.geocell.model.BoundingBox;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
+import com.googlecode.objectify.cmd.Query;
 import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
+import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
@@ -27,6 +32,9 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
 
     @Autowired
     private UserGroupService userGroupService;
+
+    @Autowired
+    private PoiService poiService;
 
     @Override
     public ResultList<UserInEventEntity> findByFilter(UserInEventFilter filter, int limit, String bookmark, long flags) {
@@ -71,6 +79,17 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
                 }
             }
         }
+
+        if ((flags & FLAG_FETCH_LAST_POI) != 0) {
+            for (UserInEventEntity inUser : result) {
+                if (inUser.getLastPoiId() != null) {
+                    inUser.setLastPoiEntity(poiService.findById(inUser.getLastPoiId(), 0));
+                }
+            }
+
+        }
+
+
     }
 
     @Override
@@ -117,6 +136,21 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
     public UserInEventEntity changeStatus(UserInEventEntity inEvent, RegistrationStatus status) {
         inEvent.setStatus(status);
         return update(inEvent);
+    }
+
+    @Override
+    public List<UserInEventEntity> findByEventAndBox(long eventId, double latN, double lonE, double latS, double lonW, long flags) {
+        // Transform this to a bounding box
+        BoundingBox bb = new BoundingBox(latN, lonE, latS, lonW);
+
+        // Calculate the geocells list to be used in the queries (optimize list of cells that complete the given bounding box)
+        List<String> cells = GeocellManager.bestBboxSearchCells(bb, null);
+
+        Query<UserInEventEntity> q = ofy().load().type(UserInEventEntity.class).filter("eventId", eventId).filter("lastLocationGeoCells IN", cells);
+        List<UserInEventEntity> result = q.list();
+
+        populate(result, flags);
+        return result;
     }
 
     @Override

@@ -31,8 +31,8 @@ import java.util.List;
  * Date: 5.12.12
  */
 @Controller
-@RequestMapping("/admin/event/place/edit")
-public class EventPlaceEditController extends AbstractEventController {
+@RequestMapping("/admin/event/poi/edit")
+public class EventPoiEditController extends AbstractEventController {
 
     @Autowired
     private PoiService poiService;
@@ -43,27 +43,27 @@ public class EventPlaceEditController extends AbstractEventController {
     @RequestMapping(method = RequestMethod.GET)
     public String edit(
             @ModelAttribute("params") EventFilterParams params,
-            @RequestParam(value = "placeId", required = false) Long placeId,
+            @RequestParam(value = "poiId", required = false) Long poiId,
             Model model) {
 
         PoiForm form;
-        if (placeId == null) {
+        if (poiId == null) {
             UserEntity user = getLoggedUser();
             form = new PoiForm();
             form.setEventId(appContext.getActiveEvent().getId());
             form.setOrganizationId(user.getOrganizationId());
         } else {
-            PoiEntity poiEntity = poiService.findById(placeId, 0l);
+            PoiEntity poiEntity = poiService.findById(poiId, 0l);
             params.setEventId(poiEntity.getEventId());
             if (poiEntity == null)
-                throw NotFoundException.idNotExist("PoiEntity", placeId);
+                throw NotFoundException.idNotExist("PoiEntity", poiId);
             form = new PoiForm();
             form.populateFrom(poiEntity);
         }
 
         model.addAttribute("form", form);
 
-        return "admin/event-place-edit";
+        return "admin/event-poi-edit";
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -72,8 +72,8 @@ public class EventPlaceEditController extends AbstractEventController {
 
             // FIXME: refaktoring
 
-            // populateEventModel(model, new EventFilterParams(form.getEventId()));
-            return "admin/event-place-edit";
+            // populateEventModel(model, new EventFilterParams(form.getEventKey()));
+            return "admin/event-poi-edit";
         }
 
         PoiEntity poiEntity = new PoiEntity().populateFrom(form);
@@ -84,21 +84,21 @@ public class EventPlaceEditController extends AbstractEventController {
             else
                 poiEntity = poiService.updatePoi(poiEntity);
 
-            return "redirect:/admin/event/place/list?eventId=" + poiEntity.getEventId();
+            return "redirect:/admin/event/poi/list?eventId=" + poiEntity.getEventId();
 
         } catch (MaPermissionDeniedException e) {
             addFormError(bindingResult, e);
 
             // FIXME: refaktoring
-            // populateEventModel(model, new EventFilterParams(form.getEventId()));
-            return "admin/event-place-edit";
+            // populateEventModel(model, new EventFilterParams(form.getEventKey()));
+            return "admin/event-poi-edit";
         }
     }
 
     protected void populateEventModel(Model model) {
         // FIXME: refaktoring
 /*        UserInEventFilter filter = new UserInEventFilter();
-        filter.setEventIdVal(((EventFilterParams) params).getEventId());
+        filter.setEventIdVal(((EventFilterParams) params).getEventKey());
         ResultList<UserInEventEntity> result = userInEventService.findByFilter(filter, 0, null, UserInEventService.FLAG_FETCH_USER);
         List<UserEntity> users = new ArrayList<UserEntity>(result.getResultSize());
         for (UserInEventEntity inEvent : result) {

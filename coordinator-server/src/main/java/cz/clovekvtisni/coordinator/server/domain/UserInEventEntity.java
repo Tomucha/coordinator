@@ -1,10 +1,13 @@
 package cz.clovekvtisni.coordinator.server.domain;
 
+import com.beoui.geocell.GeocellManager;
+import com.beoui.geocell.model.Point;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.server.util.EntityTool;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import java.util.*;
 
@@ -24,6 +27,7 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     private Long eventId;
 
     @Parent
+    @JsonIgnore
     private Key<UserEntity> parentKey;
 
     @Index
@@ -43,11 +47,17 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     private Double lastLocationLongitude;
 
+    @Index
+    private List<String> lastLocationGeoCells;
+
     private Long lastLocationPrecission;
 
     private Date lastLocationTimestamp;
 
     private Long lastPoiId;
+
+    @Ignore
+    private PoiEntity lastPoiEntity;
 
     private Date lastPoiDate;
 
@@ -84,9 +94,26 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
         return inEvent;
     }
 
+    @OnSave
+    public void countGeoCells() {
+        if (lastLocationLatitude != null && lastLocationLongitude != null) {
+
+            // Transform it to a point
+            Point p = new Point(lastLocationLatitude, lastLocationLongitude);
+
+            // Generates the list of GeoCells
+            List<String> cells = GeocellManager.generateGeoCell(p);
+            lastLocationGeoCells = cells;
+
+        } else {
+            lastLocationGeoCells = Collections.EMPTY_LIST;
+        }
+    }
+
     @Override
+    @JsonIgnore
     public Long getId() {
-        throw new IllegalStateException("Don't call this, I have no id");
+        return id;
     }
 
     @Override
@@ -96,6 +123,7 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     }
 
     @Override
+    @JsonIgnore
     public Key<UserInEventEntity> getKey() {
         return createKey(userId, eventId);
     }
@@ -235,10 +263,12 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
         this.userEntity = userEntity;
     }
 
+    @JsonIgnore
     public Key<UserEntity> getParentKey() {
         return parentKey;
     }
 
+    @JsonIgnore
     public void setParentKey(Key<UserEntity> parentKey) {
         this.parentKey = parentKey;
         if (parentKey != null) {
@@ -268,6 +298,22 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
             }
         }
         return roles.toArray(new String[0]);
+    }
+
+    public List<String> getLastLocationGeoCells() {
+        return lastLocationGeoCells;
+    }
+
+    public void setLastLocationGeoCells(List<String> lastLocationGeoCells) {
+        this.lastLocationGeoCells = lastLocationGeoCells;
+    }
+
+    public PoiEntity getLastPoiEntity() {
+        return lastPoiEntity;
+    }
+
+    public void setLastPoiEntity(PoiEntity lastPoiEntity) {
+        this.lastPoiEntity = lastPoiEntity;
     }
 
     @Override

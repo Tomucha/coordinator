@@ -26,6 +26,7 @@
         <div class="row">
             <div class="span3 bs-docs-sidebar">
                 <s:message code="application.public.info"/>
+                <s:message code="application.public.attributions"/>
             </div>
             <div class="span6">
                 <div id="page-content">

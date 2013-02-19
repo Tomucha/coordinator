@@ -64,8 +64,9 @@ public class UserApiController extends AbstractApiController {
         final UserEntity newUserEntity = new UserEntity().populateFrom(newUser);
 
         // this method is only for new users. For existed users will be method /add-to-event
-        if (!newUserEntity.isNew())
+        if (!newUserEntity.isNew()) {
             throw MaPermissionDeniedException.registrationNotAllowed();
+        }
 
         newUserEntity.setRoleIdList(new String[] {AuthorizationTool.ANONYMOUS});
         UserInEvent inEvent = params.getUserInEvent();
@@ -77,7 +78,7 @@ public class UserApiController extends AbstractApiController {
             user = regResult.getUserEntity();
 
         } else {
-            user = userService.preRegister(newUserEntity, 0l);
+            user = userService.preRegister(newUserEntity, 0l, true);
         }
 
         RegisterResponseData responseData = new RegisterResponseData(user.buildTargetEntity());

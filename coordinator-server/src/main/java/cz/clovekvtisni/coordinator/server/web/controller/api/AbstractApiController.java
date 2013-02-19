@@ -77,6 +77,9 @@ public abstract class AbstractApiController {
                     return objectMapper.readValue(jsonParser, paramClass);
                 } catch (IOException e) {
                     throw MaParseException.wrongRequestParams();
+                } catch (RuntimeException e) {
+                    logger.error("Cannot parse params: "+e,e);
+                    throw e;
                 }
             }
         });
@@ -96,7 +99,7 @@ public abstract class AbstractApiController {
 
             current = jp.nextToken();
             if (current != JsonToken.START_OBJECT) {
-                throw new IllegalArgumentException("wrong JSON format");
+                throw new IllegalArgumentException("wrong JSON format, expected start object, received: "+current);
             }
             while (jp.nextToken() != JsonToken.END_OBJECT) {
                 String fieldName = jp.getCurrentName();
@@ -153,6 +156,7 @@ public abstract class AbstractApiController {
 
     @ExceptionHandler(Exception.class)
     public @ResponseBody ApiResponse exceptionHandler(Exception ex, HttpServletResponse response) {
+        logger.error("Exception: "+ex, ex);
         if (ex instanceof MaException) {
             ErrorCode code = ((MaException) ex).getCode();
             if (code != null) switch (code) {

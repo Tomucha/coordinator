@@ -14,10 +14,6 @@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
         %>
 <c:forEach items="${assignedUsers}" var="userInEvent" begin="0" step="1" varStatus="i">
-<span
-    onclick="
-    \$('#assignedUsers').load('${root}/admin/event/user/assigned?eventId=${event.id}&poiId='+\$('#cwInputPlaceId').val()+'&ajax=true&delete=true&userId='+${userInEvent.userId});
-    "
-        >${userInEvent.userEntity.fullName} <i class="icon-remove"></i></span>
+<span onclick="onAssignedUserClick(${userInEvent.userId})">${userInEvent.userEntity.fullName} <i class="icon-remove"></i></span>
 </c:forEach>
 

@@ -65,11 +65,14 @@ public class ApplicationInitFilter implements Filter {
         String root = hRequest.getContextPath();
         hRequest.setAttribute(RequestKeys.ROOT, root);
 
-        if (hRequest.getParameter("eventId") != null) {
-            // we have an active event in URL
-            Long eventId = Long.parseLong(hRequest.getParameter("eventId"));
-            EventEntity e = eventService.findById(eventId, 0);
-            appContext.setActiveEvent(e);
+        if (!isApiCall(hRequest)) {
+            String eventId = hRequest.getParameter("eventId");
+            if (!ValueTool.isEmpty(eventId)) {
+                // we have an active event in URL
+                Long eventIdNum = Long.parseLong(eventId);
+                EventEntity e = eventService.findById(eventIdNum, 0);
+                appContext.setActiveEvent(e);
+            }
         }
 
         try {
@@ -97,6 +100,10 @@ public class ApplicationInitFilter implements Filter {
             }
             appContext.setLocale(null);
         }
+    }
+
+    private boolean isApiCall(HttpServletRequest hRequest) {
+        return isUriStartsWith(hRequest,  "/api");
     }
 
     protected Long findLoggedUserId(HttpServletRequest request) {

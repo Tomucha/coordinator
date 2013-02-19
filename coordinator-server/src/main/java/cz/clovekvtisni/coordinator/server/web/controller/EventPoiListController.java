@@ -28,8 +28,8 @@ import java.util.List;
  * Date: 19.11.12
  */
 @Controller
-@RequestMapping("/admin/event/place/list")
-public class EventPlaceListController extends AbstractEventController {
+@RequestMapping("/admin/event/poi/list")
+public class EventPoiListController extends AbstractEventController {
 
     @Autowired
     private PoiService poiService;
@@ -38,12 +38,19 @@ public class EventPlaceListController extends AbstractEventController {
     private UserGroupService userGroupService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String list(@ModelAttribute("params") EventFilterParams params, @RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
+    public String list(@ModelAttribute("params") PoiForm params, @RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
         PoiFilter filter = new PoiFilter();
         filter.setEventIdVal(params.getEventId());
+        if (!ValueTool.isEmpty(params.getWorkflowId())) {
+            filter.setWorkflowIdVal(params.getWorkflowId());
+        }
+        if (!ValueTool.isEmpty(params.getWorkflowStateId())) {
+            filter.setWorkflowStateIdVal(params.getWorkflowStateId());
+        }
+
         ResultList<PoiEntity> result = poiService.findByFilter(filter, DEFAULT_LIST_LENGTH, bookmark, 0l);
 
-        model.addAttribute("placeList", result.getResult());
+        model.addAttribute("poiList", result.getResult());
 
         PoiMultiSelection selectionForm = new PoiMultiSelection();
         selectionForm.setEventId(appContext.getActiveEvent().getId());
@@ -51,7 +58,7 @@ public class EventPlaceListController extends AbstractEventController {
 
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
 
-        return "admin/event-places";
+        return "admin/event-pois";
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -73,27 +80,11 @@ public class EventPlaceListController extends AbstractEventController {
             }
         }
 
-        return "redirect: /admin/event/place/list?eventId=" + selection.getEventId();
-    }
-
-    @RequestMapping(method = RequestMethod.POST, value = "/change-workflow-state")
-    public String onChangeWorkflowState(@ModelAttribute @Valid ChangeWorkflowStateForm form, BindingResult bindingResult) {
-        if (!bindingResult.hasErrors()) {
-            PoiEntity poi = poiService.findById(form.getPlaceId(), 0l);
-            if (poi != null) {
-                if (ValueTool.isEmpty(form.getTransitionId())) {
-                    poiService.startWorkflow(poi);
-                } else {
-                    poiService.transitWorkflowState(poi, form.getTransitionId());
-                }
-            }
-        }
-        return "redirect: /admin/event/place/list?eventId=" + form.getEventId();
-
+        return "redirect: /admin/event/poi/list?eventId=" + selection.getEventId();
     }
 
     public static Breadcrumb getBreadcrumb(EventEntity params) {
-        return new Breadcrumb(params, "/admin/event/place/list", "breadcrumb.eventPlaces");
+        return new Breadcrumb(params, "/admin/event/poi/list", "breadcrumb.eventPois");
     }
 
     @ModelAttribute("selectedPoiActions")

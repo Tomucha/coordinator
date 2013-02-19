@@ -46,7 +46,9 @@ public class EventUserListController extends AbstractEventController {
     public String listUsers(@ModelAttribute("params") EventFilterParams params, Model model) {
 
         UserInEventFilter inEventFilter = createFilterFromParams(params);
-        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS);
+        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null,
+                UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS | UserInEventService.FLAG_FETCH_LAST_POI
+        );
         model.addAttribute("userInEvents", userInEvents.getResult());
 
         UserMultiSelection selectionForm = new UserMultiSelection();
@@ -55,9 +57,12 @@ public class EventUserListController extends AbstractEventController {
 
         PoiFilter poiFilter = new PoiFilter();
         poiFilter.setEventIdVal(params.getEventId());
+/*
+           FIXME: nevim co to delalo
         poiFilter.setWorkflowIdVal(0l);
         poiFilter.setWorkflowIdOp(Filter.Operator.NOT_EQ);
         model.addAttribute("tasks", poiService.findByFilter(poiFilter, 0, null, 0l).getResult());
+*/
 
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
 
@@ -68,7 +73,9 @@ public class EventUserListController extends AbstractEventController {
     public String listUsersAjax(@ModelAttribute("params") EventFilterParams params, Model model) {
 
         UserInEventFilter inEventFilter = createFilterFromParams(params);
-        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS);
+        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null,
+                UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS | UserInEventService.FLAG_FETCH_LAST_POI
+        );
         model.addAttribute("userInEvents", userInEvents.getResult());
 
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
@@ -133,18 +140,18 @@ public class EventUserListController extends AbstractEventController {
                 FIXME: takhle ten assign nemuze byt, delam ho jinak
 
                 case REGISTER_TO_TASK:
-                    Long placeId = selection.getSelectedTaskId();
-                    if (placeId != null) {
-                        PoiEntity place = poiService.findById(placeId, 0l);
+                    Long poiId = selection.getSelectedTaskId();
+                    if (poiId != null) {
+                        PoiEntity poi = poiService.findById(poiId, 0l);
                         Set<Long> updateList = new HashSet<Long>();
-                        Long[] registered = place.getUserIdList();
+                        Long[] registered = poi.getUserIdList();
                         if (registered != null)
                             updateList.addAll(Arrays.asList(registered));
                         for (Long userId : userIds)
                             if (userId != null)
                                 updateList.add(userId);
-                        place.setUserIdList(updateList.toArray(new Long[0]));
-                        poiService.updatePoi(place);
+                        poi.setUserIdList(updateList.toArray(new Long[0]));
+                        poiService.updatePoi(poi);
                     }
                     break;
 */

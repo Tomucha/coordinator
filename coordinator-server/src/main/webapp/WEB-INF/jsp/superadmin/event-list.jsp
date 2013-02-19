@@ -35,7 +35,10 @@
                     <tbody>
                     <c:forEach items="${events}" var="event">
                         <tr>
-                            <th><c:out value="${event.name}"/></th>
+                            <th><c:out value="${event.name}"/><br/>
+                                <small><c:out value="${event.description}"/></small>
+
+                            </th>
                             <td>
                                 <c:if test="${!empty event.firstEventLocation}">
                                     <c:set value="${event.firstEventLocation}" var="location"/>

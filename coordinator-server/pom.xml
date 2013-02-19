@@ -197,6 +197,11 @@
             <artifactId>commons-io</artifactId>
             <version>1.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.ganyo</groupId>
+            <artifactId>geocell</artifactId>
+            <version>0.0.10</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

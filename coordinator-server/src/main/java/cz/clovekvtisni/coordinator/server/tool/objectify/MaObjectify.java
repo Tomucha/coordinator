@@ -10,6 +10,8 @@ import com.googlecode.objectify.cmd.Query;
 import com.googlecode.objectify.cmd.QueryKeys;
 import com.googlecode.objectify.util.cmd.ObjectifyWrapper;
 import cz.clovekvtisni.coordinator.util.ValueTool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
@@ -29,6 +31,8 @@ public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory>
 
     // objectify is not thread-safe
     private static boolean inTransaction;
+
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     public MaObjectify(Objectify ofy) {
         super(ofy);
@@ -65,11 +69,12 @@ public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory>
             Cursor cursor = Cursor.fromWebSafeString(bookmark);
             query = query.startAt(cursor);
         }
-
+        logger.info("Query: "+query+" (bookmark="+bookmark+")");
         QueryResultIterator<T> iterator = query.iterator();
         List<T> entities = new ArrayList<T>();
         while (iterator.hasNext()) {
             T entity = iterator.next();
+            logger.info("Entity in result: "+entity);
             if (!filter.accept(entity)) {
                 continue;
             }

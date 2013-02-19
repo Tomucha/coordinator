@@ -5,6 +5,7 @@ import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.Event;
 import cz.clovekvtisni.coordinator.domain.EventLocation;
 import cz.clovekvtisni.coordinator.server.util.EntityTool;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.Arrays;
@@ -23,7 +24,7 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
 
     @Index
     @NotEmpty
-    private String eventId;
+    private String eventKey;
 
     @NotEmpty
     private String name;
@@ -37,6 +38,7 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
     }
 
     @Override
+    @JsonIgnore
     public Key<EventEntity> getKey() {
         return Key.create(EventEntity.class, id);
     }
@@ -54,12 +56,12 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
         this.id = id;
     }
 
-    public String getEventId() {
-        return eventId;
+    public String getEventKey() {
+        return eventKey;
     }
 
-    public void setEventId(String id) {
-        this.eventId = id;
+    public void setEventKey(String id) {
+        this.eventKey = id;
     }
 
     public String getName() {
@@ -109,7 +111,7 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
     public String toString() {
         return "EventEntity{" +
                 "id=" + id +
-                ", eventId='" + eventId + '\'' +
+                ", eventKey='" + eventKey + '\'' +
                 ", name='" + name + '\'' +
                 '}';
     }

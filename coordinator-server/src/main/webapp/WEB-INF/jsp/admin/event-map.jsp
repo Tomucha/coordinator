@@ -4,66 +4,91 @@
     taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
     taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
     taglib prefix="tags" tagdir="/WEB-INF/tags"
-%><script type="text/javascript">
+%>
+<script type="text/javascript">
+
+    var eventId = ${event.id};
     function init() {
-        <c:if test="${!empty userInEventList}">
-            <c:forEach items="${userInEventList}" var="userInEvent">
-                <c:if test="${!empty userInEvent.userId and !empty userInEvent.lastLocationLatitude and !empty userInEvent.lastLocationLongitude}">
-                    CoordinatorMap.addPoint({
-                        type: TYPE_USER,
-                        userId: <c:out value="${userInEvent.userId}"/>,
-                        name: "<c:out value="${userInEvent.userEntity.fullName}"/>",
-                        longitude: <c:out value="${userInEvent.lastLocationLongitude}"/>,
-                        latitude: <c:out value="${userInEvent.lastLocationLatitude}"/>
-                    });
-                </c:if>
-            </c:forEach>
-        </c:if>
-
-        <c:if test="${!empty placeList}">
-            <c:forEach items="${placeList}" var="place">
-                <c:if test="${!empty place.id and !empty place.latitude and !empty place.longitude}">
-                CoordinatorMap.addPoint({
-                    type: TYPE_POI,
-                    placeId: <c:out value="${place.id}" />,
-                    description: "<c:out value="${place.poiCategory.name}"/>",
-                    longitude: <c:out value="${place.longitude}"/>,
-                    latitude: <c:out value="${place.latitude}"/>
-                });
-                </c:if>
-            </c:forEach>
-        </c:if>
-
-        <c:if test="${!empty event.eventLocationEntityList}">
-        <c:forEach items="${event.eventLocationEntityList}" var="location">
-        CoordinatorMap.addPoint({
-            type: TYPE_LOCATION,
-            longitude: <c:out value="${location.longitude}" default="null"/>,
-            latitude: <c:out value="${location.latitude}" default="null"/>,
-            radius: <c:out value="${location.radius}" default="0"/>
-        });
-        </c:forEach>
-        </c:if>
-
         CoordinatorMap.clickHandlers[TYPE_LOCATION] = function(event) {
             return "#locationPopup";
         };
+        refreshMarkers();
+    }
+
+    function fillPoiMarkers(bounds) {
+        var url = root+"/admin/event/map/api/poi";
+        var arrBounds = bounds.toArray(); //array order: left, bottom, right, top
+        var request = {
+            eventId: eventId,
+            latS : arrBounds[1], latN : arrBounds[3],
+            lonW: arrBounds[0], lonE : arrBounds[2]
+        };
+        var decodedRequest = $.param(request);
+
+        $.getJSON(url, decodedRequest, function(response, txt) {
+            $.each(response, function(i, item) {
+                item.popupUrl = "${root}/admin/event/map/popup/poi?poiId="+item.id+"&eventId=${event.id}",
+                item.type = TYPE_POI;
+                item.icon = ICON_POI[item.poiCategoryId];
+                CoordinatorMap.addPoint(item);
+            });
+        });
+    }
+
+    function fillUserMarkers(bounds) {
+        var url = root+"/admin/event/map/api/user";
+        var arrBounds = bounds.toArray(); //array order: left, bottom, right, top
+        var request = {
+            eventId: eventId,
+            latS : arrBounds[1], latN : arrBounds[3],
+            lonW: arrBounds[0], lonE : arrBounds[2]
+        };
+        var decodedRequest = $.param(request);
+
+        $.getJSON(url, decodedRequest, function(response, txt) {
+            $.each(response, function(i, item) {
+                item.name = item.userEntity.fullName;
+                item.popupUrl = "${root}/admin/event/map/popup/user?userId="+item.userId+"&eventId=${event.id}",
+                item.type = TYPE_USER;
+                item.icon = ICON_USER;
+                item.latitude = item.lastLocationLatitude;
+                item.longitude = item.lastLocationLongitude;
+                CoordinatorMap.addPoint(item);
+            });
+        });
+    }
+
+
+    function refreshMarkers() {
+        CoordinatorMap.clearMarkers();
+        var bounds = map.getExtent();
+        var proj = new OpenLayers.Projection("EPSG:4326");
+        bounds.transform(map.getProjectionObject(), proj);
+
+        if ($("#showpois").prop("checked")) {
+            fillPoiMarkers(bounds);
+        }
+        if ($("#showusers").prop("checked")) {
+            fillUserMarkers(bounds);
+        }
+
     }
 </script>
 
 <div>
-    <p class="lead"><b><s:message code="label.event"/>:</b> <c:out value="${event.name}"/></p>
-
-    <p><c:out value="${event.description}"/></p>
-
     <div>
     <tags:osm
             width="90%"
-            height="450px"
+            height="500px"
             latitude="${event.firstEventLocation.latitude}"
             longitude="${event.firstEventLocation.longitude}"
             onLoad="init()"
+            onMapChange="refreshMarkers()"
             />
+    <form>
+        <label class="checkbox"><input type="checkbox" id="showusers" onchange="refreshMarkers()" checked="checked"/> <s:message code="label.showUsers"/></label>
+        <label class="checkbox"><input type="checkbox" id="showpois" onchange="refreshMarkers()" checked="checked"/> <s:message code="label.showPois"/></label>
+    </form>
     </div>
 </div>
 

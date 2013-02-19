@@ -1216,18 +1216,18 @@ input[type="checkbox"]:focus {
   height: auto;
 }
 
-input:-moz-placeholder,
-textarea:-moz-placeholder {
+input:-moz-poiholder,
+textarea:-moz-poiholder {
   color: #999999;
 }
 
-input:-ms-input-placeholder,
-textarea:-ms-input-placeholder {
+input:-ms-input-poiholder,
+textarea:-ms-input-poiholder {
   color: #999999;
 }
 
-input::-webkit-input-placeholder,
-textarea::-webkit-input-placeholder {
+input::-webkit-input-poiholder,
+textarea::-webkit-input-poiholder {
   color: #999999;
 }
 
@@ -4803,15 +4803,15 @@ input[type="submit"].btn.btn-mini {
           transition: none;
 }
 
-.navbar-inverse .navbar-search .search-query:-moz-placeholder {
+.navbar-inverse .navbar-search .search-query:-moz-poiholder {
   color: #cccccc;
 }
 
-.navbar-inverse .navbar-search .search-query:-ms-input-placeholder {
+.navbar-inverse .navbar-search .search-query:-ms-input-poiholder {
   color: #cccccc;
 }
 
-.navbar-inverse .navbar-search .search-query::-webkit-input-placeholder {
+.navbar-inverse .navbar-search .search-query::-webkit-input-poiholder {
   color: #cccccc;
 }
 

@@ -1,5 +1,8 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
+import com.google.appengine.api.urlfetch.HTTPResponse;
+import com.google.appengine.api.urlfetch.URLFetchService;
+import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
@@ -9,14 +12,25 @@ import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import cz.clovekvtisni.coordinator.server.util.Location;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,6 +47,29 @@ public class EventMapController extends AbstractEventController {
     @Autowired
     private PoiService poiService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @RequestMapping(method = RequestMethod.GET, value = "/api/address")
+    public @ResponseBody Location addressSearch(@RequestParam(value = "query") String query) throws IOException {
+        URLFetchService urlFetch = URLFetchServiceFactory.getURLFetchService();
+        String searchUrl = "http://nominatim.openstreetmap.org/search?q="+ URLEncoder.encode(query, "UTF-8")+"&format=json&limit=1";
+        HTTPResponse response = urlFetch.fetch(new URL(searchUrl));
+        byte[] data = response.getContent();
+
+        JsonNode node = objectMapper.readTree(data);
+
+        // FIXME: empty results
+
+        double lat = Double.parseDouble(node.get(0).get("lat").getTextValue());
+        double lon = Double.parseDouble(node.get(0).get("lon").getTextValue());
+
+        Location l = new Location();
+        l.setLatitude(lat);
+        l.setLongitude(lon);
+        return l;
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public String map(@ModelAttribute("params") EventFilterParams params, Model model) {
         if (params.getEventId() == null)
@@ -40,7 +77,7 @@ public class EventMapController extends AbstractEventController {
 
 
 /*
-        EventEntity event = loadEventById(params.getEventId());
+        EventEntity event = loadEventById(params.getEventKey());
         model.addAttribute("event", event);
 */
 
@@ -53,11 +90,67 @@ public class EventMapController extends AbstractEventController {
 
         PoiFilter poiFilter = new PoiFilter();
         poiFilter.setEventIdVal(appContext.getActiveEvent().getId());
-        ResultList<PoiEntity> places = poiService.findByFilter(poiFilter, 0, null, 0l);
-        model.addAttribute("placeList", places.getResult());
+        ResultList<PoiEntity> pois = poiService.findByFilter(poiFilter, 0, null, 0l);
+        model.addAttribute("poiList", pois.getResult());
 
         return "admin/event-map";
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/api/poi")
+    public @ResponseBody List<PoiEntity> listPoi(
+            @RequestParam(required = true) long eventId,
+            @RequestParam(required = true) double latN,
+            @RequestParam(required = true) double lonE,
+            @RequestParam(required = true) double latS,
+            @RequestParam(required = true) double lonW
+    ) {
+        return poiService.findByEventAndBox(eventId, latN, lonE, latS, lonW, 0);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/api/user")
+    public @ResponseBody List<UserInEventEntity> listUsers(
+            @RequestParam(required = true) long eventId,
+            @RequestParam(required = true) double latN,
+            @RequestParam(required = true) double lonE,
+            @RequestParam(required = true) double latS,
+            @RequestParam(required = true) double lonW
+    ) {
+        List<UserInEventEntity> byEventAndBox = userInEventService.findByEventAndBox(eventId, latN, lonE, latS, lonW, UserInEventService.FLAG_FETCH_USER);
+        log.info("Users: "+byEventAndBox);
+
+        return byEventAndBox;
+    }
+
+
+    @RequestMapping(method = RequestMethod.GET, value = "/popup/poi")
+    public String popupPoi(
+            @RequestParam(value = "eventId", required = false) Long eventId,
+            @RequestParam(value = "poiId", required = false) Long poiId,
+            Model model) {
+
+        PoiEntity e = poiService.findById(poiId, 0);
+        model.addAttribute("poi", e);
+
+        Set<Long> userIds = e.getUserIdList();
+        List<UserInEventEntity> assignedUsers = userInEventService.findByIds(e.getEventId(), userIds, UserInEventService.FLAG_FETCH_USER);
+        model.addAttribute("assignedUsers", assignedUsers);
+
+        return "ajax/poi-popup";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/popup/user")
+    public String popupUser(
+            @RequestParam(value = "eventId", required = true) Long eventId,
+            @RequestParam(value = "userId", required = true) Long userId,
+            Model model) {
+
+        UserInEventEntity u = userInEventService.findById(eventId, userId,
+                UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_LAST_POI | UserInEventService.FLAG_FETCH_GROUPS
+        );
+        model.addAttribute("userInEvent", u);
+        return "ajax/user-popup";
+    }
+
 
     public static Breadcrumb getBreadcrumb(EventEntity params) {
         return new Breadcrumb(params, "/admin/event/map", "breadcrumb.eventMap");

@@ -87,7 +87,7 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
     @Override
     public EventEntity updateEvent(final EventEntity entity) {
         logger.debug("updating " + entity);
-        final EventEntity old = findByEventId(entity.getEventId(), EventService.FLAG_FETCH_LOCATIONS);
+        final EventEntity old = findByEventId(entity.getEventKey(), EventService.FLAG_FETCH_LOCATIONS);
         return ofy().transact(new Work<EventEntity>() {
             @Override
             public EventEntity run() {
@@ -107,7 +107,7 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
         for (EventLocationEntity location : entity.getEventLocationEntityList()) {
             if (oldEntity == null)
                 location.setId(null);
-            location.setEventId(entity.getEventId());
+            location.setEventId(entity.getEventKey());
             location.setParentKey(entity.getKey());
             updateSystemFields(location, null);
             if (location.isDeleted())
@@ -135,7 +135,7 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
         for (EventEntity entity : events) {
             if ((flags & EventService.FLAG_FETCH_LOCATIONS) != 0) {
                 EventLocationFilter filter = new EventLocationFilter();
-                filter.setEventIdVal(entity.getEventId());
+                filter.setEventIdVal(entity.getEventKey());
                 ResultList<EventLocationEntity> result = ofy().findByFilter(filter, null, 0);
                 entity.setEventLocationEntityList(result.getResult().toArray(new EventLocationEntity[0]));
             }

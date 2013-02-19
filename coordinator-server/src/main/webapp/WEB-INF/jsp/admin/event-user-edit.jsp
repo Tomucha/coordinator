@@ -11,12 +11,52 @@
         $( "#birthdayInput" ).datepicker({dateFormat: "dd.mm.yy"});
     });
 </script>
+<script type="text/javascript">
+
+    function onNewPoint(point) {
+        $("#latitudeInput").val(point.latitude);
+        $("#longitudeInput").val(point.longitude);
+    }
+
+    function initialize() {
+        CoordinatorMap.disablePopup(TYPE_POI);
+        CoordinatorMap.disablePopup(TYPE_LOCATION);
+
+        CoordinatorMap.startSetLocation(TYPE_POI);
+
+        <c:if test="${!empty form.lastLocationLatitude and !empty form.lastLocationLongitude}">
+        CoordinatorMap.addPoint({
+            type: TYPE_POI,
+            icon: ICON_GENERIC,
+            poiId: <c:out value="${form.id}"/>,
+            longitude: <c:out value="${form.lastLocationLongitude}"/>,
+            latitude: <c:out value="${form.lastLocationLatitude}"/>
+        });
+        </c:if>
+    }
+
+</script>
 <h2>
     <c:choose>
         <c:when test="${empty form.id}"><s:message code="header.userCreate"/></c:when>
         <c:otherwise><s:message code="header.userUpdate"/></c:otherwise>
     </c:choose>
 </h2>
+
+
+<div class="pull-right" width="400px">
+    <tags:osm
+            width="400px"
+            height="300px"
+            longitude="${!empty form.lastLocationLongitude ? form.lastLocationLongitude : event.firstEventLocation.longitude}"
+            latitude="${!empty form.lastLocationLatitude ? form.lastLocationLatitude : event.firstEventLocation.latitude}"
+            zoom="13"
+            onLoad="initialize()"
+            onNewPoint="onNewPoint"
+            maxPoints="poi=1"
+            buttons="addPoi"
+            />
+</div>
 
 <div class="mainPanel">
     <div class="userForm">
@@ -115,6 +155,19 @@
                         </sf:select>
                     </tags:input>
                 </div>
+
+                <div>
+                    <tags:input field="lastLocationLongitude" modelAttribute="form" captionCode="UserEntity.lastLocationLongitude">
+                        <sf:input id="longitudeInput" path="lastLocationLongitude" readonly="true"/>
+                    </tags:input>
+                </div>
+
+                <div>
+                    <tags:input field="lastLocationLatitude" modelAttribute="form" captionCode="UserEntity.lastLocationLatitude">
+                        <sf:input id="latitudeInput" path="lastLocationLatitude" readonly="true"/>
+                    </tags:input>
+                </div>
+
             </div>
 
             <div class="panel checkboxList">
@@ -139,7 +192,7 @@
             </div>
 
             <div class="buttonPanel">
-                <sf:button><s:message code="button.save"/></sf:button>
+                <sf:button class="btn"><s:message code="button.save"/></sf:button>
             </div>
         </sf:form>
     </div>

@@ -284,14 +284,16 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     @Override
-    public UserEntity preRegister(UserEntity newUser, long flags) {
+    public UserEntity preRegister(UserEntity newUser, long flags, boolean systemCall) {
         Organization organization = organizationService.findById(newUser.getOrganizationId(), 0l);
 
         if (organization == null)
             throw new IllegalArgumentException("Not existed organization id in " + newUser);
 
-        if (!organization.isAllowsPreRegistration())
-            throw MaPermissionDeniedException.registrationNotAllowed();
+        if (!systemCall) {
+            if (!organization.isAllowsPreRegistration())
+                throw MaPermissionDeniedException.registrationNotAllowed();
+        }
 
         return createUser(newUser);
     }
