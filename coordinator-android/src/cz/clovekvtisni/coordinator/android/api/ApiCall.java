@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 
+import cz.clovekvtisni.coordinator.android.other.Settings;
 import cz.clovekvtisni.coordinator.android.workers.Worker;
 import cz.clovekvtisni.coordinator.api.request.ApiRequest;
 import cz.clovekvtisni.coordinator.api.request.RequestParams;
@@ -32,7 +33,8 @@ public class ApiCall<S extends RequestParams, T extends ApiResponseData> extends
 
 	private String createRequestBody() {
 		ApiRequest request = new ApiRequest();
-		request.setAuthKey("8e70c14f51a6c60407aec309d5b3ea31");
+		String authKey = Settings.getAuthKey();
+		if (authKey != null) request.setAuthKey(authKey);
 		request.setData(requestParams);
 		return ApiUtils.GSON.toJsonTree(request).toString();
 	}

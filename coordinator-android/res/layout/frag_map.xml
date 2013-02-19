@@ -8,15 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/goToMyLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Moje poloha" />
-
     <LinearLayout
         android:id="@+id/poiInfo"
         android:layout_width="match_parent"
@@ -24,16 +15,18 @@
         android:layout_alignParentBottom="true"
         android:background="#dd000000"
         android:orientation="vertical"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:visibility="gone" >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:gravity="center_vertical" >
 
             <TextView
+                android:id="@+id/poiTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -54,19 +47,21 @@
 
         <View
             style="@style/Line"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:background="#ccc" />
 
         <TextView
+            android:id="@+id/poiDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:layout_marginTop="10dp"
             android:text="Popis popis popis popis popis popis popis popis popis popis popis"
             android:textColor="#f0f0f0" />
+
+        <LinearLayout
+            android:id="@+id/transitions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </RelativeLayout>

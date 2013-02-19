@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".other.CoordinatorApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="Člověk v tísni"

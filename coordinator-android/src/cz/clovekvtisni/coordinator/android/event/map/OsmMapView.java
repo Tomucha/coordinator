@@ -40,8 +40,8 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 		setOnTouchListener(new TouchHelper(context, projection, this));
 	}
 
-	public void addOverlay(MapOverlay overlay) {
-		overlays.add(overlay);
+	public List<MapOverlay> getOverlays() {
+		return overlays;
 	}
 
 	@Override

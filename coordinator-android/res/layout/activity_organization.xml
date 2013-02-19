@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -19,7 +20,8 @@
                 android:id="@+id/webView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:visibility="gone" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -37,34 +39,23 @@
                 android:layout_height="1dp"
                 android:background="#222" />
 
-            <TextView
-                android:id="@+id/event1"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/selectable_item_background"
-                android:gravity="center_vertical"
-                android:paddingLeft="4dp"
-                android:text="Povodeň"
-                android:textSize="18dp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#ddd" />
-
-            <View
+            <ListView
+                android:id="@+id/events"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                tools:listitem="@android:layout/simple_list_item_2" />
 
             <Button
                 android:id="@+id/preregister"
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
                 android:paddingLeft="32dp"
                 android:paddingRight="32dp"
-                android:text="Předregistrace" />
+                android:text="Předregistrace"
+                android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
 

@@ -11,5 +11,5 @@ public class ConfigCall extends ApiCall<EmptyRequestParams, ConfigResponse> {
 	
 	public static interface Listener extends ApiCall.Listener<ConfigResponse> {
 	}
-
+	
 }

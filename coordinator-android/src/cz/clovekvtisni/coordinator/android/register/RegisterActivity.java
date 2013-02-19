@@ -24,6 +24,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ConfigCall;
 import cz.clovekvtisni.coordinator.android.api.UserRegisterCall;
+import cz.clovekvtisni.coordinator.android.other.Settings;
 import cz.clovekvtisni.coordinator.android.register.wizard.model.ModelCallbacks;
 import cz.clovekvtisni.coordinator.android.register.wizard.model.Page;
 import cz.clovekvtisni.coordinator.android.register.wizard.model.WizardModel;
@@ -60,6 +61,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 	private UserRegisterCall.Listener registerCallListener = new UserRegisterCall.Listener() {
 		@Override
 		public void onResult(RegisterResponseData result) {
+			Settings.setAuthKey(result.getAuthKey());
 			finish();
 		}
 
@@ -289,9 +291,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 
 		@Override
 		public int getItemPosition(Object object) {
-			// TODO: be smarter about this
 			if (object == mPrimaryItem) {
-				// Re-use the current fragment (its position never changes)
 				return POSITION_UNCHANGED;
 			}
 
