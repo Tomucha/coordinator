@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android.event.map;
+package cz.clovekvtisni.coordinator.android.event.map.view;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +11,7 @@ import android.os.Handler;
 
 import com.github.kevinsawicki.http.HttpRequest;
 import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
+
 
 public class NetworkTileLoader {
 	private final DiskTileCache cache;

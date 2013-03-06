@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android.event.map;
+package cz.clovekvtisni.coordinator.android.event.map.view;
 
 import com.google.common.base.Objects;
 

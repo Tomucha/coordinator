@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android.event.map;
+package cz.clovekvtisni.coordinator.android.event.map.view;
 
 import java.io.IOException;
 import java.util.Set;
@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.os.Handler;
 
 import com.google.common.collect.Sets;
+
 
 public class DiskTileLoader implements TileLoadedListener {
 	private final DiskTileCache cache;

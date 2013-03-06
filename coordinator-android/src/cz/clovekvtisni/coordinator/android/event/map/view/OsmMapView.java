@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android.event.map;
+package cz.clovekvtisni.coordinator.android.event.map.view;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,9 +16,10 @@ import android.view.View;
 
 import com.google.common.collect.Lists;
 
-import cz.clovekvtisni.coordinator.android.event.map.Projection.LatLon;
-import cz.clovekvtisni.coordinator.android.event.map.Projection.ProjectedTile;
-import cz.clovekvtisni.coordinator.android.event.map.TouchHelper.OnSingleTapListener;
+import cz.clovekvtisni.coordinator.android.event.map.MapOverlay;
+import cz.clovekvtisni.coordinator.android.event.map.view.Projection.LatLon;
+import cz.clovekvtisni.coordinator.android.event.map.view.Projection.ProjectedTile;
+import cz.clovekvtisni.coordinator.android.event.map.view.TouchHelper.OnSingleTapListener;
 import cz.clovekvtisni.coordinator.android.util.Utils;
 
 public class OsmMapView extends View implements OnSingleTapListener, TileLoadedListener {

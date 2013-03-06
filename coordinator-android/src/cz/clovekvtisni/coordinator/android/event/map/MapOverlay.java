@@ -1,7 +1,7 @@
 package cz.clovekvtisni.coordinator.android.event.map;
 
 import android.graphics.Canvas;
-import cz.clovekvtisni.coordinator.android.event.map.Projection.LatLon;
+import cz.clovekvtisni.coordinator.android.event.map.view.Projection.LatLon;
 
 public abstract class MapOverlay {
 	private LatLon latLon;

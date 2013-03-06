@@ -20,51 +20,61 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockDialogFragment;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.fhucho.android.workers.Workers;
 import com.google.common.collect.Lists;
 
 import cz.clovekvtisni.coordinator.android.R;
-import cz.clovekvtisni.coordinator.android.api.ConfigCall;
-import cz.clovekvtisni.coordinator.android.api.EventPoiListCall;
-import cz.clovekvtisni.coordinator.android.event.map.MapFragment;
-import cz.clovekvtisni.coordinator.android.event.tasks.TasksFragment;
+import cz.clovekvtisni.coordinator.android.api.BitmapLoader;
+import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoader;
+import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoaderListener;
+import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventPoiListLoader;
+import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventPoiListLoaderListener;
+import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventUserListLoader;
+import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventUserListLoaderListener;
 import cz.clovekvtisni.coordinator.android.util.SimpleListeners.SimpleTabListener;
-import cz.clovekvtisni.coordinator.android.workers.BitmapLoader;
-import cz.clovekvtisni.coordinator.android.workers.Workers;
 import cz.clovekvtisni.coordinator.api.request.EventPoiListRequestParams;
+import cz.clovekvtisni.coordinator.api.request.EventUserListRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.api.response.EventPoiFilterResponseData;
+import cz.clovekvtisni.coordinator.api.response.EventUserListResponseData;
 import cz.clovekvtisni.coordinator.domain.Event;
 import cz.clovekvtisni.coordinator.domain.Poi;
+import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 
 public class EventActivity extends SherlockFragmentActivity implements
 		LocationTool.BestLocationListener {
 
-	private List<Fragment> fragments;
+	private List<SherlockFragment> fragments;
 	private MapFragment mapFragment;
 	private TasksFragment tasksFragment;
+	private UsersFragment usersFragment;
 	private ViewPager pager;
-	private Workers workers;
 
 	private Map<PoiCategory, Boolean> poiFilter;
 	private Map<PoiCategory, Bitmap> poiIcons = new HashMap<PoiCategory, Bitmap>();
 	private Poi[] pois = new Poi[0];
 	private PoiCategory[] poiCategories;
 
+	private long getEventId() {
+		return IntentHelper.getEvent(getIntent()).getId();
+	}
+
 	private void initFragments() {
 		mapFragment = new MapFragment();
 		tasksFragment = new TasksFragment();
+		usersFragment = new UsersFragment();
 
-		fragments = Lists.newArrayList();
-		fragments.add(mapFragment);
-		fragments.add(tasksFragment);
-		fragments.add(new TasksFragment());
-		fragments.add(new TasksFragment());
+		fragments = Lists.newArrayList(mapFragment, tasksFragment, usersFragment,
+				new UsersFragment());
 	}
 
 	private void initPager() {
@@ -111,15 +121,21 @@ public class EventActivity extends SherlockFragmentActivity implements
 		initPager();
 		initTabs();
 
-		workers = new Workers(this);
+		loadUsers();
 		loadPoiCategories();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getSupportMenuInflater().inflate(R.menu.event, menu);
+		return true;
 	}
 
 	private void loadPois() {
 		EventPoiListRequestParams params = new EventPoiListRequestParams();
-		params.setEventId(IntentHelper.getEvent(getIntent()).getId());
+		params.setEventId(getEventId());
 		params.setModifiedFrom(new Date(0));
-		workers.startOrConnect(new EventPoiListCall(params), new EventPoiListCall.Listener() {
+		Workers.load(new EventPoiListLoader(params), new EventPoiListLoaderListener() {
 			@Override
 			public void onResult(EventPoiFilterResponseData result) {
 				pois = result.getPois();
@@ -130,18 +146,17 @@ public class EventActivity extends SherlockFragmentActivity implements
 			public void onException(Exception e) {
 				e.printStackTrace();
 			}
-		});
+		}, this);
 	}
 
 	private void loadPoiIcons() {
 		for (final PoiCategory category : poiCategories) {
 			String url = category.getIcon();
-			workers.startOrConnect(new BitmapLoader(url), new BitmapLoader.Listener() {
+			DisplayMetrics metrics = new DisplayMetrics();
+			getWindowManager().getDefaultDisplay().getMetrics(metrics);
+			Workers.load(new BitmapLoader(url, metrics.densityDpi), new BitmapLoader.Listener() {
 				@Override
 				public void onSuccess(Bitmap bitmap) {
-					int h = bitmap.getHeight() * 2;
-					int w = bitmap.getWidth() * 2;
-					bitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
 					poiIcons.put(category, bitmap);
 					updatePois();
 				}
@@ -150,12 +165,12 @@ public class EventActivity extends SherlockFragmentActivity implements
 				public void onException(Exception e) {
 					e.printStackTrace();
 				}
-			});
+			}, this);
 		}
 	}
 
 	private void loadPoiCategories() {
-		workers.startOrConnect(new ConfigCall(), new ConfigCall.Listener() {
+		Workers.load(new ConfigLoader(), new ConfigLoaderListener() {
 			@Override
 			public void onResult(ConfigResponse result) {
 				poiCategories = result.getPoiCategoryList();
@@ -165,7 +180,23 @@ public class EventActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onException(Exception e) {
 			}
-		});
+		}, this);
+	}
+
+	private void loadUsers() {
+		EventUserListRequestParams params = new EventUserListRequestParams();
+		params.setEventId(getEventId());
+		params.setModifiedFrom(new Date(0));
+		Workers.load(new EventUserListLoader(params), new EventUserListLoaderListener() {
+			@Override
+			public void onResult(EventUserListResponseData result) {
+				onUsersLoaded(result.getUserInEvents());
+			}
+
+			@Override
+			public void onException(Exception e) {
+			}
+		}, this);
 	}
 
 	public void onPoiCategoriesLoaded(PoiCategory[] poiCategories) {
@@ -178,6 +209,12 @@ public class EventActivity extends SherlockFragmentActivity implements
 
 		loadPois();
 		loadPoiIcons();
+	}
+
+	private void onUsersLoaded(UserInEvent[] users) {
+		List<UserInEvent> usersList = Lists.newArrayList(users);
+		mapFragment.setFilteredUsers(usersList);
+		usersFragment.setFilteredUsers(usersList);
 	}
 
 	private void updatePois() {
@@ -196,6 +233,11 @@ public class EventActivity extends SherlockFragmentActivity implements
 
 	public void showPoiOnMap(Poi poi) {
 		mapFragment.showPoiOnMap(poi);
+		pager.setCurrentItem(0, true);
+	}
+
+	public void showUserOnMap(UserInEvent user) {
+		mapFragment.showUserOnMap(user);
 		pager.setCurrentItem(0, true);
 	}
 

@@ -4,31 +4,44 @@ import com.github.kevinsawicki.http.HttpRequest;
 import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 
 import cz.clovekvtisni.coordinator.android.other.Settings;
-import cz.clovekvtisni.coordinator.android.workers.Worker;
+import cz.clovekvtisni.coordinator.android.util.Lg;
+import cz.clovekvtisni.coordinator.android.util.Utils;
 import cz.clovekvtisni.coordinator.api.request.ApiRequest;
 import cz.clovekvtisni.coordinator.api.request.RequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse.Status;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
 
-public class ApiCall<S extends RequestParams, T extends ApiResponseData> extends
-		Worker<ApiCall.Listener<T>> {
+public abstract class ApiCall<RQ extends RequestParams, RP extends ApiResponseData> {
 
 	private static final String API_RESPONSE_STATUS = "status";
 	private static final String API_RESPONSE_DATA = "data";
 	private static final String URL_PREFIX = "https://coordinator-test.appspot.com/api/v1/";
 
-	private final S requestParams;
-	private final Class<? extends T> resultClass;
+	private final Class<? extends RP> responseClass;
+	private final RQ requestParams;
 	private final String url;
+	private final String requestBody;
 
-	public ApiCall(String urlSuffix, S requestParams, Class<? extends T> resultClass) {
+	public ApiCall(String urlSuffix, RQ requestParams, Class<? extends RP> responseClass) {
 		this.url = URL_PREFIX + urlSuffix;
 		this.requestParams = requestParams;
-		this.resultClass = resultClass;
+		this.responseClass = responseClass;
+		this.requestBody = createRequestBody();
+	}
+	
+	public RP call() throws ApiCallException {
+		try {
+			return doRequest();
+		} catch (JsonSyntaxException e) {
+			throw new ApiCallException(e);
+		} catch (HttpRequestException e) {
+			throw new ApiCallException(e);
+		} catch (ApiServerSideException e) {
+			throw new ApiCallException(e);
+		}
 	}
 
 	private String createRequestBody() {
@@ -39,62 +52,54 @@ public class ApiCall<S extends RequestParams, T extends ApiResponseData> extends
 		return ApiUtils.GSON.toJsonTree(request).toString();
 	}
 
-	private void doRequest() throws HttpRequestException, JsonSyntaxException, ApiResponseException {
-		System.out.println(createRequestBody());
-		System.out.println("---------------");
-		String responseBody = HttpRequest.post(url).send(createRequestBody()).body();
+	private RP doRequest() throws HttpRequestException, JsonSyntaxException, ApiServerSideException {
+		String responseBody = HttpRequest.post(url).send(requestBody).body();
 		JsonObject json = (JsonObject) ApiUtils.PARSER.parse(responseBody);
-		System.out.println(json);
+
+		writeToLog(requestBody, responseBody);
 
 		Status status = ApiUtils.GSON.fromJson(json.get(API_RESPONSE_STATUS), Status.class);
 		if (status == Status.OK) {
 			JsonElement resultJson = json.get(API_RESPONSE_DATA);
-			T result = ApiUtils.GSON.fromJson(resultJson, resultClass);
-			sendSuccess(result);
+			return ApiUtils.GSON.fromJson(resultJson, responseClass);
 		} else {
-			throw new ApiResponseException();
+			throw new ApiServerSideException();
 		}
 	}
-
-	@Override
-	protected void doInBackground() {
-		try {
-			doRequest();
-		} catch (HttpRequestException e) {
-			sendException(e);
-		} catch (ApiResponseException e) {
-			sendException(e);
-		} catch (JsonParseException e) {
-			sendException(e);
-		}
+	
+	protected String getCacheKey() {
+		return Utils.md5(requestBody);
 	}
 
-	protected void sendException(final Exception e) {
-		send(new Runnable() {
-			@Override
-			public void run() {
-				getListener().onException(e);
-			}
-		});
+	public RQ getRequestParams() {
+		return requestParams;
 	}
 
-	protected void sendSuccess(final T result) {
-		send(new Runnable() {
-			@Override
-			public void run() {
-				getListener().onResult(result);
-			}
-		});
+	public Class<? extends RP> getResponseClass() {
+		return responseClass;
 	}
 
-	public static interface Listener<T> {
-		public void onResult(T result);
-
-		public void onException(Exception e);
+	public boolean isEquivalentTo(ApiCall<?, ?> other) {
+		return getClass().equals(other.getClass()) && requestBody.equals(other.requestBody);
+	}
+	
+	private void writeToLog(String request, String response) {
+		Lg.API.d("ApiCall: " + url);
+		Lg.API.dd("Request body:");
+		Lg.API.dd(request);
+		Lg.API.dd("Response body:");
+		Lg.API.dd(response);
 	}
 
 	@SuppressWarnings("serial")
-	public static class ApiResponseException extends Exception {
+	public static class ApiServerSideException extends Exception {
+	}
+
+	@SuppressWarnings("serial")
+	public static class ApiCallException extends Exception {
+		public ApiCallException(Throwable cause) {
+			super(cause);
+		}
 	}
 
 }

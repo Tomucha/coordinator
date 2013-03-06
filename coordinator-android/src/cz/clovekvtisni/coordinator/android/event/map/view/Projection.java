@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android.event.map;
+package cz.clovekvtisni.coordinator.android.event.map.view;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 
 import com.google.common.collect.Lists;
+
 
 public class Projection {
 	private static final double EARTH_RADIUS = 6378137;

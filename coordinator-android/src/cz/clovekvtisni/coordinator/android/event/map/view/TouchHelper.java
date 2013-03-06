@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android.event.map;
+package cz.clovekvtisni.coordinator.android.event.map.view;
 
 import android.content.Context;
 import android.graphics.PointF;
@@ -7,7 +7,7 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import cz.clovekvtisni.coordinator.android.event.map.Projection.LatLon;
+import cz.clovekvtisni.coordinator.android.event.map.view.Projection.LatLon;
 
 class TouchHelper implements OnTouchListener {
 	private final GestureDetector gestureDetector;
