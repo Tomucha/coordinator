@@ -15,7 +15,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -43,7 +42,6 @@ import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventPoiListLoaderList
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventUserListLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventUserListLoaderListener;
 import cz.clovekvtisni.coordinator.android.api.BitmapLoader;
-import cz.clovekvtisni.coordinator.android.event.MapFragment.SendingTransitionDialog;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.android.util.SimpleListeners.SimpleTabListener;
 import cz.clovekvtisni.coordinator.api.request.EventPoiListRequestParams;
@@ -60,8 +58,10 @@ import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 
 public class EventActivity extends SherlockFragmentActivity implements LocationTool.Listener {
 
+	private Event event;
 	private List<SherlockFragment> fragments;
 	private LocationTool locationTool;
+	private InfoFragment infoFragment;
 	private MapFragment mapFragment;
 	private TasksFragment tasksFragment;
 	private UsersFragment usersFragment;
@@ -72,17 +72,13 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	private Poi[] pois = new Poi[0];
 	private PoiCategory[] poiCategories;
 
-	private long getEventId() {
-		return IntentHelper.getEvent(getIntent()).getId();
-	}
-
 	private void initFragments() {
 		mapFragment = new MapFragment();
 		tasksFragment = new TasksFragment();
 		usersFragment = new UsersFragment();
+		infoFragment = InfoFragment.newInstance(event.getDescription());
 
-		fragments = Lists.newArrayList(mapFragment, tasksFragment, usersFragment,
-				new UsersFragment());
+		fragments = Lists.newArrayList(mapFragment, tasksFragment, usersFragment, infoFragment);
 	}
 
 	private void initPager() {
@@ -120,6 +116,8 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
+		event = IntentHelper.getEvent(getIntent());
+
 		initFragments();
 		initPager();
 		initTabs();
@@ -150,13 +148,14 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 
 	private void loadPois() {
 		EventPoiListRequestParams params = new EventPoiListRequestParams();
-		params.setEventId(getEventId());
+		params.setEventId(event.getId());
 		params.setModifiedFrom(new Date(0));
 		Workers.load(new EventPoiListLoader(params), new EventPoiListLoaderListener() {
 			@Override
 			public void onResult(EventPoiFilterResponseData result) {
 				pois = result.getPois();
-				updatePois();
+				updateImportantPois();
+				updateFilteredPois();
 			}
 
 			@Override
@@ -175,7 +174,8 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 				@Override
 				public void onSuccess(Bitmap bitmap) {
 					poiIcons.put(category, bitmap);
-					updatePois();
+					updateFilteredPois();
+					updateImportantPois();
 				}
 
 				@Override
@@ -202,7 +202,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 
 	private void loadUsers() {
 		EventUserListRequestParams params = new EventUserListRequestParams();
-		params.setEventId(getEventId());
+		params.setEventId(event.getId());
 		params.setModifiedFrom(new Date(0));
 		Workers.load(new EventUserListLoader(params), new EventUserListLoaderListener() {
 			@Override
@@ -234,7 +234,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		usersFragment.setFilteredUsers(usersList);
 	}
 
-	private void updatePois() {
+	private void updateFilteredPois() {
 		List<Poi> filteredPois = new ArrayList<Poi>();
 		for (Poi poi : pois) {
 			if (poiFilter.get(poi.getPoiCategory())) filteredPois.add(poi);
@@ -242,6 +242,15 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 
 		mapFragment.setFilteredPois(filteredPois, poiIcons);
 		tasksFragment.setFilteredPois(filteredPois);
+	}
+	
+	private void updateImportantPois() {
+		List<Poi> importantPois = new ArrayList<Poi>();
+		for (Poi poi : pois) {
+			if (poi.getPoiCategory().isImportant()) importantPois.add(poi);
+		}
+
+		infoFragment.setImportantPois(importantPois);
 	}
 
 	public void showPoiFilterDialog() {
@@ -267,7 +276,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	@Override
 	public void onLocationShouldBeUploaded(Location location) {
 		Lg.LOCATION.d("Location should be uploaded. " + describeLocation(location));
-		Workers.start(new UploadMyLocationTask(location, getEventId()), this);
+		Workers.start(new UploadMyLocationTask(location, event.getId()), this);
 	}
 
 	private String describeLocation(Location location) {
@@ -341,7 +350,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 				public void onClick(DialogInterface dialog, int which, boolean isChecked) {
 					EventActivity activity = (EventActivity) getActivity();
 					activity.poiFilter.put(activity.poiCategories[which], isChecked);
-					activity.updatePois();
+					activity.updateFilteredPois();
 				}
 			});
 

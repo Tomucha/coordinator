@@ -71,7 +71,7 @@ public class MapFragment extends SherlockFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.frag_map, container, false);
+		View view = inflater.inflate(R.layout.frag_event_map, container, false);
 
 		setHasOptionsMenu(true);
 

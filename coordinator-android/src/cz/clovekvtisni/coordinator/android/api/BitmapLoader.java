@@ -7,6 +7,8 @@ import com.fhucho.android.workers.Loader;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 
+import cz.clovekvtisni.coordinator.android.DeployEnvironment;
+
 public class BitmapLoader extends Loader<BitmapLoader.Listener> {
 
 	private final int density;
@@ -17,7 +19,7 @@ public class BitmapLoader extends Loader<BitmapLoader.Listener> {
 	public BitmapLoader(String url, int density) {
 		super(Listener.class);
 		this.density = density;
-		this.url = "http://coordinator-test.appspot.com" + url;
+		this.url = DeployEnvironment.SERVER_URL_PREFIX + url;
 	}
 
 	@Override

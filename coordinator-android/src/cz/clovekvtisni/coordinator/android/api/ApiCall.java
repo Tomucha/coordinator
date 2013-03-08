@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
+import cz.clovekvtisni.coordinator.android.DeployEnvironment;
 import cz.clovekvtisni.coordinator.android.other.Settings;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.android.util.Utils;
@@ -18,7 +19,7 @@ public abstract class ApiCall<RQ extends RequestParams, RP extends ApiResponseDa
 
 	private static final String API_RESPONSE_STATUS = "status";
 	private static final String API_RESPONSE_DATA = "data";
-	private static final String URL_PREFIX = "https://coordinator-test.appspot.com/api/v1/";
+	private static final String URL_PREFIX = DeployEnvironment.SERVER_URL_PREFIX + "/api/v1/";
 
 	private final Class<? extends RP> responseClass;
 	private final RQ requestParams;
