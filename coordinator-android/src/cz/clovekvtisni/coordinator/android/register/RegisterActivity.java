@@ -17,22 +17,29 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.fhucho.android.workers.Workers;
+import com.fhucho.android.workers.simple.ActivityWorker2;
 
 import cz.clovekvtisni.coordinator.android.R;
-import cz.clovekvtisni.coordinator.android.api.ConfigCall;
-import cz.clovekvtisni.coordinator.android.api.UserRegisterCall;
+import cz.clovekvtisni.coordinator.android.api.ApiCall.ApiCallException;
+import cz.clovekvtisni.coordinator.android.api.ApiCalls.UserRegisterCall;
+import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoader;
+import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoaderListener;
+import cz.clovekvtisni.coordinator.android.other.Settings;
 import cz.clovekvtisni.coordinator.android.register.wizard.model.ModelCallbacks;
 import cz.clovekvtisni.coordinator.android.register.wizard.model.Page;
 import cz.clovekvtisni.coordinator.android.register.wizard.model.WizardModel;
 import cz.clovekvtisni.coordinator.android.register.wizard.ui.PageFragmentCallbacks;
 import cz.clovekvtisni.coordinator.android.register.wizard.ui.ReviewFragment;
-import cz.clovekvtisni.coordinator.android.workers.Workers;
 import cz.clovekvtisni.coordinator.api.request.RegisterRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.api.response.RegisterResponseData;
+import cz.clovekvtisni.coordinator.domain.Event;
 import cz.clovekvtisni.coordinator.domain.User;
+import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 
 public class RegisterActivity extends SherlockFragmentActivity implements PageFragmentCallbacks,
@@ -51,21 +58,10 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 
 	private List<Page> mCurrentPageSequence;
 
+	private Event event;
 	private Organization organization;
 
 	private ConfigResponse config;
-	private Workers workers;
-
-	private UserRegisterCall.Listener registerCallListener = new UserRegisterCall.Listener() {
-		@Override
-		public void onResult(RegisterResponseData result) {
-			finish();
-		}
-
-		@Override
-		public void onException(Exception e) {
-		}
-	};
 
 	private void initWizardModel(Bundle state) {
 		mWizardModel = new WizardModel(this, organization, config);
@@ -124,9 +120,11 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 		super.onCreate(state);
 		setContentView(R.layout.activity_register);
 
-		organization = IntentHelper.getOrganization(getIntent());
+		Intent intent = getIntent();
+		organization = IntentHelper.getOrganization(intent);
+		event = IntentHelper.getEvent(intent);
 
-		workers = new Workers(this);
+		getSupportActionBar().setTitle(event == null ? "Předregistrace" : event.getName());
 
 		if (state != null && state.containsKey("config")) {
 			config = ((ConfigSerializableWrapper) state.getSerializable("config")).config;
@@ -134,8 +132,6 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 		} else {
 			loadConfig();
 		}
-
-		workers.connectIfRunning(UserRegisterCall.class, registerCallListener);
 	}
 
 	private void initWizard(Bundle state) {
@@ -147,7 +143,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 	}
 
 	private void loadConfig() {
-		workers.startOrConnect(new ConfigCall(), new ConfigCall.Listener() {
+		Workers.load(new ConfigLoader(), new ConfigLoaderListener() {
 			@Override
 			public void onResult(ConfigResponse config) {
 				RegisterActivity.this.config = config;
@@ -157,7 +153,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 			@Override
 			public void onException(Exception e) {
 			}
-		});
+		}, this);
 	}
 
 	@Override
@@ -189,7 +185,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mWizardModel.unregisterListener(this);
+		if (mWizardModel != null) mWizardModel.unregisterListener(this);
 	}
 
 	@Override
@@ -260,10 +256,50 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 
 		RegisterRequestParams params = new RegisterRequestParams();
 		params.setNewUser(user);
-		UserRegisterCall call = new UserRegisterCall(params);
-		workers.start(call, registerCallListener);
 
-		new RegisteringDialog().show(getSupportFragmentManager(), null);
+		Event event = IntentHelper.getEvent(getIntent());
+		if (event != null) {
+			UserInEvent userInEvent = new UserInEvent();
+			userInEvent.setEventId(event.getId());
+			params.setUserInEvent(userInEvent);
+		}
+
+		Workers.start(new UserRegisterTask(params), this);
+
+		new RegisteringDialog().show(getSupportFragmentManager(), RegisteringDialog.TAG);
+	}
+
+	private static class UserRegisterTask extends
+			ActivityWorker2<RegisterActivity, RegisterResponseData, Exception> {
+
+		private final RegisterRequestParams params;
+
+		public UserRegisterTask(RegisterRequestParams params) {
+			this.params = params;
+		}
+
+		@Override
+		protected void doInBackground() {
+			try {
+				getListenerProxy().onSuccess(new UserRegisterCall(params).call());
+			} catch (ApiCallException e) {
+				getListenerProxy().onException(e);
+			}
+		}
+
+		@Override
+		public void onSuccess(RegisterResponseData result) {
+			Settings.setAuthKey(result.getAuthKey());
+			getActivity().finish();
+		}
+
+		@Override
+		public void onException(Exception e) {
+			Toast.makeText(getActivity(), "Chyba", Toast.LENGTH_SHORT).show();
+			FragmentManager fm = getActivity().getSupportFragmentManager();
+			((DialogFragment) fm.findFragmentByTag(RegisteringDialog.TAG)).dismiss();
+		}
+
 	}
 
 	private class MyPagerAdapter extends FragmentStatePagerAdapter {
@@ -285,9 +321,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 
 		@Override
 		public int getItemPosition(Object object) {
-			// TODO: be smarter about this
 			if (object == mPrimaryItem) {
-				// Re-use the current fragment (its position never changes)
 				return POSITION_UNCHANGED;
 			}
 
@@ -327,6 +361,8 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 	}
 
 	public static class RegisteringDialog extends DialogFragment {
+		private static final String TAG = "registering-dialog";
+
 		@Override
 		public Dialog onCreateDialog(Bundle state) {
 			final ProgressDialog dialog = new ProgressDialog(getActivity());
@@ -337,12 +373,18 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 	}
 
 	public static class IntentHelper {
+		private static final String EXTRA_EVENT = "event";
 		private static final String EXTRA_ORGANIZATION = "organization";
 
-		public static Intent create(Context c, Organization o) {
+		public static Intent create(Context c, Organization o, Event e) {
 			Intent i = new Intent(c, RegisterActivity.class);
 			i.putExtra(EXTRA_ORGANIZATION, o);
+			i.putExtra(EXTRA_EVENT, e);
 			return i;
+		}
+
+		public static Event getEvent(Intent i) {
+			return (Event) i.getSerializableExtra(EXTRA_EVENT);
 		}
 
 		public static Organization getOrganization(Intent i) {

@@ -1,13 +1,19 @@
-### /event/registered ###
+#### /config
+
+#### /event/registered
 * Vždy se vrací seznam pro danou organizaci.
 * Když se navíc posílá authKey, přibude do odpovědi seznam UseInEvent pro daného uživatele a vracené události.
 
-### /config ###
+#### /event/user/list
 
-### /organization/events ###
+#### /event/user/update-position
 
-### /user/filter ###
+#### /event/poi/list
 
-### /user/by-id ###
+#### /event/poi/transition
 
-### /user/register ###
+#### /user/list
+
+#### /user/by-id
+
+#### /user/register

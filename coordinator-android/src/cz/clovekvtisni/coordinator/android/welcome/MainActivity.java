@@ -1,4 +1,4 @@
-package cz.clovekvtisni.coordinator.android.ui;
+package cz.clovekvtisni.coordinator.android.welcome;
 
 import android.os.Bundle;
 import android.view.View;
@@ -11,10 +11,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.crittercism.app.Crittercism;
+import com.fhucho.android.workers.Workers;
 
+import cz.clovekvtisni.coordinator.android.CoordinatorApplication;
 import cz.clovekvtisni.coordinator.android.R;
-import cz.clovekvtisni.coordinator.android.api.ConfigCall;
-import cz.clovekvtisni.coordinator.android.workers.Workers;
+import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoader;
+import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoaderListener;
+import cz.clovekvtisni.coordinator.android.organization.OrganizationActivity;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 
@@ -23,7 +27,6 @@ public class MainActivity extends SherlockFragmentActivity {
 	private final OrganizationAdapter adapter = new OrganizationAdapter();
 
 	private Organization[] organizations;
-	private Workers workers;
 
 	private void initListView() {
 		ListView listView = (ListView) findViewById(R.id.list);
@@ -34,15 +37,6 @@ public class MainActivity extends SherlockFragmentActivity {
 				onOrganizationSelected(adapter.getItem(position));
 			}
 		});
-	}
-
-	private void initOrganizations(Bundle state) {
-		if (state != null && state.containsKey("organizations")) {
-			organizations = (Organization[]) state.getSerializable("organizations");
-		}
-		if (organizations == null) {
-			loadOrganizations();
-		}
 	}
 
 	private void initTryAgainButton() {
@@ -57,7 +51,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	private void loadOrganizations() {
 		setLoadingState(LoadingState.LOADING);
 
-		workers.startOrConnect(new ConfigCall(), new ConfigCall.Listener() {
+		Workers.load(new ConfigLoader(), new ConfigLoaderListener() {
 			@Override
 			public void onResult(ConfigResponse result) {
 				setLoadingState(LoadingState.DONE);
@@ -67,9 +61,10 @@ public class MainActivity extends SherlockFragmentActivity {
 
 			@Override
 			public void onException(Exception e) {
+				e.printStackTrace();
 				setLoadingState(LoadingState.ERROR);
 			}
-		});
+		}, this);
 	}
 
 	@Override
@@ -77,10 +72,8 @@ public class MainActivity extends SherlockFragmentActivity {
 		super.onCreate(state);
 		setContentView(R.layout.activity_main);
 
-		workers = new Workers(this);
-
 		initTryAgainButton();
-		initOrganizations(state);
+		loadOrganizations();
 		initListView();
 	}
 
@@ -94,12 +87,6 @@ public class MainActivity extends SherlockFragmentActivity {
 
 	private void onOrganizationSelected(Organization organization) {
 		startActivity(OrganizationActivity.IntentHelper.create(this, organization));
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putSerializable("organizations", organizations);
 	}
 
 	private class OrganizationAdapter extends BaseAdapter {

@@ -3,11 +3,15 @@
 
     <style name="RootTheme" parent="@style/Theme.Sherlock.Light.DarkActionBar">
         <item name="android:progressBarStyle">@android:style/Widget.ProgressBar.Large</item>
-	</style>
-    
-    <style name="AppTheme" parent="@style/RootTheme">
-	</style>
-    
+    </style>
+
+    <style name="AppTheme" parent="@style/RootTheme"></style>
+
+    <style name="Line">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+    </style>
+
     <style name="RegisterPageContainer">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
@@ -36,5 +40,5 @@
         <item name="android:paddingLeft">12dp</item>
         <item name="android:paddingRight">12dp</item>
     </style>
-	
+
 </resources>

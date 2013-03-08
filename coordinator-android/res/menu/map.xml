@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_my_location"
+        android:icon="@drawable/ic_action_my_location"
+        android:showAsAction="ifRoom"
+        android:title="Moje poloha"/>
+    <item
+        android:id="@+id/menu_add_place"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_add_place"
+        android:title="Přidat místo"/>
+    <item
+        android:id="@+id/menu_filter_places"
+        android:showAsAction="never"
+        android:title="Filtrovat místa"/>
+    <item
+        android:id="@+id/menu_filter_people"
+        android:showAsAction="never"
+        android:title="Filtrovat lidi"/>
+
+</menu>

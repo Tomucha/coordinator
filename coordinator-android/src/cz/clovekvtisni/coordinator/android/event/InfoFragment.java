@@ -14,68 +14,58 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 
-import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.domain.Poi;
 
-public class TasksFragment extends SherlockFragment {
+public class InfoFragment extends SherlockFragment {
+
+	private static final String ARGS_KEY_EVENT_INFO = "eventInfo";
 
 	private EventActivity activity;
-	private List<Poi> pois = new ArrayList<Poi>();
-	private PoisAdapter adapter;
+	private List<Poi> importantPois = new ArrayList<Poi>();
+	private ImportantPoisAdapter adapter;
+
+	public static InfoFragment newInstance(String eventInfo) {
+		InfoFragment f = new InfoFragment();
+
+		Bundle args = new Bundle();
+		args.putString(ARGS_KEY_EVENT_INFO, eventInfo);
+		f.setArguments(args);
+
+		return f;
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		setHasOptionsMenu(true);
-		
 		activity = (EventActivity) getActivity();
-
-		adapter = new PoisAdapter();
+		adapter = new ImportantPoisAdapter();
 		ListView listView = new ListView(getActivity());
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				activity.showPoiOnMap(pois.get(position));
+				activity.showPoiOnMap(importantPois.get(position));
 			}
 		});
 
 		return listView;
 	}
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.tasks, menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_filter_tasks:
-			activity.showPoiFilterDialog();
-			break;
-		}
-		return true;
-	}
-
-	public void setFilteredPois(List<Poi> pois) {
-		this.pois = pois;
+	public void setImportantPois(List<Poi> importantPois) {
+		this.importantPois = importantPois;
 		adapter.notifyDataSetChanged();
 	}
 
-	private class PoisAdapter extends BaseAdapter {
+	private class ImportantPoisAdapter extends BaseAdapter {
 
 		@Override
 		public int getCount() {
-			return pois.size();
+			return importantPois.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return pois.get(position);
+			return importantPois.get(position);
 		}
 
 		@Override
@@ -89,12 +79,12 @@ public class TasksFragment extends SherlockFragment {
 				LayoutInflater inflater = LayoutInflater.from(getActivity());
 				convertView = inflater.inflate(android.R.layout.simple_list_item_2, parent, false);
 			}
-			
-			Poi poi = pois.get(position);
+
+			Poi poi = importantPois.get(position);
 
 			TextView title = (TextView) convertView.findViewById(android.R.id.text1);
 			title.setText(poi.getName());
-			
+
 			TextView desc = (TextView) convertView.findViewById(android.R.id.text2);
 			desc.setText(poi.getDescription());
 

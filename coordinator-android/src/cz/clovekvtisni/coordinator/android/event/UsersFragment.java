@@ -19,13 +19,14 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import cz.clovekvtisni.coordinator.android.R;
-import cz.clovekvtisni.coordinator.domain.Poi;
+import cz.clovekvtisni.coordinator.domain.User;
+import cz.clovekvtisni.coordinator.domain.UserInEvent;
 
-public class TasksFragment extends SherlockFragment {
-
+public class UsersFragment extends SherlockFragment {
 	private EventActivity activity;
-	private List<Poi> pois = new ArrayList<Poi>();
-	private PoisAdapter adapter;
+	private ListView listView;
+	private List<UserInEvent> users = new ArrayList<UserInEvent>();
+	private UserAdapter adapter;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -33,13 +34,13 @@ public class TasksFragment extends SherlockFragment {
 		
 		activity = (EventActivity) getActivity();
 
-		adapter = new PoisAdapter();
-		ListView listView = new ListView(getActivity());
+		adapter = new UserAdapter();
+		listView = new ListView(getActivity());
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				activity.showPoiOnMap(pois.get(position));
+				activity.showUserOnMap(users.get(position));
 			}
 		});
 
@@ -48,34 +49,34 @@ public class TasksFragment extends SherlockFragment {
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.tasks, menu);
+		inflater.inflate(R.menu.users, menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_filter_tasks:
+		case R.id.menu_filter_users:
 			activity.showPoiFilterDialog();
 			break;
 		}
 		return true;
 	}
 
-	public void setFilteredPois(List<Poi> pois) {
-		this.pois = pois;
+	public void setFilteredUsers(List<UserInEvent> users) {
+		this.users = users;
 		adapter.notifyDataSetChanged();
 	}
 
-	private class PoisAdapter extends BaseAdapter {
+	private class UserAdapter extends BaseAdapter {
 
 		@Override
 		public int getCount() {
-			return pois.size();
+			return users.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return pois.get(position);
+			return users.get(position);
 		}
 
 		@Override
@@ -90,13 +91,13 @@ public class TasksFragment extends SherlockFragment {
 				convertView = inflater.inflate(android.R.layout.simple_list_item_2, parent, false);
 			}
 			
-			Poi poi = pois.get(position);
-
+			User user = users.get(position).getUser();
+			
 			TextView title = (TextView) convertView.findViewById(android.R.id.text1);
-			title.setText(poi.getName());
+			title.setText(user.getFullName());
 			
 			TextView desc = (TextView) convertView.findViewById(android.R.id.text2);
-			desc.setText(poi.getDescription());
+			desc.setText(user.getPhone());
 
 			return convertView;
 		}
