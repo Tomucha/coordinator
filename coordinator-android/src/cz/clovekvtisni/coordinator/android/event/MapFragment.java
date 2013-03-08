@@ -47,10 +47,10 @@ import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowTransition;
 
-public class MapFragment extends SherlockFragment implements LocationTool.BestLocationListener {
+public class MapFragment extends SherlockFragment {
 
 	private Bitmap userMarkerBitmap;
-	private LocationTool locationTool;
+	private Location myLocation;
 	private OsmMapView osmMapView;
 	private MyLocationOverlay myLocationOverlay;
 	private View poiInfo;
@@ -71,38 +71,21 @@ public class MapFragment extends SherlockFragment implements LocationTool.BestLo
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		setHasOptionsMenu(true);
-		return inflater.inflate(R.layout.frag_map, container, false);
-	}
+		View view = inflater.inflate(R.layout.frag_map, container, false);
 
-	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
+		setHasOptionsMenu(true);
 
 		userMarkerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_marker_user);
 
 		osmMapView = (OsmMapView) view.findViewById(R.id.map);
 
 		myLocationOverlay = new MyLocationOverlay(getResources());
-		myLocationOverlay.setLatLon(new LatLon(50.083333, 14.416667));
-		myLocationOverlay.setAccuracyMeters(100);
 		osmMapView.getOverlays().add(myLocationOverlay);
+		updateLocationOverlay();
 
-		locationTool = new LocationTool(this, getActivity());
+		initPoiInfo(view);
 
-		initPoiInfo();
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		locationTool.start();
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		locationTool.stop();
+		return view;
 	}
 
 	@Override
@@ -111,8 +94,8 @@ public class MapFragment extends SherlockFragment implements LocationTool.BestLo
 		osmMapView.onDestroy();
 	}
 
-	private void initPoiInfo() {
-		poiInfo = getView().findViewById(R.id.poiInfo);
+	private void initPoiInfo(View view) {
+		poiInfo = view.findViewById(R.id.poiInfo);
 
 		poiInfo.findViewById(R.id.closeInfo).setOnClickListener(new OnClickListener() {
 			@Override
@@ -122,16 +105,9 @@ public class MapFragment extends SherlockFragment implements LocationTool.BestLo
 		});
 	}
 
-	@Override
-	public void onBestLocationUpdated(Location location) {
-		myLocationOverlay.setAccuracyMeters(location.getAccuracy());
-		myLocationOverlay.setLatLon(new LatLon(location.getLatitude(), location.getLongitude()));
-		osmMapView.invalidate();
-	}
-
 	private void goToMyLocation() {
-		Location l = locationTool.getCurrentBestLocation();
-		osmMapView.setCenter(new LatLon(l.getLatitude(), l.getLongitude()));
+		LatLon latLon = new LatLon(myLocation.getLatitude(), myLocation.getLongitude());
+		osmMapView.setCenter(latLon);
 		osmMapView.setZoom(5000);
 	}
 
@@ -200,6 +176,22 @@ public class MapFragment extends SherlockFragment implements LocationTool.BestLo
 			if (user.getLastLocationLatitude() != null) overlays.add(new UserOverlay(user));
 		}
 
+		osmMapView.invalidate();
+	}
+
+	public void setMyLocation(Location myLocation) {
+		this.myLocation = myLocation;
+
+		// If the view has been created
+		if (isVisible()) updateLocationOverlay();
+	}
+
+	private void updateLocationOverlay() {
+		if (myLocation == null) return;
+		myLocationOverlay.setAccuracyMeters(myLocation.getAccuracy());
+		myLocationOverlay
+				.setLatLon(new LatLon(myLocation.getLatitude(), myLocation.getLongitude()));
+		myLocationOverlay.setVisible();
 		osmMapView.invalidate();
 	}
 
@@ -299,6 +291,7 @@ public class MapFragment extends SherlockFragment implements LocationTool.BestLo
 		private static final Paint PAINT_FILL;
 		private static final Paint PAINT_STROKE;
 
+		private boolean visible = false;
 		private double accuracyMeters;
 
 		static {
@@ -317,6 +310,7 @@ public class MapFragment extends SherlockFragment implements LocationTool.BestLo
 
 		@Override
 		public void onDraw(Canvas canvas, int x, int y, double oneMapMeterInPixels) {
+			if (!visible) return;
 			int radius = (int) (oneMapMeterInPixels * accuracyMeters);
 			canvas.drawCircle(x, y, radius, PAINT_FILL);
 			canvas.drawCircle(x, y, radius, PAINT_STROKE);
@@ -324,6 +318,10 @@ public class MapFragment extends SherlockFragment implements LocationTool.BestLo
 
 		public void setAccuracyMeters(double accuracyMeters) {
 			this.accuracyMeters = accuracyMeters;
+		}
+		
+		public void setVisible() {
+			visible = true;
 		}
 	}
 

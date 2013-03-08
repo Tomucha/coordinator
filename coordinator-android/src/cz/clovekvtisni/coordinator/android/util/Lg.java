@@ -7,6 +7,7 @@ public class Lg {
 	public static final Lg API = new Lg(_, "Api");
 	public static final Lg API_CACHE = new Lg(API, "Cache");
 	public static final Lg API_LOADER = new Lg(API, "Loader");
+	public static final Lg LOCATION = new Lg(_, "Location");
 	private static final String INDENT = "    ";
 
 	private final String tag;

@@ -5,25 +5,29 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 
 public class LocationTool implements LocationListener {
-	private final BestLocationListener listener;
-	private final LocationManager locationManager;
-	
-	private Location currentBestLocation;
+	private static final int LOCATION_UPLOAD_MIN_INTERVAL = 60 * 1000; // 1 min
 
-	public LocationTool(BestLocationListener listener, Context context) {
+	private final Listener listener;
+	private final LocationManager locationManager;
+
+	private long lastLocationUploadTime = 0;
+	private Location currentBestLocation = null;
+
+	public LocationTool(Listener listener, Context context) {
 		this.listener = listener;
 		this.locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 	}
-	
+
 	public Location getCurrentBestLocation() {
 		return currentBestLocation;
 	}
 
-	public void start() {
+	public void resume() {
 		currentBestLocation = null;
-		
+
 		Location lastGpsLocation = locationManager
 				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		if (isBetterLocation(lastGpsLocation, currentBestLocation)) {
@@ -36,13 +40,13 @@ public class LocationTool implements LocationListener {
 			currentBestLocation = lastNetworkLocation;
 		}
 
-		if (currentBestLocation != null) listener.onBestLocationUpdated(currentBestLocation);
+		if (currentBestLocation != null) listener.onLocationUpdated(currentBestLocation);
 
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 0, this);
 		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100, 0, this);
 	}
 
-	public void stop() {
+	public void pause() {
 		locationManager.removeUpdates(this);
 	}
 
@@ -50,7 +54,13 @@ public class LocationTool implements LocationListener {
 	public void onLocationChanged(Location location) {
 		if (isBetterLocation(location, currentBestLocation)) {
 			currentBestLocation = location;
-			listener.onBestLocationUpdated(currentBestLocation);
+			listener.onLocationUpdated(currentBestLocation);
+		}
+
+		long time = SystemClock.elapsedRealtime();
+		if (time - lastLocationUploadTime > LOCATION_UPLOAD_MIN_INTERVAL) {
+			lastLocationUploadTime = time;
+			listener.onLocationShouldBeUploaded(currentBestLocation);
 		}
 	}
 
@@ -75,8 +85,10 @@ public class LocationTool implements LocationListener {
 		return isNewer;
 	}
 
-	public static interface BestLocationListener {
-		public void onBestLocationUpdated(Location location);
+	public static interface Listener {
+		public void onLocationUpdated(Location location);
+
+		public void onLocationShouldBeUploaded(Location location);
 	}
 
 }

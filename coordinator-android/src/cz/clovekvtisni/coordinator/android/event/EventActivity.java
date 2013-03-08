@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -29,31 +30,38 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.fhucho.android.workers.Workers;
+import com.fhucho.android.workers.simple.ActivityWorker2;
 import com.google.common.collect.Lists;
 
 import cz.clovekvtisni.coordinator.android.R;
-import cz.clovekvtisni.coordinator.android.api.BitmapLoader;
+import cz.clovekvtisni.coordinator.android.api.ApiCall.ApiCallException;
+import cz.clovekvtisni.coordinator.android.api.ApiCalls.UserUpdatePositionCall;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoaderListener;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventPoiListLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventPoiListLoaderListener;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventUserListLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventUserListLoaderListener;
+import cz.clovekvtisni.coordinator.android.api.BitmapLoader;
+import cz.clovekvtisni.coordinator.android.event.MapFragment.SendingTransitionDialog;
+import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.android.util.SimpleListeners.SimpleTabListener;
 import cz.clovekvtisni.coordinator.api.request.EventPoiListRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventUserListRequestParams;
+import cz.clovekvtisni.coordinator.api.request.UserUpdatePositionRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.api.response.EventPoiFilterResponseData;
 import cz.clovekvtisni.coordinator.api.response.EventUserListResponseData;
+import cz.clovekvtisni.coordinator.api.response.UserUpdatePositionResponseData;
 import cz.clovekvtisni.coordinator.domain.Event;
 import cz.clovekvtisni.coordinator.domain.Poi;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 
-public class EventActivity extends SherlockFragmentActivity implements
-		LocationTool.BestLocationListener {
+public class EventActivity extends SherlockFragmentActivity implements LocationTool.Listener {
 
 	private List<SherlockFragment> fragments;
+	private LocationTool locationTool;
 	private MapFragment mapFragment;
 	private TasksFragment tasksFragment;
 	private UsersFragment usersFragment;
@@ -105,11 +113,6 @@ public class EventActivity extends SherlockFragmentActivity implements
 	}
 
 	@Override
-	public void onBestLocationUpdated(Location location) {
-
-	}
-
-	@Override
 	protected void onCreate(Bundle state) {
 		super.onCreate(state);
 		setContentView(R.layout.activity_event);
@@ -123,8 +126,22 @@ public class EventActivity extends SherlockFragmentActivity implements
 
 		loadUsers();
 		loadPoiCategories();
+
+		locationTool = new LocationTool(this, this);
 	}
-	
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		locationTool.resume();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		locationTool.pause();
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getSupportMenuInflater().inflate(R.menu.event, menu);
@@ -241,6 +258,22 @@ public class EventActivity extends SherlockFragmentActivity implements
 		pager.setCurrentItem(0, true);
 	}
 
+	@Override
+	public void onLocationUpdated(Location location) {
+		Lg.LOCATION.d("Location updated. " + describeLocation(location));
+		mapFragment.setMyLocation(location);
+	}
+
+	@Override
+	public void onLocationShouldBeUploaded(Location location) {
+		Lg.LOCATION.d("Location should be uploaded. " + describeLocation(location));
+		Workers.start(new UploadMyLocationTask(location, getEventId()), this);
+	}
+
+	private String describeLocation(Location location) {
+		return "Accuracy: " + location.getAccuracy() + " m";
+	}
+
 	public class TabsPagerAdapter extends FragmentPagerAdapter {
 		public TabsPagerAdapter(FragmentManager fm) {
 			super(fm);
@@ -255,6 +288,40 @@ public class EventActivity extends SherlockFragmentActivity implements
 		public int getCount() {
 			return fragments.size();
 		}
+	}
+
+	private static class UploadMyLocationTask extends
+			ActivityWorker2<EventActivity, UserUpdatePositionResponseData, Exception> {
+
+		private final long eventId;
+		private final Location location;
+
+		public UploadMyLocationTask(Location location, long eventId) {
+			this.location = location;
+			this.eventId = eventId;
+		}
+
+		@Override
+		protected void doInBackground() {
+			try {
+				UserUpdatePositionRequestParams params = new UserUpdatePositionRequestParams();
+				params.setEventId(eventId);
+				params.setLatitude(location.getLatitude());
+				params.setLongitude(location.getLongitude());
+				getListenerProxy().onSuccess(new UserUpdatePositionCall(params).call());
+			} catch (ApiCallException e) {
+				getListenerProxy().onException(e);
+			}
+		}
+
+		@Override
+		public void onSuccess(UserUpdatePositionResponseData result) {
+		}
+
+		@Override
+		public void onException(Exception e) {
+		}
+
 	}
 
 	public static class PoiFilterDialog extends SherlockDialogFragment {
@@ -318,5 +385,4 @@ public class EventActivity extends SherlockFragmentActivity implements
 			return (Event) i.getSerializableExtra(EXTRA_EVENT);
 		}
 	}
-
 }
