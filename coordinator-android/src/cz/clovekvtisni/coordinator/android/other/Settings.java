@@ -3,6 +3,8 @@ package cz.clovekvtisni.coordinator.android.other;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import cz.clovekvtisni.coordinator.android.CoordinatorApplication;
+
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;

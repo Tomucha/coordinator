@@ -31,7 +31,7 @@ public abstract class ApiCall<RQ extends RequestParams, RP extends ApiResponseDa
 		this.responseClass = responseClass;
 		this.requestBody = createRequestBody();
 	}
-	
+
 	public RP call() throws ApiCallException {
 		try {
 			return doRequest();
@@ -66,9 +66,9 @@ public abstract class ApiCall<RQ extends RequestParams, RP extends ApiResponseDa
 			throw new ApiServerSideException();
 		}
 	}
-	
+
 	protected String getCacheKey() {
-		return Utils.md5(requestBody);
+		return Utils.md5(getClass().getCanonicalName() + requestBody);
 	}
 
 	public RQ getRequestParams() {
@@ -82,7 +82,7 @@ public abstract class ApiCall<RQ extends RequestParams, RP extends ApiResponseDa
 	public boolean isEquivalentTo(ApiCall<?, ?> other) {
 		return getClass().equals(other.getClass()) && requestBody.equals(other.requestBody);
 	}
-	
+
 	private void writeToLog(String request, String response) {
 		Lg.API.d("ApiCall: " + url);
 		Lg.API.dd("Request body:");

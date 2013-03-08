@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".other.CoordinatorApplication"
+        android:name="cz.clovekvtisni.coordinator.android.CoordinatorApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="Člověk v tísni"
@@ -30,9 +30,8 @@
         </activity>
         <activity android:name=".organization.OrganizationActivity" />
         <activity android:name=".event.EventActivity" />
-        <activity
-            android:name=".register.RegisterActivity"
-            android:label="Předregistrace" />
+        <activity android:name=".register.RegisterActivity" />
+        <activity android:name="com.crittercism.NotificationActivity" />
     </application>
 
 </manifest>

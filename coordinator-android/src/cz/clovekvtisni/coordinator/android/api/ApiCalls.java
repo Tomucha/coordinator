@@ -6,12 +6,14 @@ import cz.clovekvtisni.coordinator.api.request.EventPoiListRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventPoiTransitionRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventUserListRequestParams;
 import cz.clovekvtisni.coordinator.api.request.RegisterRequestParams;
+import cz.clovekvtisni.coordinator.api.request.UserUpdatePositionRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.api.response.EventFilterResponseData;
 import cz.clovekvtisni.coordinator.api.response.EventPoiFilterResponseData;
 import cz.clovekvtisni.coordinator.api.response.EventPoiResponseData;
 import cz.clovekvtisni.coordinator.api.response.EventUserListResponseData;
 import cz.clovekvtisni.coordinator.api.response.RegisterResponseData;
+import cz.clovekvtisni.coordinator.api.response.UserUpdatePositionResponseData;
 
 public class ApiCalls {
 
@@ -53,6 +55,13 @@ public class ApiCalls {
 			ApiCall<RegisterRequestParams, RegisterResponseData> {
 		public UserRegisterCall(RegisterRequestParams requestParams) {
 			super("user/register", requestParams, RegisterResponseData.class);
+		}
+	}
+
+	public static class UserUpdatePositionCall extends
+			ApiCall<UserUpdatePositionRequestParams, UserUpdatePositionResponseData> {
+		public UserUpdatePositionCall(UserUpdatePositionRequestParams requestParams) {
+			super("event/user/update-position", requestParams, UserUpdatePositionResponseData.class);
 		}
 	}
 

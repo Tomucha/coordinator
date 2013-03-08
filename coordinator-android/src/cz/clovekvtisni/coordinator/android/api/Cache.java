@@ -10,7 +10,7 @@ import com.google.gson.JsonElement;
 import com.jakewharton.DiskLruCache;
 import com.jakewharton.DiskLruCache.Snapshot;
 
-import cz.clovekvtisni.coordinator.android.other.CoordinatorApplication;
+import cz.clovekvtisni.coordinator.android.CoordinatorApplication;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.android.util.Utils;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
