@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,6 +18,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import cz.clovekvtisni.coordinator.android.R;
+import cz.clovekvtisni.coordinator.android.util.BetterArrayAdapter;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 
@@ -67,39 +67,21 @@ public class UsersFragment extends SherlockFragment {
 		adapter.notifyDataSetChanged();
 	}
 
-	private class UserAdapter extends BaseAdapter {
+	private class UserAdapter extends BetterArrayAdapter<UserInEvent> {
 
-		@Override
-		public int getCount() {
-			return users.size();
+		public UserAdapter() {
+			super(getActivity(), android.R.layout.simple_list_item_2, new ArrayList<UserInEvent>());
 		}
 
 		@Override
-		public Object getItem(int position) {
-			return users.get(position);
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				LayoutInflater inflater = LayoutInflater.from(getActivity());
-				convertView = inflater.inflate(android.R.layout.simple_list_item_2, parent, false);
-			}
+		protected void setUpItem(int position, View item) {
+			User user = getItem(position).getUser();
 			
-			User user = users.get(position).getUser();
-			
-			TextView title = (TextView) convertView.findViewById(android.R.id.text1);
+			TextView title = (TextView) item.findViewById(android.R.id.text1);
 			title.setText(user.getFullName());
 			
-			TextView desc = (TextView) convertView.findViewById(android.R.id.text2);
+			TextView desc = (TextView) item.findViewById(android.R.id.text2);
 			desc.setText(user.getPhone());
-
-			return convertView;
 		}
 
 	}

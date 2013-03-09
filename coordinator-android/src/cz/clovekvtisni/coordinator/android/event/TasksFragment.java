@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,27 +18,27 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import cz.clovekvtisni.coordinator.android.R;
+import cz.clovekvtisni.coordinator.android.util.BetterArrayAdapter;
 import cz.clovekvtisni.coordinator.domain.Poi;
 
 public class TasksFragment extends SherlockFragment {
 
 	private EventActivity activity;
-	private List<Poi> pois = new ArrayList<Poi>();
 	private PoisAdapter adapter;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
-		
+
 		activity = (EventActivity) getActivity();
 
-		adapter = new PoisAdapter();
+		adapter = new PoisAdapter(new ArrayList<Poi>());
 		ListView listView = new ListView(getActivity());
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				activity.showPoiOnMap(pois.get(position));
+				activity.showPoiOnMap(adapter.getItem(position));
 			}
 		});
 
@@ -62,43 +61,25 @@ public class TasksFragment extends SherlockFragment {
 	}
 
 	public void setFilteredPois(List<Poi> pois) {
-		this.pois = pois;
-		adapter.notifyDataSetChanged();
+		adapter.clear();
+		adapter.addAll(pois);
 	}
 
-	private class PoisAdapter extends BaseAdapter {
+	private class PoisAdapter extends BetterArrayAdapter<Poi> {
 
-		@Override
-		public int getCount() {
-			return pois.size();
+		public PoisAdapter(List<Poi> pois) {
+			super(getActivity(), android.R.layout.simple_list_item_2, pois);
 		}
 
 		@Override
-		public Object getItem(int position) {
-			return pois.get(position);
-		}
+		protected void setUpItem(int position, View item) {
+			Poi poi = getItem(position);
 
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				LayoutInflater inflater = LayoutInflater.from(getActivity());
-				convertView = inflater.inflate(android.R.layout.simple_list_item_2, parent, false);
-			}
-			
-			Poi poi = pois.get(position);
-
-			TextView title = (TextView) convertView.findViewById(android.R.id.text1);
+			TextView title = (TextView) item.findViewById(android.R.id.text1);
 			title.setText(poi.getName());
-			
-			TextView desc = (TextView) convertView.findViewById(android.R.id.text2);
-			desc.setText(poi.getDescription());
 
-			return convertView;
+			TextView desc = (TextView) item.findViewById(android.R.id.text2);
+			desc.setText(poi.getDescription());
 		}
 
 	}

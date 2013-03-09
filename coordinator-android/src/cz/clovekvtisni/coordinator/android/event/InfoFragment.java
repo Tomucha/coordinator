@@ -9,12 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
+import cz.clovekvtisni.coordinator.android.util.BetterArrayAdapter;
 import cz.clovekvtisni.coordinator.domain.Poi;
 
 public class InfoFragment extends SherlockFragment {
@@ -22,7 +22,6 @@ public class InfoFragment extends SherlockFragment {
 	private static final String ARGS_KEY_EVENT_INFO = "eventInfo";
 
 	private EventActivity activity;
-	private List<Poi> importantPois = new ArrayList<Poi>();
 	private ImportantPoisAdapter adapter;
 
 	public static InfoFragment newInstance(String eventInfo) {
@@ -44,7 +43,7 @@ public class InfoFragment extends SherlockFragment {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				activity.showPoiOnMap(importantPois.get(position));
+				activity.showPoiOnMap(adapter.getItem(position));
 			}
 		});
 
@@ -52,43 +51,25 @@ public class InfoFragment extends SherlockFragment {
 	}
 
 	public void setImportantPois(List<Poi> importantPois) {
-		this.importantPois = importantPois;
-		adapter.notifyDataSetChanged();
+		adapter.clear();
+		adapter.addAll(importantPois);
 	}
 
-	private class ImportantPoisAdapter extends BaseAdapter {
+	private class ImportantPoisAdapter extends BetterArrayAdapter<Poi> {
 
-		@Override
-		public int getCount() {
-			return importantPois.size();
+		public ImportantPoisAdapter() {
+			super(getActivity(), android.R.layout.simple_list_item_2, new ArrayList<Poi>());
 		}
 
 		@Override
-		public Object getItem(int position) {
-			return importantPois.get(position);
-		}
+		protected void setUpItem(int position, View item) {
+			Poi poi = getItem(position);
 
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				LayoutInflater inflater = LayoutInflater.from(getActivity());
-				convertView = inflater.inflate(android.R.layout.simple_list_item_2, parent, false);
-			}
-
-			Poi poi = importantPois.get(position);
-
-			TextView title = (TextView) convertView.findViewById(android.R.id.text1);
+			TextView title = (TextView) item.findViewById(android.R.id.text1);
 			title.setText(poi.getName());
 
-			TextView desc = (TextView) convertView.findViewById(android.R.id.text2);
+			TextView desc = (TextView) item.findViewById(android.R.id.text2);
 			desc.setText(poi.getDescription());
-
-			return convertView;
 		}
 
 	}
