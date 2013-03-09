@@ -9,8 +9,16 @@
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="cz.clovekvtisni.coordinator.android.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission
+        android:name="cz.clovekvtisni.coordinator.android.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
 
     <application
         android:name="cz.clovekvtisni.coordinator.android.CoordinatorApplication"
@@ -32,6 +40,19 @@
         <activity android:name=".event.EventActivity" />
         <activity android:name=".register.RegisterActivity" />
         <activity android:name="com.crittercism.NotificationActivity" />
+
+        <receiver
+            android:name="com.google.android.gcm.GCMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="cz.clovekvtisni.coordinator.android" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".GCMIntentService" />
     </application>
 
 </manifest>

@@ -11,14 +11,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.crittercism.app.Crittercism;
 import com.fhucho.android.workers.Workers;
+import com.google.android.gcm.GCMRegistrar;
 
-import cz.clovekvtisni.coordinator.android.CoordinatorApplication;
+import cz.clovekvtisni.coordinator.SecretInfo;
+import cz.clovekvtisni.coordinator.android.DeployEnvironment;
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoaderListener;
 import cz.clovekvtisni.coordinator.android.organization.OrganizationActivity;
+import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 
@@ -27,6 +29,18 @@ public class MainActivity extends SherlockFragmentActivity {
 	private final OrganizationAdapter adapter = new OrganizationAdapter();
 
 	private Organization[] organizations;
+
+	private void initGCM() {
+		GCMRegistrar.checkDevice(this);
+		GCMRegistrar.checkManifest(this);
+		String regId = GCMRegistrar.getRegistrationId(this);
+		if (regId.equals("")) {
+			Lg.GCM.d("Going to register.");
+			GCMRegistrar.register(this, SecretInfo.GCM_SENDER_ID);
+		} else {
+			Lg.GCM.d("Already registered.");
+		}
+	}
 
 	private void initListView() {
 		ListView listView = (ListView) findViewById(R.id.list);
@@ -75,6 +89,7 @@ public class MainActivity extends SherlockFragmentActivity {
 		initTryAgainButton();
 		loadOrganizations();
 		initListView();
+		initGCM();
 	}
 
 	private void setLoadingState(LoadingState state) {

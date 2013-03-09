@@ -3,11 +3,12 @@ package cz.clovekvtisni.coordinator.android.util;
 import android.util.Log;
 
 public class Lg {
-	public static final Lg _ = new Lg("Coordinator");
-	public static final Lg API = new Lg(_, "Api");
+	public static final Lg APP = new Lg("Coordinator");
+	public static final Lg API = new Lg(APP, "Api");
 	public static final Lg API_CACHE = new Lg(API, "Cache");
 	public static final Lg API_LOADER = new Lg(API, "Loader");
-	public static final Lg LOCATION = new Lg(_, "Location");
+	public static final Lg GCM = new Lg(APP, "GCM");
+	public static final Lg LOCATION = new Lg(APP, "Location");
 	private static final String INDENT = "    ";
 
 	private final String tag;
@@ -34,6 +35,10 @@ public class Lg {
 
 	public void i(String msg) {
 		Log.i(tag, msg);
+	}
+	
+	public void w(String msg) {
+		Log.w(tag, msg);
 	}
 
 	public void w(String msg, Throwable tr) {
