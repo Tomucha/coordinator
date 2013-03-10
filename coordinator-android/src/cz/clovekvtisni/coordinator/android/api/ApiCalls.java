@@ -6,8 +6,10 @@ import cz.clovekvtisni.coordinator.api.request.EventPoiListRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventPoiTransitionRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventUserListRequestParams;
 import cz.clovekvtisni.coordinator.api.request.RegisterRequestParams;
+import cz.clovekvtisni.coordinator.api.request.UserPushTokenRequestParams;
 import cz.clovekvtisni.coordinator.api.request.UserUpdatePositionRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
+import cz.clovekvtisni.coordinator.api.response.EmptyResponseData;
 import cz.clovekvtisni.coordinator.api.response.EventFilterResponseData;
 import cz.clovekvtisni.coordinator.api.response.EventPoiFilterResponseData;
 import cz.clovekvtisni.coordinator.api.response.EventPoiResponseData;
@@ -62,6 +64,13 @@ public class ApiCalls {
 			ApiCall<UserUpdatePositionRequestParams, UserUpdatePositionResponseData> {
 		public UserUpdatePositionCall(UserUpdatePositionRequestParams requestParams) {
 			super("event/user/update-position", requestParams, UserUpdatePositionResponseData.class);
+		}
+	}
+
+	public static class UserPushTokenCall extends
+			ApiCall<UserPushTokenRequestParams, EmptyResponseData> {
+		public UserPushTokenCall(UserPushTokenRequestParams requestParams) {
+			super("event/user/register-push-token-android", requestParams, EmptyResponseData.class);
 		}
 	}
 

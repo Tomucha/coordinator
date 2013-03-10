@@ -6,6 +6,8 @@
 
 #### /event/user/list
 
+#### /event/user/register-push-token-android
+
 #### /event/user/update-position
 
 #### /event/poi/list
