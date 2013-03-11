@@ -40,6 +40,9 @@ public class Organization extends AbstractStaticEntity {
     @Attribute(name = "pre_registration_skill", required = false, empty = "")
     private String[] preRegistrationSkills;
 
+    @Attribute
+    private String icon;
+
     public String getId() {
         return id;
     }
@@ -74,6 +77,10 @@ public class Organization extends AbstractStaticEntity {
 
     public String[] getPreRegistrationSkills() {
         return preRegistrationSkills;
+    }
+
+    public String getIcon() {
+        return icon;
     }
 
     @Override
