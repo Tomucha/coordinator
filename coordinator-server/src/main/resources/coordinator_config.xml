@@ -54,7 +54,7 @@
                     Odmítnout
                 </transition>
                 <transition id="wkfl_zdrv_state1_trans3" name="Předat" to_state_id="wkfl_zdrv_state2"
-                            allowed_for_role="ZDRAVOTNIK, BACKEND" forces_single_assignee="true">
+                            allowed_for_role="ZDRAVOTNIK, BACKEND">
                     Předat dál
                 </transition>
                 <transition id="wkfl_zdrv_state1_trans4" name="Dokončit" to_state_id="wkfl_zdrv_state3"
