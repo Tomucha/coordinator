@@ -8,10 +8,7 @@ import com.googlecode.objectify.cmd.Query;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowTransition;
-import cz.clovekvtisni.coordinator.server.domain.ActivityEntity;
-import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
-import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
+import cz.clovekvtisni.coordinator.server.domain.*;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.ActivityService;
@@ -213,6 +210,50 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     }
 
     @Override
+    public PoiEntity assignUserExclusive(final PoiEntity poi, final Long userId) {
+        return ofy().transact(new Work<PoiEntity>() {
+            @Override
+            public PoiEntity run() {
+                PoiEntity old = ofy().get(poi.getKey());
+                UserInEventEntity user = ofy().get(UserInEventEntity.createKey(userId, old.getEventId()));
+                if (user == null) throw new IllegalStateException("No such user in event: "+userId);
+                Set<Long> oldUserIdList = old.getUserIdList();
+                HashSet<Long> newUserIdList = new HashSet<Long>(1);
+                newUserIdList.add(user.getUserId());
+                old.setUserIdList(newUserIdList);
+                updateSystemFields(old, old);
+                ofy().put(old);
+
+                ActivityEntity a = new ActivityEntity();
+                a.setUserId(userId);
+                a.setType(ActivityEntity.ActivityType.ASSIGNED);
+                a.setPoiId(poi.getId());
+                a.setEventId(poi.getEventId());
+                activityService.log(a);
+
+                UserInEventEntity u = userInEventService.findById(poi.getEventId(), userId, 0);
+                u.setLastPoiDate(new Date());
+                u.setLastPoiId(poi.getId());
+                ofy().put(u);
+
+                // remove all other assigned users
+                oldUserIdList.remove(userId);
+                for (Long unassignedUserId : oldUserIdList) {
+                    ActivityEntity ua = new ActivityEntity();
+                    ua.setUserId(unassignedUserId);
+                    ua.setType(ActivityEntity.ActivityType.UNASSIGNED);
+                    ua.setPoiId(poi.getId());
+                    ua.setEventId(poi.getEventId());
+                    activityService.log(a);
+                }
+
+                return old;
+            }
+        });
+
+    }
+
+    @Override
     public void deletePoi(PoiEntity entity, long flags) {
         entity.setDeletedDate(new Date());
         updatePoi(entity);
@@ -235,7 +276,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     }
 
     @Override
-    public PoiEntity transitWorkflowState(PoiEntity entity, String transitionId) {
+    public PoiEntity transitWorkflowState(PoiEntity entity, String transitionId, long flags) {
         if (entity == null || transitionId == null)
             return entity;
         if (entity.getWorkflowStateId() == null || entity.getWorkflowState().getTransitions() == null)
@@ -245,7 +286,13 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
             throw new IllegalArgumentException("no transition=" + transitionId + " in workflow state=" + entity.getWorkflowStateId());
         entity.setWorkflowState(null);
         entity.setWorkflowStateId(transition.getToStateId());
-        return updatePoi(entity);
+
+        if (transition.isForcesSingleAssignee() && (FLAG_DISABLE_FORCE_SINGLE_ASSIGN & flags) == 0) {
+            UserEntity loggedUser = appContext.getLoggedUser();
+            return assignUserExclusive(entity, loggedUser.getId());
+
+        } else
+            return updatePoi(entity);
     }
 
 }

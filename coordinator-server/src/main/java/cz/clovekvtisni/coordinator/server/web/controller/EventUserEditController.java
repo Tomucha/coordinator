@@ -89,6 +89,7 @@ public class EventUserEditController extends AbstractEventController {
             inEventFilter.setOrganizationIdVal(getLoggedUser().getOrganizationId());
             inEventFilter.setEventIdVal(params.getEventId());
             OrganizationInEventEntity inEventEntity = organizationInEventService.findByFilter(inEventFilter, 0, null, 0l).singleResult();
+            // TODO odtud lita null pointer, nezdarilo se najit entitu
 
             Map<String,Equipment> equipmentMap = config.getEquipmentMap();
             List<Equipment> equipmentList = new ArrayList<Equipment>(config.getEquipmentList().size());

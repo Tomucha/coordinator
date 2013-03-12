@@ -51,7 +51,7 @@ public class EventPoiApiController extends AbstractApiController {
         EventPoiTransitionRequestParams params = parseRequest(request, EventPoiTransitionRequestParams.class);
 
         PoiEntity poi = poiService.findById(params.getPoiId(), 0);
-        poi = poiService.transitWorkflowState(poi, params.getTransitionId());
+        poi = poiService.transitWorkflowState(poi, params.getTransitionId(), 0l);
 
         return okResult(new EventPoiResponseData(poi.buildTargetEntity()));
     }

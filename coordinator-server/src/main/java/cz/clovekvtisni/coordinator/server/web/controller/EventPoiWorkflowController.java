@@ -60,7 +60,7 @@ public class EventPoiWorkflowController extends AbstractEventController {
             }
         }
 
-        poiService.transitWorkflowState(poi, transitionId);
+        poiService.transitWorkflowState(poi, transitionId, PoiService.FLAG_DISABLE_FORCE_SINGLE_ASSIGN);
         return "redirect:/admin/event/poi/list?eventId=" + eventId;
 
     }
