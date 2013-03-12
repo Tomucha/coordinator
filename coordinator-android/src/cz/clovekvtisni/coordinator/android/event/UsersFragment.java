@@ -25,13 +25,12 @@ import cz.clovekvtisni.coordinator.domain.UserInEvent;
 public class UsersFragment extends SherlockFragment {
 	private EventActivity activity;
 	private ListView listView;
-	private List<UserInEvent> users = new ArrayList<UserInEvent>();
 	private UserAdapter adapter;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
-		
+
 		activity = (EventActivity) getActivity();
 
 		adapter = new UserAdapter();
@@ -40,7 +39,7 @@ public class UsersFragment extends SherlockFragment {
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				activity.showUserOnMap(users.get(position));
+				onUserClick(adapter.getItem(position));
 			}
 		});
 
@@ -50,6 +49,12 @@ public class UsersFragment extends SherlockFragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.users, menu);
+	}
+	
+	private void onUserClick(UserInEvent userInEvent) {
+		if (userInEvent.getLastLocationLatitude() != null) {
+			activity.showUserOnMap(userInEvent);
+		}
 	}
 
 	@Override
@@ -63,8 +68,8 @@ public class UsersFragment extends SherlockFragment {
 	}
 
 	public void setFilteredUsers(List<UserInEvent> users) {
-		this.users = users;
-		adapter.notifyDataSetChanged();
+		adapter.clear();
+		adapter.addAll(users);
 	}
 
 	private class UserAdapter extends BetterArrayAdapter<UserInEvent> {
@@ -76,10 +81,10 @@ public class UsersFragment extends SherlockFragment {
 		@Override
 		protected void setUpItem(int position, View item) {
 			User user = getItem(position).getUser();
-			
+
 			TextView title = (TextView) item.findViewById(android.R.id.text1);
 			title.setText(user.getFullName());
-			
+
 			TextView desc = (TextView) item.findViewById(android.R.id.text2);
 			desc.setText(user.getPhone());
 		}
