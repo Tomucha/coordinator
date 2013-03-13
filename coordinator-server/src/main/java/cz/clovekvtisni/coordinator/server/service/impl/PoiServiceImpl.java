@@ -300,13 +300,13 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
             throw new IllegalArgumentException("no transition=" + transitionId + " in workflow state=" + entity.getWorkflowStateId());
         entity.setWorkflowState(null);
         entity.setWorkflowStateId(transition.getToStateId());
+        updatePoi(entity);
 
         if (transition.isForcesSingleAssignee() && (FLAG_DISABLE_FORCE_SINGLE_ASSIGN & flags) == 0) {
             UserEntity loggedUser = appContext.getLoggedUser();
-            return assignUserExclusive(entity, loggedUser.getId());
+            assignUserExclusive(entity, loggedUser.getId());
+        }
 
-        } else
-            return updatePoi(entity);
     }
 
 }
