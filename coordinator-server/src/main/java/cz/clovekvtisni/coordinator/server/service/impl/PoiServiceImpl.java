@@ -3,8 +3,10 @@ package cz.clovekvtisni.coordinator.server.service.impl;
 import com.beoui.geocell.GeocellManager;
 import com.beoui.geocell.model.BoundingBox;
 import com.googlecode.objectify.Key;
+import com.google.android.gcm.server.*;
 import com.googlecode.objectify.Work;
 import com.googlecode.objectify.cmd.Query;
+import cz.clovekvtisni.coordinator.domain.NotificationType;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowTransition;
@@ -12,6 +14,7 @@ import cz.clovekvtisni.coordinator.server.domain.*;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.ActivityService;
+import cz.clovekvtisni.coordinator.server.service.NotificationService;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
@@ -39,6 +42,9 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
     @Autowired
     private UserInEventService userInEventService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public PoiEntity findById(Long id, long flags) {
@@ -158,7 +164,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
     @Override
     public PoiEntity assignUser(final PoiEntity poi, final Long userId) {
-        return ofy().transact(new Work<PoiEntity>() {
+        PoiEntity updatedPoi = ofy().transact(new Work<PoiEntity>() {
             @Override
             public PoiEntity run() {
                 PoiEntity old = ofy().get(poi.getKey());
@@ -183,11 +189,15 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 return old;
             }
         });
+
+        notificationService.sendPoiNotification(NotificationType.ASSIGN, updatedPoi, userId);
+
+        return updatedPoi;
     }
 
     @Override
     public PoiEntity unassignUser(final PoiEntity poi, final Long userId) {
-        return ofy().transact(new Work<PoiEntity>() {
+        PoiEntity updatedPoi = ofy().transact(new Work<PoiEntity>() {
             @Override
             public PoiEntity run() {
                 PoiEntity old = ofy().get(poi.getKey());
@@ -207,6 +217,10 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 return old;
             }
         });
+
+        notificationService.sendPoiNotification(NotificationType.UNASSIGN, updatedPoi, userId);
+
+        return updatedPoi;
     }
 
     @Override
