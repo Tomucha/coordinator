@@ -11,21 +11,39 @@ import android.preference.PreferenceManager;
 
 public class Settings {
 	private static final String KEY_AUTH_KEY = "authKey";
-	
+	private static final String KEY_GCM_REGISTRATION_ID = "gcmRegId";
+
 	private static SharedPreferences getPrefs() {
-		return PreferenceManager.getDefaultSharedPreferences(CoordinatorApplication.getAppContext());
+		return PreferenceManager
+				.getDefaultSharedPreferences(CoordinatorApplication.getAppContext());
 	}
-	
+
 	public static String getAuthKey() {
-		return getPrefs().getString(KEY_AUTH_KEY, null);
+		return getString(KEY_AUTH_KEY);
 	}
-	
+
 	public static void setAuthKey(String authKey) {
+		setString(KEY_AUTH_KEY, authKey);
+	}
+
+	public static String getGcmRegistrationId() {
+		return getString(KEY_GCM_REGISTRATION_ID);
+	}
+
+	public static void setGcmRegistrationId(String regId) {
+		setString(KEY_GCM_REGISTRATION_ID, regId);
+	}
+
+	private static String getString(String key) {
+		return getPrefs().getString(key, null);
+	}
+
+	private static void setString(String key, String value) {
 		Editor editor = getPrefs().edit();
-		editor.putString(KEY_AUTH_KEY, authKey);
+		editor.putString(key, value);
 		SharedPrefsCompat.apply(editor);
 	}
-	
+
 	private static class SharedPrefsCompat {
 		private static Method applyMethod;
 

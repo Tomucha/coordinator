@@ -25,7 +25,9 @@ import com.fhucho.android.workers.simple.ActivityWorker2;
 
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiCall.ApiCallException;
+import cz.clovekvtisni.coordinator.android.api.ApiCalls.UserPushTokenCall;
 import cz.clovekvtisni.coordinator.android.api.ApiCalls.UserRegisterCall;
+import cz.clovekvtisni.coordinator.android.api.ApiCalls.UserUpdatePositionCall;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoaderListener;
 import cz.clovekvtisni.coordinator.android.other.Settings;
@@ -34,7 +36,10 @@ import cz.clovekvtisni.coordinator.android.register.wizard.model.Page;
 import cz.clovekvtisni.coordinator.android.register.wizard.model.WizardModel;
 import cz.clovekvtisni.coordinator.android.register.wizard.ui.PageFragmentCallbacks;
 import cz.clovekvtisni.coordinator.android.register.wizard.ui.ReviewFragment;
+import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.api.request.RegisterRequestParams;
+import cz.clovekvtisni.coordinator.api.request.UserPushTokenRequestParams;
+import cz.clovekvtisni.coordinator.api.request.UserUpdatePositionRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.api.response.RegisterResponseData;
 import cz.clovekvtisni.coordinator.domain.Event;
@@ -281,7 +286,18 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 		@Override
 		protected void doInBackground() {
 			try {
-				getListenerProxy().onSuccess(new UserRegisterCall(params).call());
+				RegisterResponseData result = new UserRegisterCall(params).call();
+				
+				try {
+					String regId = Settings.getGcmRegistrationId();
+					UserPushTokenRequestParams params = new UserPushTokenRequestParams(regId);
+					new UserPushTokenCall(params).call();
+					Lg.GCM.d("Successfully uploaded registration id to the server.");
+				} catch (ApiCallException e) {
+					Lg.GCM.w("Uploading registration id to the server unsuccessful.", e);
+				}
+				
+				getListenerProxy().onSuccess(result);
 			} catch (ApiCallException e) {
 				getListenerProxy().onException(e);
 			}
@@ -289,7 +305,6 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 
 		@Override
 		public void onSuccess(RegisterResponseData result) {
-			Settings.setAuthKey(result.getAuthKey());
 			getActivity().finish();
 		}
 
