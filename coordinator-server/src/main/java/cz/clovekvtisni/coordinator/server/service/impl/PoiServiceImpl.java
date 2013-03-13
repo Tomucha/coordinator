@@ -304,9 +304,9 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
         if (transition.isForcesSingleAssignee() && (FLAG_DISABLE_FORCE_SINGLE_ASSIGN & flags) == 0) {
             UserEntity loggedUser = appContext.getLoggedUser();
-            assignUserExclusive(entity, loggedUser.getId());
+            entity = assignUserExclusive(entity, loggedUser.getId());
         }
 
+        return entity;
     }
-
 }
