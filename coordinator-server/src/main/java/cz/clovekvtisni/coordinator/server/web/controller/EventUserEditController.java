@@ -89,16 +89,18 @@ public class EventUserEditController extends AbstractEventController {
 
             Map<String,Equipment> equipmentMap = config.getEquipmentMap();
             List<Equipment> equipmentList = new ArrayList<Equipment>(config.getEquipmentList().size());
-            for (String equipmentId : inEventEntity.getRegistrationEquipment())
-                if (equipmentMap.containsKey(equipmentId))
-                    equipmentList.add(equipmentMap.get(equipmentId));
+            if (inEventEntity.getRegistrationEquipment() != null)
+                for (String equipmentId : inEventEntity.getRegistrationEquipment())
+                    if (equipmentMap.containsKey(equipmentId))
+                        equipmentList.add(equipmentMap.get(equipmentId));
             model.addAttribute("equipmentList", equipmentList);
 
             Map<String, Skill> skillMap = config.getSkillMap();
             List<Skill> skillList = new ArrayList<Skill>(config.getSkillList().size());
-            for (String skillId : inEventEntity.getRegistrationSkills())
-                if (skillMap.containsKey(skillId))
-                    skillList.add(skillMap.get(skillId));
+            if (inEventEntity.getRegistrationSkills() != null)
+                for (String skillId : inEventEntity.getRegistrationSkills())
+                    if (skillMap.containsKey(skillId))
+                        skillList.add(skillMap.get(skillId));
             model.addAttribute("skillList", skillList);
 
         } else {

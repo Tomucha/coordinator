@@ -49,3 +49,6 @@ div.dropdown-menu {
 .olPopupContent * {
     font-size: 11px;
 }
+.panel {
+    margin-bottom: 5ex;
+}
