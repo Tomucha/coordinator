@@ -40,7 +40,7 @@
             <state id="wkfl_zdrv_state1" name="Nový zdravotnický úkol" visible_for_role="COORDINATOR, ZDRAVOTNIK"
                    editable_for_role="COORDINATOR, ZDRAVOTNIK" type="STARTED">
                 <description>Nový zdravotnický úkol</description>
-                <transition id="wkfl_zdrv_state1_trans1" name="Přidělit" to_state_id="wkfl_zdrv_state2"
+                <transition id="wkfl_zdrv_state1_trans1" name="Přidělit" forces_single_assignee="true" to_state_id="wkfl_zdrv_state2"
                             allowed_for_role="COORDINATOR, ZDRAVOTNIK">
                     Přidělit
                 </transition>

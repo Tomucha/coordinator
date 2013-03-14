@@ -55,5 +55,4 @@ public class EventPoiApiController extends AbstractApiController {
 
         return okResult(new EventPoiResponseData(poi.buildTargetEntity()));
     }
-
 }
