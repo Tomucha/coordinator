@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
 import cz.clovekvtisni.coordinator.exception.MaException;
+import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
@@ -31,8 +32,8 @@ import java.util.List;
  * Date: 20.11.12
  */
 @Controller
-@RequestMapping("/admin/event/detail")
-public class EventDetailController extends AbstractEventController {
+@RequestMapping("/admin/event-register")
+public class EventRegisterController extends AbstractEventController {
 
     @Autowired
     private EventService eventService;
@@ -41,37 +42,40 @@ public class EventDetailController extends AbstractEventController {
     private OrganizationInEventService organizationInEventService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String getForm(@ModelAttribute("params") EventFilterParams params, Model model) {
-
+    public String getForm(
+        @ModelAttribute("params") EventFilterParams params,
+        Model model)
+    {
+        if (params.getEventId() == null)
+            throw NotFoundException.idNotExist("eventEntity", params.getEventId()); // TODO do filtru s tim, nebo nekam
         UserEntity user = getLoggedUser();
 
-        if (params.getEventId() != null) {
-            OrganizationInEventEntity registration = organizationInEventService.findEventInOrganization(params.getEventId(), user.getOrganizationId(), OrganizationInEventService.FLAG_FETCH_EVENT);
-            if (registration == null) {
-                // organization doesn't have a OrganizationInEventEntity yet
-                registration = new OrganizationInEventEntity();
-                registration.setEventEntity(appContext.getActiveEvent());
-                registration.setEventId(params.getEventId());
-                registration.setOrganizationId(user.getOrganizationId());
-            }
-            model.addAttribute("form", new OrganizationInEventForm().populateFrom(registration));
+        OrganizationInEventEntity registration = organizationInEventService.findEventInOrganization(params.getEventId(), user.getOrganizationId(), OrganizationInEventService.FLAG_FETCH_EVENT);
+        if (registration != null)
+            return "redirect: " + params.getRetUrl();
 
-            // FIXME: refaktorng
 
-            //populateEventModel(model, new EventFilterParams(registration.getEventEntity()));
-            //model.addAttribute("event", registration.getEventEntity());
-
-        } else {
-            throw new IllegalStateException("Null eventId");
-        }
+        // organization doesn't have a OrganizationInEventEntity yet
+        registration = new OrganizationInEventEntity();
+        registration.setEventEntity(appContext.getActiveEvent());
+        registration.setEventId(params.getEventId());
+        registration.setOrganizationId(user.getOrganizationId());
+        OrganizationInEventForm form = new OrganizationInEventForm();
+        form.populateFrom(registration);
+        model.addAttribute("form", form);
+        if (params.getRetUrl() == null)
+            form.setRetUrl("/admin/event/map?eventId=" + params.getEventId());
 
         populateModel(model);
 
-        return "admin/event-detail";
+        return "admin/event-register";
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid OrganizationInEventForm form, BindingResult bindingResult, Model model) {
+        if (form.getRetUrl() == null)
+            form.setRetUrl("/admin/event/map?eventId=" + form.getEventId());
+
         if (bindingResult.hasErrors()) {
 
             //
@@ -95,7 +99,7 @@ public class EventDetailController extends AbstractEventController {
             return "admin/event-detail";
         }
 
-        return "redirect:/admin/event/map?eventId="+form.getEventId();
+        return "redirect: " + form.getRetUrl();
     }
 
     protected void populateModel(Model model) {

@@ -19,6 +19,8 @@ public interface PoiService extends Service {
 
     public static final int LAST_POI_LIST_LENGTH = 30;
 
+    public static final long FLAG_DISABLE_FORCE_SINGLE_ASSIGN = 1l;
+
     @FilterResult("#helper.canRead(#entity)")
     PoiEntity findById(Long id, long flags);
 
@@ -45,10 +47,13 @@ public interface PoiService extends Service {
 
     // FIXME: prava, ted jsou jen pro Backend ale musi to jit posunovat i z mobilu, kdyz to na me je assignovane
     //@CheckPermission("#helper.canUpdate(#p0)")
-    PoiEntity transitWorkflowState(PoiEntity entity, String transitionId);
+    PoiEntity transitWorkflowState(PoiEntity entity, String transitionId, long flags);
 
     @CheckPermission("#helper.canUpdate(#p0)")
     PoiEntity assignUser(PoiEntity poi, Long userId);
+
+    @CheckPermission("#helper.canUpdate(#p0)")
+    PoiEntity assignUserExclusive(PoiEntity poi, Long userId);
 
     @CheckPermission("#helper.canUpdate(#p0)")
     PoiEntity unassignUser(PoiEntity poi, Long userInEventId);

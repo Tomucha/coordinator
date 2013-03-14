@@ -34,5 +34,5 @@
 </c:if>
 
 <div class="btn-group">
-    <a class="btn" href="<s:url value="${root}/admin/event/poi/edit?eventId=${poi.eventId}&poiId=${poi.id}"/>"><s:message code="button.edit"/></a>
+    <a class="btn btn-small" onclick="$(this).parents('#mapPopupContainer').load('<s:url value='${root}/admin/event/map/popup/poi?edit=true&eventId=${poi.eventId}&poiId=${poi.id}'/>');return false"><i class="icon-pencil"></i> <s:message code="button.edit"/></a>
 </div>

@@ -8,10 +8,8 @@
 <script type="text/javascript">
 
     var eventId = ${event.id};
-    function init() {
-        CoordinatorMap.clickHandlers[TYPE_LOCATION] = function(event) {
-            return "#locationPopup";
-        };
+    function initialize() {
+        CoordinatorMap.setOnClickAddPoint(TYPE_POI, "${root}/admin/event/map/popup/poi?eventId=${event.id}");
         refreshMarkers();
     }
 
@@ -82,23 +80,12 @@
             height="500px"
             latitude="${event.firstEventLocation.latitude}"
             longitude="${event.firstEventLocation.longitude}"
-            onLoad="init()"
+            onLoad="initialize()"
             onMapChange="refreshMarkers()"
             />
     <form>
         <label class="checkbox"><input type="checkbox" id="showusers" onchange="refreshMarkers()" checked="checked"/> <s:message code="label.showUsers"/></label>
         <label class="checkbox"><input type="checkbox" id="showpois" onchange="refreshMarkers()" checked="checked"/> <s:message code="label.showPois"/></label>
     </form>
-    </div>
-</div>
-
-<div id="locationPopup" style="display: none;">
-    <p><b><s:message code="label.eventLocation"/></b></p>
-    <input type="hidden" name="id"/>
-    <div>
-        Radius:<br/>
-        <input name="radius" size="2" readonly="readonly"/> km</div>
-    <div>
-        <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
     </div>
 </div>

@@ -5,6 +5,7 @@ import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserEquipment;
 import cz.clovekvtisni.coordinator.domain.UserSkill;
+import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.Email;
@@ -305,6 +306,10 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     public void setPushTokensAndroid(Set<String> pushTokensAndroid) {
         this.pushTokensAndroid = pushTokensAndroid;
+    }
+
+    public boolean isSuperadmin() {
+        return roleIdList != null && Arrays.asList(roleIdList).contains(AuthorizationTool.SUPERADMIN);
     }
 
     @Override

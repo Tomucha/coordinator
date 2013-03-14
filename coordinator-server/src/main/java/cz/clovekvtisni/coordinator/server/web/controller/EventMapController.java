@@ -3,6 +3,7 @@ package cz.clovekvtisni.coordinator.server.web.controller;
 import com.google.appengine.api.urlfetch.HTTPResponse;
 import com.google.appengine.api.urlfetch.URLFetchService;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
+import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
@@ -14,19 +15,18 @@ import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.util.Location;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
+import cz.clovekvtisni.coordinator.server.web.model.PoiForm;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
@@ -116,7 +116,7 @@ public class EventMapController extends AbstractEventController {
             @RequestParam(required = true) double lonW
     ) {
         List<UserInEventEntity> byEventAndBox = userInEventService.findByEventAndBox(eventId, latN, lonE, latS, lonW, UserInEventService.FLAG_FETCH_USER);
-        log.info("Users: "+byEventAndBox);
+        logger.info("Users: "+byEventAndBox);
 
         return byEventAndBox;
     }
@@ -126,16 +126,70 @@ public class EventMapController extends AbstractEventController {
     public String popupPoi(
             @RequestParam(value = "eventId", required = false) Long eventId,
             @RequestParam(value = "poiId", required = false) Long poiId,
+            @RequestParam(value = "latitude", required = false) Double latitude,
+            @RequestParam(value = "longitude", required = false) Double longitude,
+            @RequestParam(value = "edit", required = false) Boolean edit,
             Model model) {
 
-        PoiEntity e = poiService.findById(poiId, 0);
+        if (poiId == null) {
+            PoiForm form = new PoiForm();
+            form.setEventId(eventId);
+            form.setOrganizationId(getLoggedUser().getOrganizationId());
+            form.setLatitude(latitude);
+            form.setLongitude(longitude);
+            model.addAttribute("poiForm", form);
+
+            return "ajax/poi-popup-new";
+
+        } else if (edit != null && edit) {
+            PoiEntity poi = poiService.findById(poiId, 0);
+            PoiForm form = new PoiForm();
+            form.populateFrom(poi);
+            model.addAttribute("poiForm", form);
+
+            return "ajax/poi-popup-new";
+
+        } else {
+            return showPopupPoiForm(poiService.findById(poiId, 0), model);
+        }
+    }
+
+    private String showPopupPoiForm(PoiEntity e, Model model) {
         model.addAttribute("poi", e);
 
         Set<Long> userIds = e.getUserIdList();
         List<UserInEventEntity> assignedUsers = userInEventService.findByIds(e.getEventId(), userIds, UserInEventService.FLAG_FETCH_USER);
         model.addAttribute("assignedUsers", assignedUsers);
-
         return "ajax/poi-popup";
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/ajax/poi-update")
+    public String ajaxPoiUpdate(@ModelAttribute("poiForm") @Valid PoiForm form, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+
+            // FIXME: refaktoring
+
+            // populateEventModel(model, new EventFilterParams(form.getEventKey()));
+            return "ajax/poi-popup-new";
+        }
+
+        PoiEntity poiEntity = new PoiEntity().populateFrom(form);
+
+        try {
+            if (poiEntity.isNew())
+                poiEntity = poiService.createPoi(poiEntity);
+            else
+                poiEntity = poiService.updatePoi(poiEntity);
+
+            return showPopupPoiForm(poiEntity, model);
+
+        } catch (MaPermissionDeniedException e) {
+            addFormError(bindingResult, e);
+
+            // FIXME: refaktoring
+            // populateEventModel(model, new EventFilterParams(form.getEventKey()));
+            return "admin/event-poi-edit";
+        }
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/popup/user")

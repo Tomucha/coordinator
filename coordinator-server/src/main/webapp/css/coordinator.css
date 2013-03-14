@@ -37,3 +37,18 @@ div.dropdown-menu {
 .light a {
     color: #888;
 }
+.olPopup {
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.7);
+}
+.olPopupContent {
+    background-color: transparent !important;
+}
+.olPopupContent * {
+    font-size: 11px;
+}
+.panel {
+    margin-bottom: 5ex;
+}

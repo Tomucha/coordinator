@@ -29,7 +29,7 @@ import java.util.Set;
  */
 public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory> {
 
-    // objectify is not thread-safe
+    // objectify is not thread-safe, so what
     private static boolean inTransaction;
 
     protected Logger logger = LoggerFactory.getLogger(getClass());

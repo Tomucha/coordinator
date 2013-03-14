@@ -18,6 +18,8 @@ public class EventFilterParams {
 
     private Long groupId;
 
+    private String retUrl;
+
     public EventFilterParams() {
     }
 
@@ -61,5 +63,13 @@ public class EventFilterParams {
             map.put("userFulltext", userFulltext);
 
         return map;
+    }
+
+    public String getRetUrl() {
+        return retUrl;
+    }
+
+    public void setRetUrl(String retUrl) {
+        this.retUrl = retUrl;
     }
 }

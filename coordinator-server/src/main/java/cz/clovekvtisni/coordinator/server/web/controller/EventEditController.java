@@ -28,7 +28,7 @@ public class EventEditController extends AbstractSuperadminController {
     public String edit(@ModelAttribute("params") EventFilterParams params, Model model) {
         EventForm form = new EventForm();
         if (appContext.getActiveEvent() != null) {
-            form.populateFrom(appContext.getActiveEvent());
+            form.populateFrom(eventService.findById(appContext.getActiveEvent().getId(), EventService.FLAG_FETCH_LOCATIONS));
         }
         model.addAttribute("form", form);
         return "superadmin/event-edit";

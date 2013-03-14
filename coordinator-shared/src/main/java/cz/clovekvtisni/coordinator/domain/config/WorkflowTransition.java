@@ -33,6 +33,9 @@ public class WorkflowTransition extends AbstractStaticEntity {
     @Attribute(name = "allowed_for_role", required = false, empty = "")
     private String[] allowedForRole;
 
+    @Attribute(name = "forces_single_assignee", required = false)
+    private boolean forcesSingleAssignee;
+
     public String getId() {
         return id;
     }
@@ -55,6 +58,10 @@ public class WorkflowTransition extends AbstractStaticEntity {
 
     public String[] getAllowedForRole() {
         return allowedForRole;
+    }
+
+    public boolean isForcesSingleAssignee() {
+        return forcesSingleAssignee;
     }
 
     @Override

@@ -14,6 +14,9 @@ public interface OrganizationInEventService extends Service {
     OrganizationInEventEntity findById(Long id, long flags);
 
     @FilterResult("#helper.canRead(#entity)")
+    OrganizationInEventEntity findEventInOrganization(Long eventId, String organizationId, long flags);
+
+    @FilterResult("#helper.canRead(#entity)")
     ResultList<OrganizationInEventEntity> findByFilter(OrganizationInEventFilter filter, int limit, String bookmark, long flags);
 
     @CheckPermission("#helper.canCreate(#p0)")

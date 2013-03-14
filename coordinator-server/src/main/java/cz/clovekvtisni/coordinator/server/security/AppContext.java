@@ -1,7 +1,9 @@
 package cz.clovekvtisni.coordinator.server.security;
 
+import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 
 import java.util.Locale;
@@ -26,4 +28,7 @@ public interface AppContext {
 
     void setActiveEvent(EventEntity event);
 
+    OrganizationInEventEntity getActiveOrganizationInEvent();
+
+    void setActiveOrganizationInEvent(OrganizationInEventEntity organizationInEvent);
 }

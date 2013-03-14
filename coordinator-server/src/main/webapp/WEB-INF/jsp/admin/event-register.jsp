@@ -4,50 +4,43 @@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
-%><c:choose>
-    <c:when test="${!form.new or !empty eventList}">
-        <script>
-            $(function() {
-                $( "#datePublishInput" ).datepicker({dateFormat: "dd.mm.yy"});
-                $( "#dateClosedInput" ).datepicker({dateFormat: "dd.mm.yy"});
-                $( "#dateClosedRegistrationInput" ).datepicker({dateFormat: "dd.mm.yy"});
-            });
-        </script>
+%>
+<script>
+    $(function() {
+        $( "#datePublishInput" ).datepicker({dateFormat: "dd.mm.yy"});
+        $( "#dateClosedInput" ).datepicker({dateFormat: "dd.mm.yy"});
+        $( "#dateClosedRegistrationInput" ).datepicker({dateFormat: "dd.mm.yy"});
+    });
+</script>
 
-        <sf:form method="POST" modelAttribute="form">
+<div class="hero-unit">
+    <p>You are not registered.</p>
 
-            <sf:errors />
-
-            <%--
-            <c:if test="${empty form.organizationId}">
-                <div><s:message code="msg.notEventsDueEmptyOrganizationId"/></div>
-            </c:if>
---%>
-            <div>
-                <sf:hidden path="id"/>
-                <sf:hidden path="organizationId"/>
-                <tags:hiddenEvent/>
-
-                <c:choose>
-                    <c:when test="${form.new}">
-                        <p class="lead">
-                            <tags:hiddenEvent/>
-                            <b><s:message code="label.event"/>:</b> <c:out value="${event.name}"/>
-                        </p>
-                    </c:when>
-                    <c:otherwise>
-                        <p class="lead">
-                            <tags:hiddenEvent/>
-                            <b><s:message code="label.event"/>:</b> <c:out value="${form.eventEntity.name}"/>
-                        </p>
-                    </c:otherwise>
-                </c:choose>
-
+    <div class="accordion" id="accordion2">
+        <div class="accordion-group" style="background-color: white">
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                    Register
+                </a>
             </div>
+            <div id="collapseOne" class="accordion-body collapse">
+                <div class="accordion-inner">
+                    <sf:form method="POST" modelAttribute="form">
 
-            <div class="fluid">
-                <div class="row-fluid">
-                    <div class="mini-layout span4">
+                        <sf:errors />
+
+                        <div>
+                            <sf:hidden path="id"/>
+                            <sf:hidden path="organizationId"/>
+                            <tags:hiddenEvent/>
+
+                            <p class="lead">
+                                <tags:hiddenEvent/>
+                                <b><s:message code="label.event"/>:</b> <c:out value="${form.eventEntity.name}"/>
+                            </p>
+
+                        </div>
+
                         <div>
                             <tags:input field="name" modelAttribute="form" captionCode="OrganizationInEventEntity.name">
                                 <sf:input path="name"/>
@@ -83,28 +76,23 @@
                                 <sf:input path="dateClosed" id="dateClosedInput"/>
                             </tags:input>
                         </div>
-                    </div>
 
-                    <div class="mini-layout span4">
                         <div class="panel checkboxList">
-                            <h4><s:message code="header.equipmentList"/></h4>
+                            <h3><s:message code="header.equipmentList"/></h3>
                             <sf:checkboxes path="registrationEquipment" items="${config.equipmentList}" itemLabel="name" itemValue="id"/>
                         </div>
 
                         <div class="panel checkboxList">
-                            <h4><s:message code="header.skillList"/></h4>
+                            <h3><s:message code="header.skillList"/></h3>
                             <sf:checkboxes path="registrationSkills" items="${config.skillList}" itemLabel="name" itemValue="id"/>
                         </div>
-                    </div>
+
+                        <div class="buttonPanel">
+                            <sf:button><s:message code="button.save"/></sf:button>
+                        </div>
+                    </sf:form>
                 </div>
             </div>
-
-            <div class="buttonPanel">
-                <sf:button><s:message code="button.save"/></sf:button>
-            </div>
-        </sf:form>
-    </c:when>
-    <c:otherwise>
-        <p><s:message code="msg.noEventsFound"/></p>
-    </c:otherwise>
-</c:choose>
+        </div>
+    </div>
+</div>

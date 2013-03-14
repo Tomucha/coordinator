@@ -40,7 +40,7 @@
             <state id="wkfl_zdrv_state1" name="Nový zdravotnický úkol" visible_for_role="COORDINATOR, ZDRAVOTNIK"
                    editable_for_role="COORDINATOR, ZDRAVOTNIK" type="STARTED">
                 <description>Nový zdravotnický úkol</description>
-                <transition id="wkfl_zdrv_state1_trans1" name="Přidělit" to_state_id="wkfl_zdrv_state2"
+                <transition id="wkfl_zdrv_state1_trans1" name="Přidělit" forces_single_assignee="true" to_state_id="wkfl_zdrv_state2"
                             allowed_for_role="COORDINATOR, ZDRAVOTNIK">
                     Přidělit
                 </transition>
@@ -120,6 +120,7 @@
                 allows_pre_registration="false"
                 pre_registration_equipment="eq1, eq2"
                 pre_registration_skill="general, zdravotnik, psycholog, krizovy_intervent, socialni_pracovnik, pedagog"
+                icon="/images/logos/cvt.png"
                 >
             Člověk v tísni poskytuje okamžitou humanitární pomoc lidem v nouzi při přírodních katastrofách nebo ve
             válečných krizích. Zároveň se zaměřuje se na dlouhodobou pomoc lidem žijícím v chudobě a špatných životních
@@ -136,6 +137,7 @@
                 allows_pre_registration="false"
                 pre_registration_equipment="eq1, eq2"
                 pre_registration_skill="general, stavar, statik, krizovy_intervent, socialni_pracovnik, pedagog"
+                icon="/images/logos/adra.png"
                 >
             ADRA pomáhá jak při mimořádných událostech (živelné pohromy, jako jsou povodně či zemětřesení, válečné
             konflikty apod.), tak při realizaci dlouhodobých rozvojových projektů (podpora vzdělání, zaměstnanosti,
@@ -152,6 +154,7 @@
                 allows_pre_registration="false"
                 pre_registration_equipment="eq1, eq2"
                 pre_registration_skill="skill1, skill2"
+                icon="/images/logos/cck.png"
                 >
             ČČK působí v oblasti civilní obrany a ochrany obyvatelstva a poskytuje pomoc v případech katastrof a jiných
             mimořádných událostí; a poskytuje zdravotnické, záchranné, sociální a další humanitární služby;

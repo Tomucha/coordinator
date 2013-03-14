@@ -202,6 +202,18 @@
             <artifactId>geocell</artifactId>
             <version>0.0.10</version>
         </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.android.gcm</groupId>
+            <artifactId>gcm-server</artifactId>
+            <version>1.0.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/gcm-server.jar</systemPath>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

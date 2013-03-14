@@ -6,4 +6,6 @@ package cz.clovekvtisni.coordinator;
 // directory and fill in the secret info.
 public class SecretInfoTemplate {
     public static final String GCM_SENDER_ID = null;
+
+    public static final String GCM_API_KEY = null;
 }
