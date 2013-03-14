@@ -34,6 +34,8 @@ public class CoordinatorConfig {
     @ElementList(type = PoiCategory.class, name = "poi_category_list", required = false)
     private List<PoiCategory> poiCategoryList;
 
+    private Map<String, PoiCategory> poiCategoryMap;
+
     private HashMap<String, String> countryMap;
 
     public List<Role> getRoleList() {
@@ -168,7 +170,10 @@ public class CoordinatorConfig {
     }
 
     public Map<String, PoiCategory> getPoiCategoryMap() {
-        if (poiCategoryList == null) return new TreeMap<String, PoiCategory>();
+        if (poiCategoryList == null)
+            return new TreeMap<String, PoiCategory>();
+        if (poiCategoryMap != null)
+            return poiCategoryMap;
 
         final Map<String, PoiCategory> map = new HashMap<String, PoiCategory>(poiCategoryList.size());
         for (PoiCategory category : poiCategoryList) {
@@ -189,7 +194,7 @@ public class CoordinatorConfig {
 
         sorted.putAll(map);
 
-        return sorted;
+        return poiCategoryMap = sorted;
     }
 
     public Map<String, String> getCountryMap() {

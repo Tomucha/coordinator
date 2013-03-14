@@ -38,7 +38,7 @@
     }
 
     function initialize() {
-        CoordinatorMap.startSetLocation(TYPE_LOCATION);
+        CoordinatorMap.setOnClickAddPoint(TYPE_LOCATION);
 
         <c:if test="${!empty form.eventLocationEntityList}">
             <c:forEach items="${form.eventLocationEntityList}" var="eventLocation">

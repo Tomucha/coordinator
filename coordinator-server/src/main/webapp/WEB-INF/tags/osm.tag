@@ -59,6 +59,7 @@
     var editedLocationMarker = null;
     var selectedPointId = null;
     var currentPointType;
+    var currentPopupUrl;
     var points = {};
 
     var CoordinatorMap = {
@@ -83,6 +84,7 @@
             return state;
         },
 
+        // @deprecated
         disablePopup: function(pointType) {
             CoordinatorMap.clickHandlers[pointType] = function(point) {
                 return null;
@@ -97,7 +99,10 @@
             if (point.popupUrl) {
                 marker.events.register("click", marker, function (event) {
                     CoordinatorMap.closePopup();
-                    $("#mapPopupContainer").load(point.popupUrl, function () {
+                    var url = point.popupUrl;
+                    url += url.substring("?") == -1 ? "?" : "&";
+                    url += "latitude=" + point.latitude + "&longitude=" + point.longitude;
+                    $("#mapPopupContainer").load(url, function () {
                         popup = new OpenLayers.Popup(
                                 point.name,
                                 marker.lonlat,
@@ -189,26 +194,20 @@
         closePopup: function() {
             if (popup != null) {
                 map.removePopup(popup);
-            }
+                popup = null;
+                return true;
+            } else
+                return false;
         },
 
-        startSetLocation: function(type) {
+        setOnClickAddPoint: function(type, popupUrl) {
             if (CoordinatorMap.getState() != STATE_SET_LOCATION) {
                 CoordinatorMap.setState(STATE_SET_LOCATION);
                 currentPointType = type;
+                currentPopupUrl = popupUrl;
             }
         }
     };
-
-//    CoordinatorMap.clickHandlers[TYPE_LOCATION] = function(point) {
-//        return "#locationEditForm";
-//    }
-//    CoordinatorMap.clickHandlers[TYPE_USER] = function(point) {
-//        return "#userForm";
-//    }
-//    CoordinatorMap.clickHandlers[TYPE_POI] = function(point) {
-//        return "#poiForm";
-//    }
 
     <c:if test="${!empty maxPoints}">
     var tok = "<c:out value="${maxPoints}"/>".split(",");
@@ -241,7 +240,7 @@
         },
 
         trigger: function(event) {
-            if (CoordinatorMap.getState() == STATE_SET_LOCATION) {
+            if (!CoordinatorMap.closePopup() && CoordinatorMap.getState() == STATE_SET_LOCATION) {
                 var lonLat = CoordinatorMap.fromProjection(map.getLonLatFromPixel(event.xy));
                 var point = {
                     type: currentPointType,
@@ -249,6 +248,8 @@
                     longitude: lonLat.lon,
                     icon: ICON_GENERIC
                 };
+                if (currentPopupUrl)
+                    point.popupUrl = currentPopupUrl;
                 CoordinatorMap.addPoint(point);
                 CoordinatorMap.trimLocations();
             }
@@ -270,52 +271,6 @@
         map.events.register('zoomend', null, function() { ${onMapChange} });
         map.events.register('moveend', null, function() { ${onMapChange} });
         </c:if>
-
-
-/*
-        <c:if test="${!empty buttons}">
-
-            var panel = new OpenLayers.Control.Panel({
-                type: OpenLayers.Control.TYPE_BUTTON,
-                    createControlMarkup: function(control) {
-                    var button = document.createElement('button');
-                    if (control.title) {
-                        button.innerHTML = control.title;
-                    }
-                    return button;
-                }
-            });
-
-            var controls = [];
-            var buttons = "<c:out value="${buttons}"/>".split(",");
-            for (var index in buttons) {
-                var buttonType = buttons[index];
-                switch (buttonType.replace(/\s*//*
-, "")) {
-                    case "addLocation":
-                        controls[controls.length] = new OpenLayers.Control.Button({
-                            title: "+location",
-                            trigger: function() {
-                                CoordinatorMap.startSetLocation(TYPE_LOCATION);
-                            }
-                        });
-                        break;
-
-                    case "addPoi":
-                        controls[controls.length] = new OpenLayers.Control.Button({
-                            title: "+poi",
-                            trigger: function() {
-                                CoordinatorMap.startSetLocation(TYPE_POI);
-                            }
-                        });
-                        break;
-                }
-            }
-
-            panel.addControls(controls);
-            map.addControl(panel);
-        </c:if>
-*/
 
         var click = new OpenLayers.Control.Click();
         map.addControl(click);
@@ -342,12 +297,11 @@
            onkeypress="if (event.keyCode == 13) searchAddress($(this).val())"/>
 </p>
 
-<div id="mapContainer"></div>
+<div id="mapContainer" class="well"></div>
 <div id="mapPopupWindow" style="display: none;">
-<p style="background-color: #ccc;"><span class="icon-remove" onclick="CoordinatorMap.closePopup();"></span></p>
-<div id="mapPopupContainer">
-
-</div>
+    <!--<p style="background-color: #ccc;"><span class="icon-remove" onclick="CoordinatorMap.closePopup();"></span></p>-->
+    <p><span class="icon-remove" onclick="CoordinatorMap.closePopup();"></span></p>
+    <div id="mapPopupContainer"></div>
 </div>
 
 <%--

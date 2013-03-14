@@ -12,10 +12,7 @@
     }
 
     function initialize() {
-        CoordinatorMap.disablePopup(TYPE_POI);
-        CoordinatorMap.disablePopup(TYPE_LOCATION);
-
-        CoordinatorMap.startSetLocation(TYPE_POI);
+        CoordinatorMap.setOnClickAddPoint(TYPE_POI);
 
         <c:if test="${!empty form.latitude and !empty form.longitude}">
             CoordinatorMap.addPoint({
