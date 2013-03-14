@@ -95,4 +95,16 @@ public class OrganizationInEventServiceImpl extends AbstractEntityServiceImpl im
             }
         });
     }
+
+    @Override
+    public OrganizationInEventEntity findEventInOrganization(Long eventId, String organizationId, long flags) {
+        if (eventId == null || organizationId == null)
+            return null;
+        OrganizationInEventFilter inEventFilter = new OrganizationInEventFilter();
+        inEventFilter.setOrganizationIdVal(organizationId);
+        inEventFilter.setEventIdVal(eventId);
+        ResultList<OrganizationInEventEntity> result = findByFilter(inEventFilter, 1, null, 0l);
+
+        return  result.firstResult();
+    }
 }

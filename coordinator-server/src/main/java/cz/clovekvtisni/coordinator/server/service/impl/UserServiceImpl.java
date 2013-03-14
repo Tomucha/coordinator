@@ -310,10 +310,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         if (!isForceRegistration && !organization.isAllowsRegistration())
             throw MaPermissionDeniedException.registrationNotAllowed();
 
-        OrganizationInEventFilter filter = new OrganizationInEventFilter();
-        filter.setOrganizationIdVal(organization.getId());
-        filter.setEventIdVal(inEvent.getEventId());
-        OrganizationInEventEntity info = organizationInEventService.findByFilter(filter, 1, null, 0l).firstResult();
+        OrganizationInEventEntity info = organizationInEventService.findEventInOrganization(inEvent.getEventId(), organization.getId(), 0l);
 
         if (!isForceRegistration && (info == null
             || (info.getDateClosedRegistration() != null && info.getDateClosedRegistration().compareTo(new Date()) < 0)

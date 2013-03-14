@@ -4,7 +4,6 @@ import cz.clovekvtisni.coordinator.server.domain.ActivityEntity;
 import cz.clovekvtisni.coordinator.server.service.ActivityService;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -31,7 +30,7 @@ public abstract class AbstractEventController extends AbstractController {
         }
 
         List<ActivityEntity> result = activityService.find(eventId, poiId, userId, null, ActivityService.FLAG_FETCH_ALL).getResult();
-        log.info("Activity to model: "+result);
+        logger.info("Activity to model: "+result);
         return result;
     }
 

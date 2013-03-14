@@ -1,6 +1,8 @@
 package cz.clovekvtisni.coordinator.server;
 
+import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 
@@ -46,5 +48,15 @@ public class AppContextTestImpl implements AppContext {
     @Override
     public void setActiveEvent(EventEntity event) {
         throw new IllegalStateException("NYI");
+    }
+
+    @Override
+    public OrganizationInEventEntity getActiveOrganizationInEvent() {
+        return null;  // TODO
+    }
+
+    @Override
+    public void setActiveOrganizationInEvent(OrganizationInEventEntity organizationInEvent) {
+        // TODO
     }
 }

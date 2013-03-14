@@ -203,7 +203,7 @@ public class ImportController extends AbstractController {
             return null;
 
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return null;
         }
 

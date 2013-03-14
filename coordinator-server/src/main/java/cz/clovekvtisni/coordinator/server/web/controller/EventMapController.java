@@ -17,9 +17,7 @@ import cz.clovekvtisni.coordinator.server.util.Location;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.PoiForm;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
-import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,9 +27,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
@@ -121,7 +116,7 @@ public class EventMapController extends AbstractEventController {
             @RequestParam(required = true) double lonW
     ) {
         List<UserInEventEntity> byEventAndBox = userInEventService.findByEventAndBox(eventId, latN, lonE, latS, lonW, UserInEventService.FLAG_FETCH_USER);
-        log.info("Users: "+byEventAndBox);
+        logger.info("Users: "+byEventAndBox);
 
         return byEventAndBox;
     }
