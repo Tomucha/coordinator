@@ -8,6 +8,9 @@ public class DeployEnvironment {
 		if (BuildConfig.DEBUG) {
 			CRITTERCISM_APP_ID = "5139d88f5483087337000033";
 			SERVER_URL_PREFIX = "https://coordinator-test.appspot.com";
+		} else {
+			CRITTERCISM_APP_ID = "5139d88f5483087337000033";
+			SERVER_URL_PREFIX = "https://coordinator-test.appspot.com";
 		}
 	}
 }
