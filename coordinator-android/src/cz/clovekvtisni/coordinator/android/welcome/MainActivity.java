@@ -15,7 +15,6 @@ import com.fhucho.android.workers.Workers;
 import com.google.android.gcm.GCMRegistrar;
 
 import cz.clovekvtisni.coordinator.SecretInfo;
-import cz.clovekvtisni.coordinator.android.DeployEnvironment;
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoaderListener;

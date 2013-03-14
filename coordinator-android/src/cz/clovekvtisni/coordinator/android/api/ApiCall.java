@@ -86,8 +86,8 @@ public abstract class ApiCall<RQ extends RequestParams, RP extends ApiResponseDa
 
 	private void writeToLog(String request, String response) {
 		Lg.API.d("ApiCall: " + url);
-		Lg.API.dd("Request body: " + request.substring(0, Math.min(80, request.length())));
-		Lg.API.dd("Response body: " + response.substring(0, Math.min(80, response.length())));
+		Lg.API.dd("Request: " + request);
+		Lg.API.dd("Response: " + response);
 	}
 
 	@SuppressWarnings("serial")
