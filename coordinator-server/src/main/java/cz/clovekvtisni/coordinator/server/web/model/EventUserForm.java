@@ -35,9 +35,14 @@ public class EventUserForm extends UserForm {
 
     public UserInEventEntity buildUserInEventEntity() {
         UserInEventEntity inEventEntity = new UserInEventEntity();
+        inEventEntity.setLastLocationLatitude(getLastLocationLatitude());
+        inEventEntity.setLastLocationLongitude(getLastLocationLongitude());
         inEventEntity.setEventId(eventId);
-        inEventEntity.setUserId(getId());
-        inEventEntity.setParentKey(Key.create(UserEntity.class, getId()));
+        Long userId = getUserId();
+        if (userId != null) {
+            inEventEntity.setUserId(userId);
+            inEventEntity.setParentKey(Key.create(UserEntity.class, userId));
+        }
         if (groupIdList != null)
             inEventEntity.setGroupIdList(groupIdList.toArray(new Long[0]));
 

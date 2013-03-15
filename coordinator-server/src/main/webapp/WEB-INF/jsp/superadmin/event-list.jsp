@@ -9,16 +9,11 @@
 <h2><s:message code="header.eventList"/></h2>
 
 <div class="mainPanel">
-    <div class="buttonPanel">
-        <c:choose>
-            <c:when test="${can:create('eventEntity')}">
-                <a class="btn" href="<s:url value="/superadmin/event/edit"/>"><s:message code="button.createEvent"/></a>
-            </c:when>
-            <c:when test="${can:hasRole('ADMIN')}">
-                <a class="btn" href="<s:url value="/superadmin/event/detail"/>"><s:message code="button.registerToEvent"/></a>
-            </c:when>
-        </c:choose>
-    </div>
+    <c:if test="${can:create('eventEntity')}">
+        <div class="buttonPanel">
+            <a class="btn" href="<s:url value="/superadmin/event/edit"/>"><s:message code="button.createEvent"/></a>
+        </div>
+    </c:if>
 
     <c:choose>
         <c:when test="${!empty events}">

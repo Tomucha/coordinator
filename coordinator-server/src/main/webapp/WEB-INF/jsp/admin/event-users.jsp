@@ -38,16 +38,16 @@
         <c:choose>
             <c:when test="${can:hasRole('BACKEND')}">
 
-                <button accesskey="f" class="btn" onclick="\$('#searchFormPanel').show();"><s:message code="button.filterList"/> <span class="caret"></span></button>
+                <button accesskey="f" class="btn" onclick="\$('#searchFormPanel').show();"><i class="icon-filter"></i> <s:message code="button.filterList"/> <span class="caret"></span></button>
 
-                <a class="btn" href="<s:url value="/admin/event/user/edit?eventId=${params.eventId}"/>"><s:message
+                <a class="btn" href="<s:url value="/admin/event/user/edit?eventId=${params.eventId}"/>"><i class=" icon-plus"></i> <i class="icon-user"></i> <s:message
                         code="button.addNewUser"/></a>
-                <a class="btn" href="<s:url value="/admin/event/user-group/edit?eventId=${params.eventId}"/>"><s:message
+                <a class="btn" href="<s:url value="/admin/event/user-group/edit?eventId=${params.eventId}"/>"><i class="icon-plus"></i> <s:message
                         code="button.addNewUserGroup"/></a>
 
                 <c:if test="${!empty loggedUser.organizationId}">
                     <a class="btn"
-                       href="<s:url value="/admin/import?eventId=${params.eventId}&organizationId=${loggedUser.organizationId}"/>"><s:message
+                       href="<s:url value="/admin/import?eventId=${params.eventId}&organizationId=${loggedUser.organizationId}"/>"><i class=" icon-folder-open"></i> <s:message
                             code="button.import"/></a>
                 </c:if>
 
@@ -94,8 +94,8 @@
                                 <tags:eventUserList renderHeader="false" user="${userInEvent}"/>
                                 <td>
                                     <a class="btn"
-                                       href="<s:url value="${root}/admin/event/user/edit?eventId=${params.eventId}&userId=${userInEvent.userId}"/>"><s:message
-                                            code="button.detail"/></a>
+                                       href="<s:url value="${root}/admin/event/user/edit?eventId=${params.eventId}&userId=${userInEvent.userId}"/>"><span class=" icon-pencil"></span> <s:message
+                                            code="button.edit"/></a>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -103,29 +103,15 @@
                     </table>
                 </div>
 
-                <div>
+                <div class="bottomTableControl">
                     <sf:select id="inputSelectedAction" path="selectedAction"
                                onchange="$('#selectedTaskIdSelect').toggle(this.value=='REGISTER_TO_TASK')">
-                        <sf:option value=""/>
+                        <sf:option value="" disabled="disabled"><s:message code="option.selectAction"/></sf:option>
                         <c:forEach items="${selectedUserActions}" var="action">
                             <sf:option value="${action}"><s:message code="SelectedUserAction.${action}"/></sf:option>
                         </c:forEach>
                     </sf:select>
 
-                    <c:choose>
-                        <c:when test="${empty tasks or fn:length(tasks) == 0}">
-                            <span id="selectedTaskIdSelect" style="display: none"><s:message
-                                    code="msg.noTasksFound"/></span>
-                        </c:when>
-                        <c:otherwise>
-                            <sf:select path="selectedTaskId" id="selectedTaskIdSelect" cssStyle="display: none">
-                                <c:forEach items="${tasks}" var="task">
-                                    <sf:option value="${task.id}"><c:out value="${task.poiCategory.name}"/> - <c:out
-                                            value="${task.createdDate}"/></sf:option>
-                                </c:forEach>
-                            </sf:select>
-                        </c:otherwise>
-                    </c:choose>
 
                         <%-- Suspend reason modal --%>
                     <tags:modal id="suspendReasonModal" titleCode="modalTitle.writeSuspendReason">
@@ -137,7 +123,7 @@
                         <p><sf:select path="groupId" items="${userGroups}" itemLabel="name" itemValue="id"/></p>
                     </tags:modal>
 
-                    <button type="submit" class="btn" onclick="return onDataSubmit()"><s:message
+                    <button type="submit" class="btn" onclick="return onDataSubmit()"><span class="icon-ok"></span> <s:message
                             code="button.submit"/></button>
                 </div>
             </sf:form>

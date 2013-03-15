@@ -79,9 +79,11 @@ public class AuthorizationTool {
 
         Set<String> hasRoles = new HashSet<String>();
         for (List<String> roles : hasAllRoles) {
-            for (String role : roles) {
-                hasRoles.add(role);
-                hasRoles.addAll(roleParentMap.get(role));
+            if (roles != null) {
+                for (String role : roles) {
+                    hasRoles.add(role);
+                    hasRoles.addAll(roleParentMap.get(role));
+                }
             }
         }
 

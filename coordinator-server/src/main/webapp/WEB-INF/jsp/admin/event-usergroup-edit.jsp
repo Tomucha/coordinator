@@ -4,7 +4,7 @@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
-%><h2><s:message code="${form.new ? 'header.poiCreate' : 'header.poiEdit'}"/></h2>
+%><h2><s:message code="${form.new ? 'header.userGroupCreate' : 'header.userGroupEdit'}"/></h2>
 
 <div class="mainPanel">
     <div class="eventForm">
@@ -34,7 +34,7 @@
             </div>
 
             <div class="buttonPanel">
-                <sf:button><s:message code="button.save"/></sf:button>
+                <button type="submit" class="btn btn-primary"><span class="icon-ok icon-white"></span> <s:message code="button.save"/></button>
             </div>
 
         </sf:form>

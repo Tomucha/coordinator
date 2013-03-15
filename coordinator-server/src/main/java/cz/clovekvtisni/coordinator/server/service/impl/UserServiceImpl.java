@@ -7,7 +7,6 @@ import cz.clovekvtisni.coordinator.domain.config.Organization;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.exception.ValidationError;
 import cz.clovekvtisni.coordinator.server.domain.*;
-import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserEquipmentFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserSkillFilter;
@@ -188,6 +187,71 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             }
         });
     }
+
+    @Override
+    public UserEntity createUserInEvent(final UserEntity user, final UserInEventEntity inEventEntity) {
+        return ofy().transact(new Work<UserEntity>() {
+            @Override
+            public UserEntity run() {
+                user.setId(null);
+                if (user.getRoleIdList() == null)
+                    user.setRoleIdList(new String[] {AuthorizationTool.ANONYMOUS});
+                UserEntity created = createUser(user);
+
+                inEventEntity.setUserId(created.getId());
+                inEventEntity.setUserEntity(created);
+                userInEventService.create(inEventEntity);
+
+                return created;
+            }
+        });
+    }
+
+    @Override
+    public UserEntity updateUserInEvent(final UserEntity newUser, final UserInEventEntity inEventEntity) {
+        final UserEntity oldUser = findById(newUser.getId(), UserService.FLAG_FETCH_EQUIPMENT | UserService.FLAG_FETCH_SKILLS);
+        final UserEntity copy = CloneTool.deepClone(oldUser);
+        final UserInEventEntity oldInEventEntity = userInEventService.findById(inEventEntity.getEventId(), newUser.getId(), 0l);
+
+        return ofy().transact(new Work<UserEntity>() {
+            @Override
+            public UserEntity run() {
+                copy.setFirstName(newUser.getFirstName());
+                copy.setLastName(newUser.getLastName());
+                copy.setPhone(newUser.getPhone());
+                copy.setEmail(ValueTool.normalizeEmail(newUser.getEmail()));
+                copy.setBirthday(newUser.getBirthday());
+                 copy.setAddressLine(newUser.getAddressLine());
+                 copy.setCity(newUser.getCity());
+                 copy.setZip(newUser.getZip());
+                copy.setCountry(newUser.getCountry());
+                copy.setModifiedDate(new Date());
+
+                systemService.deleteUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, copy.getEmail());
+                systemService.saveUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, copy.getEmail(), copy.getKey());
+
+                UserEntity updated = ofy().put(copy);
+                updated.setEquipmentEntityList(newUser.getEquipmentEntityList());
+                updated.setSkillEntityList(newUser.getSkillEntityList());
+                saveFields(updated, oldUser);
+
+                if (oldInEventEntity != null) {
+                    oldInEventEntity.setGroupIdList(inEventEntity.getGroupIdList());
+                    oldInEventEntity.setLastLocationLatitude(inEventEntity.getLastLocationLatitude());
+                    oldInEventEntity.setLastLocationLongitude(inEventEntity.getLastLocationLongitude());
+                    userInEventService.update(oldInEventEntity);
+
+                } else {
+                    inEventEntity.setUserId(updated.getId());
+                    inEventEntity.setParentKey(Key.create(UserEntity.class, updated.getId()));
+                    userInEventService.create(inEventEntity);
+                }
+
+
+                return updated;             }
+         });
+
+  }
 
     /** updated "verify" fields is ignored here */
     private void saveFields(UserEntity entity, UserEntity old) {

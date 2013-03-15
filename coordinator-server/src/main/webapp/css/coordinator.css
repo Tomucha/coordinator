@@ -46,9 +46,17 @@ div.dropdown-menu {
 .olPopupContent {
     background-color: transparent !important;
 }
-.olPopupContent * {
-    font-size: 11px;
+.olPopupContent form * {
+    /*font-size: 11px;*/
 }
 .panel {
     margin-bottom: 5ex;
+}
+.activityPanel h3 {
+    margin-top: 0px;
+    line-height: 20px;
+    margin-bottom: 19px;
+}
+.bottomTableControl select {
+    margin: 0;
 }

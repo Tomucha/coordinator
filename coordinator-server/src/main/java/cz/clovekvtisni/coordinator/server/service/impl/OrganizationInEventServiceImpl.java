@@ -103,7 +103,7 @@ public class OrganizationInEventServiceImpl extends AbstractEntityServiceImpl im
         OrganizationInEventFilter inEventFilter = new OrganizationInEventFilter();
         inEventFilter.setOrganizationIdVal(organizationId);
         inEventFilter.setEventIdVal(eventId);
-        ResultList<OrganizationInEventEntity> result = findByFilter(inEventFilter, 1, null, 0l);
+        ResultList<OrganizationInEventEntity> result = findByFilter(inEventFilter, 1, null, flags);
 
         return  result.firstResult();
     }

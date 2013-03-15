@@ -14,6 +14,7 @@ import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
+import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.UniqueKeyViolation;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.EventUserForm;
@@ -57,7 +58,7 @@ public class EventUserEditController extends AbstractEventController {
         EventUserForm form = new EventUserForm();
 
         if (userId != null) {
-            UserEntity user = loadUserById(userId, 0l);
+            UserEntity user = loadUserById(userId, UserService.FLAG_FETCH_EQUIPMENT | UserService.FLAG_FETCH_SKILLS);
             form.populateFrom(user);
             form.setUserId(user.getId());
             UserInEventEntity inEvent = fetchUserInEvent(params.getEventId(), userId);
@@ -123,27 +124,12 @@ public class EventUserEditController extends AbstractEventController {
         }
 
         try {
-            // TODO begin transaction ?
             UserEntity user = new UserEntity().populateFrom(form);
             if (form.getUserId() == null) {
-                form.setRoleIdList(new String[] {AuthorizationTool.ANONYMOUS});
-                user = userService.createUser(user);
+                user = userService.createUserInEvent(user, form.buildUserInEventEntity());
             } else {
                 user.setId(form.getUserId());
-                user = userService.updateUser(user);
-            }
-
-            // FIXME: tohle je neprt, puvodne to poznaval podle ID
-            if (form.getCreatedDate() == null) {
-                form.setId(user.getId());
-                userInEventService.create(form.buildUserInEventEntity());
-
-            } else {
-                UserInEventEntity inEvent = userInEventService.findById(form.getEventId(), user.getId(), 0l);
-                inEvent.setGroupIdList(form.getGroupIdList() == null ? null : form.getGroupIdList().toArray(new Long[0]));
-                inEvent.setLastLocationLatitude(form.getLastLocationLatitude());
-                inEvent.setLastLocationLongitude(form.getLastLocationLongitude());
-                userInEventService.update(inEvent);
+                user = userService.updateUserInEvent(user, form.buildUserInEventEntity());
             }
 
             return "redirect:/admin/event/user/list?eventId=" + form.getEventId();
