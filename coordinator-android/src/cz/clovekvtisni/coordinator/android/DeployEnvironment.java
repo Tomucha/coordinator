@@ -9,7 +9,7 @@ public class DeployEnvironment {
 			CRITTERCISM_APP_ID = "5139d88f5483087337000033";
 			SERVER_URL_PREFIX = "https://coordinator-test.appspot.com";
 		} else {
-			CRITTERCISM_APP_ID = "5139d88f5483087337000033";
+			CRITTERCISM_APP_ID = "51423ed7558d6a6c02000002";
 			SERVER_URL_PREFIX = "https://coordinator-test.appspot.com";
 		}
 	}
