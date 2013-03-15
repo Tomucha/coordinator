@@ -27,7 +27,6 @@ import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiCall.ApiCallException;
 import cz.clovekvtisni.coordinator.android.api.ApiCalls.UserPushTokenCall;
 import cz.clovekvtisni.coordinator.android.api.ApiCalls.UserRegisterCall;
-import cz.clovekvtisni.coordinator.android.api.ApiCalls.UserUpdatePositionCall;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoaderListener;
 import cz.clovekvtisni.coordinator.android.other.Settings;
@@ -39,7 +38,6 @@ import cz.clovekvtisni.coordinator.android.register.wizard.ui.ReviewFragment;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.api.request.RegisterRequestParams;
 import cz.clovekvtisni.coordinator.api.request.UserPushTokenRequestParams;
-import cz.clovekvtisni.coordinator.api.request.UserUpdatePositionRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.api.response.RegisterResponseData;
 import cz.clovekvtisni.coordinator.domain.Event;
@@ -287,6 +285,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 		protected void doInBackground() {
 			try {
 				RegisterResponseData result = new UserRegisterCall(params).call();
+				Settings.setAuthKey(result.getAuthKey());
 				
 				try {
 					String regId = Settings.getGcmRegistrationId();

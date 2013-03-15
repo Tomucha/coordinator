@@ -1,16 +1,28 @@
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Keep line numbers for stack traces
+-renamesourcefileattribute SourceFile 
+-keepattributes SourceFile,LineNumberTable
 
+# ActionBarSherlock 
+-keep class android.support.** { *; } 
+-keep interface android.support.** { *; } 
+-keep class com.actionbarsherlock.** { *; } 
+-keep interface com.actionbarsherlock.** { *; } 
+
+# Coordinator shared
+-dontwarn org.codehaus.jackson.map.**
+-dontwarn cz.clovekvtisni.coordinator.util.**
+-keep public class cz.clovekvtisni.coordinator.api.** { *; } 
+-keep public class cz.clovekvtisni.coordinator.domain.** { *; } 
+-keep public class cz.clovekvtisni.coordinator.exception.** { *; }
 
 # Crittercism
 -keep public class com.crittercism.**
--keepclassmembers public class com.crittercism.* {
-    *;
-}
+-keepclassmembers public class com.crittercism.* { *; }
 
 # Guava
+-dontwarn sun.misc.Unsafe
+-dontwarn com.google.common.collect.MinMaxPriorityQueue
 
+# Simple framework
+-dontwarn javax.xml.stream.events.**
+-dontwarn javax.xml.stream.**

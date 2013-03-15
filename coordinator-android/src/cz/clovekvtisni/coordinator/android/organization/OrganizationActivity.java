@@ -19,7 +19,6 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.fhucho.android.workers.Workers;
 
 import cz.clovekvtisni.coordinator.android.R;
-import cz.clovekvtisni.coordinator.android.api.ApiLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventRegisteredLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventRegisteredLoaderListener;
 import cz.clovekvtisni.coordinator.android.event.EventActivity;
@@ -34,7 +33,6 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 
 	private static final int REQUEST_REGISTER = 0;
 
-	private ApiLoader<?, ?> eventsLoader;
 	private EventsAdapter adapter;
 	private Organization organization;
 	private Set<Long> registeredEventIds = new HashSet<Long>();
@@ -75,12 +73,11 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 		});
 	}
 
-	@SuppressWarnings("rawtypes")
 	private void loadEvents() {
 		EventFilterRequestParams params = new EventFilterRequestParams();
 		params.setOrganizationId(organization.getId());
 
-		eventsLoader = (ApiLoader) Workers.load(new EventRegisteredLoader(params), new EventRegisteredLoaderListener() {
+		Workers.load(new EventRegisteredLoader(params), new EventRegisteredLoaderListener() {
 			@Override
 			public void onException(Exception e) {
 			}
@@ -101,9 +98,6 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(requestCode == REQUEST_REGISTER) {
-			// FIXME
-			//eventsLoader.reload();
-			
 			EventFilterRequestParams params = new EventFilterRequestParams();
 			params.setOrganizationId(organization.getId());
 			

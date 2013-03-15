@@ -10,6 +10,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
@@ -52,8 +54,16 @@ public class MapFragment extends SherlockFragment {
 	private Bitmap userMarkerBitmap;
 	private Location myLocation;
 	private OsmMapView osmMapView;
+	private MarkerOverlay selectedMarker;
 	private MyLocationOverlay myLocationOverlay;
 	private View poiInfo;
+
+	private void closeMarkerInfo() {
+		poiInfo.setVisibility(View.GONE);
+		selectedMarker.setSelected(false);
+		selectedMarker = null;
+		osmMapView.invalidate();
+	}
 
 	private void doPoiTransition(Poi poi, WorkflowTransition transition) {
 		EventPoiTransitionRequestParams params = new EventPoiTransitionRequestParams();
@@ -67,6 +77,28 @@ public class MapFragment extends SherlockFragment {
 				SendingTransitionDialog.TAG);
 
 		poiInfo.setVisibility(View.GONE);
+	}
+
+	private void goToMyLocation() {
+		LatLon latLon = new LatLon(myLocation.getLatitude(), myLocation.getLongitude());
+		osmMapView.setCenter(latLon);
+		osmMapView.setZoom(5000);
+	}
+
+	private void initPoiInfo(View view) {
+		poiInfo = view.findViewById(R.id.poiInfo);
+
+		poiInfo.findViewById(R.id.closeInfo).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				closeMarkerInfo();
+			}
+		});
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.map, menu);
 	}
 
 	@Override
@@ -94,61 +126,69 @@ public class MapFragment extends SherlockFragment {
 		osmMapView.onDestroy();
 	}
 
-	private void initPoiInfo(View view) {
-		poiInfo = view.findViewById(R.id.poiInfo);
-
-		poiInfo.findViewById(R.id.closeInfo).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				poiInfo.setVisibility(View.GONE);
-			}
-		});
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_my_location:
+			goToMyLocation();
+			break;
+		case R.id.menu_add_place:
+			goToMyLocation();
+			break;
+		case R.id.menu_filter_places:
+			((EventActivity) getActivity()).showPoiFilterDialog();
+			break;
+		case R.id.menu_filter_people:
+			goToMyLocation();
+			break;
+		}
+		return true;
 	}
 
-	private void goToMyLocation() {
-		LatLon latLon = new LatLon(myLocation.getLatitude(), myLocation.getLongitude());
-		osmMapView.setCenter(latLon);
-		osmMapView.setZoom(5000);
+	private void selectMarker(MarkerOverlay marker) {
+		System.out.println(2);
+		if (selectedMarker != null) selectedMarker.setSelected(false);
+		marker.setSelected(true);
+		selectedMarker = marker;
+		osmMapView.invalidate();
 	}
 
-	private void showPoiInfo(final Poi poi) {
-		poiInfo.setVisibility(View.VISIBLE);
-
-		TextView title = (TextView) poiInfo.findViewById(R.id.poiTitle);
-		title.setText(poi.getName());
-
-		TextView description = (TextView) poiInfo.findViewById(R.id.poiDescription);
-		description.setText(poi.getDescription());
-
-		LinearLayout layout = (LinearLayout) poiInfo.findViewById(R.id.transitions);
-		layout.removeAllViews();
-		if (poi.getWorkflowState() != null) {
-			for (final WorkflowTransition transition : poi.getWorkflowState().getTransitions()) {
-				Button button = new Button(getActivity());
-				button.setText(transition.getName());
-				layout.addView(button);
-
-				button.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						doPoiTransition(poi, transition);
-					}
-				});
+	private PoiOverlay findPoiOverlay(Poi poi) {
+		for (MapOverlay overlay : osmMapView.getOverlays()) {
+			if (overlay instanceof PoiOverlay) {
+				PoiOverlay poiOverlay = (PoiOverlay) overlay;
+				if (poiOverlay.poi.getId() == poi.getId()) {
+					return poiOverlay;
+				}
 			}
 		}
+
+		throw new AssertionError();
 	}
 
-	private void showUserInfo(User user) {
-		poiInfo.setVisibility(View.VISIBLE);
+	private UserOverlay findUserOverlay(User user) {
+		for (MapOverlay overlay : osmMapView.getOverlays()) {
+			if (overlay instanceof UserOverlay) {
+				UserOverlay userOverlay = (UserOverlay) overlay;
+				System.out.println(userOverlay.userInEvent.getUser().getId());
+				if (userOverlay.userInEvent.getUser().getId() == user.getId()) {
+					return userOverlay;
+				}
+			}
+		}
 
-		TextView title = (TextView) poiInfo.findViewById(R.id.poiTitle);
-		title.setText(user.getFullName());
+		throw new AssertionError();
+	}
 
-		TextView description = (TextView) poiInfo.findViewById(R.id.poiDescription);
-		description.setText(user.getCity());
+	private void selectPoi(Poi poi) {
+		selectMarker(findPoiOverlay(poi));
+		showPoiInfo(poi);
+	}
 
-		LinearLayout layout = (LinearLayout) poiInfo.findViewById(R.id.transitions);
-		layout.removeAllViews();
+	private void selectUser(User user) {
+		System.out.println(1);
+		selectMarker(findUserOverlay(user));
+		showUserInfo(user);
 	}
 
 	public void setFilteredPois(List<Poi> pois, Map<PoiCategory, Bitmap> poiIcons) {
@@ -186,6 +226,58 @@ public class MapFragment extends SherlockFragment {
 		if (isVisible()) updateLocationOverlay();
 	}
 
+	private void showPoiInfo(final Poi poi) {
+		poiInfo.setVisibility(View.VISIBLE);
+
+		TextView title = (TextView) poiInfo.findViewById(R.id.poiTitle);
+		title.setText(poi.getName());
+
+		TextView description = (TextView) poiInfo.findViewById(R.id.poiDescription);
+		description.setText(poi.getDescription());
+
+		LinearLayout layout = (LinearLayout) poiInfo.findViewById(R.id.transitions);
+		layout.removeAllViews();
+		if (poi.getWorkflowState() != null) {
+			for (final WorkflowTransition transition : poi.getWorkflowState().getTransitions()) {
+				Button button = new Button(getActivity());
+				button.setText(transition.getName());
+				layout.addView(button);
+
+				button.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						doPoiTransition(poi, transition);
+					}
+				});
+			}
+		}
+	}
+
+	public void showPoiOnMap(Poi poi) {
+		LatLon latLon = new LatLon(poi.getLatitude(), poi.getLongitude());
+		osmMapView.setCenter(latLon);
+		selectPoi(poi);
+	}
+
+	private void showUserInfo(User user) {
+		poiInfo.setVisibility(View.VISIBLE);
+
+		TextView title = (TextView) poiInfo.findViewById(R.id.poiTitle);
+		title.setText(user.getFullName());
+
+		TextView description = (TextView) poiInfo.findViewById(R.id.poiDescription);
+		description.setText(user.getCity());
+
+		LinearLayout layout = (LinearLayout) poiInfo.findViewById(R.id.transitions);
+		layout.removeAllViews();
+	}
+
+	public void showUserOnMap(UserInEvent user) {
+		LatLon latLon = new LatLon(user.getLastLocationLatitude(), user.getLastLocationLongitude());
+		osmMapView.setCenter(latLon);
+		selectUser(user.getUser());
+	}
+
 	private void updateLocationOverlay() {
 		if (myLocation == null) return;
 		myLocationOverlay.setAccuracyMeters(myLocation.getAccuracy());
@@ -195,53 +287,47 @@ public class MapFragment extends SherlockFragment {
 		osmMapView.invalidate();
 	}
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.map, menu);
-	}
+	private static class EventPoiTransitionTask extends
+			ActivityWorker2<EventActivity, EventPoiResponseData, Exception> {
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_my_location:
-			goToMyLocation();
-			break;
-		case R.id.menu_add_place:
-			goToMyLocation();
-			break;
-		case R.id.menu_filter_places:
-			((EventActivity) getActivity()).showPoiFilterDialog();
-			break;
-		case R.id.menu_filter_people:
-			goToMyLocation();
-			break;
+		private final EventPoiTransitionRequestParams params;
+
+		public EventPoiTransitionTask(EventPoiTransitionRequestParams params) {
+			this.params = params;
 		}
-		return true;
-	}
 
-	public void showPoiOnMap(Poi poi) {
-		LatLon latLon = new LatLon(poi.getLatitude(), poi.getLongitude());
-		osmMapView.setCenter(latLon);
-		showPoiInfo(poi);
-	}
-
-	public void showUserOnMap(UserInEvent user) {
-		// FIXME
-		if (user.getLastLocationLatitude() != null) {
-			LatLon latLon = new LatLon(user.getLastLocationLatitude(),
-					user.getLastLocationLongitude());
-			osmMapView.setCenter(latLon);
+		@Override
+		protected void doInBackground() {
+			try {
+				getListenerProxy().onSuccess(new EventPoiTransitionCall(params).call());
+			} catch (ApiCallException e) {
+				getListenerProxy().onException(e);
+			}
 		}
-		showUserInfo(user.getUser());
+
+		@Override
+		public void onException(Exception e) {
+		}
+
+		@Override
+		public void onSuccess(EventPoiResponseData result) {
+			FragmentManager fm = getActivity().getSupportFragmentManager();
+			((DialogFragment) fm.findFragmentByTag(SendingTransitionDialog.TAG)).dismiss();
+		}
+
 	}
 
 	private class MarkerOverlay extends MapOverlay {
-		private final Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
+		private final Paint paintNormal = new Paint(Paint.FILTER_BITMAP_FLAG);
+		private final Paint paintSelected = new Paint(paintNormal);
 		private final Bitmap bitmap;
+
+		private boolean selected = false;
 
 		public MarkerOverlay(LatLon latLon, Bitmap bitmap) {
 			super(latLon);
 			this.bitmap = bitmap;
+			paintSelected.setColorFilter(new LightingColorFilter(Color.GRAY, 0));
 		}
 
 		@Override
@@ -251,36 +337,12 @@ public class MapFragment extends SherlockFragment {
 			int left = x - bitmap.getWidth() / 2;
 			Rect dst = new Rect(left, y - bitmap.getHeight(), left + bitmap.getWidth(), y);
 
+			Paint paint = selected ? paintSelected : paintNormal;
 			canvas.drawBitmap(bitmap, src, dst, paint);
 		}
-	}
 
-	private class PoiOverlay extends MarkerOverlay {
-		private final Poi poi;
-
-		public PoiOverlay(Poi poi, Bitmap bitmap) {
-			super(new LatLon(poi.getLatitude(), poi.getLongitude()), bitmap);
-			this.poi = poi;
-		}
-
-		@Override
-		public void onTap() {
-			showPoiInfo(poi);
-		}
-	}
-
-	private class UserOverlay extends MarkerOverlay {
-		private final UserInEvent userInEvent;
-
-		public UserOverlay(UserInEvent userInEvent) {
-			super(new LatLon(userInEvent.getLastLocationLatitude(),
-					userInEvent.getLastLocationLongitude()), userMarkerBitmap);
-			this.userInEvent = userInEvent;
-		}
-
-		@Override
-		public void onTap() {
-			showUserInfo(userInEvent.getUser());
+		private void setSelected(boolean selected) {
+			this.selected = selected;
 		}
 	}
 
@@ -319,40 +381,40 @@ public class MapFragment extends SherlockFragment {
 		public void setAccuracyMeters(double accuracyMeters) {
 			this.accuracyMeters = accuracyMeters;
 		}
-		
+
 		public void setVisible() {
 			visible = true;
 		}
 	}
 
-	private static class EventPoiTransitionTask extends
-			ActivityWorker2<EventActivity, EventPoiResponseData, Exception> {
+	private class PoiOverlay extends MarkerOverlay {
+		private final Poi poi;
 
-		private final EventPoiTransitionRequestParams params;
-
-		public EventPoiTransitionTask(EventPoiTransitionRequestParams params) {
-			this.params = params;
+		public PoiOverlay(Poi poi, Bitmap bitmap) {
+			super(new LatLon(poi.getLatitude(), poi.getLongitude()), bitmap);
+			this.poi = poi;
 		}
 
 		@Override
-		protected void doInBackground() {
-			try {
-				getListenerProxy().onSuccess(new EventPoiTransitionCall(params).call());
-			} catch (ApiCallException e) {
-				getListenerProxy().onException(e);
-			}
+		public void onTap() {
+			selectPoi(poi);
+		}
+	}
+
+	private class UserOverlay extends MarkerOverlay {
+		private final UserInEvent userInEvent;
+
+		public UserOverlay(UserInEvent userInEvent) {
+			super(new LatLon(userInEvent.getLastLocationLatitude(),
+					userInEvent.getLastLocationLongitude()), userMarkerBitmap);
+			this.userInEvent = userInEvent;
 		}
 
 		@Override
-		public void onSuccess(EventPoiResponseData result) {
-			FragmentManager fm = getActivity().getSupportFragmentManager();
-			((DialogFragment) fm.findFragmentByTag(SendingTransitionDialog.TAG)).dismiss();
+		public void onTap() {
+			System.out.println(0);
+			selectUser(userInEvent.getUser());
 		}
-
-		@Override
-		public void onException(Exception e) {
-		}
-
 	}
 
 	public static class SendingTransitionDialog extends DialogFragment {
