@@ -9,4 +9,14 @@ import cz.clovekvtisni.coordinator.server.domain.UserGroupEntity;
  * Date: 5.12.12
  */
 public class UserGroupForm extends UserGroupEntity {
+
+    private String retUrl;
+
+    public String getRetUrl() {
+        return retUrl;
+    }
+
+    public void setRetUrl(String retUrl) {
+        this.retUrl = retUrl;
+    }
 }

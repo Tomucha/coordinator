@@ -14,6 +14,7 @@
 
             <div>
                 <sf:hidden path="id"/>
+                <sf:hidden path="retUrl"/>
                 <tags:hiddenEvent/>
                 <sf:hidden path="organizationId"/>
             </div>
