@@ -11,25 +11,21 @@ import cz.clovekvtisni.coordinator.android.DeployEnvironment;
 
 public class BitmapLoader extends Loader<BitmapLoader.Listener> {
 
-	private final int density;
 	private final String url;
 
 	private Result result;
 
-	public BitmapLoader(String url, int density) {
+	public BitmapLoader(String url) {
 		super(Listener.class);
-		this.density = density;
 		this.url = DeployEnvironment.SERVER_URL_PREFIX + url;
+	
 	}
 
 	@Override
 	protected void doInBackground() {
 		try {
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inDensity = 160;
-			options.inTargetDensity = density;
 			Bitmap bitmap = BitmapFactory
-					.decodeStream(HttpRequest.get(url).stream(), null, options);
+					.decodeStream(HttpRequest.get(url).stream(), null, null);
 			result = new Result(bitmap);
 			getListenerProxy().onSuccess(bitmap);
 		} catch (HttpRequestException e) {

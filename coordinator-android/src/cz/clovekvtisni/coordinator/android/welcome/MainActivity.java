@@ -1,14 +1,15 @@
 package cz.clovekvtisni.coordinator.android.welcome;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.fhucho.android.workers.Workers;
@@ -18,16 +19,18 @@ import cz.clovekvtisni.coordinator.SecretInfo;
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoaderListener;
+import cz.clovekvtisni.coordinator.android.api.BitmapLoader;
 import cz.clovekvtisni.coordinator.android.organization.OrganizationActivity;
+import cz.clovekvtisni.coordinator.android.util.BetterArrayAdapter;
+import cz.clovekvtisni.coordinator.android.util.FindView;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 
 public class MainActivity extends SherlockFragmentActivity {
 
-	private final OrganizationAdapter adapter = new OrganizationAdapter();
-
-	private Organization[] organizations;
+	private final Map<Organization, Bitmap> organizationIcons = new HashMap<Organization, Bitmap>();
+	private OrganizationAdapter adapter;
 
 	private void initGCM() {
 		GCMRegistrar.checkDevice(this);
@@ -67,9 +70,7 @@ public class MainActivity extends SherlockFragmentActivity {
 		Workers.load(new ConfigLoader(), new ConfigLoaderListener() {
 			@Override
 			public void onResult(ConfigResponse result) {
-				setLoadingState(LoadingState.DONE);
-				organizations = result.getOrganizationList();
-				adapter.notifyDataSetChanged();
+				onOrganizationsLoaded(result.getOrganizationList());
 			}
 
 			@Override
@@ -86,9 +87,31 @@ public class MainActivity extends SherlockFragmentActivity {
 		setContentView(R.layout.activity_main);
 
 		initTryAgainButton();
+		adapter = new OrganizationAdapter();
 		loadOrganizations();
 		initListView();
 		initGCM();
+	}
+
+	private void onOrganizationsLoaded(Organization[] organizations) {
+		setLoadingState(LoadingState.DONE);
+		adapter.clear();
+		adapter.addAll(organizations);
+		adapter.notifyDataSetChanged();
+
+		for (final Organization organization : organizations) {
+			Workers.load(new BitmapLoader(organization.getIcon()), new BitmapLoader.Listener() {
+				@Override
+				public void onSuccess(Bitmap bitmap) {
+					organizationIcons.put(organization, bitmap);
+					adapter.notifyDataSetChanged();
+				}
+
+				@Override
+				public void onException(Exception e) {
+				}
+			}, this);
+		}
 	}
 
 	private void setLoadingState(LoadingState state) {
@@ -103,34 +126,15 @@ public class MainActivity extends SherlockFragmentActivity {
 		startActivity(OrganizationActivity.IntentHelper.create(this, organization));
 	}
 
-	private class OrganizationAdapter extends BaseAdapter {
-		@Override
-		public int getCount() {
-			if (organizations == null) return 0;
-			else return organizations.length;
+	private class OrganizationAdapter extends BetterArrayAdapter<Organization> {
+		public OrganizationAdapter() {
+			super(MainActivity.this, R.layout.item_organization);
 		}
 
 		@Override
-		public Organization getItem(int position) {
-			return organizations[position];
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			TextView textView = (TextView) convertView;
-			if (textView == null) {
-				textView = (TextView) getLayoutInflater().inflate(
-						android.R.layout.simple_list_item_1, null);
-			}
-
-			textView.setText(organizations[position].getName());
-
-			return textView;
+		protected void setUpView(Organization organization, View view) {
+			FindView.textView(view, R.id.title).setText(organization.getName());
+			FindView.imageView(view, R.id.icon).setImageBitmap(organizationIcons.get(organization));
 		}
 	}
 

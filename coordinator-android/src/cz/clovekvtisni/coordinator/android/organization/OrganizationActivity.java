@@ -26,6 +26,7 @@ import cz.clovekvtisni.coordinator.android.register.RegisterActivity;
 import cz.clovekvtisni.coordinator.api.request.EventFilterRequestParams;
 import cz.clovekvtisni.coordinator.api.response.EventFilterResponseData;
 import cz.clovekvtisni.coordinator.domain.Event;
+import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 
@@ -35,6 +36,7 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 
 	private EventsAdapter adapter;
 	private Organization organization;
+	private OrganizationInEvent[] orgInEvents;
 	private Set<Long> registeredEventIds = new HashSet<Long>();
 	private View preregister;
 
@@ -52,7 +54,8 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 				Event event = events[position];
 				boolean registered = registeredEventIds.contains(event.getId());
 				if (registered) {
-					startActivity(EventActivity.IntentHelper.create(c, events[position]));
+					startActivity(EventActivity.IntentHelper.create(c, events[position],
+							orgInEvents[position]));
 				} else {
 					startActivityForResult(
 							RegisterActivity.IntentHelper.create(c, organization, event),
@@ -87,20 +90,23 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 				UserInEvent[] userInEvents = result.getUserInEvents();
 				if (userInEvents == null) userInEvents = new UserInEvent[0];
 
+				OrganizationInEvent[] orgInEvents = result.getOrganizationInEvents();
+				if (orgInEvents == null) orgInEvents = new OrganizationInEvent[0];
+
 				Event[] events = result.getEvents();
 				if (events == null) events = new Event[0];
 
-				onEventsLoaded(events, userInEvents);
+				onEventsLoaded(events, userInEvents, orgInEvents);
 			}
 		}, this);
 	}
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if(requestCode == REQUEST_REGISTER) {
+		if (requestCode == REQUEST_REGISTER) {
 			EventFilterRequestParams params = new EventFilterRequestParams();
 			params.setOrganizationId(organization.getId());
-			
+
 			Workers.load(new EventRegisteredLoader(params), new EventRegisteredLoaderListener() {
 				@Override
 				public void onException(Exception e) {
@@ -111,17 +117,24 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 					UserInEvent[] userInEvents = result.getUserInEvents();
 					if (userInEvents == null) userInEvents = new UserInEvent[0];
 
+					OrganizationInEvent[] orgInEvents = result.getOrganizationInEvents();
+					if (orgInEvents == null) orgInEvents = new OrganizationInEvent[0];
+
 					Event[] events = result.getEvents();
 					if (events == null) events = new Event[0];
 
-					onEventsLoaded(events, userInEvents);
+					onEventsLoaded(events, userInEvents, orgInEvents);
 				}
 			}, this);
 		}
 	}
 
-	private void onEventsLoaded(Event[] events, UserInEvent[] userInEvents) {
+	private void onEventsLoaded(Event[] events, UserInEvent[] userInEvents,
+			OrganizationInEvent[] orgInEvents) {
 		this.events = events;
+		this.orgInEvents = orgInEvents;
+		
+			System.out.println(orgInEvents[0].getOperationalInfo() + "!");System.out.println(orgInEvents[1].getOperationalInfo() + "!");
 
 		registeredEventIds.clear();
 		for (UserInEvent userInEvent : userInEvents) {

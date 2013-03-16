@@ -3,6 +3,6 @@
 
     <style name="RootTheme" parent="@style/Theme.Sherlock.Light.DarkActionBar">
         <item name="android:progressBarStyle">@android:style/Widget.Holo.Light.ProgressBar.Large</item>
-	</style>
-	
+    </style>
+
 </resources>

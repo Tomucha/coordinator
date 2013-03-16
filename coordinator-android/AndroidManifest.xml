@@ -28,7 +28,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".welcome.MainActivity"
-            android:label="Člověk v tísni" >
+            android:label="Koordinátor" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,7 +37,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".organization.OrganizationActivity" />
-        <activity android:name=".event.EventActivity" />
+        <activity
+            android:name=".event.EventActivity"
+            android:theme="@style/EventActivityTheme" />
         <activity android:name=".register.RegisterActivity" />
         <activity android:name="com.crittercism.NotificationActivity" />
 

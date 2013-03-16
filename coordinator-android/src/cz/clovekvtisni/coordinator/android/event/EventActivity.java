@@ -13,6 +13,8 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -44,6 +46,7 @@ import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventUserListLoaderLis
 import cz.clovekvtisni.coordinator.android.api.BitmapLoader;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.android.util.SimpleListeners.SimpleTabListener;
+import cz.clovekvtisni.coordinator.android.util.Utils;
 import cz.clovekvtisni.coordinator.api.request.EventPoiListRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventUserListRequestParams;
 import cz.clovekvtisni.coordinator.api.request.UserUpdatePositionRequestParams;
@@ -52,6 +55,7 @@ import cz.clovekvtisni.coordinator.api.response.EventPoiFilterResponseData;
 import cz.clovekvtisni.coordinator.api.response.EventUserListResponseData;
 import cz.clovekvtisni.coordinator.api.response.UserUpdatePositionResponseData;
 import cz.clovekvtisni.coordinator.domain.Event;
+import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.domain.Poi;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
@@ -76,7 +80,8 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		mapFragment = new MapFragment();
 		tasksFragment = new TasksFragment();
 		usersFragment = new UsersFragment();
-		infoFragment = InfoFragment.newInstance(event.getDescription());
+		String info = IntentHelper.getOrganizationInEvent(getIntent()).getOperationalInfo();
+		infoFragment = InfoFragment.newInstance(info);
 
 		fragments = Lists.newArrayList(mapFragment, tasksFragment, usersFragment, infoFragment);
 	}
@@ -115,6 +120,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		actionBar.setLogo(new ColorDrawable(Color.TRANSPARENT));
 
 		event = IntentHelper.getEvent(getIntent());
 
@@ -170,9 +176,10 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 			String url = category.getIcon();
 			DisplayMetrics metrics = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(metrics);
-			Workers.load(new BitmapLoader(url, metrics.densityDpi), new BitmapLoader.Listener() {
+			Workers.load(new BitmapLoader(url), new BitmapLoader.Listener() {
 				@Override
 				public void onSuccess(Bitmap bitmap) {
+					bitmap = Utils.scaleBitmapAccordingToDensity(bitmap, getWindowManager());
 					poiIcons.put(category, bitmap);
 					updateFilteredPois();
 					updateImportantPois();
@@ -243,7 +250,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		mapFragment.setFilteredPois(filteredPois, poiIcons);
 		tasksFragment.setFilteredPois(filteredPois);
 	}
-	
+
 	private void updateImportantPois() {
 		List<Poi> importantPois = new ArrayList<Poi>();
 		for (Poi poi : pois) {
@@ -382,16 +389,22 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	}
 
 	public static class IntentHelper {
-		private static final String EXTRA_EVENT = "organization";
+		private static final String EXTRA_EVENT = "event";
+		private static final String EXTRA_ORG_IN_EVENT = "orgInEvent";
 
-		public static Intent create(Context c, Event event) {
+		public static Intent create(Context c, Event event, OrganizationInEvent organizationInEvent) {
 			Intent i = new Intent(c, EventActivity.class);
 			i.putExtra(EXTRA_EVENT, event);
+			i.putExtra(EXTRA_ORG_IN_EVENT, organizationInEvent);
 			return i;
 		}
 
 		public static Event getEvent(Intent i) {
 			return (Event) i.getSerializableExtra(EXTRA_EVENT);
+		}
+
+		public static OrganizationInEvent getOrganizationInEvent(Intent i) {
+			return (OrganizationInEvent) i.getSerializableExtra(EXTRA_ORG_IN_EVENT);
 		}
 	}
 }

@@ -8,8 +8,10 @@ import java.security.NoSuchAlgorithmException;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.WindowManager;
 
 public class Utils {
 	public static int dpToPx(Resources res, int dp) {
@@ -42,5 +44,13 @@ public class Utils {
 		} catch (UnsupportedEncodingException e) {
 			throw new AssertionError();
 		}
+	}
+	
+	public static Bitmap scaleBitmapAccordingToDensity(Bitmap bitmap, WindowManager wm) {
+		DisplayMetrics metrics = new DisplayMetrics();
+		wm.getDefaultDisplay().getMetrics(metrics);
+		int w = (int) (bitmap.getWidth()*metrics.density);
+		int h = (int) (bitmap.getHeight() * metrics.density);
+		return Bitmap.createScaledBitmap(bitmap,  w,h, true);
 	}
 }

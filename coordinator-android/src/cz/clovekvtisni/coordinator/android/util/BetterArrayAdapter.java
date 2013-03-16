@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.android.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -15,8 +16,12 @@ public abstract class BetterArrayAdapter<T> extends ArrayAdapter<T> {
 		super(context, layoutResource, objects);
 		this.layoutResource = layoutResource;
 	}
+	
+	public BetterArrayAdapter(Context context, int layoutResource) {
+		this(context, layoutResource, new ArrayList<T>());
+	}
 
-	protected abstract void setUpItem(int position, View item);
+	protected abstract void setUpView(T item, View view);
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -24,7 +29,7 @@ public abstract class BetterArrayAdapter<T> extends ArrayAdapter<T> {
 			LayoutInflater inflater = LayoutInflater.from(getContext());
 			convertView = inflater.inflate(layoutResource, parent, false);
 		}
-		setUpItem(position, convertView);
+		setUpView(getItem(position), convertView);
 		return convertView;
 	}
 }

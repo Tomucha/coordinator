@@ -1,6 +1,5 @@
 package cz.clovekvtisni.coordinator.android.event;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -19,6 +17,7 @@ import com.actionbarsherlock.view.MenuItem;
 
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.util.BetterArrayAdapter;
+import cz.clovekvtisni.coordinator.android.util.FindView;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 
@@ -75,18 +74,14 @@ public class UsersFragment extends SherlockFragment {
 	private class UserAdapter extends BetterArrayAdapter<UserInEvent> {
 
 		public UserAdapter() {
-			super(getActivity(), android.R.layout.simple_list_item_2, new ArrayList<UserInEvent>());
+			super(getActivity(), android.R.layout.simple_list_item_2);
 		}
 
 		@Override
-		protected void setUpItem(int position, View item) {
-			User user = getItem(position).getUser();
-
-			TextView title = (TextView) item.findViewById(android.R.id.text1);
-			title.setText(user.getFullName());
-
-			TextView desc = (TextView) item.findViewById(android.R.id.text2);
-			desc.setText(user.getPhone());
+		protected void setUpView(UserInEvent userInEvent, View view) {
+			User user = userInEvent.getUser();			
+			FindView.textView(view, android.R.id.text1).setText(user.getFullName());
+			FindView.textView(view, android.R.id.text2).setText(user.getPhone());
 		}
 
 	}

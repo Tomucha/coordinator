@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -19,6 +18,7 @@ import com.actionbarsherlock.view.MenuItem;
 
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.util.BetterArrayAdapter;
+import cz.clovekvtisni.coordinator.android.util.FindView;
 import cz.clovekvtisni.coordinator.domain.Poi;
 
 public class TasksFragment extends SherlockFragment {
@@ -68,18 +68,13 @@ public class TasksFragment extends SherlockFragment {
 	private class PoisAdapter extends BetterArrayAdapter<Poi> {
 
 		public PoisAdapter(List<Poi> pois) {
-			super(getActivity(), android.R.layout.simple_list_item_2, pois);
+			super(getActivity(), android.R.layout.simple_list_item_2);
 		}
 
 		@Override
-		protected void setUpItem(int position, View item) {
-			Poi poi = getItem(position);
-
-			TextView title = (TextView) item.findViewById(android.R.id.text1);
-			title.setText(poi.getName());
-
-			TextView desc = (TextView) item.findViewById(android.R.id.text2);
-			desc.setText(poi.getDescription());
+		protected void setUpView(Poi poi, View view) {
+			FindView.textView(view, android.R.id.text1).setText(poi.getName());
+			FindView.textView(view, android.R.id.text2).setText(poi.getDescription());
 		}
 
 	}
