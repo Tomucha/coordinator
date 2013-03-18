@@ -41,19 +41,6 @@
 </h2>
 
 
-<div class="pull-right" width="400px">
-    <tags:osm
-            width="400px"
-            height="300px"
-            longitude="${!empty form.lastLocationLongitude ? form.lastLocationLongitude : event.firstEventLocation.longitude}"
-            latitude="${!empty form.lastLocationLatitude ? form.lastLocationLatitude : event.firstEventLocation.latitude}"
-            zoom="13"
-            onLoad="initialize()"
-            onNewPoint="onNewPoint"
-            maxPoints="poi=1"
-            buttons="addPoi"
-            />
-</div>
 
 <div class="mainPanel">
     <div class="userForm">
@@ -61,135 +48,155 @@
 
             <sf:errors cssClass="alert alert-error" />
 
-            <div class="formPanel">
+            <div class="fluid">
+                <div class="row-fluid">
+                    <div class="mini-layout span3">
+                        <div>
+                            <c:choose>
+                                <c:when test="${can:isSuperadmin() and empty form.id}">
+                                    <div>
+                                        <tags:input field="organizationId" modelAttribute="form" captionCode="UserEntity.organization">
+                                            <sf:select path="organizationId" items="${config.organizationMap}" itemLabel="name"/>
+                                        </tags:input>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <sf:hidden path="organizationId"/>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
 
-                <div>
-                    <c:choose>
-                        <c:when test="${can:isSuperadmin() and empty form.id}">
+                        <div>
+                            <tags:hiddenEvent/>
+                            <sf:hidden path="userId"/>
+                            <sf:hidden path="createdDate"/>
+
+                            <tags:input field="firstName" modelAttribute="form" captionCode="UserEntity.firstName">
+                                <sf:input path="firstName" />
+                            </tags:input>
+                        </div>
+
+                        <div>
+                            <tags:input field="lastName" modelAttribute="form" captionCode="UserEntity.lastName">
+                                <sf:input path="lastName"/>
+                            </tags:input>
+                        </div>
+
+                        <div>
+                            <tags:input field="email" modelAttribute="form" captionCode="UserEntity.email">
+                                <sf:input path="email"/>
+                            </tags:input>
+                        </div>
+
+                        <c:if test="${empty form.id}">
                             <div>
-                                <tags:input field="organizationId" modelAttribute="form" captionCode="UserEntity.organization">
-                                    <sf:select path="organizationId" items="${config.organizationMap}" itemLabel="name"/>
+                                <tags:input field="password" modelAttribute="form" captionCode="UserEntity.password">
+                                    <sf:password path="password"/>
                                 </tags:input>
                             </div>
-                        </c:when>
-                        <c:otherwise>
-                            <sf:hidden path="organizationId"/>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
 
-                <div>
-                    <tags:hiddenEvent/>
-                    <sf:hidden path="userId"/>
-                    <sf:hidden path="createdDate"/>
+                            <div>
+                                <tags:input field="confirmPassword" modelAttribute="form" captionCode="UserEntity.confirmPassword">
+                                    <sf:password path="confirmPassword"/>
+                                </tags:input>
+                            </div>
+                        </c:if>
 
-                    <tags:input field="firstName" modelAttribute="form" captionCode="UserEntity.firstName">
-                        <sf:input path="firstName" />
-                    </tags:input>
-                </div>
+                        <div>
+                            <tags:input field="phone" modelAttribute="form" captionCode="UserEntity.phone">
+                                <sf:input path="phone"/>
+                            </tags:input>
+                        </div>
 
-                <div>
-                    <tags:input field="lastName" modelAttribute="form" captionCode="UserEntity.lastName">
-                        <sf:input path="lastName"/>
-                    </tags:input>
-                </div>
+                        <div>
+                            <tags:input field="birthday" modelAttribute="form" captionCode="UserEntity.birthday">
+                                <sf:input path="birthday" id="birthdayInput" />
+                            </tags:input>
+                        </div>
 
-                <div>
-                    <tags:input field="email" modelAttribute="form" captionCode="UserEntity.email">
-                        <sf:input path="email"/>
-                    </tags:input>
-                </div>
+                        <div>
+                            <tags:input field="addressLine" modelAttribute="form" captionCode="UserEntity.addressLine">
+                                <sf:input path="addressLine"/>
+                            </tags:input>
+                        </div>
 
-                <c:if test="${empty form.id}">
-                    <div>
-                        <tags:input field="password" modelAttribute="form" captionCode="UserEntity.password">
-                            <sf:password path="password"/>
-                        </tags:input>
+                        <div>
+                            <tags:input field="city" modelAttribute="form" captionCode="UserEntity.city">
+                                <sf:input path="city"/>
+                            </tags:input>
+                        </div>
+
+                        <div>
+                            <tags:input field="zip" modelAttribute="form" captionCode="UserEntity.zip">
+                                <sf:input path="zip"/>
+                            </tags:input>
+                        </div>
+
+                        <div>
+                            <tags:input field="country" modelAttribute="form" captionCode="UserEntity.country">
+                                <sf:select path="country">
+                                    <sf:option value=""><s:message code="label.emptyCountry"/></sf:option>
+                                    <sf:options items="${config.countryMap}"/>
+                                </sf:select>
+                            </tags:input>
+                        </div>
+
+                        <div>
+                            <tags:input field="lastLocationLongitude" modelAttribute="form" captionCode="UserEntity.lastLocationLongitude">
+                                <sf:input id="longitudeInput" path="lastLocationLongitude" readonly="true"/>
+                            </tags:input>
+                        </div>
+
+                        <div>
+                            <tags:input field="lastLocationLatitude" modelAttribute="form" captionCode="UserEntity.lastLocationLatitude">
+                                <sf:input id="latitudeInput" path="lastLocationLatitude" readonly="true"/>
+                            </tags:input>
+                        </div>
                     </div>
 
-                    <div>
-                        <tags:input field="confirmPassword" modelAttribute="form" captionCode="UserEntity.confirmPassword">
-                            <sf:password path="confirmPassword"/>
-                        </tags:input>
+                    <div class="mini-layout span3">
+
+                        <div class="panel checkboxList">
+                            <h3><s:message code="header.equipmentList"/></h3>
+                            <sf:checkboxes path="selectedEquipment" items="${equipmentList}" itemLabel="name" itemValue="id"/>
+                            <c:if test="${empty equipmentList or fn:length(equipmentList) == 0}">
+                                <p class="label label-inf"><s:message code="msg.noItemsAreRequired"/></p>
+                            </c:if>
+                        </div>
+
+                        <div class="panel checkboxList">
+                            <h3><s:message code="header.skillList"/></h3>
+                            <sf:checkboxes path="selectedSkill" items="${skillList}" itemLabel="name" itemValue="id"/>
+                            <c:if test="${empty skillList or fn:length(skillList) == 0}">
+                                <p class="label label-inf"><s:message code="msg.noItemsAreRequired"/></p>
+                            </c:if>
+                        </div>
+
+                        <div class="panel checkboxList">
+                            <h3><s:message code="header.userGroupList"/></h3>
+                            <sf:checkboxes path="groupIdList" items="${userGroups}" itemLabel="name" itemValue="id"/>
+                        </div>
+
                     </div>
-                </c:if>
 
-                <div>
-                    <tags:input field="phone" modelAttribute="form" captionCode="UserEntity.phone">
-                        <sf:input path="phone"/>
-                    </tags:input>
+                    <div class="mini-layout span3">
+                        <tags:osm
+                                width="400px"
+                                height="300px"
+                                longitude="${!empty form.lastLocationLongitude ? form.lastLocationLongitude : event.firstEventLocation.longitude}"
+                                latitude="${!empty form.lastLocationLatitude ? form.lastLocationLatitude : event.firstEventLocation.latitude}"
+                                zoom="13"
+                                onLoad="initialize()"
+                                onNewPoint="onNewPoint"
+                                maxPoints="poi=1"
+                                buttons="addPoi"
+                                />
+                    </div>
                 </div>
-
-                <div>
-                    <tags:input field="birthday" modelAttribute="form" captionCode="UserEntity.birthday">
-                        <sf:input path="birthday" id="birthdayInput" />
-                    </tags:input>
-                </div>
-
-                <div>
-                    <tags:input field="addressLine" modelAttribute="form" captionCode="UserEntity.addressLine">
-                        <sf:input path="addressLine"/>
-                    </tags:input>
-                </div>
-
-                <div>
-                    <tags:input field="city" modelAttribute="form" captionCode="UserEntity.city">
-                        <sf:input path="city"/>
-                    </tags:input>
-                </div>
-
-                <div>
-                    <tags:input field="zip" modelAttribute="form" captionCode="UserEntity.zip">
-                        <sf:input path="zip"/>
-                    </tags:input>
-                </div>
-
-                <div>
-                    <tags:input field="country" modelAttribute="form" captionCode="UserEntity.country">
-                        <sf:select path="country">
-                            <sf:option value=""><s:message code="label.emptyCountry"/></sf:option>
-                            <sf:options items="${config.countryMap}"/>
-                        </sf:select>
-                    </tags:input>
-                </div>
-
-                <div>
-                    <tags:input field="lastLocationLongitude" modelAttribute="form" captionCode="UserEntity.lastLocationLongitude">
-                        <sf:input id="longitudeInput" path="lastLocationLongitude" readonly="true"/>
-                    </tags:input>
-                </div>
-
-                <div>
-                    <tags:input field="lastLocationLatitude" modelAttribute="form" captionCode="UserEntity.lastLocationLatitude">
-                        <sf:input id="latitudeInput" path="lastLocationLatitude" readonly="true"/>
-                    </tags:input>
-                </div>
-
-            </div>
-
-            <div class="panel checkboxList">
-                <h3><s:message code="header.equipmentList"/></h3>
-                <sf:checkboxes path="selectedEquipment" items="${equipmentList}" itemLabel="name" itemValue="id"/>
-                <c:if test="${empty equipmentList or fn:length(equipmentList) == 0}">
-                    <p class="label label-inf"><s:message code="msg.noItemsAreRequired"/></p>
-                </c:if>
-            </div>
-
-            <div class="panel checkboxList">
-                <h3><s:message code="header.skillList"/></h3>
-                <sf:checkboxes path="selectedSkill" items="${skillList}" itemLabel="name" itemValue="id"/>
-                <c:if test="${empty skillList or fn:length(skillList) == 0}">
-                    <p class="label label-inf"><s:message code="msg.noItemsAreRequired"/></p>
-                </c:if>
-            </div>
-
-            <div class="panel checkboxList">
-                <h3><s:message code="header.userGroupList"/></h3>
-                <sf:checkboxes path="groupIdList" items="${userGroups}" itemLabel="name" itemValue="id"/>
             </div>
 
             <div class="buttonPanel">
-                <sf:button class="btn"><s:message code="button.save"/></sf:button>
+                <sf:button class="btn btn-primary"><span class="icon-ok icon-white"></span> <s:message code="button.save"/></sf:button>
             </div>
         </sf:form>
     </div>

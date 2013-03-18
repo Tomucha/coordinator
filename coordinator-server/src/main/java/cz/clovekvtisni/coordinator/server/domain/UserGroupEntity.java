@@ -9,6 +9,8 @@ import cz.clovekvtisni.coordinator.domain.UserGroup;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jka
@@ -22,12 +24,15 @@ public class UserGroupEntity extends AbstractPersistentEntity<UserGroup, UserGro
     private Long id;
 
     @Index
+    @NotNull
     private Long eventId;
 
     @Index
+    @NotEmpty
     private String organizationId;
 
     @Index
+    @NotEmpty
     private String name;
 
     private String roleId;

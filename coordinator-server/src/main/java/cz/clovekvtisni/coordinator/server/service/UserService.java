@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.service;
 
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
+import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserAuthKey;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
@@ -43,6 +44,12 @@ public interface UserService extends Service {
 
     @CheckPermission("#helper.canUpdate(#p0)")
     UserEntity updateUser(UserEntity user);
+
+    @CheckPermission("#helper.canUpdate(#p0)")
+    UserEntity createUserInEvent(UserEntity user, UserInEventEntity event);
+
+    @CheckPermission("#helper.canUpdate(#p0)")
+    UserEntity updateUserInEvent(UserEntity user, UserInEventEntity event);
 
     @CheckPermission("#helper.canDelete(new cz.clovekvtisni.coordinator.server.domain.UserEntity(#p0))")
     void deleteUser(Long id);

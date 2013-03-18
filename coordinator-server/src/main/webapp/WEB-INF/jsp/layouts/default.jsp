@@ -24,15 +24,20 @@
             <div class="row-fluid">
 
                 <div class="span3">
-                    <div class="well sidebar-nav">
+                    <div class="activityPanel well sidebar-nav">
                         <h3><s:message code="title.activityFeed"/></h3>
-                        <c:if test="${not empty activity}">
-                            <div class="activityList">
-                                <c:forEach items="${activity}" var="activityRow">
-                                    <p><tags:renderActivity activity="${activityRow}"/></p>
-                                </c:forEach>
-                            </div>
-                        </c:if>
+                        <c:choose>
+                            <c:when test="${not empty activity}">
+                                <div class="activityList">
+                                    <c:forEach items="${activity}" var="activityRow">
+                                        <p><tags:renderActivity activity="${activityRow}"/></p>
+                                    </c:forEach>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <i><s:message code="msg.noActivitiesInEvent"/></i>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                     <!--/.well -->
                 </div>

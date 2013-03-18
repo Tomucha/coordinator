@@ -207,6 +207,14 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 updateSystemFields(old, old);
                 ofy().put(old);
 
+                // odstraneni posledni poi
+                if (user.getLastPoiId() != null && user.getLastPoiId().equals(poi.getId())) {
+                    user.setLastPoiEntity(null);
+                    user.setLastPoiId(null);
+                    user.setLastPoiDate(null);
+                    ofy().put(user);
+                }
+
                 ActivityEntity a = new ActivityEntity();
                 a.setUserId(userId);
                 a.setType(ActivityEntity.ActivityType.UNASSIGNED);

@@ -12,7 +12,7 @@
 
 <div class="buttonPanel">
     <c:if test="${can:create('userEntity')}">
-        <a class="btn" href="${root}/superadmin/user/edit"><s:message code="button.createUser"/></a>
+        <a class="btn" href="${root}/superadmin/user/edit"><i class="icon-plus"></i> <i class="icon-user"></i> <s:message code="button.createUser"/></a>
     </c:if>
 </div>
 

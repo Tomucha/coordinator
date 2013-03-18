@@ -26,17 +26,19 @@
     <div class="row-fluid">
 
         <div class="span3">
-            <div class="well">
+            <div class="activityPanel well sidebar-nav">
                 <h2><s:message code="title.currentEvents"/></h2>
                 <c:choose>
                     <c:when test="${empty currentEvents}">
                         <p><s:message code="msg.noCurrentEvents"/></p>
                     </c:when>
                     <c:otherwise>
+                        <ul>
                             <c:forEach items="${currentEvents}" var="event">
-                                <p><a href="${root}/admin/event/map?eventId=${event.id}"><c:out value="${event.name}"/></a><br/>
-                                   <c:out value="${event.description}"/></p>
+                                <li><a href="${root}/admin/event/map?eventId=${event.id}"><c:out value="${event.name}"/></a><br/>
+                                   <c:out value="${event.description}"/></li>
                             </c:forEach>
+                         </ul>
                     </c:otherwise>
                 </c:choose>
             </div>

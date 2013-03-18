@@ -21,8 +21,8 @@
     <div class="buttonPanel">
         <c:choose>
             <c:when test="${can:hasRole('BACKEND')}">
-                <button accesskey="f" class="btn" onclick="\$('#searchFormPanel').show();"><s:message code="button.filterList"/> <span class="caret"></span></button>
-                <a class="btn" href="<s:url value="/admin/event/poi/edit?eventId=${params.eventId}"/>"><s:message
+                <button accesskey="f" class="btn" onclick="\$('#searchFormPanel').show();"><i class="icon-filter"></i> <s:message code="button.filterList"/> <span class="caret"></span></button>
+                <a class="btn" href="<s:url value="/admin/event/poi/edit?eventId=${params.eventId}"/>"><span class="icon-plus"></span> <span class="icon-map-marker"></span> <s:message
                         code="button.addNew"/></a>
             </c:when>
         </c:choose>
@@ -101,7 +101,7 @@
                                 </td>
                                 <td>
                                     <a class="btn"
-                                       href="<s:url value="${root}/admin/event/poi/edit?eventId=${poi.eventId}&poiId=${poi.id}"/>"><s:message
+                                       href="<s:url value="${root}/admin/event/poi/edit?eventId=${poi.eventId}&poiId=${poi.id}"/>"><span class=" icon-pencil"></span> <s:message
                                             code="button.edit"/></a>
                                 </td>
                             </tr>
@@ -109,16 +109,15 @@
                         </tbody>
                     </table>
 
-                    <div>
+                    <div class="bottomTableControl">
                         <sf:select path="selectedAction">
-                            <sf:option value=""/>
-                            <sf:option value="" disabled="true">foo</sf:option>
+                            <sf:option value="" disabled="disabled"><s:message code="option.selectAction"/></sf:option>
                             <c:forEach items="${selectedPoiActions}" var="action">
                                 <sf:option value="${action}"><s:message code="SelectedPoiAction.${action}"/></sf:option>
                             </c:forEach>
                         </sf:select>
 
-                        <sf:button class="btn"><s:message code="button.submit"/></sf:button>
+                        <sf:button class="btn"><span class="icon-ok"></span> <s:message code="button.submit"/></sf:button>
                     </div>
                 </div>
             </sf:form>

@@ -18,19 +18,19 @@
 <p><small>${poi.description}<br/>${poi.poiCategory.name}</small></p>
 
 <c:if test="${not empty poi.workflow}">
-<p><a href="${root}/admin/event/poi/workflow?poiId=<c:out value='${poi.id}'/>&eventId=${poi.eventId}">
-    <c:out value="${poi.workflowState.name}"/><br/>
-    <small><c:out value="${poi.workflowState.description}"/></small>
-</a></p>
+    <p><a href="${root}/admin/event/poi/workflow?poiId=<c:out value='${poi.id}'/>&eventId=${poi.eventId}">
+        <c:out value="${poi.workflowState.name}"/><br/>
+        <small><c:out value="${poi.workflowState.description}"/></small>
+    </a></p>
 </c:if>
 
 <c:if test="${not empty assignedUsers}">
-<h4><s:message code="label.assignedUsers"/></h4>
-<p>
-<c:forEach items="${assignedUsers}" var="userInEvent" begin="0" step="1" varStatus="i">
-    <span>${userInEvent.userEntity.fullName}</span>
-</c:forEach>
-</p>
+    <h4><s:message code="label.assignedUsers"/></h4>
+    <p>
+        <c:forEach items="${assignedUsers}" var="userInEvent" begin="0" step="1" varStatus="i">
+            <span>${userInEvent.userEntity.fullName}</span>
+        </c:forEach>
+    </p>
 </c:if>
 
 <div class="btn-group">

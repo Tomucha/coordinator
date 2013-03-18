@@ -57,12 +57,6 @@ public class EventUserListController extends AbstractEventController {
 
         PoiFilter poiFilter = new PoiFilter();
         poiFilter.setEventIdVal(params.getEventId());
-/*
-           FIXME: nevim co to delalo
-        poiFilter.setWorkflowIdVal(0l);
-        poiFilter.setWorkflowIdOp(Filter.Operator.NOT_EQ);
-        model.addAttribute("tasks", poiService.findByFilter(poiFilter, 0, null, 0l).getResult());
-*/
 
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
 

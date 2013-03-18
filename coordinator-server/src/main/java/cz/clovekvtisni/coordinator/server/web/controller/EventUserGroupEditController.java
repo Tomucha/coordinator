@@ -6,6 +6,7 @@ import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserGroupEntity;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.UniqueKeyViolation;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.PoiForm;
 import cz.clovekvtisni.coordinator.server.web.model.UserGroupForm;
@@ -52,6 +53,7 @@ public class EventUserGroupEditController extends AbstractEventController {
             form = new UserGroupForm();
             form.populateFrom(userGroupEntity);
         }
+        form.setRetUrl(params.getRetUrl());
 
         model.addAttribute("form", form);
 
@@ -60,6 +62,9 @@ public class EventUserGroupEditController extends AbstractEventController {
 
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid UserGroupForm form, BindingResult bindingResult, Model model) {
+        if (form.getRetUrl() == null)
+            form.setRetUrl("/admin/event/user/list");
+
         if (bindingResult.hasErrors()) {
             // FIXME: refaktoring
 
@@ -71,11 +76,18 @@ public class EventUserGroupEditController extends AbstractEventController {
             form.setRoleId(null);
         UserGroupEntity userGroupEntity = new UserGroupEntity().populateFrom(form);
 
-        if (userGroupEntity.isNew())
-            userGroupEntity = userGroupService.createUserGroup(userGroupEntity);
-        else
-            userGroupEntity = userGroupService.updateUserGroup(userGroupEntity);
+        try {
+            if (userGroupEntity.isNew())
+                userGroupEntity = userGroupService.createUserGroup(userGroupEntity);
+            else
+                userGroupEntity = userGroupService.updateUserGroup(userGroupEntity);
 
-        return "redirect:/admin/event/user/list?eventId=" + userGroupEntity.getEventId();
+        } catch (UniqueKeyViolation e) {
+            addFieldError(bindingResult, "form", "name", form.getName(), "error.UNIQUE_KEY_VIOLATION");
+            return "admin/event-usergroup-edit";
+        }
+
+
+        return "redirect:" + form.getRetUrl() + "?eventId=" + userGroupEntity.getEventId();
     }
 }
