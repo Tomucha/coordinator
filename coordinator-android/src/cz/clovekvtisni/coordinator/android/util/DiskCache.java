@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.android.util;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,11 +38,13 @@ public class DiskCache {
 		this.dir = dir;
 		this.tmpDir = new File(dir, "tmp");
 
-		Utils.mkDirsOrThrow(dir);
-		Utils.mkDirOrThrow(tmpDir);
+		FileUtils.forceMkdir(dir);
+		FileUtils.forceMkdir(tmpDir);
+		
+		clean();
 	}
 
-	public static DiskCache newInstance(File dir) throws IOException {
+	public static synchronized DiskCache newInstance(File dir) throws IOException {
 		if (usedDirs.contains(dir)) {
 			throw new RuntimeException("Cache dir " + dir.getAbsolutePath() + " was used before.");
 		}
@@ -50,10 +53,16 @@ public class DiskCache {
 
 		return new DiskCache(dir);
 	}
+	
+	private synchronized void clean() throws IOException {
+		for(File file:tmpDir.listFiles()) {
+			System.out.println(file.getAbsolutePath());
+			FileUtils.forceDelete(file);
+		}
+	}
 
 	public synchronized Snapshot get(String key) throws IOException {
 		File entryDir = new File(dir, toInternalKey(key));
-		System.out.println("get" + entryDir.getAbsolutePath());
 		if (!entryDir.exists()) return null;
 
 		File versionDir = new File(entryDir, String.valueOf(maxEntryVersion(entryDir)));
@@ -65,15 +74,15 @@ public class DiskCache {
 		return new Snapshot(fis, readAnnotations(annotationsFile));
 	}
 
-	public synchronized CacheOutputStream getOutputStream(String key) throws IOException {
-		return getOutputStream(key, new HashMap<String, Serializable>());
+	public synchronized CacheOutputStream openStream(String key) throws IOException {
+		return openStream(key, new HashMap<String, Serializable>());
 	}
 
-	public synchronized CacheOutputStream getOutputStream(String key,
-			Map<String, Serializable> annotations) throws IOException {
+	public synchronized CacheOutputStream openStream(String key,
+			Map<String, ? extends Serializable> annotations) throws IOException {
 		nextTmpFileName++;
 		File dir = new File(tmpDir, String.valueOf(nextTmpFileName));
-		Utils.mkDirOrThrow(dir);
+		FileUtils.forceMkdir(dir);
 		return new CacheOutputStream(dir, key, annotations);
 	}
 
@@ -85,8 +94,23 @@ public class DiskCache {
 			throws IOException {
 		CacheOutputStream os = null;
 		try {
-			os = getOutputStream(key, annotations);
+			os = openStream(key, annotations);
 			IOUtils.copy(is, os);
+		} finally {
+			if (os != null) os.close();
+		}
+	}
+
+	public void put(String key, String value) throws IOException {
+		put(key, value, new HashMap<String, Serializable>());
+	}
+
+	public void put(String key, String value, Map<String, ? extends Serializable> annotations)
+			throws IOException {
+		CacheOutputStream os = null;
+		try {
+			os = openStream(key, annotations);
+			os.write(value.getBytes());
 		} finally {
 			if (os != null) os.close();
 		}
@@ -95,8 +119,7 @@ public class DiskCache {
 
 	private synchronized void publish(String key, File unpublished) throws IOException {
 		File entryDir = new File(dir, toInternalKey(key));
-		if (!entryDir.exists()) Utils.mkDirOrThrow(entryDir);
-		System.out.println("created" + entryDir.getAbsolutePath());
+		if (!entryDir.exists()) FileUtils.forceMkdir(entryDir);
 
 		String version = String.valueOf(maxEntryVersion(entryDir) + 1);
 		deleteAllVersions(entryDir);
@@ -136,7 +159,7 @@ public class DiskCache {
 		}
 	}
 
-	private void saveAnnotations(Map<String, Serializable> annotations, File file)
+	private void saveAnnotations(Map<String, ? extends Serializable> annotations, File file)
 			throws IOException {
 		ObjectOutputStream oos = null;
 		try {
@@ -154,13 +177,13 @@ public class DiskCache {
 	private class CacheOutputStream extends FilterOutputStream {
 
 		private final File dir;
-		private final Map<String, Serializable> annotations;
+		private final Map<String,? extends  Serializable> annotations;
 		private final String key;
 		private boolean failed = false;
 
-		public CacheOutputStream(File dir, String key, Map<String, Serializable> annotations)
+		public CacheOutputStream(File dir, String key, Map<String, ? extends Serializable> annotations)
 				throws FileNotFoundException {
-			super(new FileOutputStream(new File(dir, FILENAME_VALUE)));
+			super(new BufferedOutputStream(new FileOutputStream(new File(dir, FILENAME_VALUE))));
 			this.dir = dir;
 			this.key = key;
 			this.annotations = annotations;

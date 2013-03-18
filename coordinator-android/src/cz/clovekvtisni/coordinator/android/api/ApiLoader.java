@@ -2,7 +2,7 @@ package cz.clovekvtisni.coordinator.android.api;
 
 import com.fhucho.android.workers.Loader;
 
-import cz.clovekvtisni.coordinator.android.api.Cache.Item;
+import cz.clovekvtisni.coordinator.android.api.ApiCache.Item;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.api.request.RequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
@@ -22,7 +22,7 @@ public abstract class ApiLoader<RQ extends RequestParams, RP extends ApiResponse
 	@Override
 	protected void doInBackground() {
 		try {
-			Cache cache = Cache.INSTANCE;
+			ApiCache cache = ApiCache.getInstance();
 
 			Item<RP> item = cache.get(apiCall.getCacheKey(), apiCall.getResponseClass());
 			if (reload) item = null; // FIXME

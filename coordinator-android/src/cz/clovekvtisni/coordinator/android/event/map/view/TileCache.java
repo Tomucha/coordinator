@@ -2,45 +2,42 @@ package cz.clovekvtisni.coordinator.android.event.map.view;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
-import android.graphics.BitmapFactory;
-
-import com.jakewharton.DiskLruCache;
-import com.jakewharton.DiskLruCache.Editor;
-import com.jakewharton.DiskLruCache.Snapshot;
-
-import cz.clovekvtisni.coordinator.android.util.Utils;
+import cz.clovekvtisni.coordinator.android.CoordinatorApplication;
+import cz.clovekvtisni.coordinator.android.util.DiskCache;
+import cz.clovekvtisni.coordinator.android.util.DiskCache.Snapshot;
 
 public class TileCache {
-	private static final int MAX_SIZE_BYTES = 1024 * 1024 * 500; // 500 MB
-	private static final String DIRECTORY = "tiles";
+	private static final String CACHE_DIR = "tiles";
 
-	private final DiskLruCache diskLruCache;
+	private static TileCache instance;
 
-	public TileCache(Context c) throws IOException {
-		File dir = new File(c.getExternalCacheDir(), DIRECTORY);
-		dir.mkdir();
-		diskLruCache = DiskLruCache.open(dir, Utils.getVersionCode(c), 1, MAX_SIZE_BYTES);
+	private final DiskCache diskCache;
+
+	public static synchronized TileCache getInstance() throws IOException {
+		if (instance == null) instance = new TileCache();
+		return instance;
+	}
+
+	private TileCache() throws IOException {
+		Context c = CoordinatorApplication.getAppContext();
+		diskCache = DiskCache.newInstance(new File(c.getExternalCacheDir(), CACHE_DIR));
 	}
 
 	public Bitmap get(TileId tileId) throws IOException {
-		Snapshot snapshot = diskLruCache.get(keyForTile(tileId));
+		Snapshot snapshot = diskCache.get(tileKey(tileId));
 		if (snapshot == null) return null;
-		else return BitmapFactory.decodeStream(snapshot.getInputStream(0));
+		else return snapshot.getBitmap();
+	}
+	
+	public void put(TileId tileId, InputStream is) throws IOException {
+		diskCache.put(tileKey(tileId), is);
 	}
 
-	public void put(TileId tileId, Bitmap bitmap) throws IOException {
-		Editor editor = diskLruCache.edit(keyForTile(tileId));
-		OutputStream outputStream = editor.newOutputStream(0);
-		bitmap.compress(CompressFormat.PNG, 100, outputStream);
-		editor.commit();
-	}
-
-	private String keyForTile(TileId tileId) {
+	private String tileKey(TileId tileId) {
 		return tileId.getOsmZoom() + "_" + tileId.getOsmX() + "_" + tileId.getOsmY();
 	}
 }

@@ -98,7 +98,7 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 	private void initTileLoader() {
 		TileCache cache;
 		try {
-			cache = new TileCache(getContext());
+			cache = TileCache.getInstance();
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new AssertionError();

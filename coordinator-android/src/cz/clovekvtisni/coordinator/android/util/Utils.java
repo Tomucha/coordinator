@@ -47,17 +47,7 @@ public class Utils {
 			throw new AssertionError();
 		}
 	}
-	
-	public static void mkDirOrThrow(File file) throws IOException {
-		file.mkdir();
-		if (!file.isDirectory()) throw new IOException();
-	}
 
-	public static void mkDirsOrThrow(File file) throws IOException {
-		file.mkdirs();
-		if (!file.isDirectory()) throw new IOException();
-	}
-	
 	public static Bitmap scaleBitmapAccordingToDensity(Bitmap bitmap, WindowManager wm) {
 		DisplayMetrics metrics = new DisplayMetrics();
 		wm.getDefaultDisplay().getMetrics(metrics);

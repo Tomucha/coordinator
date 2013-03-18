@@ -134,8 +134,6 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 		this.events = events;
 		this.orgInEvents = orgInEvents;
 		
-			System.out.println(orgInEvents[0].getOperationalInfo() + "!");System.out.println(orgInEvents[1].getOperationalInfo() + "!");
-
 		registeredEventIds.clear();
 		for (UserInEvent userInEvent : userInEvents) {
 			registeredEventIds.add(userInEvent.getId());

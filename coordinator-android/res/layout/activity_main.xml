@@ -1,84 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="16dp" >
 
-    <LinearLayout
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Koordinátor je aplikace určená zájemcům o dobrovolnickou činnost. Zastřešuje nejvýznamnější české neziskové organizace, které se organizací dobrovolníků zabývají. Vyberte si prosím, pro kterou z těchto organizací chcete pracovat."
+        android:textSize="16sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="#333" />
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#333" />
+
+    <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:layout_weight="1" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Koordinátor je aplikace určená zájemcům o dobrovolnickou činnost. Zastřešuje nejvýznamnější české neziskové organizace, které se organizací dobrovolníků zabývají. Vyberte si prosím, pro kterou z těchto organizací chcete pracovat."
-            android:textSize="16dp" />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="82dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/nadace_vodafone" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:background="#333" />
-
-        <ListView
-            android:id="@+id/list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#333" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="82dp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/nadace_vodafone" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/loading_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/abs__background_holo_light"
-        android:gravity="center"
-        android:visibility="gone" >
-
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/error_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/abs__background_holo_light"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="Chyba při načítání dat."
-            android:textSize="20sp" />
-
-        <Button
-            android:id="@+id/try_again"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Zkusit znovu" />
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>

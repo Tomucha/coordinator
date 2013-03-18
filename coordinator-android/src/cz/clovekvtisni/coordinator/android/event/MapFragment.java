@@ -146,7 +146,6 @@ public class MapFragment extends SherlockFragment {
 	}
 
 	private void selectMarker(MarkerOverlay marker) {
-		System.out.println(2);
 		if (selectedMarker != null) selectedMarker.setSelected(false);
 		marker.setSelected(true);
 		selectedMarker = marker;
@@ -170,7 +169,6 @@ public class MapFragment extends SherlockFragment {
 		for (MapOverlay overlay : osmMapView.getOverlays()) {
 			if (overlay instanceof UserOverlay) {
 				UserOverlay userOverlay = (UserOverlay) overlay;
-				System.out.println(userOverlay.userInEvent.getUser().getId());
 				if (userOverlay.userInEvent.getUser().getId() == user.getId()) {
 					return userOverlay;
 				}
@@ -186,7 +184,6 @@ public class MapFragment extends SherlockFragment {
 	}
 
 	private void selectUser(User user) {
-		System.out.println(1);
 		selectMarker(findUserOverlay(user));
 		showUserInfo(user);
 	}

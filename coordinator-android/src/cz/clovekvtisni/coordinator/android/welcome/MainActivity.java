@@ -55,18 +55,7 @@ public class MainActivity extends SherlockFragmentActivity {
 		});
 	}
 
-	private void initTryAgainButton() {
-		findViewById(R.id.try_again).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				loadOrganizations();
-			}
-		});
-	}
-
 	private void loadOrganizations() {
-		setLoadingState(LoadingState.LOADING);
-
 		Workers.load(new ConfigLoader(), new ConfigLoaderListener() {
 			@Override
 			public void onResult(ConfigResponse result) {
@@ -76,7 +65,6 @@ public class MainActivity extends SherlockFragmentActivity {
 			@Override
 			public void onException(Exception e) {
 				e.printStackTrace();
-				setLoadingState(LoadingState.ERROR);
 			}
 		}, this);
 	}
@@ -86,7 +74,6 @@ public class MainActivity extends SherlockFragmentActivity {
 		super.onCreate(state);
 		setContentView(R.layout.activity_main);
 
-		initTryAgainButton();
 		adapter = new OrganizationAdapter();
 		loadOrganizations();
 		initListView();
@@ -94,7 +81,6 @@ public class MainActivity extends SherlockFragmentActivity {
 	}
 
 	private void onOrganizationsLoaded(Organization[] organizations) {
-		setLoadingState(LoadingState.DONE);
 		adapter.clear();
 		adapter.addAll(organizations);
 		adapter.notifyDataSetChanged();
@@ -114,14 +100,6 @@ public class MainActivity extends SherlockFragmentActivity {
 		}
 	}
 
-	private void setLoadingState(LoadingState state) {
-		int loadingVisibility = state == LoadingState.LOADING ? View.VISIBLE : View.GONE;
-		findViewById(R.id.loading_overlay).setVisibility(loadingVisibility);
-
-		int errorVisibility = state == LoadingState.ERROR ? View.VISIBLE : View.GONE;
-		findViewById(R.id.error_overlay).setVisibility(errorVisibility);
-	}
-
 	private void onOrganizationSelected(Organization organization) {
 		startActivity(OrganizationActivity.IntentHelper.create(this, organization));
 	}
@@ -136,10 +114,6 @@ public class MainActivity extends SherlockFragmentActivity {
 			FindView.textView(view, R.id.title).setText(organization.getName());
 			FindView.imageView(view, R.id.icon).setImageBitmap(organizationIcons.get(organization));
 		}
-	}
-
-	private enum LoadingState {
-		LOADING, ERROR, DONE
 	}
 
 }

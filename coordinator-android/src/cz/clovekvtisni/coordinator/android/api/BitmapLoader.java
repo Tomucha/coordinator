@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.android.api;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -11,18 +12,16 @@ import android.graphics.Bitmap;
 import com.fhucho.android.workers.Loader;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
-import com.jakewharton.DiskLruCache.Snapshot;
 
 import cz.clovekvtisni.coordinator.android.CoordinatorApplication;
 import cz.clovekvtisni.coordinator.android.DeployEnvironment;
 import cz.clovekvtisni.coordinator.android.util.DiskCache;
 
 public class BitmapLoader extends Loader<BitmapLoader.Listener> {
-
-	private final String url;
-
+	private static final String CACHE_DIR = "bitmaps";
 	private static DiskCache diskCache;
 
+	private final String url;
 	private Result result;
 
 	public BitmapLoader(String url) {
@@ -31,9 +30,12 @@ public class BitmapLoader extends Loader<BitmapLoader.Listener> {
 
 	}
 
-	private static DiskCache getOrCreateDiskCache() throws IOException {
+	private static synchronized DiskCache getOrCreateDiskCache() throws IOException {
 		Context appContext = CoordinatorApplication.getAppContext();
-		if (diskCache == null) diskCache = DiskCache.newInstance(appContext.getExternalCacheDir());
+		if (diskCache == null) {
+			File dir = new File(appContext.getExternalCacheDir(), CACHE_DIR);
+			diskCache = DiskCache.newInstance(dir);
+		}
 		return diskCache;
 	}
 
@@ -54,7 +56,7 @@ public class BitmapLoader extends Loader<BitmapLoader.Listener> {
 		} catch (IOException e) {
 			result = new Result(e);
 		} finally {
-			if (is != null) IOUtils.closeQuietly(is);
+			IOUtils.closeQuietly(is);
 		}
 
 		result.sendToListener();

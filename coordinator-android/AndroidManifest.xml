@@ -24,7 +24,7 @@
         android:name="cz.clovekvtisni.coordinator.android.CoordinatorApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="Člověk v tísni"
+        android:label="Koordinátor"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".welcome.MainActivity"

@@ -5,13 +5,13 @@ import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.io.IOUtils;
+
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Handler;
 
 import com.github.kevinsawicki.http.HttpRequest;
 import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
-
 
 public class NetworkTileLoader {
 	private final TileCache cache;
@@ -43,21 +43,19 @@ public class NetworkTileLoader {
 
 		@Override
 		public void run() {
+			InputStream is = null;
 			try {
-				InputStream stream = HttpRequest.get(tileId.getUrl()).stream();
-				Bitmap bitmap = BitmapFactory.decodeStream(stream);
-				if (bitmap == null) {
-					returnBitmapOrNull(null);
-				} else {
-					cache.put(tileId, bitmap);
-					returnBitmapOrNull(bitmap);
-				}
+				is = HttpRequest.get(tileId.getUrl()).buffer();
+				cache.put(tileId, is);
+				returnBitmapOrNull(cache.get(tileId));
 			} catch (HttpRequestException e) {
 				e.printStackTrace();
 				returnBitmapOrNull(null);
 			} catch (IOException e) {
 				e.printStackTrace();
 				returnBitmapOrNull(null);
+			} finally {
+				IOUtils.closeQuietly(is);
 			}
 		}
 
