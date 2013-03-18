@@ -15,13 +15,13 @@ import com.jakewharton.DiskLruCache.Snapshot;
 
 import cz.clovekvtisni.coordinator.android.util.Utils;
 
-public class DiskTileCache {
+public class TileCache {
 	private static final int MAX_SIZE_BYTES = 1024 * 1024 * 500; // 500 MB
 	private static final String DIRECTORY = "tiles";
 
 	private final DiskLruCache diskLruCache;
 
-	public DiskTileCache(Context c) throws IOException {
+	public TileCache(Context c) throws IOException {
 		File dir = new File(c.getExternalCacheDir(), DIRECTORY);
 		dir.mkdir();
 		diskLruCache = DiskLruCache.open(dir, Utils.getVersionCode(c), 1, MAX_SIZE_BYTES);

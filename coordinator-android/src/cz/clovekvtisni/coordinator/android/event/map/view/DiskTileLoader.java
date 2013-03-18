@@ -12,14 +12,14 @@ import com.google.common.collect.Sets;
 
 
 public class DiskTileLoader implements TileLoadedListener {
-	private final DiskTileCache cache;
+	private final TileCache cache;
 	private final ExecutorService executor;
 	private final Handler handler;
 	private final NetworkTileLoader networkTileLoader;
 	private final TileLoadedListener listener;
 	private final Set<TileId> tileIds = Sets.newHashSet();
 
-	public DiskTileLoader(DiskTileCache cache, TileLoadedListener listener, Handler handler) {
+	public DiskTileLoader(TileCache cache, TileLoadedListener listener, Handler handler) {
 		this.cache = cache;
 		this.executor = Executors.newFixedThreadPool(1);
 		this.listener = listener;

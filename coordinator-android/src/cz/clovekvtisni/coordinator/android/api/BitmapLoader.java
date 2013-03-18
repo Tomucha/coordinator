@@ -1,35 +1,60 @@
 package cz.clovekvtisni.coordinator.android.api;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
+
+import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import com.fhucho.android.workers.Loader;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
+import com.jakewharton.DiskLruCache.Snapshot;
 
+import cz.clovekvtisni.coordinator.android.CoordinatorApplication;
 import cz.clovekvtisni.coordinator.android.DeployEnvironment;
+import cz.clovekvtisni.coordinator.android.util.DiskCache;
 
 public class BitmapLoader extends Loader<BitmapLoader.Listener> {
 
 	private final String url;
+
+	private static DiskCache diskCache;
 
 	private Result result;
 
 	public BitmapLoader(String url) {
 		super(Listener.class);
 		this.url = DeployEnvironment.SERVER_URL_PREFIX + url;
-	
+
+	}
+
+	private static DiskCache getOrCreateDiskCache() throws IOException {
+		Context appContext = CoordinatorApplication.getAppContext();
+		if (diskCache == null) diskCache = DiskCache.newInstance(appContext.getExternalCacheDir());
+		return diskCache;
 	}
 
 	@Override
 	protected void doInBackground() {
+		InputStream is = null;
 		try {
-			Bitmap bitmap = BitmapFactory
-					.decodeStream(HttpRequest.get(url).stream(), null, null);
+			DiskCache cache = getOrCreateDiskCache();
+			if (cache.get(url) == null) {
+				is = HttpRequest.get(url).stream();
+				cache.put(url, is);
+			}
+			Bitmap bitmap = cache.get(url).getBitmap();
 			result = new Result(bitmap);
 			getListenerProxy().onSuccess(bitmap);
 		} catch (HttpRequestException e) {
 			result = new Result(e);
+		} catch (IOException e) {
+			result = new Result(e);
+		} finally {
+			if (is != null) IOUtils.closeQuietly(is);
 		}
 
 		result.sendToListener();

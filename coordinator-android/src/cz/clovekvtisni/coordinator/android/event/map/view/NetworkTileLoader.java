@@ -14,12 +14,12 @@ import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 
 
 public class NetworkTileLoader {
-	private final DiskTileCache cache;
+	private final TileCache cache;
 	private final ExecutorService executor;
 	private final Handler handler;
 	private final TileLoadedListener listener;
 
-	public NetworkTileLoader(DiskTileCache cache, TileLoadedListener listener, Handler handler) {
+	public NetworkTileLoader(TileCache cache, TileLoadedListener listener, Handler handler) {
 		this.cache = cache;
 		this.executor = Executors.newFixedThreadPool(2);
 		this.listener = listener;

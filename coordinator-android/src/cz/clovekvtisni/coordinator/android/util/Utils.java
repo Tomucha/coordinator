@@ -1,5 +1,7 @@
 package cz.clovekvtisni.coordinator.android.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -44,6 +46,16 @@ public class Utils {
 		} catch (UnsupportedEncodingException e) {
 			throw new AssertionError();
 		}
+	}
+	
+	public static void mkDirOrThrow(File file) throws IOException {
+		file.mkdir();
+		if (!file.isDirectory()) throw new IOException();
+	}
+
+	public static void mkDirsOrThrow(File file) throws IOException {
+		file.mkdirs();
+		if (!file.isDirectory()) throw new IOException();
 	}
 	
 	public static Bitmap scaleBitmapAccordingToDensity(Bitmap bitmap, WindowManager wm) {
