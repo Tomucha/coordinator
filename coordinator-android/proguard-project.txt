@@ -1,3 +1,7 @@
+# Don't obfuscate code
+# This makes some of the settings below useless, but let's keep them because someday we may want to turn obfuscation on.
+-dontobfuscate
+
 # Keep line numbers for stack traces
 -renamesourcefileattribute SourceFile 
 -keepattributes SourceFile,LineNumberTable
