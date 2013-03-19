@@ -30,4 +30,16 @@
         </attribute>
     </tag>
 
+    <tag>
+        <name>json</name>
+        <tag-class>cz.clovekvtisni.coordinator.server.web.tag.JsonTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>value</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>java.lang.Object</type>
+        </attribute>
+    </tag>
+
 </taglib>
