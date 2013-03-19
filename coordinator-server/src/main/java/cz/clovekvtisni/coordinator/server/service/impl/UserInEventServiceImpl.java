@@ -156,7 +156,8 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
     @Override
     public UserInEventEntity findById(long eventId, long userId, long flags) {
         UserInEventEntity entity = ofy().get(UserInEventEntity.createKey(userId, eventId));
-        populate(Arrays.asList(entity), flags);
+        if (entity != null)
+            populate(Arrays.asList(entity), flags);
         return entity;
     }
 

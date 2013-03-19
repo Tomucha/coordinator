@@ -3,6 +3,7 @@
     taglib prefix="s" uri="http://www.springframework.org/tags" %><%@
     taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
     taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
+    taglib prefix="www" uri="/WEB-INF/www.tld" %><%@
     taglib prefix="tags" tagdir="/WEB-INF/tags"
 %>
 <script type="text/javascript">
@@ -16,11 +17,12 @@
     function fillPoiMarkers(bounds) {
         var url = root+"/admin/event/map/api/poi";
         var arrBounds = bounds.toArray(); //array order: left, bottom, right, top
-        var request = {
-            eventId: eventId,
-            latS : arrBounds[1], latN : arrBounds[3],
-            lonW: arrBounds[0], lonE : arrBounds[2]
-        };
+        var request = <www:json value="${params}"/>;
+        request.latS = arrBounds[1];
+        request.latN = arrBounds[3];
+        request.lonW = arrBounds[0];
+        request.lonE = arrBounds[2];
+
         var decodedRequest = $.param(request);
 
         $.getJSON(url, decodedRequest, function(response, txt) {
@@ -36,11 +38,12 @@
     function fillUserMarkers(bounds) {
         var url = root+"/admin/event/map/api/user";
         var arrBounds = bounds.toArray(); //array order: left, bottom, right, top
-        var request = {
-            eventId: eventId,
-            latS : arrBounds[1], latN : arrBounds[3],
-            lonW: arrBounds[0], lonE : arrBounds[2]
-        };
+        var request = <www:json value="${params}"/>;
+        request.latS = arrBounds[1];
+        request.latN = arrBounds[3];
+        request.lonW = arrBounds[0];
+        request.lonE = arrBounds[2];
+
         var decodedRequest = $.param(request);
 
         $.getJSON(url, decodedRequest, function(response, txt) {

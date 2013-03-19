@@ -1,6 +1,8 @@
 package cz.clovekvtisni.coordinator.server.web.model;
 
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
+import cz.clovekvtisni.coordinator.util.ValueTool;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +21,14 @@ public class EventFilterParams {
     private Long groupId;
 
     private String retUrl;
+
+    private String workflowId;
+
+    private String workflowStateId;
+
+    private Boolean userFilterSet;
+
+    private Boolean poiFilterSet;
 
     public EventFilterParams() {
     }
@@ -71,5 +81,49 @@ public class EventFilterParams {
 
     public void setRetUrl(String retUrl) {
         this.retUrl = retUrl;
+    }
+
+    public String getWorkflowId() {
+        return workflowId;
+    }
+
+    public void setWorkflowId(String workflowId) {
+        this.workflowId = workflowId;
+    }
+
+    public String getWorkflowStateId() {
+        return workflowStateId;
+    }
+
+    public void setWorkflowStateId(String workflowStateId) {
+        this.workflowStateId = workflowStateId;
+    }
+
+    public Boolean getUserFilterSet() {
+        return userFilterSet;
+    }
+
+    public void setUserFilterSet(Boolean userFilterSet) {
+        this.userFilterSet = userFilterSet;
+    }
+
+    public Boolean getPoiFilterSet() {
+        return poiFilterSet;
+    }
+
+    public void setPoiFilterSet(Boolean poiFilterSet) {
+        this.poiFilterSet = poiFilterSet;
+    }
+
+    public PoiFilter populatePoiFilter(PoiFilter filter) {
+        filter.setEventIdVal(getEventId());
+        if (!ValueTool.isEmpty(getWorkflowId())) {
+            filter.setWorkflowIdVal(getWorkflowId());
+        }
+        if (!ValueTool.isEmpty(getWorkflowStateId())) {
+            filter.setWorkflowStateIdVal(getWorkflowStateId());
+        }
+
+        return filter;
     }
 }

@@ -75,14 +75,6 @@ public class EventMapController extends AbstractEventController {
         if (params.getEventId() == null)
             throw NotFoundException.idNotExist();
 
-
-/*
-        EventEntity event = loadEventById(params.getEventKey());
-        model.addAttribute("event", event);
-*/
-
-        //populateEventModel(model, params);
-
         UserInEventFilter userInEventFilter = new UserInEventFilter();
         userInEventFilter.setEventIdVal(appContext.getActiveEvent().getId());
         ResultList<UserInEventEntity> inEvents = userInEventService.findByFilter(userInEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER);
@@ -98,24 +90,24 @@ public class EventMapController extends AbstractEventController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/poi")
     public @ResponseBody List<PoiEntity> listPoi(
-            @RequestParam(required = true) long eventId,
+            @ModelAttribute("params") EventFilterParams params,
             @RequestParam(required = true) double latN,
             @RequestParam(required = true) double lonE,
             @RequestParam(required = true) double latS,
             @RequestParam(required = true) double lonW
     ) {
-        return poiService.findByEventAndBox(eventId, latN, lonE, latS, lonW, 0);
+        return poiService.findByEventAndBox(params.getEventId(), latN, lonE, latS, lonW, 0);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/user")
     public @ResponseBody List<UserInEventEntity> listUsers(
-            @RequestParam(required = true) long eventId,
+            @ModelAttribute("params") EventFilterParams params,
             @RequestParam(required = true) double latN,
             @RequestParam(required = true) double lonE,
             @RequestParam(required = true) double latS,
             @RequestParam(required = true) double lonW
     ) {
-        List<UserInEventEntity> byEventAndBox = userInEventService.findByEventAndBox(eventId, latN, lonE, latS, lonW, UserInEventService.FLAG_FETCH_USER);
+        List<UserInEventEntity> byEventAndBox = userInEventService.findByEventAndBox(params.getEventId(), latN, lonE, latS, lonW, UserInEventService.FLAG_FETCH_USER);
         logger.info("Users: "+byEventAndBox);
 
         return byEventAndBox;

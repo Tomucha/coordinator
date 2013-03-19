@@ -50,7 +50,8 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     public PoiEntity findById(Long id, long flags) {
         PoiEntity poi = ofy().get(Key.create(PoiEntity.class, id));
 
-        populate(Arrays.asList(new PoiEntity[] {poi}), flags);
+        if (poi != null)
+            populate(Arrays.asList(new PoiEntity[] {poi}), flags);
 
         return poi;
     }
@@ -58,7 +59,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     private void populate(Collection<PoiEntity> entities, long flags) {
         Map<String,PoiCategory> categoryMap = config.getPoiCategoryMap();
         for (PoiEntity poi : entities) {
-            if (poi.getPoiCategoryId() != null) {
+            if (poi != null && poi.getPoiCategoryId() != null) {
                 poi.setPoiCategory(categoryMap.get(poi.getPoiCategoryId()));
             }
         }

@@ -80,7 +80,8 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     public UserEntity findById(Long id, long flags) {
         UserEntity userEntity = ofy().load().key(Key.create(UserEntity.class, id)).get();
 
-        populate(Arrays.asList(new UserEntity[]{userEntity}), flags);
+        if (userEntity != null)
+            populate(Arrays.asList(new UserEntity[]{userEntity}), flags);
 
         return userEntity;
 
@@ -198,6 +199,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                     user.setRoleIdList(new String[] {AuthorizationTool.ANONYMOUS});
                 UserEntity created = createUser(user);
 
+                inEventEntity.setParentKey(user.getKey());
                 inEventEntity.setUserId(created.getId());
                 inEventEntity.setUserEntity(created);
                 userInEventService.create(inEventEntity);
