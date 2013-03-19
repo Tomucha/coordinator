@@ -3,7 +3,9 @@ package cz.clovekvtisni.coordinator.server.domain;
 import com.beoui.geocell.GeocellManager;
 import com.beoui.geocell.model.Point;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.*;
+import com.googlecode.objectify.impl.ref.StdRef;
 import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.server.util.EntityTool;
@@ -63,11 +65,11 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     private Long[] groupIdList;
 
-    @Ignore
-    private EventEntity eventEntity;
+    @Load
+    Ref<UserEntity> refToUser;
 
     @Ignore
-    private UserEntity userEntity;
+    private EventEntity eventEntity;
 
     @Ignore
     private List<UserGroupEntity> groupEntities;
@@ -86,8 +88,8 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
         UserInEvent inEvent = super.buildTargetEntity();
         if (eventEntity != null)
             inEvent.setEvent(eventEntity.buildTargetEntity());
-        if (userEntity != null)
-            inEvent.setUser(userEntity.buildTargetEntity());
+        if (getUserEntity() != null)
+            inEvent.setUser(getUserEntity().buildTargetEntity());
         if (groupEntities != null)
             inEvent.setGroups(new EntityTool().buildTargetEntities(groupEntities));
 
@@ -256,11 +258,11 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     }
 
     public UserEntity getUserEntity() {
-        return userEntity;
+        return refToUser.getValue();
     }
 
     public void setUserEntity(UserEntity userEntity) {
-        this.userEntity = userEntity;
+        this.refToUser = new StdRef<UserEntity>(userEntity.getKey(), userEntity);
     }
 
     @JsonIgnore
@@ -287,8 +289,8 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
 
     public String[] getRoles() {
         Set<String> roles = new HashSet<String>();
-        if (userEntity != null && userEntity.getRoleIdList() != null) {
-            for (String role : userEntity.getRoleIdList()) {
+        if (getUserEntity() != null && getUserEntity().getRoleIdList() != null) {
+            for (String role : getUserEntity().getRoleIdList()) {
                 roles.add(role);
             }
         }

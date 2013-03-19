@@ -58,19 +58,6 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
             }
         }
 
-        if ((flags & FLAG_FETCH_USER) != 0) {
-            Map<Key<UserEntity>, UserInEventEntity> inUserMap = new HashMap<Key<UserEntity>, UserInEventEntity>(result.size());
-            for (UserInEventEntity inUser : result) {
-                Key<UserEntity> key = Key.create(UserEntity.class, inUser.getUserId());
-                inUserMap.put(key, inUser);
-            }
-            Map<Key<UserEntity>, UserEntity> entityMap = ofy().get(inUserMap.keySet());
-            for (Map.Entry<Key<UserEntity>, UserEntity> entry : entityMap.entrySet()) {
-                if (entry.getValue().isDeleted()) continue;
-                inUserMap.get(entry.getKey()).setUserEntity(entry.getValue());
-            }
-        }
-
         if ((flags & FLAG_FETCH_GROUPS) != 0) {
             for (UserInEventEntity inUser : result) {
                 if (inUser.getGroupIdList() != null) {

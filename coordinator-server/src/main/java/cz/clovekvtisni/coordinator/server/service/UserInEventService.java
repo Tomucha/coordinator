@@ -15,8 +15,6 @@ public interface UserInEventService extends Service {
 
     public static final long FLAG_FETCH_EVENT = 1l;
 
-    public static final long FLAG_FETCH_USER = 2l;
-
     public static final long FLAG_FETCH_GROUPS = 4l;
 
     public static final long FLAG_FETCH_LAST_POI = 8l;

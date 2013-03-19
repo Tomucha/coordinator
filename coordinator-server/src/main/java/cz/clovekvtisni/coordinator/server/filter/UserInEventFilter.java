@@ -31,7 +31,6 @@ public class UserInEventFilter extends NoDeletedFilter<UserInEventEntity> {
 
     private Operator geoCellsOp = Operator.IN;
 
-
     public Long getUserIdVal() {
         return userIdVal;
     }

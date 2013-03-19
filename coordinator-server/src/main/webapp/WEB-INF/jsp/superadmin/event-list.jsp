@@ -11,7 +11,7 @@
 <div class="mainPanel">
     <c:if test="${can:create('eventEntity')}">
         <div class="buttonPanel">
-            <a class="btn" href="<s:url value="/superadmin/event/edit"/>"><s:message code="button.createEvent"/></a>
+            <a class="btn" href="<s:url value="/superadmin/event/edit"/>"><span class="icon-plus"></span> <s:message code="button.createEvent"/></a>
         </div>
     </c:if>
 
@@ -52,7 +52,7 @@
                                     <a class="btn" href="/admin/event/map?eventId=<c:out value="${event.id}"/>"><s:message code="button.detail"/></a>
                                 </c:if>
                                 <c:if test="${can:create('eventEntity')}">
-                                    <a class="btn" href="/superadmin/event/edit?eventId=<c:out value="${event.id}"/>"><s:message code="button.edit"/></a>
+                                    <a class="btn" href="/superadmin/event/edit?eventId=<c:out value="${event.id}"/>"><span class="icon-pencil"></span> <s:message code="button.edit"/></a>
                                 </c:if>
                             </td>
                         </tr>

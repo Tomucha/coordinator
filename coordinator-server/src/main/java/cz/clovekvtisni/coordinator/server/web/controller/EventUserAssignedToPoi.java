@@ -50,7 +50,7 @@ public class EventUserAssignedToPoi extends AbstractEventController {
 
         Set<Long> userIds = poi.getUserIdList();
 
-        List<UserInEventEntity> assignedUsers = userInEventService.findByIds(poi.getEventId(), userIds, UserInEventService.FLAG_FETCH_USER);
+        List<UserInEventEntity> assignedUsers = userInEventService.findByIds(poi.getEventId(), userIds, 0l);
         model.addAttribute("assignedUsers", assignedUsers);
 
         return "ajax/assigned-users";

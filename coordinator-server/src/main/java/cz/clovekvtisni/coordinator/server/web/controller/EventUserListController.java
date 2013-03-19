@@ -46,7 +46,7 @@ public class EventUserListController extends AbstractEventController {
         params.populateUserInEventFilter(inEventFilter);
 
         ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null,
-                UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS | UserInEventService.FLAG_FETCH_LAST_POI
+                UserInEventService.FLAG_FETCH_GROUPS | UserInEventService.FLAG_FETCH_LAST_POI
         );
         model.addAttribute("userInEvents", userInEvents.getResult());
 
@@ -68,7 +68,7 @@ public class EventUserListController extends AbstractEventController {
         UserInEventFilter filter = new UserInEventFilter();
         params.populateUserInEventFilter(filter);
         ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(filter, 0, null,
-                UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS | UserInEventService.FLAG_FETCH_LAST_POI
+                UserInEventService.FLAG_FETCH_GROUPS | UserInEventService.FLAG_FETCH_LAST_POI
         );
         model.addAttribute("userInEvents", userInEvents.getResult());
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));

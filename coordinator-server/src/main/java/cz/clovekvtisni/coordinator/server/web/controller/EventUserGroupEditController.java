@@ -69,7 +69,7 @@ public class EventUserGroupEditController extends AbstractEventController {
             // FIXME: refaktoring
 
             // populateEventModel(model, new EventFilterParams(form.getEventKey()));
-            return "admin/event-group-edit";
+            return "admin/event-usergroup-edit";
         }
 
         if ("".equals(form.getRoleId()))

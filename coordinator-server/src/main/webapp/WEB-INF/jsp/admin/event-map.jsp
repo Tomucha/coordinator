@@ -85,7 +85,7 @@
             onLoad="initialize()"
             onMapChange="refreshMarkers()"
             />
-    <sf:form modelAttribute="params" id="filterForm">
+    <sf:form modelAttribute="params" id="filterForm" onsubmit="return false">
         <div class="container-fluid">
             <tags:hiddenEvent/>
 

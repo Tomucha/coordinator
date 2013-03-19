@@ -81,7 +81,7 @@ public class EventMapController extends AbstractEventController {
 
         UserInEventFilter userInEventFilter = new UserInEventFilter();
         userInEventFilter.setEventIdVal(appContext.getActiveEvent().getId());
-        ResultList<UserInEventEntity> inEvents = userInEventService.findByFilter(userInEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER);
+        ResultList<UserInEventEntity> inEvents = userInEventService.findByFilter(userInEventFilter, 0, null, 0l);
         model.addAttribute("userInEventList", inEvents.getResult());
 
         PoiFilter poiFilter = new PoiFilter();
@@ -113,7 +113,7 @@ public class EventMapController extends AbstractEventController {
             @RequestParam(required = true) double latS,
             @RequestParam(required = true) double lonW
     ) {
-        return userInEventService.findByFilterAndBox(params.populateUserInEventFilter(new UserInEventFilter()), latN, lonE, latS, lonW, UserInEventService.FLAG_FETCH_USER);
+        return userInEventService.findByFilterAndBox(params.populateUserInEventFilter(new UserInEventFilter()), latN, lonE, latS, lonW, 0l);
     }
 
 
@@ -153,7 +153,7 @@ public class EventMapController extends AbstractEventController {
         model.addAttribute("poi", e);
 
         Set<Long> userIds = e.getUserIdList();
-        List<UserInEventEntity> assignedUsers = userInEventService.findByIds(e.getEventId(), userIds, UserInEventService.FLAG_FETCH_USER);
+        List<UserInEventEntity> assignedUsers = userInEventService.findByIds(e.getEventId(), userIds, 0l);
         model.addAttribute("assignedUsers", assignedUsers);
         return "ajax/poi-popup";
     }
@@ -194,7 +194,7 @@ public class EventMapController extends AbstractEventController {
             Model model) {
 
         UserInEventEntity u = userInEventService.findById(eventId, userId,
-                UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_LAST_POI | UserInEventService.FLAG_FETCH_GROUPS
+                UserInEventService.FLAG_FETCH_LAST_POI | UserInEventService.FLAG_FETCH_GROUPS
         );
         model.addAttribute("userInEvent", u);
         return "ajax/user-popup";

@@ -157,7 +157,7 @@ public class EventUserEditController extends AbstractEventController {
         filter.setEventIdVal(eventId);
         filter.setUserIdVal(userId);
 
-        UserInEventEntity inEventEntity = userInEventService.findByFilter(filter, 0, null, UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS).firstResult();
+        UserInEventEntity inEventEntity = userInEventService.findByFilter(filter, 0, null, UserInEventService.FLAG_FETCH_GROUPS).firstResult();
 
         return inEventEntity;
     }

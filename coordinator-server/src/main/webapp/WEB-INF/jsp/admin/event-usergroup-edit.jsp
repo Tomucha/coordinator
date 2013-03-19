@@ -27,6 +27,7 @@
 
             <div>
                 <tags:input field="roleId" modelAttribute="form" captionCode="UserGroupEntity.role">
+                    <%-- TODO ne admin, ne superadmin --%>
                     <sf:select path="roleId">
                         <sf:option value=""/>
                         <sf:options  items="${config.roleList}" itemLabel="name" itemValue="id"/>

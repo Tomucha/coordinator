@@ -90,7 +90,7 @@
             </div>
 
             <div class="buttonPanel">
-                <sf:button><s:message code="button.save"/></sf:button>
+                <button type="submit" class="btn btn-primary"><span class="icon-ok icon-white"></span> <s:message code="button.save"/></button>
             </div>
 
         </sf:form>
