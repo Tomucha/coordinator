@@ -2,6 +2,7 @@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
         taglib prefix="can" uri="/WEB-INF/permissions.tld" %><%@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
+        taglib prefix="tags" tagdir="/WEB-INF/tags" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags"
 
 %><script type="text/javascript">
@@ -14,7 +15,7 @@
 <c:if test="${form.rowCount > 0}">
     <sf:form modelAttribute="form" action="${root}/admin/import/data">
         <div class="importTablePanel">
-            <tags:hiddenEvent/>
+            <sf:hidden path="eventId"/>
             <sf:hidden path="organizationId"/>
 
             <sf:errors />
