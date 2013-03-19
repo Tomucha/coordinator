@@ -11,6 +11,7 @@ import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
+import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.util.Location;
@@ -43,6 +44,9 @@ public class EventMapController extends AbstractEventController {
 
     @Autowired
     private UserInEventService userInEventService;
+
+    @Autowired
+    private UserGroupService userGroupService;
 
     @Autowired
     private PoiService poiService;
@@ -85,6 +89,8 @@ public class EventMapController extends AbstractEventController {
         ResultList<PoiEntity> pois = poiService.findByFilter(poiFilter, 0, null, 0l);
         model.addAttribute("poiList", pois.getResult());
 
+        model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
+
         return "admin/event-map";
     }
 
@@ -96,7 +102,7 @@ public class EventMapController extends AbstractEventController {
             @RequestParam(required = true) double latS,
             @RequestParam(required = true) double lonW
     ) {
-        return poiService.findByEventAndBox(params.getEventId(), latN, lonE, latS, lonW, 0);
+        return poiService.findByFilterAndBox(params.populatePoiFilter(new PoiFilter()), latN, lonE, latS, lonW, 0);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/user")
@@ -107,10 +113,7 @@ public class EventMapController extends AbstractEventController {
             @RequestParam(required = true) double latS,
             @RequestParam(required = true) double lonW
     ) {
-        List<UserInEventEntity> byEventAndBox = userInEventService.findByEventAndBox(params.getEventId(), latN, lonE, latS, lonW, UserInEventService.FLAG_FETCH_USER);
-        logger.info("Users: "+byEventAndBox);
-
-        return byEventAndBox;
+        return userInEventService.findByFilterAndBox(params.populateUserInEventFilter(new UserInEventFilter()), latN, lonE, latS, lonW, UserInEventService.FLAG_FETCH_USER);
     }
 
 

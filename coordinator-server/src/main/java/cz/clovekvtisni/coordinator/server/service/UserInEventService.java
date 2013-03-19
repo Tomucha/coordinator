@@ -40,5 +40,5 @@ public interface UserInEventService extends Service {
     UserInEventEntity changeStatus(UserInEventEntity inEvent, RegistrationStatus status);
 
     @FilterResult("#helper.canRead(#entity)")
-    List<UserInEventEntity> findByEventAndBox(long eventId, double latN, double lonE, double latS, double lonW, long flags);
+    List<UserInEventEntity> findByFilterAndBox(UserInEventFilter filter, double latN, double lonE, double latS, double lonW, long flags);
 }

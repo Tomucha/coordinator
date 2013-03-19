@@ -3,9 +3,7 @@ package cz.clovekvtisni.coordinator.server.service.impl;
 import com.beoui.geocell.GeocellManager;
 import com.beoui.geocell.model.BoundingBox;
 import com.googlecode.objectify.Key;
-import com.google.android.gcm.server.*;
 import com.googlecode.objectify.Work;
-import com.googlecode.objectify.cmd.Query;
 import cz.clovekvtisni.coordinator.domain.NotificationType;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
@@ -17,6 +15,7 @@ import cz.clovekvtisni.coordinator.server.service.ActivityService;
 import cz.clovekvtisni.coordinator.server.service.NotificationService;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,18 +84,19 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     }
 
     @Override
-    public List<PoiEntity> findByEventAndBox(long eventId, double latN, double lonE, double latS, double lonW, long flags) {
-        // Transform this to a bounding box
+    public List<PoiEntity> findByFilterAndBox(PoiFilter filter, double latN, double lonE, double latS, double lonW, long flags) {
         BoundingBox bb = new BoundingBox(latN, lonE, latS, lonW);
 
         // Calculate the geocells list to be used in the queries (optimize list of cells that complete the given bounding box)
         List<String> cells = GeocellManager.bestBboxSearchCells(bb, null);
 
-        Query<PoiEntity> q = ofy().load().type(PoiEntity.class).filter("eventId", eventId).filter("geoCells IN", cells);
-        List<PoiEntity> result = q.list();
+        filter.setGeoCellsVal(cells);
+        filter.setGeoCellsOp(Filter.Operator.IN);
 
-        populate(result, flags);
-        return result;
+        ResultList<PoiEntity> result = ofy().findByFilter(filter, null, 0);
+        populate(result.getResult(), flags);
+
+        return result.getResult();
     }
 
     @Override

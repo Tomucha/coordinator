@@ -4,18 +4,17 @@ import com.beoui.geocell.GeocellManager;
 import com.beoui.geocell.model.BoundingBox;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
-import com.googlecode.objectify.cmd.Query;
 import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
-import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -139,18 +138,19 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
     }
 
     @Override
-    public List<UserInEventEntity> findByEventAndBox(long eventId, double latN, double lonE, double latS, double lonW, long flags) {
-        // Transform this to a bounding box
+    public List<UserInEventEntity> findByFilterAndBox(UserInEventFilter filter, double latN, double lonE, double latS, double lonW, long flags) {
         BoundingBox bb = new BoundingBox(latN, lonE, latS, lonW);
 
         // Calculate the geocells list to be used in the queries (optimize list of cells that complete the given bounding box)
         List<String> cells = GeocellManager.bestBboxSearchCells(bb, null);
 
-        Query<UserInEventEntity> q = ofy().load().type(UserInEventEntity.class).filter("eventId", eventId).filter("lastLocationGeoCells IN", cells);
-        List<UserInEventEntity> result = q.list();
+        filter.setGeoCellsVal(cells);
+        filter.setGeoCellsOp(Filter.Operator.IN);
 
-        populate(result, flags);
-        return result;
+        ResultList<UserInEventEntity> result = ofy().findByFilter(filter, null, 0);
+        populate(result.getResult(), flags);
+
+        return result.getResult();
     }
 
     @Override

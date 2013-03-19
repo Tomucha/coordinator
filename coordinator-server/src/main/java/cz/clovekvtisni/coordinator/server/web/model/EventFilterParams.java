@@ -1,9 +1,14 @@
 package cz.clovekvtisni.coordinator.server.web.model;
 
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
+import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
+import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,10 +30,6 @@ public class EventFilterParams {
     private String workflowId;
 
     private String workflowStateId;
-
-    private Boolean userFilterSet;
-
-    private Boolean poiFilterSet;
 
     public EventFilterParams() {
     }
@@ -65,6 +66,7 @@ public class EventFilterParams {
         this.groupId = groupId;
     }
 
+    /** @deprecated */
     public Map<String, String> toMap() {
         Map<String, String> map = new HashMap<String, String>(2);
         if (eventId != null)
@@ -99,22 +101,6 @@ public class EventFilterParams {
         this.workflowStateId = workflowStateId;
     }
 
-    public Boolean getUserFilterSet() {
-        return userFilterSet;
-    }
-
-    public void setUserFilterSet(Boolean userFilterSet) {
-        this.userFilterSet = userFilterSet;
-    }
-
-    public Boolean getPoiFilterSet() {
-        return poiFilterSet;
-    }
-
-    public void setPoiFilterSet(Boolean poiFilterSet) {
-        this.poiFilterSet = poiFilterSet;
-    }
-
     public PoiFilter populatePoiFilter(PoiFilter filter) {
         filter.setEventIdVal(getEventId());
         if (!ValueTool.isEmpty(getWorkflowId())) {
@@ -122,6 +108,32 @@ public class EventFilterParams {
         }
         if (!ValueTool.isEmpty(getWorkflowStateId())) {
             filter.setWorkflowStateIdVal(getWorkflowStateId());
+        }
+
+        return filter;
+    }
+
+    public UserInEventFilter populateUserInEventFilter(UserInEventFilter filter) {
+        filter.setEventIdVal(getEventId());
+        if (!ValueTool.isEmpty(getUserFulltext())) {
+            final String fullText = getUserFulltext().trim().toLowerCase();
+            filter.addAfterLoadCallback(new Filter.AfterLoadCallback<UserInEventEntity>() {
+                @Override
+                public boolean accept(UserInEventEntity entity) {
+                    UserEntity user = entity.getUserEntity();
+                    return user != null && user.getFullName() != null && user.getFullName().toLowerCase().contains(fullText);
+                }
+            });
+        }
+        final Long groupId = getGroupId();
+        if (groupId != null) {
+            filter.addAfterLoadCallback(new Filter.AfterLoadCallback<UserInEventEntity>() {
+                @Override
+                public boolean accept(UserInEventEntity entity) {
+                    return entity.getGroupIdList() != null &&
+                            Arrays.asList(entity.getGroupIdList()).contains(groupId);
+                }
+            });
         }
 
         return filter;
