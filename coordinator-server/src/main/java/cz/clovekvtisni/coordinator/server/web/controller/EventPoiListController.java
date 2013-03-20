@@ -62,6 +62,8 @@ public class EventPoiListController extends AbstractEventController {
 
         if (action != null && pois != null && pois.size() > 0) {
             for (Long poiId : pois) {
+                if (poiId == null)
+                    continue;
                 PoiEntity poiEntity = poiService.findById(poiId, 0l);
                 if (poiEntity == null)
                     continue;
