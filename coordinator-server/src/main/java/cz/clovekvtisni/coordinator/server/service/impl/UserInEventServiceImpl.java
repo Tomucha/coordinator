@@ -9,6 +9,7 @@ import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserGroupEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
@@ -168,4 +169,22 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
 
     }
 
+    @Override
+    public ResultList<UserInEventEntity> findByUserGroupId(long eventId, final long userGroupId, int limit, String bookmark, long flags) {
+        UserGroupEntity userGroup = userGroupService.findById(userGroupId, 0l);
+        if (userGroup == null || userGroup.getEventId() != eventId)
+            return new ResultList<UserInEventEntity>(new ArrayList<UserInEventEntity>(0), bookmark);
+
+        UserInEventFilter filter = new UserInEventFilter();
+        filter.setEventIdVal(userGroup.getEventId());
+        filter.addAfterLoadCallback(new Filter.AfterLoadCallback<UserInEventEntity>() {
+            @Override
+            public boolean accept(UserInEventEntity entity) {
+                return entity.getGroupIdList() != null &&
+                        Arrays.asList(entity.getGroupIdList()).contains(userGroupId);
+            }
+        });
+
+        return findByFilter(filter, limit, bookmark, flags);
+    }
 }

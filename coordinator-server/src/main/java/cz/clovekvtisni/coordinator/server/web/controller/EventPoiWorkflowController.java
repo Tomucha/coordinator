@@ -24,9 +24,6 @@ public class EventPoiWorkflowController extends AbstractEventController {
     private PoiService poiService;
 
     @Autowired
-    private UserInEventService userInEventService;
-
-    @Autowired
     private UserGroupService userGroupService;
 
     @RequestMapping(method = RequestMethod.GET)
@@ -35,13 +32,11 @@ public class EventPoiWorkflowController extends AbstractEventController {
             @RequestParam(value = "poiId", required = true) Long poiId,
             Model model) {
 
-
         PoiEntity poi = poiService.findById(poiId, 0);
         model.addAttribute("poi", poi);
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
         return "admin/event-poi-workflow";
     }
-
 
     @RequestMapping(method = RequestMethod.GET, value = "/transition")
     public String changeWorkflowState(

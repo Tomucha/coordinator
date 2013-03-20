@@ -3,14 +3,21 @@
         taglib prefix="s" uri="http://www.springframework.org/tags" %><%@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
-        taglib prefix="tags" tagdir="/WEB-INF/tags"
-%>
+        taglib prefix="tags" tagdir="/WEB-INF/tags" %><%@
+        taglib prefix="www" uri="/WEB-INF/www.tld"
+        %>
 <%--@elvariable id="poi" type="cz.clovekvtisni.coordinator.server.domain.PoiEntity"--%>
 
 <script type="text/javascript">
 
     function loadUsers() {
-        $('#userList').load('${root}/admin/event/user/list?eventId=${event.id}&ajax=true&groupId='+$("#groupId").val()+"&userFulltext="+$("#userFulltext").val());
+        $('#userList').load('${root}/admin/event/user/list?eventId=${event.id}&ajax=true&groupId='+$("#groupId").val()+"&userFulltext="+$("#userFulltext").val(), function() {
+            var selectedGroup = $("#groupId").val();
+            if (selectedGroup != "")
+                $("#assignGroupConfirm").show();
+            else
+                $("#assignGroupConfirm").hide();
+        });
         return false;
     }
 
@@ -19,16 +26,32 @@
     }
 
     function onUserClick(userId) {
-        $('#assignedUsers').load('${root}/admin/event/user/assigned?eventId=${event.id}&poiId='+${poi.id}+'&ajax=true&delete=false&userId='+userId);
+        $("#assignedUsers").load("${root}/admin/event/user/assigned", {assignUserId:userId, eventId:<www:json value="${event.id}"/>, poiId:<www:json value="${poi.id}"/>, ajax:true}, function() {
+            blink($("#assignedUsers"));
+        });
     }
 
     function onAssignedUserClick(userId) {
-        $('#assignedUsers').load('${root}/admin/event/user/assigned?eventId=${event.id}&poiId='+${poi.id}+'&ajax=true&delete=true&userId='+userId);
+        $("#assignedUsers").load("${root}/admin/event/user/assigned", {unassignUserId:userId, eventId:<www:json value="${event.id}"/>, poiId:<www:json value="${poi.id}"/>, ajax:true});
+    }
+
+    function onUserGroupClick(groupId) {
+        $("#assignGroupConfirm").hide();
+        $("#assignedUsers").load("${root}/admin/event/user/assigned", {assignUserGroupId:groupId, eventId:<www:json value="${event.id}"/>, poiId:<www:json value="${poi.id}"/>, ajax:true}, function() {
+            blink($("#assignedUsers"));
+        });
+    }
+
+    function blink(element) {
+        element.fadeOut(400).fadeIn(400);
     }
 
     $(document).ready(function() {
         loadUsers();
         loadAssignedUsers();
+        $("#groupId").change(function() {
+            $("#assignGroupConfirm").hide();
+        });
     });
 
 </script>
@@ -81,6 +104,7 @@
                             <option value="${group.id}"><c:out value="${group.name}"/></option>
                         </c:forEach>
                     </select>
+                    <span style="display:none" class="clickable" id="assignGroupConfirm"><s:message code="msg.assignGroupToPoi"/> [<a onclick="onUserGroupClick($('#groupId').val())"><s:message code="label.assign"/></a>].</span>
                     <label><s:message code="label.name"/>:</label> <input type="text" id="userFulltext"/>
 
                     <p>

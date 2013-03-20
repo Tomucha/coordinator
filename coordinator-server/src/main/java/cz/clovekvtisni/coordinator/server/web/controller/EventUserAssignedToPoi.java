@@ -5,6 +5,7 @@ import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,12 +23,6 @@ public class EventUserAssignedToPoi extends AbstractEventController {
     private UserInEventService userInEventService;
 
     @Autowired
-    private UserGroupService userGroupService;
-
-    @Autowired
-    private OrganizationInEventService organizationInEventService;
-
-    @Autowired
     private PoiService poiService;
 
 
@@ -36,24 +31,65 @@ public class EventUserAssignedToPoi extends AbstractEventController {
             @RequestParam(value = "eventId", required = true) long eventId,
             @RequestParam(value = "poiId", required = true) long poiId,
             @RequestParam(value = "userId", required = false) Long userId,
-            @RequestParam(value = "delete", required = false) Boolean delete,
+            Model model) {
+
+        return returnAssignedUsers(model, poiService.findById(poiId, 0));
+    }
+
+    @RequestMapping(method = RequestMethod.POST, params = "assignUserId")
+    public String assignUser(
+            @RequestParam(value = "eventId", required = true) long eventId,
+            @RequestParam(value = "poiId", required = true) long poiId,
+            @RequestParam(value = "assignUserId", required = true) Long assignUserId,
+            Model model) {
+        PoiEntity poi = poiService.findById(poiId, 0);
+        if (poi != null && assignUserId != null)
+            poi = poiService.assignUser(poi, assignUserId);
+
+        return returnAssignedUsers(model, poi);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, params = "unassignUserId")
+    public String unassignUser(
+            @RequestParam(value = "eventId", required = true) long eventId,
+            @RequestParam(value = "poiId", required = true) long poiId,
+            @RequestParam(value = "unassignUserId", required = true) Long assignUserId,
+            Model model) {
+        PoiEntity poi = poiService.findById(poiId, 0);
+        if (poi != null && assignUserId != null)
+            poi = poiService.unassignUser(poi, assignUserId);
+
+        return returnAssignedUsers(model, poi);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, params = "assignUserGroupId")
+    public String assignUserGroup(
+            @RequestParam(value = "eventId", required = true) long eventId,
+            @RequestParam(value = "poiId", required = true) long poiId,
+            @RequestParam(value = "assignUserGroupId", required = true) Long assignUserGroupId,
             Model model) {
 
         PoiEntity poi = poiService.findById(poiId, 0);
-        if (userId != null) {
-            if (delete != null && delete == false) {
-                poi = poiService.assignUser(poi, userId);
-            } else {
-                poi = poiService.unassignUser(poi, userId);
+        if (assignUserGroupId != null && poi != null) {
+            ResultList<UserInEventEntity> inEvents = userInEventService.findByUserGroupId(eventId, assignUserGroupId, 0, null, 0l);
+            for (UserInEventEntity inEvent : inEvents) {
+                poi = poiService.assignUser(poi, inEvent.getUserId());
             }
         }
 
-        Set<Long> userIds = poi.getUserIdList();
-
-        List<UserInEventEntity> assignedUsers = userInEventService.findByIds(poi.getEventId(), userIds, 0l);
-        model.addAttribute("assignedUsers", assignedUsers);
-
-        return "ajax/assigned-users";
+        return returnAssignedUsers(model, poi);
     }
 
-}
+    private String returnAssignedUsers(Model model, PoiEntity poi) {
+        if (poi == null) {
+            model.addAttribute("assignedUsers", new ArrayList<UserInEventEntity>(0));
+
+        } else {
+            Set<Long> userIds = poi.getUserIdList();
+
+            List<UserInEventEntity> assignedUsers = userInEventService.findByIds(poi.getEventId(), userIds, 0l);
+            model.addAttribute("assignedUsers", assignedUsers);
+        }
+
+        return "ajax/assigned-users";
+    }}

@@ -33,7 +33,7 @@ public class NotificationServiceImp extends AbstractServiceImpl implements Notif
     @Override
     public void sendPoiNotification(NotificationType type, PoiEntity poi, Long receiverUserId) {
         UserEntity receiver = userService.findById(receiverUserId, 0l);
-        if (receiver == null || receiver.getPushTokensAndroid() == null)
+        if (receiver == null || receiver.getPushTokensAndroid() == null || receiver.getPushTokensAndroid().size() == 0)
             return;
         Message.Builder builder = new Message.Builder();
         builder.addData("type", type.toString());

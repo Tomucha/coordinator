@@ -28,6 +28,9 @@ public interface UserInEventService extends Service {
     @FilterResult("#helper.canRead(#entity)")
     ResultList<UserInEventEntity> findByFilter(UserInEventFilter filter, int limit, String bookmark, long flags);
 
+    @FilterResult("#helper.canRead(#entity)")
+    ResultList<UserInEventEntity> findByUserGroupId(long eventId, long userGroupId, int limit, String bookmark, long flags);
+
     @CheckPermission("#helper.canCreate(#p0)")
     UserInEventEntity create(UserInEventEntity inEvent);
 

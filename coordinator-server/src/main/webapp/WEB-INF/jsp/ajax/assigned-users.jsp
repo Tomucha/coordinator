@@ -14,6 +14,6 @@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
         %>
 <c:forEach items="${assignedUsers}" var="userInEvent" begin="0" step="1" varStatus="i">
-<span onclick="onAssignedUserClick(${userInEvent.userId})">${userInEvent.userEntity.fullName} <i class="icon-remove"></i></span>
+<span class="clickable" onclick="onAssignedUserClick(${userInEvent.userId})">${userInEvent.userEntity.fullName} <i class="icon-remove"></i></span>
 </c:forEach>
 
