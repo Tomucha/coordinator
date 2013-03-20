@@ -104,7 +104,7 @@
                             <option value="${group.id}"><c:out value="${group.name}"/></option>
                         </c:forEach>
                     </select>
-                    <span style="display:none" class="clickable" id="assignGroupConfirm"><s:message code="msg.assignGroupToPoi"/> [<a onclick="onUserGroupClick($('#groupId').val())"><s:message code="label.assign"/></a>].</span>
+                    <div style="display:none;width:220px" class="alert alert-success clickable" id="assignGroupConfirm"><s:message code="msg.assignGroupToPoi"/> [<a onclick="onUserGroupClick($('#groupId').val())"><s:message code="label.assign"/></a>].</div>
                     <label><s:message code="label.name"/>:</label> <input type="text" id="userFulltext"/>
 
                     <p>
