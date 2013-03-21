@@ -18,6 +18,9 @@ public abstract class ApiLoader<RQ extends RequestParams, RP extends ApiResponse
 		super(typeOfListener);
 		this.apiCall = apiCall;
 	}
+	
+	// FIXME
+	private volatile boolean reload = false;
 
 	@Override
 	protected void doInBackground() {
@@ -58,9 +61,6 @@ public abstract class ApiLoader<RQ extends RequestParams, RP extends ApiResponse
 	protected void onListenerAdded() {
 		if (result != null) result.sendToListener();
 	}
-
-	// FIXME
-	private volatile boolean reload = false;
 
 	public void reload() {
 		reload = true;

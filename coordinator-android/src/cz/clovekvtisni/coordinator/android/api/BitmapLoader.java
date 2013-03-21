@@ -16,8 +16,11 @@ import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 import cz.clovekvtisni.coordinator.android.CoordinatorApplication;
 import cz.clovekvtisni.coordinator.android.DeployEnvironment;
 import cz.clovekvtisni.coordinator.android.util.DiskCache;
+import cz.clovekvtisni.coordinator.android.util.DiskCache.BitmapEntry;
+import cz.clovekvtisni.coordinator.android.util.Utils;
 
 public class BitmapLoader extends Loader<BitmapLoader.Listener> {
+	private static final int CACHE_SIZE = 50 * 1024 * 1024; // 50 MiB
 	private static final String CACHE_DIR = "bitmaps";
 	private static DiskCache diskCache;
 
@@ -34,7 +37,7 @@ public class BitmapLoader extends Loader<BitmapLoader.Listener> {
 		Context appContext = CoordinatorApplication.getAppContext();
 		if (diskCache == null) {
 			File dir = new File(appContext.getExternalCacheDir(), CACHE_DIR);
-			diskCache = DiskCache.newInstance(dir);
+			diskCache = DiskCache.open(dir, Utils.getVersionCode(appContext), CACHE_SIZE);
 		}
 		return diskCache;
 	}
@@ -44,11 +47,15 @@ public class BitmapLoader extends Loader<BitmapLoader.Listener> {
 		InputStream is = null;
 		try {
 			DiskCache cache = getOrCreateDiskCache();
-			if (cache.get(url) == null) {
+			BitmapEntry bitmapEntry = cache.getBitmap(url);
+			Bitmap bitmap;
+			if (bitmapEntry == null) {
 				is = HttpRequest.get(url).stream();
 				cache.put(url, is);
+				bitmap = cache.getBitmap(url).getBitmap();
+			} else {
+				bitmap = bitmapEntry.getBitmap();
 			}
-			Bitmap bitmap = cache.get(url).getBitmap();
 			result = new Result(bitmap);
 			getListenerProxy().onSuccess(bitmap);
 		} catch (HttpRequestException e) {

@@ -1,7 +1,5 @@
 package cz.clovekvtisni.coordinator.android.util;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;

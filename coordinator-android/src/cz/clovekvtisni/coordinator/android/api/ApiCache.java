@@ -11,16 +11,18 @@ import com.google.gson.JsonElement;
 
 import cz.clovekvtisni.coordinator.android.CoordinatorApplication;
 import cz.clovekvtisni.coordinator.android.util.DiskCache;
-import cz.clovekvtisni.coordinator.android.util.DiskCache.Snapshot;
+import cz.clovekvtisni.coordinator.android.util.DiskCache.StringEntry;
 import cz.clovekvtisni.coordinator.android.util.Lg;
+import cz.clovekvtisni.coordinator.android.util.Utils;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
 
 public class ApiCache {
+	private static final int CACHE_SIZE = 10 * 1024 * 1024; // 10 MiB
 	private static final String CACHE_DIR = "api";
 	private static final String KEY_TIME = "time";
-	
+
 	private static ApiCache instance;
-	
+
 	private final DiskCache diskCache;
 
 	public static synchronized ApiCache getInstance() throws IOException {
@@ -30,17 +32,18 @@ public class ApiCache {
 
 	private ApiCache() throws IOException {
 		Context c = CoordinatorApplication.getAppContext();
-		diskCache = DiskCache.newInstance(new File(c.getExternalCacheDir(), CACHE_DIR));
+		diskCache = DiskCache.open(new File(c.getExternalCacheDir(), CACHE_DIR),
+				Utils.getVersionCode(c), CACHE_SIZE);
 	}
 
 	public <RP> Item<RP> get(String key, Class<? extends RP> type) throws IOException {
 		String logMsgPrefix = "Get " + key + ": ";
-		Snapshot snapshot = diskCache.get(key); // muze byt null
-		if (snapshot == null) {
+		StringEntry stringEntry = diskCache.getString(key);
+		if (stringEntry == null) {
 			Lg.API_CACHE.d(logMsgPrefix + "doesn't exist.");
 			return null;
 		} else {
-			Item<RP> item = new Item<RP>(snapshot, type);
+			Item<RP> item = new Item<RP>(stringEntry, type);
 			Lg.API_CACHE.d(logMsgPrefix + "success.");
 			return item;
 		}
@@ -60,10 +63,10 @@ public class ApiCache {
 		private final long time;
 		private final RP value;
 
-		private Item(Snapshot snapshot, Class<? extends RP> type) throws IOException {
-			time = (Long) snapshot.getAnnotations().get(KEY_TIME);
+		private Item(StringEntry stringEntry, Class<? extends RP> type) throws IOException {
+			time = (Long) stringEntry.getMetadata().get(KEY_TIME);
 
-			JsonElement json = ApiUtils.PARSER.parse(snapshot.getString());
+			JsonElement json = ApiUtils.PARSER.parse(stringEntry.getString());
 			value = ApiUtils.GSON.fromJson(json, type);
 		}
 

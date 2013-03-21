@@ -9,6 +9,7 @@ public class Lg {
 	public static final Lg API_LOADER = new Lg(API, "Loader");
 	public static final Lg GCM = new Lg(APP, "GCM");
 	public static final Lg LOCATION = new Lg(APP, "Location");
+	public static final Lg MAP = new Lg(APP, "Map");
 	private static final String INDENT = "    ";
 
 	private final String tag;

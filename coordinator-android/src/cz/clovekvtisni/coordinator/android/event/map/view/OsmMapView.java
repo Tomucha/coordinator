@@ -27,7 +27,8 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 	private static final int TILE_BITMAP_BYTES = 256 * 256 * 4;
 	private static final Paint BITMAP_PAINT = new Paint(Paint.FILTER_BITMAP_FLAG);
 
-	private DiskTileLoader tileLoader;
+	private DiskTileLoader diskTileLoader;
+	private NetworkTileLoader netTileLoader;
 	private List<MapOverlay> overlays = Lists.newArrayList();
 	private LruCache<TileId, Bitmap> bitmapCache;
 	private Projection projection;
@@ -37,7 +38,7 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 
 		initCache();
 		initProjection();
-		initTileLoader();
+		initTileLoaders();
 		setOnTouchListener(new TouchHelper(context, projection, this));
 	}
 
@@ -53,7 +54,8 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 	}
 
 	public void onDestroy() {
-		tileLoader.shutDown();
+		diskTileLoader.shutDown();
+		netTileLoader.shutDown();
 	}
 
 	@Override
@@ -95,7 +97,7 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 		};
 	}
 
-	private void initTileLoader() {
+	private void initTileLoaders() {
 		TileCache cache;
 		try {
 			cache = TileCache.getInstance();
@@ -103,7 +105,9 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 			e.printStackTrace();
 			throw new AssertionError();
 		}
-		tileLoader = new DiskTileLoader(cache, this, new Handler());
+		
+		netTileLoader = new NetworkTileLoader(cache, new Handler());
+		diskTileLoader = new DiskTileLoader(cache, this, netTileLoader, new Handler());
 	}
 
 	private void initProjection() {
@@ -123,7 +127,7 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 		for (ProjectedTile tile : projection.getTiles()) {
 			Bitmap bitmap = bitmapCache.get(tile.getTileId());
 			if (bitmap == null) {
-				tileLoader.requestTile(tile.getTileId());
+				diskTileLoader.requestTile(tile.getTileId());
 
 				ProjectedTile parentTile = tile.createCorrespondingTileWithOneLevelLowerZoom();
 				bitmap = bitmapCache.get(parentTile.getTileId());

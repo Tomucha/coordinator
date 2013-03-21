@@ -2,8 +2,10 @@ package cz.clovekvtisni.coordinator.android.event.map.view;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.commons.io.IOUtils;
 
@@ -13,57 +15,87 @@ import android.os.Handler;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 
+import cz.clovekvtisni.coordinator.android.util.Lg;
+
 public class NetworkTileLoader {
+	private static final int THREADS = 2;
+
+	private final BlockingDeque<TileId> requestedTiles = new LinkedBlockingDeque<TileId>();
 	private final TileCache cache;
 	private final ExecutorService executor;
 	private final Handler handler;
-	private final TileLoadedListener listener;
+	private TileLoadedListener listener;
 
-	public NetworkTileLoader(TileCache cache, TileLoadedListener listener, Handler handler) {
+	public NetworkTileLoader(TileCache cache, Handler handler) {
 		this.cache = cache;
-		this.executor = Executors.newFixedThreadPool(2);
-		this.listener = listener;
+		this.executor = Executors.newFixedThreadPool(THREADS);
 		this.handler = handler;
+		startUp();
 	}
 
 	public void requestTile(TileId tileId) {
-		executor.execute(new Worker(tileId));
+		requestedTiles.remove(tileId);
+		requestedTiles.addFirst(tileId);
+	}
+
+	public void setListener(TileLoadedListener listener) {
+		if (this.listener != null) throw new IllegalStateException();
+		this.listener = listener;
+	}
+
+	public void removeListener(TileLoadedListener listener) {
+		if (this.listener != listener) throw new IllegalStateException();
+		this.listener = null;
 	}
 
 	public void shutDown() {
 		executor.shutdownNow();
 	}
 
-	private class Worker implements Runnable {
-		private final TileId tileId;
-
-		public Worker(TileId tileId) {
-			this.tileId = tileId;
+	public void startUp() {
+		for (int i = 0; i < THREADS; i++) {
+			executor.submit(new Worker());
 		}
+	}
 
-		@Override
-		public void run() {
+	private class Worker implements Runnable {
+		private void download(TileId tileId) {
 			InputStream is = null;
 			try {
 				is = HttpRequest.get(tileId.getUrl()).buffer();
 				cache.put(tileId, is);
-				returnBitmapOrNull(cache.get(tileId));
+				Lg.MAP.d("Downloaded tile, " + requestedTiles.size() + " remaining.");
+				returnBitmapOrNull(cache.get(tileId), tileId);
 			} catch (HttpRequestException e) {
 				e.printStackTrace();
-				returnBitmapOrNull(null);
+				returnBitmapOrNull(null, tileId);
 			} catch (IOException e) {
 				e.printStackTrace();
-				returnBitmapOrNull(null);
+				returnBitmapOrNull(null, tileId);
 			} finally {
 				IOUtils.closeQuietly(is);
 			}
 		}
 
-		private void returnBitmapOrNull(final Bitmap bitmap) {
+		@Override
+		public void run() {
+			while (true) {
+				if (executor.isShutdown()) break;
+				TileId tileId;
+				try {
+					tileId = requestedTiles.takeFirst();
+				} catch (InterruptedException e) {
+					continue;
+				}
+				download(tileId);
+			}
+		}
+
+		private void returnBitmapOrNull(final Bitmap bitmap, final TileId tileId) {
 			handler.post(new Runnable() {
 				@Override
 				public void run() {
-					listener.onTileLoaded(tileId, bitmap);
+					if (listener != null) listener.onTileLoaded(tileId, bitmap);
 				}
 			});
 		}

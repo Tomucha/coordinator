@@ -10,7 +10,6 @@ import android.os.Handler;
 
 import com.google.common.collect.Sets;
 
-
 public class DiskTileLoader implements TileLoadedListener {
 	private final TileCache cache;
 	private final ExecutorService executor;
@@ -19,17 +18,21 @@ public class DiskTileLoader implements TileLoadedListener {
 	private final TileLoadedListener listener;
 	private final Set<TileId> tileIds = Sets.newHashSet();
 
-	public DiskTileLoader(TileCache cache, TileLoadedListener listener, Handler handler) {
+	public DiskTileLoader(TileCache cache, TileLoadedListener listener,
+			NetworkTileLoader networkTileLoader, Handler handler) {
 		this.cache = cache;
 		this.executor = Executors.newFixedThreadPool(1);
 		this.listener = listener;
 		this.handler = handler;
-		this.networkTileLoader = new NetworkTileLoader(cache, this, handler);
+		this.networkTileLoader = networkTileLoader;
+		networkTileLoader.setListener(this);
 	}
 
 	public void onTileLoaded(final TileId tileId, final Bitmap bitmap) {
-		tileIds.remove(tileId);
-		listener.onTileLoaded(tileId, bitmap);
+		if (tileIds.contains(tileId)) {
+			tileIds.remove(tileId);
+			listener.onTileLoaded(tileId, bitmap);
+		}
 	}
 
 	public void requestTile(TileId tileId) {
@@ -41,7 +44,7 @@ public class DiskTileLoader implements TileLoadedListener {
 
 	public void shutDown() {
 		executor.shutdownNow();
-		networkTileLoader.shutDown();
+		networkTileLoader.removeListener(this);
 	}
 
 	private class Worker implements Runnable {

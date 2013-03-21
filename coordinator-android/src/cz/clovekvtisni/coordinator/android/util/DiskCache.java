@@ -1,89 +1,99 @@
 package cz.clovekvtisni.coordinator.android.util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.jakewharton.DiskLruCache;
+
 public class DiskCache {
 
-	private static final String FILENAME_ANNOTATIONS = "annotations";
-	private static final String FILENAME_VALUE = "value";
-
+	private static final int VALUE_IDX = 0;
+	private static final int METADATA_IDX = 1;
 	private static final List<File> usedDirs = new ArrayList<File>();
 
-	private final File dir;
-	private final File tmpDir;
-	private int nextTmpFileName = 0;
+	private final DiskLruCache diskLruCache;
 
-	private DiskCache(File dir) throws IOException {
-		this.dir = dir;
-		this.tmpDir = new File(dir, "tmp");
-
-		FileUtils.forceMkdir(dir);
-		FileUtils.forceMkdir(tmpDir);
-		
-		clean();
+	private DiskCache(File dir, int appVersion, long maxSize) throws IOException {
+		diskLruCache = DiskLruCache.open(dir, appVersion, 2, maxSize);
 	}
 
-	public static synchronized DiskCache newInstance(File dir) throws IOException {
+	public static synchronized DiskCache open(File dir, int appVersion, long maxSize)
+			throws IOException {
 		if (usedDirs.contains(dir)) {
 			throw new RuntimeException("Cache dir " + dir.getAbsolutePath() + " was used before.");
 		}
 
 		usedDirs.add(dir);
 
-		return new DiskCache(dir);
+		return new DiskCache(dir, appVersion, maxSize);
 	}
-	
-	private synchronized void clean() throws IOException {
-		for(File file:tmpDir.listFiles()) {
-			System.out.println(file.getAbsolutePath());
-			FileUtils.forceDelete(file);
+
+	public InputStreamEntry getInputStream(String key) throws IOException {
+		DiskLruCache.Snapshot snapshot = diskLruCache.get(toInternalKey(key));
+		if (snapshot == null) return null;
+
+		try {
+			return new InputStreamEntry(snapshot, readMetadata(snapshot));
+		} finally {
+			snapshot.close();
 		}
 	}
 
-	public synchronized Snapshot get(String key) throws IOException {
-		File entryDir = new File(dir, toInternalKey(key));
-		if (!entryDir.exists()) return null;
+	public BitmapEntry getBitmap(String key) throws IOException {
+		DiskLruCache.Snapshot snapshot = diskLruCache.get(toInternalKey(key));
+		if (snapshot == null) return null;
 
-		File versionDir = new File(entryDir, String.valueOf(maxEntryVersion(entryDir)));
-		File valueFile = new File(versionDir, FILENAME_VALUE);
-		File annotationsFile = new File(versionDir, FILENAME_ANNOTATIONS);
-		if (!valueFile.exists() || !annotationsFile.exists()) return null;
-
-		FileInputStream fis = new FileInputStream(valueFile);
-		return new Snapshot(fis, readAnnotations(annotationsFile));
+		try {
+			Bitmap bitmap = BitmapFactory.decodeStream(snapshot.getInputStream(VALUE_IDX));
+			return new BitmapEntry(bitmap, readMetadata(snapshot));
+		} finally {
+			snapshot.close();
+		}
 	}
 
-	public synchronized CacheOutputStream openStream(String key) throws IOException {
+	public StringEntry getString(String key) throws IOException {
+		DiskLruCache.Snapshot snapshot = diskLruCache.get(toInternalKey(key));
+		if (snapshot == null) return null;
+
+		try {
+			return new StringEntry(snapshot.getString(VALUE_IDX), readMetadata(snapshot));
+		} finally {
+			snapshot.close();
+		}
+	}
+
+	public CacheOutputStream openStream(String key) throws IOException {
 		return openStream(key, new HashMap<String, Serializable>());
 	}
 
-	public synchronized CacheOutputStream openStream(String key,
-			Map<String, ? extends Serializable> annotations) throws IOException {
-		nextTmpFileName++;
-		File dir = new File(tmpDir, String.valueOf(nextTmpFileName));
-		FileUtils.forceMkdir(dir);
-		return new CacheOutputStream(dir, key, annotations);
+	public CacheOutputStream openStream(String key, Map<String, ? extends Serializable> metadata)
+			throws IOException {
+		DiskLruCache.Editor editor = diskLruCache.edit(toInternalKey(key));
+		try {
+			writeMetadata(metadata, editor);
+			BufferedOutputStream bos = new BufferedOutputStream(editor.newOutputStream(VALUE_IDX));
+			return new CacheOutputStream(bos, editor);
+		} catch (IOException e) {
+			editor.abort();
+			throw e;
+		}
 	}
 
 	public void put(String key, InputStream is) throws IOException {
@@ -107,48 +117,34 @@ public class DiskCache {
 
 	public void put(String key, String value, Map<String, ? extends Serializable> annotations)
 			throws IOException {
-		CacheOutputStream os = null;
+		CacheOutputStream cos = null;
 		try {
-			os = openStream(key, annotations);
-			os.write(value.getBytes());
+			cos = openStream(key, annotations);
+			cos.write(value.getBytes());
 		} finally {
-			if (os != null) os.close();
+			if (cos != null) cos.close();
 		}
 
 	}
 
-	private synchronized void publish(String key, File unpublished) throws IOException {
-		File entryDir = new File(dir, toInternalKey(key));
-		if (!entryDir.exists()) FileUtils.forceMkdir(entryDir);
-
-		String version = String.valueOf(maxEntryVersion(entryDir) + 1);
-		deleteAllVersions(entryDir);
-		File versionDir = new File(entryDir, version);
-
-		FileUtils.moveDirectory(unpublished, versionDir);
-	}
-
-	private int maxEntryVersion(File entryDir) {
-		String[] names = entryDir.list();
-		int maxVersion = 0;
-		for (String name : names) {
-			int version = Integer.parseInt(name);
-			if (version > maxVersion) maxVersion = version;
-		}
-		return maxVersion;
-	}
-
-	private void deleteAllVersions(File entryDir) {
-		File[] files = entryDir.listFiles();
-		for (File file : files) {
-			file.delete();
+	private void writeMetadata(Map<String, ? extends Serializable> metadata,
+			DiskLruCache.Editor editor) throws IOException {
+		ObjectOutputStream oos = null;
+		try {
+			oos = new ObjectOutputStream(new BufferedOutputStream(
+					editor.newOutputStream(METADATA_IDX)));
+			oos.writeObject(metadata);
+		} finally {
+			IOUtils.closeQuietly(oos);
 		}
 	}
 
-	private Map<String, Serializable> readAnnotations(File file) throws IOException {
+	private Map<String, Serializable> readMetadata(DiskLruCache.Snapshot snapshot)
+			throws IOException {
 		ObjectInputStream ois = null;
 		try {
-			ois = new ObjectInputStream(new FileInputStream(file));
+			ois = new ObjectInputStream(new BufferedInputStream(
+					snapshot.getInputStream(METADATA_IDX)));
 			@SuppressWarnings("unchecked")
 			Map<String, Serializable> annotations = (Map<String, Serializable>) ois.readObject();
 			return annotations;
@@ -159,42 +155,36 @@ public class DiskCache {
 		}
 	}
 
-	private void saveAnnotations(Map<String, ? extends Serializable> annotations, File file)
-			throws IOException {
-		ObjectOutputStream oos = null;
-		try {
-			oos = new ObjectOutputStream(new FileOutputStream(file));
-			oos.writeObject(annotations);
-		} finally {
-			IOUtils.closeQuietly(oos);
-		}
-	}
-
 	private String toInternalKey(String key) {
 		return Utils.md5(key);
 	}
 
 	private class CacheOutputStream extends FilterOutputStream {
 
-		private final File dir;
-		private final Map<String,? extends  Serializable> annotations;
-		private final String key;
+		private final DiskLruCache.Editor editor;
 		private boolean failed = false;
 
-		public CacheOutputStream(File dir, String key, Map<String, ? extends Serializable> annotations)
-				throws FileNotFoundException {
-			super(new BufferedOutputStream(new FileOutputStream(new File(dir, FILENAME_VALUE))));
-			this.dir = dir;
-			this.key = key;
-			this.annotations = annotations;
+		private CacheOutputStream(OutputStream os, DiskLruCache.Editor editor) {
+			super(os);
+			this.editor = editor;
 		}
 
 		@Override
 		public void close() throws IOException {
-			super.close();
-			saveAnnotations(annotations, new File(dir, FILENAME_ANNOTATIONS));
+			IOException closeException = null;
+			try {
+				super.close();
+			} catch (IOException e) {
+				closeException = e;
+			}
 
-			if (!failed) publish(key, dir);
+			if (failed) {
+				editor.abort();
+			} else {
+				editor.commit();
+			}
+
+			if (closeException != null) throw closeException;
 		}
 
 		@Override
@@ -238,44 +228,63 @@ public class DiskCache {
 		}
 	}
 
-	public static class Snapshot {
-		private final InputStream is;
-		private final Map<String, Serializable> annotations;
+	public static class InputStreamEntry {
+		private final DiskLruCache.Snapshot snapshot;
+		private final Map<String, Serializable> metadata;
 
-		public Snapshot(InputStream is, Map<String, Serializable> annotations) {
-			this.is = is;
-			this.annotations = annotations;
-		}
-
-		public Bitmap getBitmap() throws IOException {
-			try {
-				Bitmap bitmap = BitmapFactory.decodeStream(is);
-				return bitmap;
-			} finally {
-				is.close();
-			}
-
-		}
-
-		public String getString() throws IOException {
-			try {
-				String string = IOUtils.toString(is, Charsets.UTF_8);
-				return string;
-			} finally {
-				is.close();
-			}
+		public InputStreamEntry(DiskLruCache.Snapshot snapshot, Map<String, Serializable> metadata) {
+			this.metadata = metadata;
+			this.snapshot = snapshot;
 		}
 
 		public InputStream getInputStream() {
-			return is;
+			return snapshot.getInputStream(VALUE_IDX);
 		}
 
-		public Map<String, Serializable> getAnnotations() {
-			return annotations;
+		public Map<String, Serializable> getMetadata() {
+			return metadata;
 		}
 
-		public void close() throws IOException {
-			is.close();
+		public void close() {
+			snapshot.close();
+
+		}
+
+	}
+
+	public static class BitmapEntry {
+		private final Bitmap bitmap;
+		private final Map<String, Serializable> metadata;
+
+		public BitmapEntry(Bitmap bitmap, Map<String, Serializable> metadata) {
+			this.bitmap = bitmap;
+			this.metadata = metadata;
+		}
+
+		public Bitmap getBitmap() {
+			return bitmap;
+		}
+
+		public Map<String, Serializable> getMetadata() {
+			return metadata;
+		}
+	}
+
+	public static class StringEntry {
+		private final String string;
+		private final Map<String, Serializable> metadata;
+
+		public StringEntry(String string, Map<String, Serializable> metadata) {
+			this.string = string;
+			this.metadata = metadata;
+		}
+
+		public String getString() {
+			return string;
+		}
+
+		public Map<String, Serializable> getMetadata() {
+			return metadata;
 		}
 	}
 }
