@@ -27,9 +27,9 @@ OrganizationActivity: Logo a název orgaznizace, Text z konfigu, a seznam akcí,
 
 DULEZITE
 GCM
-Dodelat workflow (ted se to musi manualne obnovit)
+Dodelat workflow transition - ted se musi seznam poi nacist znovu, aby se to zmenilo i u uzivatele
 Pridat POI
-Preloading map?
+Preload map
 Pady
-Pravidelne aktualizovat uzivatele
+Aktualizovat uzivatele i kdyz odejde z app
 
