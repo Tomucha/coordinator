@@ -42,7 +42,8 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
     @Override
     public EventEntity findById(Long id, long flags) {
         EventEntity entity = ofy().get(Key.create(EventEntity.class, id));
-        populate(Arrays.asList(new EventEntity[]{entity}), flags);
+        if (entity != null)
+            populate(Arrays.asList(new EventEntity[]{entity}), flags);
         return entity;
     }
 

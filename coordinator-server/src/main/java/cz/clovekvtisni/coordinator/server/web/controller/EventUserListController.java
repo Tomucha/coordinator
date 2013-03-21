@@ -1,18 +1,18 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
 import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
-import cz.clovekvtisni.coordinator.server.domain.*;
+import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserGroupEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
-import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.SelectedUserAction;
 import cz.clovekvtisni.coordinator.server.web.model.UserMultiSelection;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
-import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,10 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,9 +42,11 @@ public class EventUserListController extends AbstractEventController {
     @RequestMapping(method = RequestMethod.GET)
     public String listUsers(@ModelAttribute("params") EventFilterParams params, Model model) {
 
-        UserInEventFilter inEventFilter = createFilterFromParams(params);
+        UserInEventFilter inEventFilter = new UserInEventFilter();
+        params.populateUserInEventFilter(inEventFilter);
+
         ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null,
-                UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS | UserInEventService.FLAG_FETCH_LAST_POI
+                UserInEventService.FLAG_FETCH_GROUPS | UserInEventService.FLAG_FETCH_LAST_POI
         );
         model.addAttribute("userInEvents", userInEvents.getResult());
 
@@ -66,42 +65,15 @@ public class EventUserListController extends AbstractEventController {
     @RequestMapping(method = RequestMethod.GET, params = "ajax")
     public String listUsersAjax(@ModelAttribute("params") EventFilterParams params, Model model) {
 
-        UserInEventFilter inEventFilter = createFilterFromParams(params);
-        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(inEventFilter, 0, null,
-                UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS | UserInEventService.FLAG_FETCH_LAST_POI
+        UserInEventFilter filter = new UserInEventFilter();
+        params.populateUserInEventFilter(filter);
+        ResultList<UserInEventEntity> userInEvents = userInEventService.findByFilter(filter, 0, null,
+                UserInEventService.FLAG_FETCH_GROUPS | UserInEventService.FLAG_FETCH_LAST_POI
         );
         model.addAttribute("userInEvents", userInEvents.getResult());
-
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
 
         return "ajax/event-users";
-    }
-
-
-    private UserInEventFilter createFilterFromParams(EventFilterParams params) {
-        UserInEventFilter inEventFilter = new UserInEventFilter();
-        inEventFilter.setEventIdVal(params.getEventId());
-        if (!ValueTool.isEmpty(params.getUserFulltext())) {
-            final String fullText = params.getUserFulltext().trim().toLowerCase();
-            inEventFilter.addAfterLoadCallback(new Filter.AfterLoadCallback<UserInEventEntity>() {
-                @Override
-                public boolean accept(UserInEventEntity entity) {
-                    UserEntity user = entity.getUserEntity();
-                    return user != null && user.getFullName() != null && user.getFullName().toLowerCase().contains(fullText);
-                }
-            });
-        }
-        final Long groupId = params.getGroupId();
-        if (groupId != null) {
-            inEventFilter.addAfterLoadCallback(new Filter.AfterLoadCallback<UserInEventEntity>() {
-                @Override
-                public boolean accept(UserInEventEntity entity) {
-                    return entity.getGroupIdList() != null &&
-                            Arrays.asList(entity.getGroupIdList()).contains(groupId);
-                }
-            });
-        }
-        return inEventFilter;
     }
 
     @RequestMapping(method = RequestMethod.POST)

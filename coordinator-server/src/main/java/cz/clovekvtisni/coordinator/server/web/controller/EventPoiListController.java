@@ -38,15 +38,9 @@ public class EventPoiListController extends AbstractEventController {
     private UserGroupService userGroupService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String list(@ModelAttribute("params") PoiForm params, @RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
+    public String list(@ModelAttribute("params") EventFilterParams params, @RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
         PoiFilter filter = new PoiFilter();
-        filter.setEventIdVal(params.getEventId());
-        if (!ValueTool.isEmpty(params.getWorkflowId())) {
-            filter.setWorkflowIdVal(params.getWorkflowId());
-        }
-        if (!ValueTool.isEmpty(params.getWorkflowStateId())) {
-            filter.setWorkflowStateIdVal(params.getWorkflowStateId());
-        }
+        params.populatePoiFilter(filter);
 
         ResultList<PoiEntity> result = poiService.findByFilter(filter, DEFAULT_LIST_LENGTH, bookmark, 0l);
 
@@ -68,6 +62,8 @@ public class EventPoiListController extends AbstractEventController {
 
         if (action != null && pois != null && pois.size() > 0) {
             for (Long poiId : pois) {
+                if (poiId == null)
+                    continue;
                 PoiEntity poiEntity = poiService.findById(poiId, 0l);
                 if (poiEntity == null)
                     continue;

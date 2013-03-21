@@ -28,7 +28,7 @@ public interface PoiService extends Service {
     ResultList<PoiEntity> findByFilter(PoiFilter filter, int limit, String bookmark, long flags);
 
     @FilterResult("#helper.canRead(#entity)")
-    List<PoiEntity> findByEventAndBox(long eventId, double latN, double lonE, double latS, double lonW, long flags);
+    List<PoiEntity> findByFilterAndBox(PoiFilter filter, double latN, double lonE, double latS, double lonW, long flags);
 
     @CheckPermission("#helper.canCreate(#p0)")
     PoiEntity createPoi(PoiEntity entity);

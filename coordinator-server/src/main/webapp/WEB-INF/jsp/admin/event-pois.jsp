@@ -21,7 +21,10 @@
     <div class="buttonPanel">
         <c:choose>
             <c:when test="${can:hasRole('BACKEND')}">
-                <button accesskey="f" class="btn" onclick="\$('#searchFormPanel').show();"><i class="icon-filter"></i> <s:message code="button.filterList"/> <span class="caret"></span></button>
+                <c:set var="isFilter" value="${!empty params.workflowId or !empty params.workflowStateId}"/>
+
+                <button accesskey="f" class="btn${isFilter ? ' btn-danger' : ''}" onclick="$('#searchFormPanel').slideToggle();"><i class="icon-filter${isFilter ? ' icon-white' : ''}"></i> <s:message code="button.filterList"/> <span class="caret"></span></button>
+
                 <a class="btn" href="<s:url value="/admin/event/poi/edit?eventId=${params.eventId}"/>"><span class="icon-plus"></span> <span class="icon-map-marker"></span> <s:message
                         code="button.addNew"/></a>
             </c:when>

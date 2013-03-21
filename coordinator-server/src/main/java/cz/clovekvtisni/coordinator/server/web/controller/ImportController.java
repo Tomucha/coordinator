@@ -68,6 +68,7 @@ public class ImportController extends AbstractController {
             return "admin/import-data-form";
         }
 
+        usersForm.setEventId(appContext.getActiveEvent().getId());
         List<String> types = usersForm.getTyp();
         List<Integer> checked = usersForm.getChecked();
         List<List<String>> vals = usersForm.getVal();
@@ -93,6 +94,7 @@ public class ImportController extends AbstractController {
                     errorMap.put(errorVals.size() - 1, "error.UNIQUE_KEY_VIOLATION");
 
             } catch (Exception e) {
+                logger.error(e.getMessage(), e);
                 errorVals.add(row);
                 errorMap.put(errorVals.size() - 1, "error.unknown");
             }
@@ -195,6 +197,7 @@ public class ImportController extends AbstractController {
                 } else if (name.equals("eventId")) {
                     String data = readStream(inputStream);
                     form.setEventId("".equals(data) ? null : Long.parseLong(data));
+
                 } else {
                     readStream(inputStream);
                 }

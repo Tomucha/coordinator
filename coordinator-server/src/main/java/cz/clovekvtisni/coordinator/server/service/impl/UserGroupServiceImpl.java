@@ -35,7 +35,8 @@ public class UserGroupServiceImpl extends AbstractEntityServiceImpl implements U
     public UserGroupEntity findById(Long id, long flags) {
         UserGroupEntity entity = ofy().load().key(Key.create(UserGroupEntity.class, id)).get();
 
-        populate(Arrays.asList(new UserGroupEntity[]{entity}), flags);
+        if (entity != null)
+            populate(Arrays.asList(new UserGroupEntity[]{entity}), flags);
 
         return entity;
     }

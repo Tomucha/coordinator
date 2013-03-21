@@ -37,8 +37,9 @@
     <div class="btn-toolbar">
         <c:choose>
             <c:when test="${can:hasRole('BACKEND')}">
+                <c:set var="isFilter" value="${!empty params.groupId or !empty params.userFulltext}"/>
 
-                <button accesskey="f" class="btn" onclick="\$('#searchFormPanel').show();"><i class="icon-filter"></i> <s:message code="button.filterList"/> <span class="caret"></span></button>
+                <button accesskey="f" class="btn${isFilter ? ' btn-danger' : ''}" onclick="$('#searchFormPanel').slideToggle();"><i class="icon-filter${isFilter ? ' icon-white' : ''}"></i> <s:message code="button.filterList"/> <span class="caret"></span></button>
 
                 <a class="btn" href="<s:url value="/admin/event/user/edit?eventId=${params.eventId}"/>"><i class=" icon-plus"></i> <i class="icon-user"></i> <s:message
                         code="button.addNewUser"/></a>

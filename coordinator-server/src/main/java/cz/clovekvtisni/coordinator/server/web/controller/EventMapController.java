@@ -11,6 +11,7 @@ import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
+import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.util.Location;
@@ -45,6 +46,9 @@ public class EventMapController extends AbstractEventController {
     private UserInEventService userInEventService;
 
     @Autowired
+    private UserGroupService userGroupService;
+
+    @Autowired
     private PoiService poiService;
 
     @Autowired
@@ -75,17 +79,9 @@ public class EventMapController extends AbstractEventController {
         if (params.getEventId() == null)
             throw NotFoundException.idNotExist();
 
-
-/*
-        EventEntity event = loadEventById(params.getEventKey());
-        model.addAttribute("event", event);
-*/
-
-        //populateEventModel(model, params);
-
         UserInEventFilter userInEventFilter = new UserInEventFilter();
         userInEventFilter.setEventIdVal(appContext.getActiveEvent().getId());
-        ResultList<UserInEventEntity> inEvents = userInEventService.findByFilter(userInEventFilter, 0, null, UserInEventService.FLAG_FETCH_USER);
+        ResultList<UserInEventEntity> inEvents = userInEventService.findByFilter(userInEventFilter, 0, null, 0l);
         model.addAttribute("userInEventList", inEvents.getResult());
 
         PoiFilter poiFilter = new PoiFilter();
@@ -93,32 +89,31 @@ public class EventMapController extends AbstractEventController {
         ResultList<PoiEntity> pois = poiService.findByFilter(poiFilter, 0, null, 0l);
         model.addAttribute("poiList", pois.getResult());
 
+        model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
+
         return "admin/event-map";
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/poi")
     public @ResponseBody List<PoiEntity> listPoi(
-            @RequestParam(required = true) long eventId,
+            @ModelAttribute("params") EventFilterParams params,
             @RequestParam(required = true) double latN,
             @RequestParam(required = true) double lonE,
             @RequestParam(required = true) double latS,
             @RequestParam(required = true) double lonW
     ) {
-        return poiService.findByEventAndBox(eventId, latN, lonE, latS, lonW, 0);
+        return poiService.findByFilterAndBox(params.populatePoiFilter(new PoiFilter()), latN, lonE, latS, lonW, 0);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/user")
     public @ResponseBody List<UserInEventEntity> listUsers(
-            @RequestParam(required = true) long eventId,
+            @ModelAttribute("params") EventFilterParams params,
             @RequestParam(required = true) double latN,
             @RequestParam(required = true) double lonE,
             @RequestParam(required = true) double latS,
             @RequestParam(required = true) double lonW
     ) {
-        List<UserInEventEntity> byEventAndBox = userInEventService.findByEventAndBox(eventId, latN, lonE, latS, lonW, UserInEventService.FLAG_FETCH_USER);
-        logger.info("Users: "+byEventAndBox);
-
-        return byEventAndBox;
+        return userInEventService.findByFilterAndBox(params.populateUserInEventFilter(new UserInEventFilter()), latN, lonE, latS, lonW, 0l);
     }
 
 
@@ -158,7 +153,7 @@ public class EventMapController extends AbstractEventController {
         model.addAttribute("poi", e);
 
         Set<Long> userIds = e.getUserIdList();
-        List<UserInEventEntity> assignedUsers = userInEventService.findByIds(e.getEventId(), userIds, UserInEventService.FLAG_FETCH_USER);
+        List<UserInEventEntity> assignedUsers = userInEventService.findByIds(e.getEventId(), userIds, 0l);
         model.addAttribute("assignedUsers", assignedUsers);
         return "ajax/poi-popup";
     }
@@ -199,7 +194,7 @@ public class EventMapController extends AbstractEventController {
             Model model) {
 
         UserInEventEntity u = userInEventService.findById(eventId, userId,
-                UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_LAST_POI | UserInEventService.FLAG_FETCH_GROUPS
+                UserInEventService.FLAG_FETCH_LAST_POI | UserInEventService.FLAG_FETCH_GROUPS
         );
         model.addAttribute("userInEvent", u);
         return "ajax/user-popup";

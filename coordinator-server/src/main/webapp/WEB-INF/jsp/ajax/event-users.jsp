@@ -27,7 +27,7 @@
                         <tbody>
                         <c:forEach items="${userInEvents}" var="userInEvent" begin="0" step="1" varStatus="i">
                             <!-- This javascript function should be defined on page which includes picker -->
-                            <tr onclick="onUserClick(${userInEvent.userId})">
+                            <tr onclick="onUserClick(${userInEvent.userId})" class="clickable">
                                 <tags:eventUserList renderHeader="false" user="${userInEvent}"/>
                             </tr>
                         </c:forEach>

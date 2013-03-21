@@ -33,7 +33,8 @@ public class OrganizationInEventServiceImpl extends AbstractEntityServiceImpl im
     public OrganizationInEventEntity findById(Long id, long flags) {
         OrganizationInEventEntity inEvent = ofy().get(Key.create(OrganizationInEventEntity.class, id));
 
-        populate(Arrays.asList(new OrganizationInEventEntity[] {inEvent}), flags);
+        if (inEvent != null)
+            populate(Arrays.asList(new OrganizationInEventEntity[] {inEvent}), flags);
 
         return inEvent;
     }

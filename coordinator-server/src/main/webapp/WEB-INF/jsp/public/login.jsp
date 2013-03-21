@@ -8,7 +8,7 @@
 <div class="well">
 <sf:form modelAttribute="user" method="POST">
 
-    <sf:errors />
+    <sf:errors cssClass="alert alert-error" element="div" />
 
     <tags:input field="email" modelAttribute="user">
         <sf:input path="email" />

@@ -6,6 +6,7 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.NoDeletedFilter;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,6 +34,10 @@ public class PoiFilter extends NoDeletedFilter<PoiEntity> {
     private Date modifiedDateVal;
 
     private Operator modifiedDateOp = Operator.EQ;
+
+    private List<String> geoCellsVal;
+
+    private Operator geoCellsOp = Operator.IN;
 
     public Long getEventIdVal() {
         return eventIdVal;
@@ -112,6 +117,22 @@ public class PoiFilter extends NoDeletedFilter<PoiEntity> {
 
     public void setWorkflowStateIdOp(Operator workflowStateIdOp) {
         this.workflowStateIdOp = workflowStateIdOp;
+    }
+
+    public List<String> getGeoCellsVal() {
+        return geoCellsVal;
+    }
+
+    public void setGeoCellsVal(List<String> geoCellsVal) {
+        this.geoCellsVal = geoCellsVal;
+    }
+
+    public Operator getGeoCellsOp() {
+        return geoCellsOp;
+    }
+
+    public void setGeoCellsOp(Operator geoCellsOp) {
+        this.geoCellsOp = geoCellsOp;
     }
 
     @Override

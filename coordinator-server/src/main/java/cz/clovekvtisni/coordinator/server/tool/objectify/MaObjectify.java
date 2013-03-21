@@ -69,7 +69,7 @@ public class MaObjectify extends ObjectifyWrapper<MaObjectify, ObjectifyFactory>
             Cursor cursor = Cursor.fromWebSafeString(bookmark);
             query = query.startAt(cursor);
         }
-        logger.info("Query: "+query+" (bookmark="+bookmark+")");
+        logger.debug("Query: "+query+" (bookmark="+bookmark+")");
         QueryResultIterator<T> iterator = query.iterator();
         List<T> entities = new ArrayList<T>();
         while (iterator.hasNext()) {

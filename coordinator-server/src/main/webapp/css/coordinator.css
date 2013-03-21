@@ -60,3 +60,6 @@ div.dropdown-menu {
 .bottomTableControl select {
     margin: 0;
 }
+.clickable {
+    cursor: pointer;
+}

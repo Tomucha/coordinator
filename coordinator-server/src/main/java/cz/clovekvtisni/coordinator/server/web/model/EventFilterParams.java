@@ -1,7 +1,14 @@
 package cz.clovekvtisni.coordinator.server.web.model;
 
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
+import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
+import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
+import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
+import cz.clovekvtisni.coordinator.util.ValueTool;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +26,10 @@ public class EventFilterParams {
     private Long groupId;
 
     private String retUrl;
+
+    private String workflowId;
+
+    private String workflowStateId;
 
     public EventFilterParams() {
     }
@@ -55,6 +66,7 @@ public class EventFilterParams {
         this.groupId = groupId;
     }
 
+    /** @deprecated */
     public Map<String, String> toMap() {
         Map<String, String> map = new HashMap<String, String>(2);
         if (eventId != null)
@@ -71,5 +83,59 @@ public class EventFilterParams {
 
     public void setRetUrl(String retUrl) {
         this.retUrl = retUrl;
+    }
+
+    public String getWorkflowId() {
+        return workflowId;
+    }
+
+    public void setWorkflowId(String workflowId) {
+        this.workflowId = workflowId;
+    }
+
+    public String getWorkflowStateId() {
+        return workflowStateId;
+    }
+
+    public void setWorkflowStateId(String workflowStateId) {
+        this.workflowStateId = workflowStateId;
+    }
+
+    public PoiFilter populatePoiFilter(PoiFilter filter) {
+        filter.setEventIdVal(getEventId());
+        if (!ValueTool.isEmpty(getWorkflowId())) {
+            filter.setWorkflowIdVal(getWorkflowId());
+        }
+        if (!ValueTool.isEmpty(getWorkflowStateId())) {
+            filter.setWorkflowStateIdVal(getWorkflowStateId());
+        }
+
+        return filter;
+    }
+
+    public UserInEventFilter populateUserInEventFilter(UserInEventFilter filter) {
+        filter.setEventIdVal(getEventId());
+        if (!ValueTool.isEmpty(getUserFulltext())) {
+            final String fullText = getUserFulltext().trim().toLowerCase();
+            filter.addAfterLoadCallback(new Filter.AfterLoadCallback<UserInEventEntity>() {
+                @Override
+                public boolean accept(UserInEventEntity entity) {
+                    UserEntity user = entity.getUserEntity();
+                    return user != null && user.getFullName() != null && user.getFullName().toLowerCase().contains(fullText);
+                }
+            });
+        }
+        final Long groupId = getGroupId();
+        if (groupId != null) {
+            filter.addAfterLoadCallback(new Filter.AfterLoadCallback<UserInEventEntity>() {
+                @Override
+                public boolean accept(UserInEventEntity entity) {
+                    return entity.getGroupIdList() != null &&
+                            Arrays.asList(entity.getGroupIdList()).contains(groupId);
+                }
+            });
+        }
+
+        return filter;
     }
 }

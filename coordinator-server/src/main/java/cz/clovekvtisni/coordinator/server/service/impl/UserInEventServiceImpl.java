@@ -4,18 +4,18 @@ import com.beoui.geocell.GeocellManager;
 import com.beoui.geocell.model.BoundingBox;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
-import com.googlecode.objectify.cmd.Query;
 import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
-import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserGroupEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
+import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,19 +56,6 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
             for (Map.Entry<Key<EventEntity>, EventEntity> entry : entityMap.entrySet()) {
                 if (entry.getValue().isDeleted()) continue;
                 inEventMap.get(entry.getKey()).setEventEntity(entry.getValue());
-            }
-        }
-
-        if ((flags & FLAG_FETCH_USER) != 0) {
-            Map<Key<UserEntity>, UserInEventEntity> inUserMap = new HashMap<Key<UserEntity>, UserInEventEntity>(result.size());
-            for (UserInEventEntity inUser : result) {
-                Key<UserEntity> key = Key.create(UserEntity.class, inUser.getUserId());
-                inUserMap.put(key, inUser);
-            }
-            Map<Key<UserEntity>, UserEntity> entityMap = ofy().get(inUserMap.keySet());
-            for (Map.Entry<Key<UserEntity>, UserEntity> entry : entityMap.entrySet()) {
-                if (entry.getValue().isDeleted()) continue;
-                inUserMap.get(entry.getKey()).setUserEntity(entry.getValue());
             }
         }
 
@@ -139,24 +126,26 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
     }
 
     @Override
-    public List<UserInEventEntity> findByEventAndBox(long eventId, double latN, double lonE, double latS, double lonW, long flags) {
-        // Transform this to a bounding box
+    public List<UserInEventEntity> findByFilterAndBox(UserInEventFilter filter, double latN, double lonE, double latS, double lonW, long flags) {
         BoundingBox bb = new BoundingBox(latN, lonE, latS, lonW);
 
         // Calculate the geocells list to be used in the queries (optimize list of cells that complete the given bounding box)
         List<String> cells = GeocellManager.bestBboxSearchCells(bb, null);
 
-        Query<UserInEventEntity> q = ofy().load().type(UserInEventEntity.class).filter("eventId", eventId).filter("lastLocationGeoCells IN", cells);
-        List<UserInEventEntity> result = q.list();
+        filter.setGeoCellsVal(cells);
+        filter.setGeoCellsOp(Filter.Operator.IN);
 
-        populate(result, flags);
-        return result;
+        ResultList<UserInEventEntity> result = ofy().findByFilter(filter, null, 0);
+        populate(result.getResult(), flags);
+
+        return result.getResult();
     }
 
     @Override
     public UserInEventEntity findById(long eventId, long userId, long flags) {
         UserInEventEntity entity = ofy().get(UserInEventEntity.createKey(userId, eventId));
-        populate(Arrays.asList(entity), flags);
+        if (entity != null)
+            populate(Arrays.asList(entity), flags);
         return entity;
     }
 
@@ -180,4 +169,22 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
 
     }
 
+    @Override
+    public ResultList<UserInEventEntity> findByUserGroupId(long eventId, final long userGroupId, int limit, String bookmark, long flags) {
+        UserGroupEntity userGroup = userGroupService.findById(userGroupId, 0l);
+        if (userGroup == null || userGroup.getEventId() != eventId)
+            return new ResultList<UserInEventEntity>(new ArrayList<UserInEventEntity>(0), bookmark);
+
+        UserInEventFilter filter = new UserInEventFilter();
+        filter.setEventIdVal(userGroup.getEventId());
+        filter.addAfterLoadCallback(new Filter.AfterLoadCallback<UserInEventEntity>() {
+            @Override
+            public boolean accept(UserInEventEntity entity) {
+                return entity.getGroupIdList() != null &&
+                        Arrays.asList(entity.getGroupIdList()).contains(userGroupId);
+            }
+        });
+
+        return findByFilter(filter, limit, bookmark, flags);
+    }
 }

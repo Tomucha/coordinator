@@ -15,8 +15,6 @@ public interface UserInEventService extends Service {
 
     public static final long FLAG_FETCH_EVENT = 1l;
 
-    public static final long FLAG_FETCH_USER = 2l;
-
     public static final long FLAG_FETCH_GROUPS = 4l;
 
     public static final long FLAG_FETCH_LAST_POI = 8l;
@@ -30,6 +28,9 @@ public interface UserInEventService extends Service {
     @FilterResult("#helper.canRead(#entity)")
     ResultList<UserInEventEntity> findByFilter(UserInEventFilter filter, int limit, String bookmark, long flags);
 
+    @FilterResult("#helper.canRead(#entity)")
+    ResultList<UserInEventEntity> findByUserGroupId(long eventId, long userGroupId, int limit, String bookmark, long flags);
+
     @CheckPermission("#helper.canCreate(#p0)")
     UserInEventEntity create(UserInEventEntity inEvent);
 
@@ -40,5 +41,5 @@ public interface UserInEventService extends Service {
     UserInEventEntity changeStatus(UserInEventEntity inEvent, RegistrationStatus status);
 
     @FilterResult("#helper.canRead(#entity)")
-    List<UserInEventEntity> findByEventAndBox(long eventId, double latN, double lonE, double latS, double lonW, long flags);
+    List<UserInEventEntity> findByFilterAndBox(UserInEventFilter filter, double latN, double lonE, double latS, double lonW, long flags);
 }

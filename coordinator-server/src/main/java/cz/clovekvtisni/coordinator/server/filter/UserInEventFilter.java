@@ -6,6 +6,7 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.NoDeletedFilter;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,6 +26,10 @@ public class UserInEventFilter extends NoDeletedFilter<UserInEventEntity> {
     private Date modifiedDateVal;
 
     private Operator modifiedDateOp = Operator.EQ;
+
+    private List<String> geoCellsVal;
+
+    private Operator geoCellsOp = Operator.IN;
 
     public Long getUserIdVal() {
         return userIdVal;
@@ -72,6 +77,22 @@ public class UserInEventFilter extends NoDeletedFilter<UserInEventEntity> {
 
     public void setModifiedDateOp(Operator modifiedDateOp) {
         this.modifiedDateOp = modifiedDateOp;
+    }
+
+    public List<String> getGeoCellsVal() {
+        return geoCellsVal;
+    }
+
+    public void setGeoCellsVal(List<String> geoCellsVal) {
+        this.geoCellsVal = geoCellsVal;
+    }
+
+    public Operator getGeoCellsOp() {
+        return geoCellsOp;
+    }
+
+    public void setGeoCellsOp(Operator geoCellsOp) {
+        this.geoCellsOp = geoCellsOp;
     }
 
     @Override

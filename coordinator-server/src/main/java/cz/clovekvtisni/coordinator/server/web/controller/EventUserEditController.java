@@ -62,6 +62,8 @@ public class EventUserEditController extends AbstractEventController {
             form.populateFrom(user);
             form.setUserId(user.getId());
             UserInEventEntity inEvent = fetchUserInEvent(params.getEventId(), userId);
+            if (inEvent == null)
+                NotFoundException.idNotExist();
             form.setEventId(inEvent.getEventId());
             form.setLastLocationLatitude(inEvent.getLastLocationLatitude());
             form.setLastLocationLongitude(inEvent.getLastLocationLongitude());
@@ -157,7 +159,7 @@ public class EventUserEditController extends AbstractEventController {
         filter.setEventIdVal(eventId);
         filter.setUserIdVal(userId);
 
-        UserInEventEntity inEventEntity = userInEventService.findByFilter(filter, 0, null, UserInEventService.FLAG_FETCH_USER | UserInEventService.FLAG_FETCH_GROUPS).firstResult();
+        UserInEventEntity inEventEntity = userInEventService.findByFilter(filter, 0, null, UserInEventService.FLAG_FETCH_GROUPS).firstResult();
 
         return inEventEntity;
     }

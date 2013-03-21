@@ -14,7 +14,7 @@
 </script>
 
 <div class="hero-unit">
-    <p>You are not registered.</p>
+    <p><s:message code="msg.notRegisteredInEvent"/></p>
 
     <div class="accordion" id="accordion2">
         <div class="accordion-group" style="background-color: white">
@@ -29,66 +29,75 @@
 
                         <sf:errors />
 
-                        <div>
-                            <sf:hidden path="id"/>
-                            <sf:hidden path="organizationId"/>
-                            <tags:hiddenEvent/>
+                        <div class="container-fluid">
+                            <div class="row-fluid">
+                                <div class="span4">
+                                    <div>
+                                        <sf:hidden path="id"/>
+                                        <sf:hidden path="organizationId"/>
+                                        <tags:hiddenEvent/>
 
-                            <p class="lead">
-                                <tags:hiddenEvent/>
-                                <b><s:message code="label.event"/>:</b> <c:out value="${form.eventEntity.name}"/>
-                            </p>
+                                        <p class="lead">
+                                            <tags:hiddenEvent/>
+                                            <b><s:message code="label.event"/>:</b> <c:out value="${form.eventEntity.name}"/>
+                                        </p>
 
-                        </div>
+                                    </div>
 
-                        <div>
-                            <tags:input field="name" modelAttribute="form" captionCode="OrganizationInEventEntity.name">
-                                <sf:input path="name"/>
-                            </tags:input>
-                        </div>
+                                    <div>
+                                        <tags:input field="name" modelAttribute="form" captionCode="OrganizationInEventEntity.name">
+                                            <sf:input path="name"/>
+                                        </tags:input>
+                                    </div>
 
-                        <div>
-                            <tags:input field="description" modelAttribute="form" captionCode="OrganizationInEventEntity.description">
-                                <sf:textarea path="description"/>
-                            </tags:input>
-                        </div>
+                                    <div>
+                                        <tags:input field="description" modelAttribute="form" captionCode="OrganizationInEventEntity.description">
+                                            <sf:textarea path="description"/>
+                                        </tags:input>
+                                    </div>
 
-                        <div>
-                            <tags:input field="operationalInfo" modelAttribute="form" captionCode="OrganizationInEventEntity.operationalInfo">
-                                <sf:textarea path="operationalInfo"/>
-                            </tags:input>
-                        </div>
+                                    <div>
+                                        <tags:input field="operationalInfo" modelAttribute="form" captionCode="OrganizationInEventEntity.operationalInfo">
+                                            <sf:textarea path="operationalInfo"/>
+                                        </tags:input>
+                                    </div>
 
-                        <div>
-                            <tags:input field="datePublish" modelAttribute="form" captionCode="OrganizationInEventEntity.datePublish">
-                                <sf:input path="datePublish" id="datePublishInput"/>
-                            </tags:input>
-                        </div>
+                                    <div>
+                                        <tags:input field="datePublish" modelAttribute="form" captionCode="OrganizationInEventEntity.datePublish">
+                                            <sf:input path="datePublish" id="datePublishInput"/>
+                                        </tags:input>
+                                    </div>
 
-                        <div>
-                            <tags:input field="dateClosedRegistration" modelAttribute="form" captionCode="OrganizationInEventEntity.dateClosedRegistration">
-                                <sf:input path="dateClosedRegistration" id="dateClosedRegistrationInput"/>
-                            </tags:input>
-                        </div>
+                                    <div>
+                                        <tags:input field="dateClosedRegistration" modelAttribute="form" captionCode="OrganizationInEventEntity.dateClosedRegistration">
+                                            <sf:input path="dateClosedRegistration" id="dateClosedRegistrationInput"/>
+                                        </tags:input>
+                                    </div>
 
-                        <div>
-                            <tags:input field="dateClosed" modelAttribute="form" captionCode="OrganizationInEventEntity.dateClosed">
-                                <sf:input path="dateClosed" id="dateClosedInput"/>
-                            </tags:input>
-                        </div>
+                                    <div>
+                                        <tags:input field="dateClosed" modelAttribute="form" captionCode="OrganizationInEventEntity.dateClosed">
+                                            <sf:input path="dateClosed" id="dateClosedInput"/>
+                                        </tags:input>
+                                    </div>
+                                </div>
 
-                        <div class="panel checkboxList">
-                            <h3><s:message code="header.equipmentList"/></h3>
-                            <sf:checkboxes path="registrationEquipment" items="${config.equipmentList}" itemLabel="name" itemValue="id"/>
-                        </div>
+                                <div class="span4">
 
-                        <div class="panel checkboxList">
-                            <h3><s:message code="header.skillList"/></h3>
-                            <sf:checkboxes path="registrationSkills" items="${config.skillList}" itemLabel="name" itemValue="id"/>
+                                    <div class="panel checkboxList">
+                                        <h3><s:message code="header.equipmentList"/></h3>
+                                        <sf:checkboxes path="registrationEquipment" items="${config.equipmentList}" itemLabel="name" itemValue="id"/>
+                                    </div>
+
+                                    <div class="panel checkboxList">
+                                        <h3><s:message code="header.skillList"/></h3>
+                                        <sf:checkboxes path="registrationSkills" items="${config.skillList}" itemLabel="name" itemValue="id"/>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="buttonPanel">
-                            <sf:button><s:message code="button.save"/></sf:button>
+                            <button type="submit" class="btn btn-primary"><span class="icon-ok icon-white"></span> <s:message code="button.save"/></button>
                         </div>
                     </sf:form>
                 </div>
