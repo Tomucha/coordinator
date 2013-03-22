@@ -7,6 +7,8 @@ import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.api.request.RequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
 
+import java.net.SocketException;
+
 public abstract class ApiLoader<RQ extends RequestParams, RP extends ApiResponseData> extends
 		Loader<ApiLoader.Listener<RP>> {
 
@@ -87,14 +89,33 @@ public abstract class ApiLoader<RQ extends RequestParams, RP extends ApiResponse
 
 		private void sendToListener() {
 			if (response != null) getListenerProxy().onResult(response);
-			if (exception != null) getListenerProxy().onException(exception);
+			if (exception != null) {
+                Throwable cause = findExceptionCause(exception);
+
+                if (cause instanceof java.net.UnknownHostException) {
+                    getListenerProxy().onInternetException(exception);
+
+                } else if (cause instanceof SocketException) {
+                    getListenerProxy().onInternetException(exception);
+
+                } else {
+                    // ok, this really should not happen, let Crittercism handle this
+                    throw new IllegalStateException(exception);
+                }
+            }
 		}
 	}
 
-	public static interface Listener<RP> {
-		public void onResult(RP result);
+    private Throwable findExceptionCause(Throwable exception) {
+        while (exception.getCause() != null && exception.getCause() != exception) {
+            exception = exception.getCause();
+        }
+        return exception;
+    }
 
-		public void onException(Exception e);
+    public static interface Listener<RP> {
+		public void onResult(RP result);
+		public void onInternetException(Exception e);
 	}
 
 }

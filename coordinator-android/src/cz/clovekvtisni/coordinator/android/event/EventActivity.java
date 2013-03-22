@@ -46,6 +46,7 @@ import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventUserListLoaderLis
 import cz.clovekvtisni.coordinator.android.api.BitmapLoader;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.android.util.SimpleListeners.SimpleTabListener;
+import cz.clovekvtisni.coordinator.android.util.UiTool;
 import cz.clovekvtisni.coordinator.android.util.Utils;
 import cz.clovekvtisni.coordinator.api.request.EventPoiListRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventUserListRequestParams;
@@ -128,16 +129,24 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		initPager();
 		initTabs();
 
-		loadUsers();
-		loadPoiCategories();
-
 		locationTool = new LocationTool(this, this);
 	}
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+    }
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		locationTool.resume();
+        // if we do this in onCreate, it might end up with NPE in
+        // MapFragment.setFilteredUsers
+        loadUsers();
+        loadPoiCategories();
+        locationTool.resume();
+
 	}
 
 	@Override
@@ -165,8 +174,8 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 			}
 
 			@Override
-			public void onException(Exception e) {
-				e.printStackTrace();
+			public void onInternetException(Exception e) {
+                UiTool.toast(R.string.error_no_internet, getApplicationContext());
 			}
 		}, this);
 	}
@@ -202,7 +211,8 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 			}
 
 			@Override
-			public void onException(Exception e) {
+			public void onInternetException(Exception e) {
+                UiTool.toast(R.string.error_no_internet, getApplicationContext());
 			}
 		}, this);
 	}
@@ -218,7 +228,8 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 			}
 
 			@Override
-			public void onException(Exception e) {
+			public void onInternetException(Exception e) {
+                UiTool.toast(R.string.error_no_internet, getApplicationContext());
 			}
 		}, this);
 	}
@@ -407,4 +418,10 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 			return (OrganizationInEvent) i.getSerializableExtra(EXTRA_ORG_IN_EVENT);
 		}
 	}
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString("DO NOT CRASH", "OK");
+        super.onSaveInstanceState(outState);
+    }
 }

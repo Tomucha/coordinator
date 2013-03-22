@@ -23,6 +23,26 @@ public abstract class BetterArrayAdapter<T> extends ArrayAdapter<T> {
 
 	protected abstract void setUpView(T item, View view);
 
+    /**
+     * No such method in 2.2
+     * @param items
+     */
+    public void addAll(T... items) {
+        for (T item : items) {
+            add(item);
+        }
+    }
+
+    /**
+     * No such method in 2.2
+     * @param items
+     */
+    public void addAll(java.util.Collection<? extends T> collection) {
+        for (T item : collection) {
+            add(item);
+        }
+    }
+
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if (convertView == null) {

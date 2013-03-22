@@ -36,6 +36,7 @@ public class NotificationServiceImp extends AbstractServiceImpl implements Notif
         if (receiver == null || receiver.getPushTokensAndroid() == null || receiver.getPushTokensAndroid().size() == 0)
             return;
         Message.Builder builder = new Message.Builder();
+        // TODO odprasit tady ty stringy, pouzivaji se i v Androidu v cz.clovekvtisni.coordinator.android.GCMIntentService
         builder.addData("type", type.toString());
         builder.addData("eventId", poi.getEventId() != null ? poi.getEventId().toString() : null);
         builder.addData("poiId", poi.getId() != null ? poi.getId().toString() : null);

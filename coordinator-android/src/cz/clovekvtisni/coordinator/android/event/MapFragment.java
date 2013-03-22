@@ -204,6 +204,9 @@ public class MapFragment extends SherlockFragment {
 	}
 
 	public void setFilteredUsers(List<UserInEvent> users) {
+        if (osmMapView == null) {
+            return;
+        }
 		List<MapOverlay> overlays = osmMapView.getOverlays();
 		for (Iterator<MapOverlay> iter = overlays.iterator(); iter.hasNext();) {
 			if (iter.next() instanceof UserOverlay) iter.remove();
@@ -425,5 +428,17 @@ public class MapFragment extends SherlockFragment {
 			return dialog;
 		}
 	}
+
+
+    /**
+     * This is a terrible hack of:
+     * http://stackoverflow.com/questions/14516804/nullpointerexception-android-support-v4-app-fragmentmanagerimpl-savefragmentbasi
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString("DO NOT CRASH", "OK");
+        setUserVisibleHint(true);
+        super.onSaveInstanceState(outState);
+    }
 
 }

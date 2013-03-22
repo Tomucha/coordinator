@@ -23,6 +23,7 @@ import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventRegisteredLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventRegisteredLoaderListener;
 import cz.clovekvtisni.coordinator.android.event.EventActivity;
 import cz.clovekvtisni.coordinator.android.register.RegisterActivity;
+import cz.clovekvtisni.coordinator.android.util.UiTool;
 import cz.clovekvtisni.coordinator.api.request.EventFilterRequestParams;
 import cz.clovekvtisni.coordinator.api.response.EventFilterResponseData;
 import cz.clovekvtisni.coordinator.domain.Event;
@@ -82,8 +83,9 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 
 		Workers.load(new EventRegisteredLoader(params), new EventRegisteredLoaderListener() {
 			@Override
-			public void onException(Exception e) {
-			}
+			public void onInternetException(Exception e) {
+                UiTool.toast(R.string.error_no_internet, getApplicationContext());
+            }
 
 			@Override
 			public void onResult(EventFilterResponseData result) {
@@ -109,7 +111,8 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 
 			Workers.load(new EventRegisteredLoader(params), new EventRegisteredLoaderListener() {
 				@Override
-				public void onException(Exception e) {
+				public void onInternetException(Exception e) {
+                    UiTool.toast(R.string.error_no_internet, getApplicationContext());
 				}
 
 				@Override
@@ -156,6 +159,8 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 		initPreregisterButton();
 
 		loadEvents();
+
+        ((TextView)findViewById(R.id.organization_description)).setText(organization.getDescription());
 	}
 
 	private class EventsAdapter extends BaseAdapter {

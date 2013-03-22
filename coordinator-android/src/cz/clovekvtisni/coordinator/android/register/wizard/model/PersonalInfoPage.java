@@ -42,7 +42,11 @@ public class PersonalInfoPage extends Page {
     public void saveToUser(User user) {
     	String[] name = mData.getString(NAME_DATA_KEY).split(" ", 2);
     	user.setFirstName(name[0]);
-    	user.setLastName(name[1]);
+        if (name.length == 1) {
+    	    user.setLastName("");
+        } else {
+            user.setLastName(name[1]);
+        }
     	
     	user.setEmail(mData.getString(EMAIL_DATA_KEY));
     	

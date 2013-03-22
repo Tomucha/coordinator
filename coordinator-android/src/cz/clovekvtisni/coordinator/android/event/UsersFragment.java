@@ -85,4 +85,16 @@ public class UsersFragment extends SherlockFragment {
 		}
 
 	}
+
+    /**
+     * This is a terrible hack of:
+     * http://stackoverflow.com/questions/14516804/nullpointerexception-android-support-v4-app-fragmentmanagerimpl-savefragmentbasi
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString("DO NOT CRASH", "OK");
+        setUserVisibleHint(true);
+        super.onSaveInstanceState(outState);
+    }
+
 }

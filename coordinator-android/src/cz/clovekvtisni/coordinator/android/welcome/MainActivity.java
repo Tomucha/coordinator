@@ -24,6 +24,7 @@ import cz.clovekvtisni.coordinator.android.organization.OrganizationActivity;
 import cz.clovekvtisni.coordinator.android.util.BetterArrayAdapter;
 import cz.clovekvtisni.coordinator.android.util.FindView;
 import cz.clovekvtisni.coordinator.android.util.Lg;
+import cz.clovekvtisni.coordinator.android.util.UiTool;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 
@@ -61,10 +62,9 @@ public class MainActivity extends SherlockFragmentActivity {
 			public void onResult(ConfigResponse result) {
 				onOrganizationsLoaded(result.getOrganizationList());
 			}
-
 			@Override
-			public void onException(Exception e) {
-				e.printStackTrace();
+			public void onInternetException(Exception e) {
+                UiTool.toast(R.string.error_no_internet, getApplicationContext());
 			}
 		}, this);
 	}
@@ -95,6 +95,7 @@ public class MainActivity extends SherlockFragmentActivity {
 
 				@Override
 				public void onException(Exception e) {
+                    throw new IllegalStateException(e);
 				}
 			}, this);
 		}

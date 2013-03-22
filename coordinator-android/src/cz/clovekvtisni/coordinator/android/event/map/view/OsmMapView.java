@@ -20,6 +20,7 @@ import cz.clovekvtisni.coordinator.android.event.map.MapOverlay;
 import cz.clovekvtisni.coordinator.android.event.map.view.Projection.LatLon;
 import cz.clovekvtisni.coordinator.android.event.map.view.Projection.ProjectedTile;
 import cz.clovekvtisni.coordinator.android.event.map.view.TouchHelper.OnSingleTapListener;
+import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.android.util.Utils;
 
 public class OsmMapView extends View implements OnSingleTapListener, TileLoadedListener {
@@ -118,8 +119,12 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 
 	private void drawOverlays(Canvas canvas) {
 		for (MapOverlay overlay : overlays) {
-			Point p = projection.latLonToPixels(overlay.getLatLon());
-			overlay.onDraw(canvas, p.x, p.y, projection.mapMetersToPixels(1));
+            if (overlay.getLatLon() != null) {
+			    Point p = projection.latLonToPixels(overlay.getLatLon());
+			    overlay.onDraw(canvas, p.x, p.y, projection.mapMetersToPixels(1));
+            } else {
+                Lg.MAP.w("Null LatLon in overlay: "+overlay);
+            }
 		}
 	}
 

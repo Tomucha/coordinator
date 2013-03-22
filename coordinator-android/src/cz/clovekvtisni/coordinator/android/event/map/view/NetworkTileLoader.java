@@ -2,6 +2,9 @@ package cz.clovekvtisni.coordinator.android.event.map.view;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,9 +21,9 @@ import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 
 public class NetworkTileLoader {
-	private static final int THREADS = 2;
+	private static final int THREADS = 3;
 
-	private final BlockingDeque<TileId> requestedTiles = new LinkedBlockingDeque<TileId>();
+	private final LinkedList<TileId> requestedTiles = new LinkedList<TileId>();
 	private final TileCache cache;
 	private final ExecutorService executor;
 	private final Handler handler;
@@ -34,8 +37,12 @@ public class NetworkTileLoader {
 	}
 
 	public void requestTile(TileId tileId) {
-		requestedTiles.remove(tileId);
-		requestedTiles.addFirst(tileId);
+        synchronized (requestedTiles) {
+            Lg.MAP.i("Requested tile: "+tileId);
+		    requestedTiles.remove(tileId);
+		    requestedTiles.addFirst(tileId);
+            requestedTiles.notify();
+        }
 	}
 
 	public void setListener(TileLoadedListener listener) {
@@ -54,6 +61,7 @@ public class NetworkTileLoader {
 
 	public void startUp() {
 		for (int i = 0; i < THREADS; i++) {
+            Lg.MAP.i("Creating new Worker");
 			executor.submit(new Worker());
 		}
 	}
@@ -64,7 +72,7 @@ public class NetworkTileLoader {
 			try {
 				is = HttpRequest.get(tileId.getUrl()).buffer();
 				cache.put(tileId, is);
-				Lg.MAP.d("Downloaded tile, " + requestedTiles.size() + " remaining.");
+				Lg.MAP.i("Downloaded tile, " + requestedTiles.size() + " remaining.");
 				returnBitmapOrNull(cache.get(tileId), tileId);
 			} catch (HttpRequestException e) {
 				e.printStackTrace();
@@ -80,14 +88,33 @@ public class NetworkTileLoader {
 		@Override
 		public void run() {
 			while (true) {
-				if (executor.isShutdown()) break;
-				TileId tileId;
+				if (executor.isShutdown()) {
+                    Lg.MAP.i("Ending download thread");
+                    break;
+                }
+				TileId tileId = null;
 				try {
-					tileId = requestedTiles.takeFirst();
+                    try {
+                        synchronized (requestedTiles) {
+                           if (!requestedTiles.isEmpty()) {
+                              tileId = requestedTiles.removeFirst();
+                           }
+                        }
+                    } catch (NoSuchElementException e) {
+                        // ok, ok, we get it, no such element
+                    }
+                    if (tileId == null) {
+                        synchronized (requestedTiles) {
+                            Lg.MAP.i("Waiting for tile: "+tileId);
+                            requestedTiles.wait();
+                        }
+                    }
 				} catch (InterruptedException e) {
 					continue;
 				}
-				download(tileId);
+                if (tileId != null) {
+				    download(tileId);
+                }
 			}
 		}
 

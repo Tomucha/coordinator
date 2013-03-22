@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Coordinator</string>
+    <string name="app_name">Koordinátor</string>
     
     <string name="next">Další</string>
     <string name="prev">Předchozí</string>
     <string name="finish">Dokončit</string>
     <string name="review">Shrnutí</string>
+
+    <string name="app_welcome_description">Koordinátor je aplikace určená zájemcům o dobrovolnickou činnost. Zastřešuje
+        nejvýznamnější české neziskové organizace, které se organizací dobrovolníků zabývají.
+        <b>Vyberte si prosím, pod kterou z těchto organizací chcete pomáhat.</b>
+    </string>
+
+    <string name="error_no_internet">Vypadá to, že jsme bez internetu. Ale teď ho bohužel potřebujeme.</string>
+    <string name="label_events">UDÁLOSTI</string>
 
 </resources>

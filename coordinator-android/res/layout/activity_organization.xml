@@ -16,12 +16,11 @@
             android:orientation="vertical"
             android:padding="16dp" >
 
-            <WebView
-                android:id="@+id/webView"
+            <TextView
+                android:id="@+id/organization_description"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:visibility="gone" />
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -29,7 +28,7 @@
                 android:layout_marginTop="16dp"
                 android:paddingBottom="4dp"
                 android:paddingLeft="4dp"
-                android:text="UDÁLOSTI"
+                android:text="@string/label_events"
                 android:textColor="#444"
                 android:textSize="14sp"
                 android:textStyle="bold" />

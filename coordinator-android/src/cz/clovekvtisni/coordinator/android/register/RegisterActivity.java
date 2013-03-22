@@ -36,6 +36,7 @@ import cz.clovekvtisni.coordinator.android.register.wizard.model.WizardModel;
 import cz.clovekvtisni.coordinator.android.register.wizard.ui.PageFragmentCallbacks;
 import cz.clovekvtisni.coordinator.android.register.wizard.ui.ReviewFragment;
 import cz.clovekvtisni.coordinator.android.util.Lg;
+import cz.clovekvtisni.coordinator.android.util.UiTool;
 import cz.clovekvtisni.coordinator.api.request.RegisterRequestParams;
 import cz.clovekvtisni.coordinator.api.request.UserPushTokenRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
@@ -154,7 +155,8 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 			}
 
 			@Override
-			public void onException(Exception e) {
+			public void onInternetException(Exception e) {
+                UiTool.toast(R.string.error_no_internet, getApplicationContext());
 			}
 		}, this);
 	}
