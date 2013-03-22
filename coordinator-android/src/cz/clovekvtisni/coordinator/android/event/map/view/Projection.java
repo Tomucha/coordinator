@@ -22,6 +22,23 @@ public class Projection {
 	public Projection(int dpi) {
 		onePixelInMeters = 1 / (dpi / 2.54 * 100);
 	}
+	
+	public static double oneLatitudeInMeters() {
+		return ONE_LATITUDE_IN_METERS;
+	}
+
+	public static double oneLongitudeInMeters(double latitude) {
+		return Math.PI / 180 * EARTH_RADIUS * Math.cos(Math.toRadians(latitude));
+	}
+	
+	public static Point latLonToOsm(LatLon latLon, int osmZoom) {
+		int osmX = (int) Math.floor((latLon.getLon() + 180) / 360 * (1 << osmZoom));
+		int osmY = (int) Math.floor((1 - Math.log(Math.tan(Math.toRadians(latLon.getLat())) + 1
+				/ Math.cos(Math.toRadians(latLon.getLat())))
+				/ Math.PI)
+				/ 2 * (1 << osmZoom));
+		return new Point(osmX, osmY);
+	}
 
 	public List<ProjectedTile> getTiles() {
 		LatLon topLeftLatLon = new LatLon(centerLatLon.getLat() + pixelsToLatitudes(screenHeight)
@@ -81,7 +98,7 @@ public class Projection {
 	}
 
 	public double pixelsToLongitudes(double pixels) {
-		return pixelsToMapMeters(pixels) / oneLongitudeInMeters();
+		return pixelsToMapMeters(pixels) / oneLongitudeInMeters(centerLatLon.getLat());
 	}
 
 	public LatLon getCenterLatLon() {
@@ -114,20 +131,7 @@ public class Projection {
 	}
 
 	private double longitudesToPixels(double longitudes) {
-		return longitudes * oneLongitudeInMeters() / zoom / onePixelInMeters;
-	}
-
-	private Point latLonToOsm(LatLon latLon, int osmZoom) {
-		int osmX = (int) Math.floor((latLon.getLon() + 180) / 360 * (1 << osmZoom));
-		int osmY = (int) Math.floor((1 - Math.log(Math.tan(Math.toRadians(latLon.getLat())) + 1
-				/ Math.cos(Math.toRadians(latLon.getLat())))
-				/ Math.PI)
-				/ 2 * (1 << osmZoom));
-		return new Point(osmX, osmY);
-	}
-
-	private double oneLongitudeInMeters() {
-		return Math.PI / 180 * EARTH_RADIUS * Math.cos(Math.toRadians(centerLatLon.getLat()));
+		return longitudes * oneLongitudeInMeters(centerLatLon.getLat()) / zoom / onePixelInMeters;
 	}
 
 	private LatLon osmToLatLon(int x, int y, int osmZoom) {

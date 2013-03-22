@@ -2,6 +2,7 @@ package cz.clovekvtisni.coordinator.android.event.map.view;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,7 +16,9 @@ import android.os.Handler;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 
+import cz.clovekvtisni.coordinator.android.event.map.PreloadTool;
 import cz.clovekvtisni.coordinator.android.util.Lg;
+import cz.clovekvtisni.coordinator.domain.EventLocation;
 
 public class NetworkTileLoader {
 	private static final int THREADS = 2;
@@ -31,6 +34,22 @@ public class NetworkTileLoader {
 		this.executor = Executors.newFixedThreadPool(THREADS);
 		this.handler = handler;
 		startUp();
+	}
+
+	public void preloadTiles(final EventLocation[] eventLocations) {
+		new Thread() {
+			public void run() {
+				try {
+					Set<TileId> tiles = PreloadTool.tilesThatShouldBePreloaded(eventLocations,
+							cache);
+					for (TileId tileId : tiles) {
+						if (!requestedTiles.contains(tileId)) requestedTiles.addLast(tileId);
+					}
+				} catch (IOException e) {
+					throw new AssertionError();
+				}
+			};
+		}.start();
 	}
 
 	public void requestTile(TileId tileId) {
@@ -64,7 +83,8 @@ public class NetworkTileLoader {
 			try {
 				is = HttpRequest.get(tileId.getUrl()).buffer();
 				cache.put(tileId, is);
-				Lg.MAP.d("Downloaded tile, " + requestedTiles.size() + " remaining.");
+				Lg.MAP.d("Downloaded tile " + tileId + ", " + requestedTiles.size()
+						+ " more in the queue.");
 				returnBitmapOrNull(cache.get(tileId), tileId);
 			} catch (HttpRequestException e) {
 				e.printStackTrace();

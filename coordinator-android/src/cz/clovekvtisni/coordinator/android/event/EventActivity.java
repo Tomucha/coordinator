@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.android.event;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -44,6 +46,8 @@ import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventPoiListLoaderList
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventUserListLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventUserListLoaderListener;
 import cz.clovekvtisni.coordinator.android.api.BitmapLoader;
+import cz.clovekvtisni.coordinator.android.event.map.view.NetworkTileLoader;
+import cz.clovekvtisni.coordinator.android.event.map.view.TileCache;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.android.util.SimpleListeners.SimpleTabListener;
 import cz.clovekvtisni.coordinator.android.util.Utils;
@@ -67,6 +71,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	private LocationTool locationTool;
 	private InfoFragment infoFragment;
 	private MapFragment mapFragment;
+	private NetworkTileLoader netTileLoader;
 	private TasksFragment tasksFragment;
 	private UsersFragment usersFragment;
 	private ViewPager pager;
@@ -76,6 +81,12 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	private Poi[] pois = new Poi[0];
 	private PoiCategory[] poiCategories;
 
+	private void initActionBar() {
+		ActionBar actionBar = getSupportActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		actionBar.setLogo(new ColorDrawable(Color.TRANSPARENT));
+	}
+
 	private void initFragments() {
 		mapFragment = new MapFragment();
 		tasksFragment = new TasksFragment();
@@ -84,6 +95,20 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		infoFragment = InfoFragment.newInstance(info);
 
 		fragments = Lists.newArrayList(mapFragment, tasksFragment, usersFragment, infoFragment);
+	}
+
+	private void initNetTileLoader() {
+		TileCache cache;
+		try {
+			cache = TileCache.getInstance();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new AssertionError();
+		}
+
+		netTileLoader = new NetworkTileLoader(cache, new Handler());
+		netTileLoader.preloadTiles(event.getLocationList());
+		mapFragment.setNetTileLoader(netTileLoader);
 	}
 
 	private void initPager() {
@@ -118,20 +143,20 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		super.onCreate(state);
 		setContentView(R.layout.activity_event);
 
-		ActionBar actionBar = getSupportActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		actionBar.setLogo(new ColorDrawable(Color.TRANSPARENT));
-
 		event = IntentHelper.getEvent(getIntent());
 
+		initActionBar();
 		initFragments();
 		initPager();
 		initTabs();
-
+		
+		locationTool = new LocationTool(this, this);
+	}
+	
+	public void onMapFragmentReady() {
+		initNetTileLoader();
 		loadUsers();
 		loadPoiCategories();
-
-		locationTool = new LocationTool(this, this);
 	}
 
 	@Override
@@ -278,6 +303,13 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	public void onLocationUpdated(Location location) {
 		Lg.LOCATION.d("Location updated. " + describeLocation(location));
 		mapFragment.setMyLocation(location);
+	}
+	
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		netTileLoader.shutDown();
 	}
 
 	@Override

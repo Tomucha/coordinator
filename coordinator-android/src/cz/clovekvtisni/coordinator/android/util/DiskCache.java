@@ -78,6 +78,14 @@ public class DiskCache {
 			snapshot.close();
 		}
 	}
+	
+	public boolean contains(String key) throws IOException {
+		DiskLruCache.Snapshot snapshot = diskLruCache.get(toInternalKey(key));
+		if(snapshot==null) return false;
+		
+		snapshot.close();
+		return true;
+	}
 
 	public CacheOutputStream openStream(String key) throws IOException {
 		return openStream(key, new HashMap<String, Serializable>());

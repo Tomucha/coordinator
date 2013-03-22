@@ -35,6 +35,10 @@ public class TileCache {
 		if (bitmapEntry == null) return null;
 		else return bitmapEntry.getBitmap();
 	}
+	
+	public boolean contains(TileId tileId) throws IOException {
+		return diskCache.contains(tileKey(tileId));
+	}
 
 	public void put(TileId tileId, InputStream is) throws IOException {
 		diskCache.put(tileKey(tileId), is);

@@ -1,7 +1,6 @@
 NEDULEZITE
 Nevytvaret objekty v OsmMapView.onDraw
 Vybirat tile server nahodne nebo rotovat?
-Overit ze funguje shutdown vlaken u mapy
 Divne chovani mapy pri velkym oddaleni
 Dpi mapy
 Double tap on map
@@ -14,7 +13,6 @@ Otevreni mapy je trochu pomaly
 Prejit na jiny system stahovani z netu
 
 STREDNE
-Priority u mapovych dlazdic (nacitat prioritne dlazdice, co jsou videt)
 Markery - touch oblast
 Cache se nepromazava
 Pokud je predregistrovanej, tak nezobrazovat tlacitko predregistrovat

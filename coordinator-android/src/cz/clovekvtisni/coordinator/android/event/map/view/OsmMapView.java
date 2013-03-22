@@ -28,7 +28,6 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 	private static final Paint BITMAP_PAINT = new Paint(Paint.FILTER_BITMAP_FLAG);
 
 	private DiskTileLoader diskTileLoader;
-	private NetworkTileLoader netTileLoader;
 	private List<MapOverlay> overlays = Lists.newArrayList();
 	private LruCache<TileId, Bitmap> bitmapCache;
 	private Projection projection;
@@ -38,7 +37,6 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 
 		initCache();
 		initProjection();
-		initTileLoaders();
 		setOnTouchListener(new TouchHelper(context, projection, this));
 	}
 
@@ -55,7 +53,6 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 
 	public void onDestroy() {
 		diskTileLoader.shutDown();
-		netTileLoader.shutDown();
 	}
 
 	@Override
@@ -79,6 +76,18 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 		projection.setCenterLatLon(center);
 		invalidate();
 	}
+	
+	public void setNetTileLoader(NetworkTileLoader netTileLoader) {
+		TileCache cache;
+		try {
+			cache = TileCache.getInstance();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new AssertionError();
+		}
+		
+		diskTileLoader = new DiskTileLoader(cache, this, netTileLoader, new Handler());
+	}
 
 	public void setZoom(double zoom) {
 		projection.setZoom(zoom);
@@ -95,19 +104,6 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 				return TILE_BITMAP_BYTES;
 			}
 		};
-	}
-
-	private void initTileLoaders() {
-		TileCache cache;
-		try {
-			cache = TileCache.getInstance();
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new AssertionError();
-		}
-		
-		netTileLoader = new NetworkTileLoader(cache, new Handler());
-		diskTileLoader = new DiskTileLoader(cache, this, netTileLoader, new Handler());
 	}
 
 	private void initProjection() {
