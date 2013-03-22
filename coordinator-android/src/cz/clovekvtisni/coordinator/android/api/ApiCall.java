@@ -68,7 +68,7 @@ public abstract class ApiCall<RQ extends RequestParams, RP extends ApiResponseDa
 		}
 	}
 
-	protected String getCacheKey() {
+	public String getCacheKey() {
 		return Utils.md5(getClass().getCanonicalName() + requestBody);
 	}
 
@@ -95,7 +95,7 @@ public abstract class ApiCall<RQ extends RequestParams, RP extends ApiResponseDa
 	}
 
 	@SuppressWarnings("serial")
-	public static class ApiCallException extends Exception {
+	public static class ApiCallException extends RuntimeException {
 		public ApiCallException(Throwable cause) {
 			super(cause);
 		}

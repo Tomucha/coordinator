@@ -193,6 +193,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
         notificationService.sendPoiNotification(NotificationType.ASSIGN, updatedPoi, userId);
 
+
         return updatedPoi;
     }
 

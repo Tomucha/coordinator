@@ -25,21 +25,30 @@ public class ApiCache {
 
 	private final DiskCache diskCache;
 
-	public static synchronized ApiCache getInstance() throws IOException {
+	public static synchronized ApiCache getInstance() {
 		if (instance == null) instance = new ApiCache();
 		return instance;
 	}
 
-	private ApiCache() throws IOException {
+	private ApiCache() {
 		Context c = CoordinatorApplication.getAppContext();
-		diskCache = DiskCache.open(new File(c.getExternalCacheDir(), CACHE_DIR),
-				Utils.getVersionCode(c), CACHE_SIZE);
-	}
+        try {
+            diskCache = DiskCache.open(new File(c.getExternalCacheDir(), CACHE_DIR),
+                    Utils.getVersionCode(c), CACHE_SIZE);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-	public <RP> Item<RP> get(String key, Class<? extends RP> type) throws IOException {
+	public <RP> Item<RP> get(String key, Class<? extends RP> type) {
 		String logMsgPrefix = "Get " + key + ": ";
-		StringEntry stringEntry = diskCache.getString(key);
-		if (stringEntry == null) {
+        StringEntry stringEntry = null;
+        try {
+            stringEntry = diskCache.getString(key);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+        if (stringEntry == null) {
 			Lg.API_CACHE.d(logMsgPrefix + "doesn't exist.");
 			return null;
 		} else {
@@ -49,21 +58,25 @@ public class ApiCache {
 		}
 	}
 
-	public void put(String key, ApiResponseData data) throws IOException {
+	public void put(String key, ApiResponseData data) {
 		Lg.API_CACHE.d("Put " + key + ".");
 
 		String value = ApiUtils.GSON.toJsonTree(data).toString();
 
 		Map<String, Long> annotations = new HashMap<String, Long>();
 		annotations.put(KEY_TIME, System.currentTimeMillis());
-		diskCache.put(key, value, annotations);
-	}
+        try {
+            diskCache.put(key, value, annotations);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
 	public static class Item<RP> {
 		private final long time;
 		private final RP value;
 
-		private Item(StringEntry stringEntry, Class<? extends RP> type) throws IOException {
+		private Item(StringEntry stringEntry, Class<? extends RP> type) {
 			time = (Long) stringEntry.getMetadata().get(KEY_TIME);
 
 			JsonElement json = ApiUtils.PARSER.parse(stringEntry.getString());
