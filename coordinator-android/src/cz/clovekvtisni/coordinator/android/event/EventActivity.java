@@ -37,6 +37,8 @@ import com.google.common.collect.Lists;
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiCall.ApiCallException;
 import cz.clovekvtisni.coordinator.android.api.ApiCalls.UserUpdatePositionCall;
+import cz.clovekvtisni.coordinator.android.api.ApiLoader;
+import cz.clovekvtisni.coordinator.android.api.ApiLoaders;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoaderListener;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventPoiListLoader;
@@ -76,10 +78,16 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	private Map<PoiCategory, Bitmap> poiIcons = new HashMap<PoiCategory, Bitmap>();
 	private Poi[] pois = new Poi[0];
 	private PoiCategory[] poiCategories;
+    private Long zoomToPoi;
 
-	private void initFragments() {
+    private void initFragments() {
 		mapFragment = new MapFragment();
-		tasksFragment = new TasksFragment();
+
+        if (zoomToPoi != null) {
+            mapFragment.zoomToPoi(zoomToPoi);
+        }
+
+        tasksFragment = new TasksFragment();
 		usersFragment = new UsersFragment();
 		String info = IntentHelper.getOrganizationInEvent(getIntent()).getOperationalInfo();
 		infoFragment = InfoFragment.newInstance(info);
@@ -117,7 +125,9 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	@Override
 	protected void onCreate(Bundle state) {
 		super.onCreate(state);
+        Lg.APP.i("Starting EventActivity");
 		setContentView(R.layout.activity_event);
+        UiTool.dropNotification(this);
 
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -125,7 +135,13 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 
 		event = IntentHelper.getEvent(getIntent());
 
-		initFragments();
+        zoomToPoi = EventActivity.IntentHelper.getPOI(getIntent());
+        if (zoomToPoi != null) {
+            Lg.APP.i("Will zoom to "+zoomToPoi);
+            IntentHelper.removePOI(getIntent());
+        }
+
+        initFragments();
 		initPager();
 		initTabs();
 
@@ -162,22 +178,28 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	}
 
 	private void loadPois() {
+        Lg.APP.i("Loading POIs");
 		EventPoiListRequestParams params = new EventPoiListRequestParams();
 		params.setEventId(event.getId());
 		params.setModifiedFrom(new Date(0));
-		Workers.load(new EventPoiListLoader(params), new EventPoiListLoaderListener() {
-			@Override
-			public void onResult(EventPoiFilterResponseData result) {
-				pois = result.getPois();
-				updateImportantPois();
-				updateFilteredPois();
-			}
+		EventPoiListLoader loader = (EventPoiListLoader) Workers.load(new EventPoiListLoader(params), new EventPoiListLoaderListener() {
+            @Override
+            public void onResult(EventPoiFilterResponseData result) {
+                pois = result.getPois();
+                updateImportantPois();
+                updateFilteredPois();
+            }
 
-			@Override
-			public void onInternetException(Exception e) {
+            @Override
+            public void onInternetException(Exception e) {
                 UiTool.toast(R.string.error_no_internet, getApplicationContext());
-			}
-		}, this);
+            }
+        }, this);
+        if (zoomToPoi != null) {
+            // FIXME: pokud byl loader prave vytvoren, pusti se load 2x
+            Lg.APP.i("Reload required POIs");
+            loader.reload();
+        }
 	}
 
 	private void loadPoiIcons() {
@@ -401,7 +423,14 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 
 	public static class IntentHelper {
 		private static final String EXTRA_EVENT = "event";
+        private static final String EXTRA_POI = "poiId";
 		private static final String EXTRA_ORG_IN_EVENT = "orgInEvent";
+
+        public static Intent create(Context c, Event event, OrganizationInEvent organizationInEvent, long poiId) {
+            Intent i = create(c, event, organizationInEvent);
+            i.putExtra(EXTRA_POI, poiId);
+            return i;
+        }
 
 		public static Intent create(Context c, Event event, OrganizationInEvent organizationInEvent) {
 			Intent i = new Intent(c, EventActivity.class);
@@ -417,7 +446,20 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		public static OrganizationInEvent getOrganizationInEvent(Intent i) {
 			return (OrganizationInEvent) i.getSerializableExtra(EXTRA_ORG_IN_EVENT);
 		}
-	}
+
+        public static Long getPOI(Intent i) {
+            if (i.hasExtra(EXTRA_POI)) {
+                return i.getLongExtra(EXTRA_POI, 0);
+            }
+            return null;
+        }
+
+        public static void removePOI(Intent i ) {
+            if (i.hasExtra(EXTRA_POI)) {
+                i.removeExtra(EXTRA_POI);
+            }
+        }
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {

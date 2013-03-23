@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -87,11 +88,21 @@ public class GCMIntentService extends GCMBaseIntentService {
                 AsyncTask<ApiCall, Void, EventFilterResponseData> task = new AsyncTask<ApiCall, Void, EventFilterResponseData>() {
                     @Override
                     protected EventFilterResponseData doInBackground(ApiCall... apiCalls) {
-                        return apiCall.call();
+                        try {
+                            Lg.GCM.i("Loading fresh data");
+                            return apiCall.call();
+                        } catch (Exception e) {
+                            Lg.GCM.e("Cannot load fresh data: "+e, e);
+                            return null;
+                        }
                     }
 
                     @Override
                     protected void onPostExecute(EventFilterResponseData eventFilterResponseData) {
+                        if (eventFilterResponseData == null) {
+                            notifyMessage(type, poiName, poiId, null, null);
+                            return;
+                        }
                         cache.put(apiCall.getCacheKey(), eventFilterResponseData);
                         notifyMessage(type, poiName, poiId,
                                 findEvent(eventId, eventFilterResponseData.getEvents()),
@@ -129,12 +140,17 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     @Override
 	protected void onUnregistered(Context context, String registrationId) {
-		Lg.GCM.d("Device unregistered.");
+		Lg.GCM.i("Device unregistered.");
+        Settings.setGcmRegistrationId(null);
 	}
 
     private void notifyMessage(String type, String poiName, long poiId, Event event, OrganizationInEvent organizationInEvent) {
 
-        // FIXME: vic informaci v notifikaci
+        if (event == null || organizationInEvent == null) {
+            fallbackNotification();
+            return;
+        }
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_launcher)
@@ -150,7 +166,35 @@ public class GCMIntentService extends GCMBaseIntentService {
             mBuilder.setContentText(getString(R.string.notification_unknown));
         }
 
-        Intent resultIntent = EventActivity.IntentHelper.create(this, event, organizationInEvent);
+        mBuilder.setVibrate(new long[] {200, 200, 500});
+        mBuilder.setLights(Color.RED, 800, 400);
+
+        Intent resultIntent = EventActivity.IntentHelper.create(this, event, organizationInEvent, poiId);
+        resultIntent.setAction("DUMMY_ACTION_TO_MAKE_INTENTS_DIFFERENT_"+System.currentTimeMillis());
+
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setContentIntent(resultPendingIntent);
+
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        mNotificationManager.notify(UiTool.DEFAULT_NOTIFICATION, mBuilder.getNotification());
+    }
+
+    /**
+     *
+     * This creates simple dummy notification.
+     */
+    private void fallbackNotification() {
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle(getString(R.string.app_name));
+
+            mBuilder.setContentText(getString(R.string.notification_unknown));
+
+        Intent resultIntent = new Intent(this, MainActivity.class);
+        resultIntent.setAction("DUMMY_ACTION_TO_MAKE_INTENTS_DIFFERENT_"+System.currentTimeMillis());
 
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, 0);
 
@@ -158,7 +202,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        mNotificationManager.notify(0, mBuilder.getNotification());
+        mNotificationManager.notify(UiTool.DEFAULT_NOTIFICATION, mBuilder.getNotification());
     }
 
 }

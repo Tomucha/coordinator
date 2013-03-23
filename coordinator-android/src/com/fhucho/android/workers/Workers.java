@@ -10,8 +10,7 @@ public class Workers {
 		return null;
 	}
 
-	public static <L> Loader<L> load(Loader<L> loaderPrototype, L listener,
-			FragmentActivity activity) {
+	public static <L> Loader<L> load(Loader<L> loaderPrototype, L listener, FragmentActivity activity) {
 		Utils.checkOnUiThread();
 		
 		WorkersFragment frag = Workers.getOrCreateFragment(activity);

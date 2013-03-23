@@ -20,7 +20,7 @@ Cache se nepromazava
 Pokud je predregistrovanej, tak nezobrazovat tlacitko predregistrovat
 Moznost "synchronizovat"
 Predvyplnit registraci
-Vyberu ochorny clovek, zobrazi se krizovy intervent
+>> OPRAVENO: Vyberu ochorny clovek, zobrazi se krizovy intervent
 Moznost zobrazit poi info a user info v mape najednou
 Napojení na Inspecto - slibovali jsme
 OrganizationActivity: Logo a název orgaznizace, Text z konfigu, a seznam akcí, tak jak to je uz ted.

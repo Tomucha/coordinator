@@ -160,7 +160,11 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 
 		loadEvents();
 
-        ((TextView)findViewById(R.id.organization_description)).setText(organization.getDescription());
+        String description = organization.getDescription();
+        if (description != null) {
+            description = description.trim();
+        }
+        ((TextView)findViewById(R.id.organization_description)).setText(description);
 	}
 
 	private class EventsAdapter extends BaseAdapter {
@@ -183,8 +187,7 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {
-				convertView = getLayoutInflater().inflate(android.R.layout.simple_list_item_2,
-						parent, false);
+				convertView = getLayoutInflater().inflate(android.R.layout.simple_list_item_2, parent, false);
 			}
 
 			Event event = events[position];

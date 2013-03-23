@@ -105,8 +105,8 @@ public class EquipmentFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         SparseBooleanArray checkedPositions = getListView().getCheckedItemPositions();
         ArrayList<Integer> selections = new ArrayList<Integer>();
-        for (int i = 0; i < checkedPositions.size(); i++) {
-            if (checkedPositions.valueAt(i)) {
+        for (int i = 0; i < page.getEquipmentsList().size(); i++) {
+            if (checkedPositions.get(i)) {
                 selections.add(i);
             }
         }

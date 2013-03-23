@@ -89,7 +89,7 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 	private void initCache() {
 		int memClass = ((ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE))
 				.getMemoryClass();
-		int cacheSize = 1024 * 1024 * memClass / 2;
+		int cacheSize = 1024 * 1024 * memClass / 3;
 		bitmapCache = new LruCache<TileId, Bitmap>(cacheSize) {
 			@Override
 			protected int sizeOf(TileId key, Bitmap bitmap) {

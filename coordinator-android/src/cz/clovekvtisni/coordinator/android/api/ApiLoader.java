@@ -4,6 +4,7 @@ import com.fhucho.android.workers.Loader;
 
 import cz.clovekvtisni.coordinator.android.api.ApiCache.Item;
 import cz.clovekvtisni.coordinator.android.util.Lg;
+import cz.clovekvtisni.coordinator.android.util.UiTool;
 import cz.clovekvtisni.coordinator.api.request.RequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
 
@@ -25,27 +26,41 @@ public abstract class ApiLoader<RQ extends RequestParams, RP extends ApiResponse
 	private volatile boolean reload = false;
 
 	@Override
-	protected void doInBackground() {
+	protected synchronized void doInBackground() {
+        ApiCache cache = ApiCache.getInstance();
+        Item<RP> item = cache.get(apiCall.getCacheKey(), apiCall.getResponseClass());
+
+        boolean tooOld = false;
 		try {
-			ApiCache cache = ApiCache.getInstance();
 
-			Item<RP> item = cache.get(apiCall.getCacheKey(), apiCall.getResponseClass());
-			if (reload) item = null; // FIXME
-
-			if (item != null) {
-				Lg.API_LOADER.d("Cached value exists, loading.");
+			if (item != null && !reload ) {
+				Lg.API_LOADER.d("Cached value exists, loading from cache");
 				result = new Result(item.getValue());
 				result.sendToListener();
 			}
-
-			if (item == null || (System.currentTimeMillis() - item.getTime() > 5 * 60 * 1000)) {
-				Lg.API_LOADER.d("Doing api call.");
+            if (item != null) {
+                tooOld = (System.currentTimeMillis() - item.getTime() > 5 * 60 * 1000);
+            }
+			if (item == null || tooOld || reload) {
+				Lg.API_LOADER.d("Doing api call");
 				result = new Result(apiCall.call());
 				cache.put(apiCall.getCacheKey(), result.response);
 				result.sendToListener();
 			}
 		} catch (Exception e) {
 			Lg.API_LOADER.w("Exception while loading", e);
+
+            if (reload) {
+                // well, it is an exception, let's notify user, and try to return cache (if reloading)
+                item = cache.get(apiCall.getCacheKey(), apiCall.getResponseClass());
+                if (item != null) {
+                    // we have at least cache
+                    // TODO: show offline warning
+                    result = new Result(item.getValue());
+                    result.sendToListener();
+                    return;
+                }
+            }
 			new Result(e).sendToListener();
 		}
 	}
@@ -66,6 +81,7 @@ public abstract class ApiLoader<RQ extends RequestParams, RP extends ApiResponse
 
 	public void reload() {
 		reload = true;
+        // FIXME: no tak startovat furt novy thready, to teda nevim
 		new Thread() {
 			public void run() {
 				doInBackground();

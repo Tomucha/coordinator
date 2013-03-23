@@ -19,6 +19,7 @@ import android.widget.TextView;
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.register.wizard.model.Page;
 import cz.clovekvtisni.coordinator.android.register.wizard.model.SkillsPage;
+import cz.clovekvtisni.coordinator.android.util.Lg;
 
 public class SkillsFragment extends ListFragment {
 	private static final String ARG_KEY = "key";
@@ -103,8 +104,9 @@ public class SkillsFragment extends ListFragment {
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		SparseBooleanArray checkedPositions = getListView().getCheckedItemPositions();
 		ArrayList<Integer> selections = new ArrayList<Integer>();
-		for (int i = 0; i < checkedPositions.size(); i++) {
-			if (checkedPositions.valueAt(i)) {
+		for (int i = 0; i < page.getSkillsList().size(); i++) {
+            Lg.APP.i("Checked: "+page.getSkillsList().get(i).getName()+" "+checkedPositions.get(i));
+            if (checkedPositions.get(i)) {
 				selections.add(i);
 			}
 		}

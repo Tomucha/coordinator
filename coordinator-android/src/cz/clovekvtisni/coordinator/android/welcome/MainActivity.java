@@ -20,6 +20,7 @@ import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.ConfigLoaderListener;
 import cz.clovekvtisni.coordinator.android.api.BitmapLoader;
+import cz.clovekvtisni.coordinator.android.event.EventActivity;
 import cz.clovekvtisni.coordinator.android.organization.OrganizationActivity;
 import cz.clovekvtisni.coordinator.android.util.BetterArrayAdapter;
 import cz.clovekvtisni.coordinator.android.util.FindView;
@@ -34,14 +35,15 @@ public class MainActivity extends SherlockFragmentActivity {
 	private OrganizationAdapter adapter;
 
 	private void initGCM() {
+        Lg.GCM.i("GCM init");
 		GCMRegistrar.checkDevice(this);
 		GCMRegistrar.checkManifest(this);
 		String regId = GCMRegistrar.getRegistrationId(this);
 		if (regId.equals("")) {
-			Lg.GCM.d("Going to register.");
+			Lg.GCM.i("Going to register.");
 			GCMRegistrar.register(this, SecretInfo.GCM_SENDER_ID);
 		} else {
-			Lg.GCM.d("Already registered.");
+			Lg.GCM.i("Already registered to GCM");
 		}
 	}
 
@@ -75,6 +77,7 @@ public class MainActivity extends SherlockFragmentActivity {
 		setContentView(R.layout.activity_main);
 
 		adapter = new OrganizationAdapter();
+
 		loadOrganizations();
 		initListView();
 		initGCM();

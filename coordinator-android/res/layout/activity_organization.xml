@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true" >
-
-        <LinearLayout
+    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="16dp" >
+            android:padding="16dp">
 
-            <TextView
-                android:id="@+id/organization_description"
+        <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_height="150dp"
+                >
 
             <TextView
+                    android:id="@+id/organization_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+        </ScrollView>
+
+        <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -31,21 +32,21 @@
                 android:text="@string/label_events"
                 android:textColor="#444"
                 android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"/>
 
-            <View
+        <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#222" />
+                android:background="#222"/>
 
-            <ListView
+        <ListView
                 android:id="@+id/events"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                tools:listitem="@android:layout/simple_list_item_2" />
+                tools:listitem="@android:layout/simple_list_item_2"/>
 
-            <Button
+        <Button
                 android:id="@+id/preregister"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -53,9 +54,8 @@
                 android:layout_marginTop="16dp"
                 android:paddingLeft="32dp"
                 android:paddingRight="32dp"
-                android:text="Předregistrace"
-                android:visibility="gone" />
-        </LinearLayout>
-    </ScrollView>
+                android:text="@string/button_pre_register"
+                android:visibility="gone"/>
+    </LinearLayout>
 
 </LinearLayout>

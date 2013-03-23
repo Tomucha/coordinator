@@ -40,6 +40,7 @@ import cz.clovekvtisni.coordinator.android.api.ApiCalls.EventPoiTransitionCall;
 import cz.clovekvtisni.coordinator.android.event.map.MapOverlay;
 import cz.clovekvtisni.coordinator.android.event.map.view.OsmMapView;
 import cz.clovekvtisni.coordinator.android.event.map.view.Projection.LatLon;
+import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.android.util.Utils;
 import cz.clovekvtisni.coordinator.api.request.EventPoiTransitionRequestParams;
 import cz.clovekvtisni.coordinator.api.response.EventPoiResponseData;
@@ -57,8 +58,9 @@ public class MapFragment extends SherlockFragment {
 	private MarkerOverlay selectedMarker;
 	private MyLocationOverlay myLocationOverlay;
 	private View poiInfo;
+    private Long zoomToPoi = null;
 
-	private void closeMarkerInfo() {
+    private void closeMarkerInfo() {
 		poiInfo.setVisibility(View.GONE);
 		selectedMarker.setSelected(false);
 		selectedMarker = null;
@@ -189,16 +191,30 @@ public class MapFragment extends SherlockFragment {
 	}
 
 	public void setFilteredPois(List<Poi> pois, Map<PoiCategory, Bitmap> poiIcons) {
+        Lg.APP.i("Setting filtered POIs to MapFragment: "+pois.size());
 		List<MapOverlay> overlays = osmMapView.getOverlays();
 		for (Iterator<MapOverlay> iter = overlays.iterator(); iter.hasNext();) {
 			if (iter.next() instanceof PoiOverlay) iter.remove();
 		}
 
+        Poi toZoomTo = null;
+
 		for (Poi poi : pois) {
+            if (zoomToPoi != null) {
+                if (poi.getId() == zoomToPoi.longValue()) {
+                    toZoomTo = poi;
+                    zoomToPoi = null;
+                }
+            }
 			Bitmap bitmap = poiIcons.get(poi.getPoiCategory());
 			if (bitmap == null) continue;
 			overlays.add(new PoiOverlay(poi, bitmap));
 		}
+
+        if (toZoomTo != null) {
+            Lg.APP.i("Zooming to "+toZoomTo);
+            showPoiOnMap(toZoomTo);
+        }
 
 		osmMapView.invalidate();
 	}
@@ -287,7 +303,11 @@ public class MapFragment extends SherlockFragment {
 		osmMapView.invalidate();
 	}
 
-	private static class EventPoiTransitionTask extends
+    public void zoomToPoi(Long zoomToPoi) {
+        this.zoomToPoi = zoomToPoi;
+    }
+
+    private static class EventPoiTransitionTask extends
 			ActivityWorker2<EventActivity, EventPoiResponseData, Exception> {
 
 		private final EventPoiTransitionRequestParams params;
@@ -327,7 +347,9 @@ public class MapFragment extends SherlockFragment {
 		public MarkerOverlay(LatLon latLon, Bitmap bitmap) {
 			super(latLon);
 			this.bitmap = bitmap;
-			paintSelected.setColorFilter(new LightingColorFilter(Color.GRAY, 0));
+			paintSelected.setColor(Color.RED);
+            paintSelected.setShadowLayer(4,2,2, Color.BLACK);
+            paintSelected.setAntiAlias(true);
 		}
 
 		@Override
@@ -337,8 +359,11 @@ public class MapFragment extends SherlockFragment {
 			int left = x - bitmap.getWidth() / 2;
 			Rect dst = new Rect(left, y - bitmap.getHeight(), left + bitmap.getWidth(), y);
 
-			Paint paint = selected ? paintSelected : paintNormal;
-			canvas.drawBitmap(bitmap, src, dst, paint);
+            if (selected) {
+                canvas.drawCircle(x, y - (bitmap.getHeight()/2) , bitmap.getWidth() * 0.6f, paintSelected);
+            }
+
+			canvas.drawBitmap(bitmap, src, dst, paintNormal);
 		}
 
 		private void setSelected(boolean selected) {

@@ -14,9 +14,10 @@
     </string>
 
     <string name="error_no_internet">Vypadá to, že jsme bez internetu. Ale teď ho bohužel potřebujeme.</string>
-    <string name="label_events">UDÁLOSTI</string>
+    <string name="label_events">PROBÍHAJÍCÍ UDÁLOSTI</string>
     <string name="notification_assigned">V Koordinátoru Vám byl přiřazen úkol</string>
     <string name="notification_unassigned">V Koordinátoru Vám byl odebrán úkol</string>
     <string name="notification_unknown">Koordinátor si žádá Vaší pozornosti!</string>
+    <string name="button_pre_register">Předregistrace</string>
 
 </resources>

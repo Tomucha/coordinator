@@ -48,7 +48,7 @@ public abstract class Loader<L> {
 	void start() {
 		new Thread() {
 			public void run() {
-				doInBackground();
+                doInBackground();
 			};
 		}.start();
 	}

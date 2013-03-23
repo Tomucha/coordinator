@@ -1,8 +1,6 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
-import com.google.android.gcm.server.Message;
-import com.google.android.gcm.server.MulticastResult;
-import com.google.android.gcm.server.Sender;
+import com.google.android.gcm.server.*;
 import cz.clovekvtisni.coordinator.SecretInfo;
 import cz.clovekvtisni.coordinator.SecretInfoTemplate;
 import cz.clovekvtisni.coordinator.domain.NotificationType;
@@ -48,8 +46,13 @@ public class NotificationServiceImp extends AbstractServiceImpl implements Notif
 
         Message message = builder.build();
         try {
-            sender.send(message, new ArrayList<String>(receiver.getPushTokensAndroid()), 5);
-            logger.info("Sent message to userId=" + receiver.getId());
+
+            String[] pushes = receiver.getPushTokensAndroid().toArray(new String[0]);
+            boolean changed = false;
+            for (String push : pushes) {
+                Result result = sender.send(message, push, 5);
+                // FIXME: zpracovat vysledek
+            }
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
