@@ -27,7 +27,8 @@ public class NetworkTileLoader {
 	private final TileCache cache;
 	private final ExecutorService executor;
 	private final Handler handler;
-	private TileLoadedListener listener;
+	private RemainingTilesListener remainingTilesListener;
+	private TileLoadedListener tileLoadedListener;
 
 	public NetworkTileLoader(TileCache cache, Handler handler) {
 		this.cache = cache;
@@ -42,6 +43,7 @@ public class NetworkTileLoader {
 				try {
 					Set<TileId> tiles = PreloadTool.tilesThatShouldBePreloaded(eventLocations,
 							cache);
+					System.out.println(tiles.size());
 					for (TileId tileId : tiles) {
 						if (!requestedTiles.contains(tileId)) requestedTiles.addLast(tileId);
 					}
@@ -57,14 +59,24 @@ public class NetworkTileLoader {
 		requestedTiles.addFirst(tileId);
 	}
 
-	public void setListener(TileLoadedListener listener) {
-		if (this.listener != null) throw new IllegalStateException();
-		this.listener = listener;
+	public void setTileLoadedListener(TileLoadedListener listener) {
+		if (this.tileLoadedListener != null) throw new IllegalStateException();
+		this.tileLoadedListener = listener;
 	}
 
-	public void removeListener(TileLoadedListener listener) {
-		if (this.listener != listener) throw new IllegalStateException();
-		this.listener = null;
+	public void removeTileLoadedListener(TileLoadedListener listener) {
+		if (this.tileLoadedListener != listener) throw new IllegalStateException();
+		this.tileLoadedListener = null;
+	}
+	
+	public void setRemainingTilesListener(RemainingTilesListener listener) {
+		if (this.remainingTilesListener != null) throw new IllegalStateException();
+		this.remainingTilesListener = listener;
+	}
+	
+	public void removeRemainingTilesListener(RemainingTilesListener listener) {
+		if (this.remainingTilesListener != listener) throw new IllegalStateException();
+		this.remainingTilesListener = null;
 	}
 
 	public void shutDown() {
@@ -115,9 +127,16 @@ public class NetworkTileLoader {
 			handler.post(new Runnable() {
 				@Override
 				public void run() {
-					if (listener != null) listener.onTileLoaded(tileId, bitmap);
+					if (tileLoadedListener != null) tileLoadedListener.onTileLoaded(tileId, bitmap);
+					
+					int remaining = requestedTiles.size();
+					if (remainingTilesListener != null) remainingTilesListener.onRemainingTilesChanged(remaining);
 				}
 			});
 		}
+	}
+	
+	public static interface RemainingTilesListener {
+		public void onRemainingTilesChanged(int remainingTiles);
 	}
 }

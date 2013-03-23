@@ -10,6 +10,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +41,7 @@ public class DiskCache {
 	public static synchronized DiskCache open(File dir, int appVersion, long maxSize)
 			throws IOException {
 		if (usedDirs.contains(dir)) {
-			throw new RuntimeException("Cache dir " + dir.getAbsolutePath() + " was used before.");
+			throw new IllegalStateException("Cache dir " + dir.getAbsolutePath() + " was used before.");
 		}
 
 		usedDirs.add(dir);
@@ -78,20 +82,20 @@ public class DiskCache {
 			snapshot.close();
 		}
 	}
-	
+
 	public boolean contains(String key) throws IOException {
 		DiskLruCache.Snapshot snapshot = diskLruCache.get(toInternalKey(key));
-		if(snapshot==null) return false;
-		
+		if (snapshot == null) return false;
+
 		snapshot.close();
 		return true;
 	}
 
-	public CacheOutputStream openStream(String key) throws IOException {
+	public OutputStream openStream(String key) throws IOException {
 		return openStream(key, new HashMap<String, Serializable>());
 	}
 
-	public CacheOutputStream openStream(String key, Map<String, ? extends Serializable> metadata)
+	public OutputStream openStream(String key, Map<String, ? extends Serializable> metadata)
 			throws IOException {
 		DiskLruCache.Editor editor = diskLruCache.edit(toInternalKey(key));
 		try {
@@ -110,7 +114,7 @@ public class DiskCache {
 
 	public void put(String key, InputStream is, Map<String, Serializable> annotations)
 			throws IOException {
-		CacheOutputStream os = null;
+		OutputStream os = null;
 		try {
 			os = openStream(key, annotations);
 			IOUtils.copy(is, os);
@@ -125,7 +129,7 @@ public class DiskCache {
 
 	public void put(String key, String value, Map<String, ? extends Serializable> annotations)
 			throws IOException {
-		CacheOutputStream cos = null;
+		OutputStream cos = null;
 		try {
 			cos = openStream(key, annotations);
 			cos.write(value.getBytes());
@@ -164,7 +168,21 @@ public class DiskCache {
 	}
 
 	private String toInternalKey(String key) {
-		return Utils.md5(key);
+		return md5(key);
+	}
+
+	public String md5(String s) {
+		try {
+			MessageDigest m = MessageDigest.getInstance("MD5");
+			m.update(s.getBytes("UTF-8"));
+			byte[] digest = m.digest();
+			BigInteger bigInt = new BigInteger(1, digest);
+			return bigInt.toString(16);
+		} catch (NoSuchAlgorithmException e) {
+			throw new AssertionError();
+		} catch (UnsupportedEncodingException e) {
+			throw new AssertionError();
+		}
 	}
 
 	private class CacheOutputStream extends FilterOutputStream {

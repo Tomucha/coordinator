@@ -30,4 +30,3 @@ Pridat POI
 Preload map
 Pady
 Aktualizovat uzivatele i kdyz odejde z app
-

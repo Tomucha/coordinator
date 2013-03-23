@@ -14,8 +14,8 @@ import cz.clovekvtisni.coordinator.domain.EventLocation;
 
 public class PreloadTool {
 	private static final int DEFAULT_RADIUS_METERS = 400;
-	private static final int MIN_OSM_ZOOM = 14;
-	private static final int MAX_OSM_ZOOM = 17;
+	private static final int MIN_OSM_ZOOM = 10;
+	private static final int MAX_OSM_ZOOM = 18;
 
 	public static Set<TileId> tilesThatShouldBePreloaded(EventLocation[] eventLocations,
 			TileCache cache) throws IOException {
@@ -63,7 +63,6 @@ public class PreloadTool {
 	}
 
 	private static void removeCachedTiles(Set<TileId> tiles, TileCache cache) throws IOException {
-		long t = System.currentTimeMillis();
 		for (Iterator<TileId> i = tiles.iterator(); i.hasNext();) {
 			TileId tileId = i.next();
 			if (cache.contains(tileId)) i.remove();
