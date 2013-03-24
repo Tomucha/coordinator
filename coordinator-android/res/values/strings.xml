@@ -19,5 +19,11 @@
     <string name="notification_unassigned">V Koordinátoru Vám byl odebrán úkol</string>
     <string name="notification_unknown">Koordinátor si žádá Vaší pozornosti!</string>
     <string name="button_pre_register">Předregistrace</string>
+    <string name="preload_downloading">Stahuji mapu...</string>
+    <string name="preload_question">Přednačíst mapu?</string>
+    <string name="preload_info">Koordinátor umožňuje stáhnout si dopředu mapové podklady pro událost. Ale může to být dost dat, bylo dobré být na WiFi.
+    </string>
+    <string name="preload_button_no">Teď ne</string>
+    <string name="preload_button_yes">OK, stahuj</string>
 
 </resources>

@@ -316,6 +316,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	private void startMapPreload() {
 		final PreloadingDialog dialog = new PreloadingDialog();
 		dialog.show(getSupportFragmentManager(), PreloadingDialog.TAG);
+
 		netTileLoader.setRemainingTilesListener(new RemainingTilesListener() {
 			@Override
 			public void onRemainingTilesChanged(int remainingTiles) {
@@ -442,10 +443,10 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		@Override
 		public Dialog onCreateDialog(Bundle state) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-			builder.setTitle("Přednačíst mapu?");
-			builder.setMessage("Pro offline použití se stáhne dopředu mapa v oblastech, kde probíhá tato akce.");
-			builder.setNegativeButton("Ne", null);
-			builder.setPositiveButton("Tak jo", new DialogInterface.OnClickListener() {
+			builder.setTitle(getString(R.string.preload_question));
+			builder.setMessage(getString(R.string.preload_info));
+			builder.setNegativeButton(getString(R.string.preload_button_no), null);
+			builder.setPositiveButton(getString(R.string.preload_button_yes), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					((EventActivity) getActivity()).startMapPreload();
@@ -461,7 +462,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		@Override
 		public Dialog onCreateDialog(Bundle state) {
 			ProgressDialog dialog = new ProgressDialog(getActivity());
-			dialog.setMessage("Stahuji mapu...");
+			dialog.setMessage(getString(R.string.preload_downloading));
 			dialog.setCancelable(false);
 			dialog.setCanceledOnTouchOutside(false);
 			return dialog;

@@ -38,11 +38,18 @@ public class NetworkTileLoader {
         new Thread() {
             public void run() {
                 try {
-                    Set<TileId> tiles = PreloadTool.tilesThatShouldBePreloaded(eventLocations,
-                            cache);
-                    System.out.println(tiles.size());
-                    for (TileId tileId : tiles) {
-                        if (!requestedTiles.contains(tileId)) requestedTiles.addLast(tileId);
+                    Lg.MAP.i("Computing tiles to preload");
+                    Set<TileId> tiles = PreloadTool.tilesThatShouldBePreloaded(eventLocations, cache);
+                    Lg.MAP.i("Will preload: " + tiles.size());
+                    synchronized (requestedTiles) {
+                        for (TileId tileId : tiles) {
+                            if (!requestedTiles.contains(tileId)) requestedTiles.addLast(tileId);
+                        }
+                        if (requestedTiles.isEmpty() && remainingTilesListener != null) {
+                            remainingTilesListener.onRemainingTilesChanged(0);
+                        } else {
+                            requestedTiles.notify();
+                        }
                     }
                 } catch (IOException e) {
                     throw new AssertionError();
@@ -99,7 +106,7 @@ public class NetworkTileLoader {
             try {
                 is = HttpRequest.get(tileId.getUrl()).buffer();
                 cache.put(tileId, is);
-                Lg.MAP.d("Downloaded tile " + tileId + ", " + requestedTiles.size() + " more in the queue.");
+                Lg.MAP.i("Downloaded tile " + tileId + ", " + requestedTiles.size() + " more in the queue.");
                 returnBitmapOrNull(cache.get(tileId), tileId);
             } catch (HttpRequestException e) {
                 e.printStackTrace();
