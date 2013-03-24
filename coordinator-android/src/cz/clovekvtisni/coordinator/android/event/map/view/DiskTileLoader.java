@@ -25,7 +25,7 @@ public class DiskTileLoader implements TileLoadedListener {
 		this.listener = listener;
 		this.handler = handler;
 		this.networkTileLoader = networkTileLoader;
-		networkTileLoader.setListener(this);
+		networkTileLoader.setTileLoadedListener(this);
 	}
 
 	public void onTileLoaded(final TileId tileId, final Bitmap bitmap) {
@@ -44,7 +44,7 @@ public class DiskTileLoader implements TileLoadedListener {
 
 	public void shutDown() {
 		executor.shutdownNow();
-		networkTileLoader.removeListener(this);
+		networkTileLoader.removeTileLoadedListener(this);
 	}
 
 	private class Worker implements Runnable {

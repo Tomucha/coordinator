@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.android.event;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
@@ -17,6 +19,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -46,6 +49,10 @@ import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventPoiListLoaderList
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventUserListLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventUserListLoaderListener;
 import cz.clovekvtisni.coordinator.android.api.BitmapLoader;
+import cz.clovekvtisni.coordinator.android.event.map.view.NetworkTileLoader;
+import cz.clovekvtisni.coordinator.android.event.map.view.NetworkTileLoader.RemainingTilesListener;
+import cz.clovekvtisni.coordinator.android.event.map.view.TileCache;
+import cz.clovekvtisni.coordinator.android.other.Settings;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.android.util.SimpleListeners.SimpleTabListener;
 import cz.clovekvtisni.coordinator.android.util.UiTool;
@@ -70,6 +77,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	private LocationTool locationTool;
 	private InfoFragment infoFragment;
 	private MapFragment mapFragment;
+	private NetworkTileLoader netTileLoader;
 	private TasksFragment tasksFragment;
 	private UsersFragment usersFragment;
 	private ViewPager pager;
@@ -80,7 +88,13 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	private PoiCategory[] poiCategories;
     private Long zoomToPoi;
 
-    private void initFragments() {
+	private void initActionBar() {
+		ActionBar actionBar = getSupportActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		actionBar.setLogo(new ColorDrawable(Color.TRANSPARENT));
+	}
+
+	private void initFragments() {
 		mapFragment = new MapFragment();
 
         if (zoomToPoi != null) {
@@ -93,6 +107,25 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		infoFragment = InfoFragment.newInstance(info);
 
 		fragments = Lists.newArrayList(mapFragment, tasksFragment, usersFragment, infoFragment);
+	}
+
+	private void initMapPreload() {
+		if (!Settings.isEventMapPreloaded(event.getId())) {
+			new AskIfPreloadDialog().show(getSupportFragmentManager(), AskIfPreloadDialog.TAG);
+		}
+	}
+
+	private void initNetTileLoader() {
+		TileCache cache;
+		try {
+			cache = TileCache.getInstance();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new AssertionError();
+		}
+
+		netTileLoader = new NetworkTileLoader(cache, new Handler());
+		mapFragment.setNetTileLoader(netTileLoader);
 	}
 
 	private void initPager() {
@@ -129,10 +162,6 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		setContentView(R.layout.activity_event);
         UiTool.dropNotification(this);
 
-		ActionBar actionBar = getSupportActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		actionBar.setLogo(new ColorDrawable(Color.TRANSPARENT));
-
 		event = IntentHelper.getEvent(getIntent());
 
         zoomToPoi = EventActivity.IntentHelper.getPOI(getIntent());
@@ -141,11 +170,19 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
             IntentHelper.removePOI(getIntent());
         }
 
+        initActionBar();
         initFragments();
 		initPager();
 		initTabs();
 
 		locationTool = new LocationTool(this, this);
+	}
+
+	public void onMapFragmentReady() {
+		initNetTileLoader();
+		initMapPreload();
+		loadUsers();
+		loadPoiCategories();
 	}
 
     @Override
@@ -157,10 +194,12 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	@Override
 	public void onResume() {
 		super.onResume();
+        /*
         // if we do this in onCreate, it might end up with NPE in
         // MapFragment.setFilteredUsers
         loadUsers();
         loadPoiCategories();
+        */
         locationTool.resume();
 
 	}
@@ -274,6 +313,24 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		usersFragment.setFilteredUsers(usersList);
 	}
 
+	private void startMapPreload() {
+		final PreloadingDialog dialog = new PreloadingDialog();
+		dialog.show(getSupportFragmentManager(), PreloadingDialog.TAG);
+		netTileLoader.setRemainingTilesListener(new RemainingTilesListener() {
+			@Override
+			public void onRemainingTilesChanged(int remainingTiles) {
+				if (dialog.getDialog() == null) return;
+				dialog.setRemainingTiles(remainingTiles);
+				if (remainingTiles == 0) {
+					dialog.dismiss();
+					Settings.setEventMapPreloaded(event.getId());
+					netTileLoader.removeRemainingTilesListener(this);
+				}
+			}
+		});
+		netTileLoader.preloadTiles(event.getLocationList());
+	}
+
 	private void updateFilteredPois() {
 		List<Poi> filteredPois = new ArrayList<Poi>();
 		for (Poi poi : pois) {
@@ -311,6 +368,12 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	public void onLocationUpdated(Location location) {
 		Lg.LOCATION.d("Location updated. " + describeLocation(location));
 		mapFragment.setMyLocation(location);
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		netTileLoader.shutDown();
 	}
 
 	@Override
@@ -371,6 +434,43 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		public void onException(Exception e) {
 		}
 
+	}
+
+	public static class AskIfPreloadDialog extends SherlockDialogFragment {
+		private static final String TAG = "ask-if-preload-dialog";
+
+		@Override
+		public Dialog onCreateDialog(Bundle state) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			builder.setTitle("Přednačíst mapu?");
+			builder.setMessage("Pro offline použití se stáhne dopředu mapa v oblastech, kde probíhá tato akce.");
+			builder.setNegativeButton("Ne", null);
+			builder.setPositiveButton("Tak jo", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					((EventActivity) getActivity()).startMapPreload();
+				}
+			});
+			return builder.create();
+		}
+	}
+
+	public static class PreloadingDialog extends SherlockDialogFragment {
+		private static final String TAG = "preloading-dialog";
+
+		@Override
+		public Dialog onCreateDialog(Bundle state) {
+			ProgressDialog dialog = new ProgressDialog(getActivity());
+			dialog.setMessage("Stahuji mapu...");
+			dialog.setCancelable(false);
+			dialog.setCanceledOnTouchOutside(false);
+			return dialog;
+		}
+
+		public void setRemainingTiles(int remaining) {
+			ProgressDialog d = (ProgressDialog) getDialog();
+			d.setMessage("Zbývá " + remaining + " dlaždic.");
+		}
 	}
 
 	public static class PoiFilterDialog extends SherlockDialogFragment {

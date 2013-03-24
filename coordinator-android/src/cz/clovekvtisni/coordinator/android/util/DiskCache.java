@@ -1,26 +1,18 @@
 package cz.clovekvtisni.coordinator.android.util;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FilterOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import com.jakewharton.DiskLruCache;
+import org.apache.commons.io.IOUtils;
+
+import java.io.*;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.io.IOUtils;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
-import com.jakewharton.DiskLruCache;
 
 public class DiskCache {
 
@@ -37,7 +29,7 @@ public class DiskCache {
     public static synchronized DiskCache open(File dir, int appVersion, long maxSize)
             throws IOException {
         if (usedDirs.contains(dir)) {
-            throw new RuntimeException("Cache dir " + dir.getAbsolutePath() + " was used before.");
+            throw new IllegalStateException("Cache dir " + dir.getAbsolutePath() + " was used before.");
         }
 
         usedDirs.add(dir);
@@ -79,11 +71,19 @@ public class DiskCache {
         }
     }
 
-    public CacheOutputStream openStream(String key) throws IOException {
+    public boolean contains(String key) throws IOException {
+        DiskLruCache.Snapshot snapshot = diskLruCache.get(toInternalKey(key));
+        if (snapshot == null) return false;
+
+        snapshot.close();
+        return true;
+    }
+
+    public OutputStream openStream(String key) throws IOException {
         return openStream(key, new HashMap<String, Serializable>());
     }
 
-    public CacheOutputStream openStream(String key, Map<String, ? extends Serializable> metadata)
+    public OutputStream openStream(String key, Map<String, ? extends Serializable> metadata)
             throws IOException {
         DiskLruCache.Editor editor = diskLruCache.edit(toInternalKey(key));
         try {
@@ -102,8 +102,8 @@ public class DiskCache {
 
     public void put(String key, InputStream is, Map<String, Serializable> annotations)
             throws IOException {
+        OutputStream os = null;
         synchronized (key.intern()) {
-            CacheOutputStream os = null;
             try {
                 os = openStream(key, annotations);
                 IOUtils.copy(is, os);
@@ -119,14 +119,15 @@ public class DiskCache {
 
     public void put(String key, String value, Map<String, ? extends Serializable> annotations)
             throws IOException {
-        CacheOutputStream cos = null;
-        try {
-            cos = openStream(key, annotations);
-            cos.write(value.getBytes());
-        } finally {
-            if (cos != null) cos.close();
+        OutputStream cos = null;
+        synchronized (key.intern()) {
+            try {
+                cos = openStream(key, annotations);
+                cos.write(value.getBytes());
+            } finally {
+                if (cos != null) cos.close();
+            }
         }
-
     }
 
     private void writeMetadata(Map<String, ? extends Serializable> metadata,
@@ -158,7 +159,21 @@ public class DiskCache {
     }
 
     private String toInternalKey(String key) {
-        return Utils.md5(key);
+        return md5(key);
+    }
+
+    public String md5(String s) {
+        try {
+            MessageDigest m = MessageDigest.getInstance("MD5");
+            m.update(s.getBytes("UTF-8"));
+            byte[] digest = m.digest();
+            BigInteger bigInt = new BigInteger(1, digest);
+            return bigInt.toString(16);
+        } catch (NoSuchAlgorithmException e) {
+            throw new AssertionError();
+        } catch (UnsupportedEncodingException e) {
+            throw new AssertionError();
+        }
     }
 
     private class CacheOutputStream extends FilterOutputStream {
@@ -289,4 +304,5 @@ public class DiskCache {
             return metadata;
         }
     }
+
 }

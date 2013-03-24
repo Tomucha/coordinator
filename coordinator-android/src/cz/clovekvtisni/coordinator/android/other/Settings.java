@@ -3,15 +3,15 @@ package cz.clovekvtisni.coordinator.android.other;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import cz.clovekvtisni.coordinator.android.CoordinatorApplication;
-
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+import cz.clovekvtisni.coordinator.android.CoordinatorApplication;
 
 public class Settings {
 	private static final String KEY_AUTH_KEY = "authKey";
 	private static final String KEY_GCM_REGISTRATION_ID = "gcmRegId";
+	private static final String KEY_PREFIX_PRELOADED = "preloaded";
 
 	private static SharedPreferences getPrefs() {
 		return PreferenceManager
@@ -33,6 +33,14 @@ public class Settings {
 	public static void setGcmRegistrationId(String regId) {
 		setString(KEY_GCM_REGISTRATION_ID, regId);
 	}
+	
+	public static boolean isEventMapPreloaded(long eventId) {
+		return getPrefs().getBoolean(KEY_PREFIX_PRELOADED + eventId, false);
+	}
+	
+	public static void setEventMapPreloaded(long eventId) {
+		setBoolean(KEY_PREFIX_PRELOADED + eventId, true);
+	}
 
 	private static String getString(String key) {
 		return getPrefs().getString(key, null);
@@ -41,6 +49,12 @@ public class Settings {
 	private static void setString(String key, String value) {
 		Editor editor = getPrefs().edit();
 		editor.putString(key, value);
+		SharedPrefsCompat.apply(editor);
+	}
+	
+	private static void setBoolean(String key, boolean value) {
+		Editor editor = getPrefs().edit();
+		editor.putBoolean(key, value);
 		SharedPrefsCompat.apply(editor);
 	}
 

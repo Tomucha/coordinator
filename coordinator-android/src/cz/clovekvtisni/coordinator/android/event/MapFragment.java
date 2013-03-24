@@ -38,6 +38,7 @@ import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiCall.ApiCallException;
 import cz.clovekvtisni.coordinator.android.api.ApiCalls.EventPoiTransitionCall;
 import cz.clovekvtisni.coordinator.android.event.map.MapOverlay;
+import cz.clovekvtisni.coordinator.android.event.map.view.NetworkTileLoader;
 import cz.clovekvtisni.coordinator.android.event.map.view.OsmMapView;
 import cz.clovekvtisni.coordinator.android.event.map.view.Projection.LatLon;
 import cz.clovekvtisni.coordinator.android.util.Lg;
@@ -123,9 +124,9 @@ public class MapFragment extends SherlockFragment {
 	}
 
 	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		osmMapView.onDestroy();
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		((EventActivity) getActivity()).onMapFragmentReady();
 	}
 
 	@Override
@@ -240,6 +241,10 @@ public class MapFragment extends SherlockFragment {
 
 		// If the view has been created
 		if (isVisible()) updateLocationOverlay();
+	}
+	
+	public void setNetTileLoader(NetworkTileLoader netTileLoader) {
+		osmMapView.setNetTileLoader(netTileLoader);
 	}
 
 	private void showPoiInfo(final Poi poi) {
@@ -437,7 +442,6 @@ public class MapFragment extends SherlockFragment {
 
 		@Override
 		public void onTap() {
-			System.out.println(0);
 			selectUser(userInEvent.getUser());
 		}
 	}

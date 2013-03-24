@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.fhucho.android.workers.Workers;
 import com.fhucho.android.workers.simple.ActivityWorker2;
@@ -376,7 +377,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 		}
 	}
 
-	public static class RegisteringDialog extends DialogFragment {
+	public static class RegisteringDialog extends SherlockDialogFragment {
 		private static final String TAG = "registering-dialog";
 
 		@Override
