@@ -35,6 +35,13 @@
             </div>
             <div class="span3">
                 <s:message code="application.public.info2"/>
+
+                <c:set var="rootDomain" value="http://coordinator-test.appspot.com"/>
+                <p>
+                    <img src="https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${rootDomain}/coordinator-android.apk&choe=UTF-8&chld=L" alt=""/><br/>
+
+                    <a href="${rootDomain}/coordinator-android.apk">${rootDomain}/coordinator-android.apk</a></p>
+
             </div>
         </div>
     </body>
