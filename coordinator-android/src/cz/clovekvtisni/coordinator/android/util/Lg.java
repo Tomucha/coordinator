@@ -46,6 +46,10 @@ public class Lg {
 		Log.w(tag, msg, tr);
 	}
 
+    public void e(String msg) {
+        Log.e(tag, msg);
+    }
+
 	public void e(String msg, Throwable tr) {
 		Log.e(tag, msg, tr);
 	}

@@ -11,13 +11,13 @@ import cz.clovekvtisni.coordinator.android.event.map.view.Projection.LatLon;
 
 class TouchHelper implements OnTouchListener {
 	private final GestureDetector gestureDetector;
-	private final OnSingleTapListener onSingleTapListener;
+	private final OnMapTapListener onSingleTapListener;
 	private final Projection projection;
 
 	private PinchTracker pinchTracker;
 	private ScrollTracker scrollTracker;
 
-	public TouchHelper(Context context, Projection projection, OnSingleTapListener listener) {
+	public TouchHelper(Context context, Projection projection, OnMapTapListener listener) {
 		this.projection = projection;
 		this.onSingleTapListener = listener;
 		gestureDetector = new GestureDetector(context, new GestureListener());
@@ -101,9 +101,15 @@ class TouchHelper implements OnTouchListener {
 			onSingleTapListener.onSingleTap(e.getX(), e.getY());
 			return true;
 		}
-	}
 
-	public static interface OnSingleTapListener {
+        @Override
+        public void onLongPress(MotionEvent e) {
+            onSingleTapListener.onLongTap(e.getX(), e.getY());
+        }
+    }
+
+	public static interface OnMapTapListener {
 		public void onSingleTap(float x, float y);
+        public void onLongTap(float x, float y);
 	}
 }

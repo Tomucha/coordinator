@@ -19,11 +19,10 @@ import com.google.common.collect.Lists;
 import cz.clovekvtisni.coordinator.android.event.map.MapOverlay;
 import cz.clovekvtisni.coordinator.android.event.map.view.Projection.LatLon;
 import cz.clovekvtisni.coordinator.android.event.map.view.Projection.ProjectedTile;
-import cz.clovekvtisni.coordinator.android.event.map.view.TouchHelper.OnSingleTapListener;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.android.util.Utils;
 
-public class OsmMapView extends View implements OnSingleTapListener, TileLoadedListener {
+public class OsmMapView extends View implements TouchHelper.OnMapTapListener, TileLoadedListener {
 
 	private static final int TILE_BITMAP_BYTES = 256 * 256 * 4;
 	private static final Paint BITMAP_PAINT = new Paint(Paint.FILTER_BITMAP_FLAG);
@@ -32,6 +31,8 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 	private List<MapOverlay> overlays = Lists.newArrayList();
 	private LruCache<TileId, Bitmap> bitmapCache;
 	private Projection projection;
+
+    private OsmMapEventsListener osmMapEventsListener;
 
 	public OsmMapView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -73,7 +74,17 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 		if (nearestOverlay != null) nearestOverlay.onTap();
 	}
 
-	public void setCenter(LatLon center) {
+    @Override
+    public void onLongTap(float x, float y) {
+        double latitude = projection.pixelsToLatitudes(x-getWidth()/2) + projection.getCenterLatLon().getLat();
+        double longitude = projection.pixelsToLongitudes(y-getHeight()/2) + projection.getCenterLatLon().getLon();
+        Lg.MAP.i("Long touch at "+latitude+" x "+longitude);
+        if (osmMapEventsListener != null) {
+            osmMapEventsListener.onLongTap(latitude, longitude);
+        }
+    }
+
+    public void setCenter(LatLon center) {
 		projection.setCenterLatLon(center);
 		invalidate();
 	}
@@ -96,8 +107,7 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 	}
 
 	private void initCache() {
-		int memClass = ((ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE))
-				.getMemoryClass();
+		int memClass = ((ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
 		int cacheSize = 1024 * 1024 * memClass / 3;
 		bitmapCache = new LruCache<TileId, Bitmap>(cacheSize) {
 			@Override
@@ -152,4 +162,18 @@ public class OsmMapView extends View implements OnSingleTapListener, TileLoadedL
 		super.onSizeChanged(w, h, oldw, oldh);
 		projection.setScreenSize(w, h);
 	}
+
+
+    public interface OsmMapEventsListener {
+        void onLongTap(double latitude, double longitude);
+    }
+
+    public OsmMapEventsListener getOsmMapEventsListener() {
+        return osmMapEventsListener;
+    }
+
+    public void setOsmMapEventsListener(OsmMapEventsListener osmMapEventsListener) {
+        this.osmMapEventsListener = osmMapEventsListener;
+    }
+
 }

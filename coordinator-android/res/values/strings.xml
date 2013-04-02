@@ -14,6 +14,11 @@
     </string>
 
     <string name="error_no_internet">Vypadá to, že jsme bez internetu. Ale teď ho bohužel potřebujeme.</string>
+    <string name="error_server">Něco nám nefunguje na straně serveru, zkus to prosím za chvíli :-/</string>
+
+
+    <string name="ok_poi_saved">Nové POI je uloženo!</string>
+
     <string name="label_events">PROBÍHAJÍCÍ UDÁLOSTI</string>
     <string name="notification_assigned">V Koordinátoru Vám byl přiřazen úkol</string>
     <string name="notification_unassigned">V Koordinátoru Vám byl odebrán úkol</string>

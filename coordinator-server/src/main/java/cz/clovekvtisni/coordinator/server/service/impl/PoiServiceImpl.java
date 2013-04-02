@@ -111,6 +111,8 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
                 // let's enforce workflow
 
+                if (entity.getPoiCategoryId() == null) throw new IllegalArgumentException("Null poiCategoryId");
+
                 PoiCategory c = config.getPoiCategoryMap().get(entity.getPoiCategoryId());
                 Workflow w = config.getWorkflowMap().get(c.getWorkflowId());
                 entity.setWorkflow(w);

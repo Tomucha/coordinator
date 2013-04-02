@@ -216,7 +216,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		return true;
 	}
 
-	private void loadPois() {
+	public void loadPois(boolean reload) {
         Lg.APP.i("Loading POIs");
 		EventPoiListRequestParams params = new EventPoiListRequestParams();
 		params.setEventId(event.getId());
@@ -234,7 +234,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
                 UiTool.toast(R.string.error_no_internet, getApplicationContext());
             }
         }, this);
-        if (zoomToPoi != null) {
+        if (zoomToPoi != null || reload) {
             // FIXME: pokud byl loader prave vytvoren, pusti se load 2x
             Lg.APP.i("Reload required POIs");
             loader.reload();
@@ -274,6 +274,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 			@Override
 			public void onInternetException(Exception e) {
                 UiTool.toast(R.string.error_no_internet, getApplicationContext());
+                finish();
 			}
 		}, this);
 	}
@@ -291,6 +292,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 			@Override
 			public void onInternetException(Exception e) {
                 UiTool.toast(R.string.error_no_internet, getApplicationContext());
+                finish();
 			}
 		}, this);
 	}
@@ -303,7 +305,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 			poiFilter.put(category, true);
 		}
 
-		loadPois();
+		loadPois(false);
 		loadPoiIcons();
 	}
 
@@ -387,7 +389,11 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		return "Accuracy: " + location.getAccuracy() + " m";
 	}
 
-	public class TabsPagerAdapter extends FragmentPagerAdapter {
+    public long getEventId() {
+        return event.getId();
+    }
+
+    public class TabsPagerAdapter extends FragmentPagerAdapter {
 		public TabsPagerAdapter(FragmentManager fm) {
 			super(fm);
 		}
@@ -560,6 +566,11 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
                 i.removeExtra(EXTRA_POI);
             }
         }
+    }
+
+    public PoiCategory[] getPoiCategories() {
+        // TODO: unmodifieable
+        return poiCategories;
     }
 
     @Override

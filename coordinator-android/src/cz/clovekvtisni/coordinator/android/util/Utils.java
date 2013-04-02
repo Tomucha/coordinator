@@ -46,6 +46,14 @@ public class Utils {
 		}
 	}
 
+
+    public static Throwable findExceptionCause(Throwable exception) {
+        while (exception.getCause() != null && exception.getCause() != exception) {
+            exception = exception.getCause();
+        }
+        return exception;
+    }
+
 	public static Bitmap scaleBitmapAccordingToDensity(Bitmap bitmap, WindowManager wm) {
 		DisplayMetrics metrics = new DisplayMetrics();
 		wm.getDefaultDisplay().getMetrics(metrics);

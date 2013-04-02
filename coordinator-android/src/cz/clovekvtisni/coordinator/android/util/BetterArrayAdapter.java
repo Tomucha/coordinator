@@ -52,4 +52,16 @@ public abstract class BetterArrayAdapter<T> extends ArrayAdapter<T> {
 		setUpView(getItem(position), convertView);
 		return convertView;
 	}
+
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            convertView = inflater.inflate(layoutResource, parent, false);
+        }
+        setUpView(getItem(position), convertView);
+        return convertView;
+    }
+
+
 }

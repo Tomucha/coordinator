@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
@@ -23,9 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.*;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -36,13 +33,14 @@ import com.fhucho.android.workers.simple.ActivityWorker2;
 
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiCall.ApiCallException;
+import cz.clovekvtisni.coordinator.android.api.ApiCalls;
 import cz.clovekvtisni.coordinator.android.api.ApiCalls.EventPoiTransitionCall;
 import cz.clovekvtisni.coordinator.android.event.map.MapOverlay;
 import cz.clovekvtisni.coordinator.android.event.map.view.NetworkTileLoader;
 import cz.clovekvtisni.coordinator.android.event.map.view.OsmMapView;
 import cz.clovekvtisni.coordinator.android.event.map.view.Projection.LatLon;
-import cz.clovekvtisni.coordinator.android.util.Lg;
-import cz.clovekvtisni.coordinator.android.util.Utils;
+import cz.clovekvtisni.coordinator.android.util.*;
+import cz.clovekvtisni.coordinator.api.request.EventPoiCreateRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventPoiTransitionRequestParams;
 import cz.clovekvtisni.coordinator.api.response.EventPoiResponseData;
 import cz.clovekvtisni.coordinator.domain.Poi;
@@ -51,7 +49,7 @@ import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowTransition;
 
-public class MapFragment extends SherlockFragment {
+public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEventsListener {
 
 	private Bitmap userMarkerBitmap;
 	private Location myLocation;
@@ -76,8 +74,7 @@ public class MapFragment extends SherlockFragment {
 
 		Workers.start(new EventPoiTransitionTask(params), (EventActivity) getActivity());
 
-		new SendingTransitionDialog().show(getActivity().getSupportFragmentManager(),
-				SendingTransitionDialog.TAG);
+		new SendingProgressDialog().show(getActivity().getSupportFragmentManager(), SendingProgressDialog.TAG);
 
 		poiInfo.setVisibility(View.GONE);
 	}
@@ -113,6 +110,7 @@ public class MapFragment extends SherlockFragment {
 		userMarkerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_marker_user);
 
 		osmMapView = (OsmMapView) view.findViewById(R.id.map);
+        osmMapView.setOsmMapEventsListener(this);
 
 		myLocationOverlay = new MyLocationOverlay(getResources());
 		osmMapView.getOverlays().add(myLocationOverlay);
@@ -312,8 +310,14 @@ public class MapFragment extends SherlockFragment {
         this.zoomToPoi = zoomToPoi;
     }
 
-    private static class EventPoiTransitionTask extends
-			ActivityWorker2<EventActivity, EventPoiResponseData, Exception> {
+    @Override
+    public void onLongTap(double latitude, double longitude) {
+        // let's create a new POI
+        PoiCategory[] poiCategories = ((EventActivity)getActivity()).getPoiCategories();
+        new CreatePoiDialog(latitude, longitude, poiCategories).show(getActivity().getSupportFragmentManager(), CreatePoiDialog.TAG);
+    }
+
+    private static class EventPoiTransitionTask extends ActivityWorker2<EventActivity, EventPoiResponseData, Exception> {
 
 		private final EventPoiTransitionRequestParams params;
 
@@ -332,15 +336,55 @@ public class MapFragment extends SherlockFragment {
 
 		@Override
 		public void onException(Exception e) {
+            UiTool.toast(R.string.error_server, getActivity().getApplicationContext());
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            ((DialogFragment) fm.findFragmentByTag(SendingProgressDialog.TAG)).dismiss();
 		}
 
 		@Override
 		public void onSuccess(EventPoiResponseData result) {
 			FragmentManager fm = getActivity().getSupportFragmentManager();
-			((DialogFragment) fm.findFragmentByTag(SendingTransitionDialog.TAG)).dismiss();
+			((DialogFragment) fm.findFragmentByTag(SendingProgressDialog.TAG)).dismiss();
+            ((EventActivity)getActivity()).loadPois(true);
 		}
 
 	}
+
+    private static class EventPoiCreateTask extends ActivityWorker2<EventActivity, EventPoiResponseData, Exception> {
+
+        private final EventPoiCreateRequestParams params;
+
+        public EventPoiCreateTask(EventPoiCreateRequestParams params) {
+            this.params = params;
+        }
+
+        @Override
+        protected void doInBackground() {
+            try {
+                getListenerProxy().onSuccess(new ApiCalls.EventPoiCreateCall(params).call());
+            } catch (ApiCallException e) {
+                getListenerProxy().onException(e);
+            }
+        }
+
+        @Override
+        public void onException(Exception e) {
+            Lg.API.e("Exception calling API: "+e, e);
+            UiTool.toast(R.string.error_server, getActivity().getApplicationContext());
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            ((DialogFragment) fm.findFragmentByTag(SendingProgressDialog.TAG)).dismiss();
+        }
+
+        @Override
+        public void onSuccess(EventPoiResponseData result) {
+            UiTool.toast(R.string.ok_poi_saved, getActivity().getApplicationContext());
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            ((DialogFragment) fm.findFragmentByTag(SendingProgressDialog.TAG)).dismiss();
+            ((EventActivity)getActivity()).loadPois(true);
+        }
+
+    }
+
 
 	private class MarkerOverlay extends MapOverlay {
 		private final Paint paintNormal = new Paint(Paint.FILTER_BITMAP_FLAG);
@@ -446,8 +490,8 @@ public class MapFragment extends SherlockFragment {
 		}
 	}
 
-	public static class SendingTransitionDialog extends DialogFragment {
-		private static final String TAG = "SendingTransitionDialog";
+	public static class SendingProgressDialog extends DialogFragment {
+		private static final String TAG = "SendingProgressDialog";
 
 		@Override
 		public Dialog onCreateDialog(Bundle state) {
@@ -457,6 +501,82 @@ public class MapFragment extends SherlockFragment {
 			return dialog;
 		}
 	}
+
+    /**
+     * New POI dialog.
+     *
+     * User: tomucha
+     * Date: 31.03.13
+     */
+    public class CreatePoiDialog extends DialogFragment implements OnClickListener {
+
+        private static final String TAG = "CreatePoiDialog";
+
+        private double latitude;
+        private double longitude;
+        private final PoiCategory[] poiCategories;
+
+        public CreatePoiDialog(double latitude, double longitude, PoiCategory[] poiCategories) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.poiCategories = poiCategories;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View view = inflater.inflate(R.layout.frag_create_poi, container);
+            getDialog().setTitle("Nové POI");
+
+            Spinner s = (Spinner) view.findViewById(R.id.poi_categories);
+            s.setAdapter(new PoiCategoryAdapter(poiCategories));
+
+            view.findViewById(R.id.button).setOnClickListener(this);
+
+            return view;
+        }
+
+        @Override
+        public void onClick(View view) {
+            View root = getView();
+            PoiCategory category = (PoiCategory) ((Spinner)root.findViewById(R.id.poi_categories)).getSelectedItem();
+            String name = ((TextView)root.findViewById(R.id.poi_name)).getText().toString().trim();
+            String description = ((TextView)root.findViewById(R.id.poi_description)).getText().toString().trim();
+            Spinner s = (Spinner) root.findViewById(R.id.poi_categories);
+
+            if (name.length() < 3) {
+                ((TextView)root.findViewById(R.id.poi_name)).requestFocus();
+            } else {
+
+                EventPoiCreateRequestParams params = new EventPoiCreateRequestParams();
+                params.setName(name);
+                params.setDescription(description);
+                params.setEventId(((EventActivity) getActivity()).getEventId());
+                params.setLatitude(latitude);
+                params.setLongitude(longitude);
+
+                params.setPoiCategoryId(((PoiCategory)s.getSelectedItem()).getId());
+
+                Workers.start(new EventPoiCreateTask(params), (EventActivity) getActivity());
+
+                new SendingProgressDialog().show(getActivity().getSupportFragmentManager(), SendingProgressDialog.TAG);
+
+                dismiss();
+
+            }
+        }
+    }
+
+    private class PoiCategoryAdapter extends BetterArrayAdapter<PoiCategory> {
+        public PoiCategoryAdapter(PoiCategory[] poiCategories) {
+            super(getActivity(), R.layout.item_poi_category);
+            addAll(poiCategories);
+        }
+        @Override
+        protected void setUpView(PoiCategory poiCategory, View view) {
+            FindView.textView(view, R.id.name).setText(poiCategory.getName());
+            FindView.textView(view, R.id.description).setText(poiCategory.getDescription().trim());
+        }
+    }
 
 
     /**

@@ -5,6 +5,7 @@ import com.fhucho.android.workers.Loader;
 import cz.clovekvtisni.coordinator.android.api.ApiCache.Item;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.android.util.UiTool;
+import cz.clovekvtisni.coordinator.android.util.Utils;
 import cz.clovekvtisni.coordinator.api.request.RequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
 
@@ -106,7 +107,7 @@ public abstract class ApiLoader<RQ extends RequestParams, RP extends ApiResponse
 		private void sendToListener() {
 			if (response != null) getListenerProxy().onResult(response);
 			if (exception != null) {
-                Throwable cause = findExceptionCause(exception);
+                Throwable cause = Utils.findExceptionCause(exception);
 
                 if (cause instanceof java.net.UnknownHostException) {
                     getListenerProxy().onInternetException(exception);
@@ -121,13 +122,6 @@ public abstract class ApiLoader<RQ extends RequestParams, RP extends ApiResponse
             }
 		}
 	}
-
-    private Throwable findExceptionCause(Throwable exception) {
-        while (exception.getCause() != null && exception.getCause() != exception) {
-            exception = exception.getCause();
-        }
-        return exception;
-    }
 
     public static interface Listener<RP> {
 		public void onResult(RP result);

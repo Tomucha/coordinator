@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.controller.api.v1;
 
+import cz.clovekvtisni.coordinator.api.request.EventPoiCreateRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventPoiListRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventPoiTransitionRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse;
@@ -55,4 +56,23 @@ public class EventPoiApiController extends AbstractApiController {
 
         return okResult(new EventPoiResponseData(poi.buildTargetEntity()));
     }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/create")
+    public @ResponseBody ApiResponse create(HttpServletRequest request) {
+        EventPoiCreateRequestParams params = parseRequest(request, EventPoiCreateRequestParams.class);
+
+        PoiEntity newPoi = new PoiEntity();
+        newPoi.setLatitude(params.getLatitude());
+        newPoi.setLongitude(params.getLongitude());
+        newPoi.setName(params.getName());
+        newPoi.setDescription(params.getDescription());
+        newPoi.setEventId(params.getEventId());
+        newPoi.setPoiCategoryId(params.getPoiCategoryId());
+        newPoi.setOrganizationId(getLoggedUser().getOrganizationId());
+
+        newPoi = poiService.createPoi(newPoi);
+
+        return okResult(new EventPoiResponseData(newPoi.buildTargetEntity()));
+    }
+
 }

@@ -1,13 +1,6 @@
 package cz.clovekvtisni.coordinator.android.api;
 
-import cz.clovekvtisni.coordinator.api.request.EmptyRequestParams;
-import cz.clovekvtisni.coordinator.api.request.EventFilterRequestParams;
-import cz.clovekvtisni.coordinator.api.request.EventPoiListRequestParams;
-import cz.clovekvtisni.coordinator.api.request.EventPoiTransitionRequestParams;
-import cz.clovekvtisni.coordinator.api.request.EventUserListRequestParams;
-import cz.clovekvtisni.coordinator.api.request.RegisterRequestParams;
-import cz.clovekvtisni.coordinator.api.request.UserPushTokenRequestParams;
-import cz.clovekvtisni.coordinator.api.request.UserUpdatePositionRequestParams;
+import cz.clovekvtisni.coordinator.api.request.*;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.api.response.EmptyResponseData;
 import cz.clovekvtisni.coordinator.api.response.EventFilterResponseData;
@@ -38,6 +31,13 @@ public class ApiCalls {
 			super("event/poi/transition", requestParams, EventPoiResponseData.class);
 		}
 	}
+
+    public static class EventPoiCreateCall extends
+            ApiCall<EventPoiCreateRequestParams, EventPoiResponseData> {
+        public EventPoiCreateCall(EventPoiCreateRequestParams requestParams) {
+            super("event/poi/create", requestParams, EventPoiResponseData.class);
+        }
+    }
 
 	public static class EventRegisteredCall extends
 			ApiCall<EventFilterRequestParams, EventFilterResponseData> {

@@ -64,6 +64,7 @@ public abstract class ApiCall<RQ extends RequestParams, RP extends ApiResponseDa
 			JsonElement resultJson = json.get(API_RESPONSE_DATA);
 			return ApiUtils.GSON.fromJson(resultJson, responseClass);
 		} else {
+            Lg.API.e("Server response: "+json);
 			throw new ApiServerSideException();
 		}
 	}

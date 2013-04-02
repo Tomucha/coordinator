@@ -18,7 +18,6 @@ public class UiTool {
     public static void dropNotification(Context context) {
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(DEFAULT_NOTIFICATION);
-
     }
 
     public static void toast(int message, Context context) {
