@@ -12,6 +12,7 @@ public class Settings {
 	private static final String KEY_AUTH_KEY = "authKey";
 	private static final String KEY_GCM_REGISTRATION_ID = "gcmRegId";
 	private static final String KEY_PREFIX_PRELOADED = "preloaded";
+    private static final String KEY_PREFIX_MAP_SETTINGS = "map-settings";
 
 	private static SharedPreferences getPrefs() {
 		return PreferenceManager
@@ -26,7 +27,29 @@ public class Settings {
 		setString(KEY_AUTH_KEY, authKey);
 	}
 
-	public static String getGcmRegistrationId() {
+    public static void setMapSettings(long eventId, float latitude, float longitude, float zoom) {
+        setFloat(KEY_PREFIX_MAP_SETTINGS+eventId+"latitude", latitude);
+        setFloat(KEY_PREFIX_MAP_SETTINGS+eventId+"longitude", longitude);
+        setFloat(KEY_PREFIX_MAP_SETTINGS+eventId+"zoom", zoom);
+    }
+
+    public static boolean hasMapSettings(long eventId) {
+        return getPrefs().getFloat(KEY_PREFIX_MAP_SETTINGS+eventId+"latitude", 0) != 0;
+    }
+
+    public static float getMapSettingsLatitude(long eventId) {
+        return getPrefs().getFloat(KEY_PREFIX_MAP_SETTINGS+eventId+"latitude", 0);
+    }
+
+    public static float getMapSettingsLongitude(long eventId) {
+        return getPrefs().getFloat(KEY_PREFIX_MAP_SETTINGS+eventId+"longitude", 0);
+    }
+
+    public static float getMapSettingsZoom(long eventId) {
+        return getPrefs().getFloat(KEY_PREFIX_MAP_SETTINGS+eventId+"zoom", 0);
+    }
+
+    public static String getGcmRegistrationId() {
 		return getString(KEY_GCM_REGISTRATION_ID);
 	}
 
@@ -51,8 +74,20 @@ public class Settings {
 		editor.putString(key, value);
 		SharedPrefsCompat.apply(editor);
 	}
-	
-	private static void setBoolean(String key, boolean value) {
+
+    private static void setFloat(String key, float value) {
+        Editor editor = getPrefs().edit();
+        editor.putFloat(key, value);
+        SharedPrefsCompat.apply(editor);
+    }
+
+    private static void setInt(String key, int value) {
+        Editor editor = getPrefs().edit();
+        editor.putInt(key, value);
+        SharedPrefsCompat.apply(editor);
+    }
+
+    private static void setBoolean(String key, boolean value) {
 		Editor editor = getPrefs().edit();
 		editor.putBoolean(key, value);
 		SharedPrefsCompat.apply(editor);

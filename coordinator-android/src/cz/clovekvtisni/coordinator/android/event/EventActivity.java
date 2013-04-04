@@ -207,6 +207,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	@Override
 	public void onPause() {
 		super.onPause();
+        mapFragment.saveMapSettings();
 		locationTool.pause();
 	}
 
@@ -391,6 +392,10 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 
     public long getEventId() {
         return event.getId();
+    }
+
+    public Event getEvent() {
+        return event;
     }
 
     public class TabsPagerAdapter extends FragmentPagerAdapter {

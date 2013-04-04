@@ -39,10 +39,12 @@ import cz.clovekvtisni.coordinator.android.event.map.MapOverlay;
 import cz.clovekvtisni.coordinator.android.event.map.view.NetworkTileLoader;
 import cz.clovekvtisni.coordinator.android.event.map.view.OsmMapView;
 import cz.clovekvtisni.coordinator.android.event.map.view.Projection.LatLon;
+import cz.clovekvtisni.coordinator.android.other.Settings;
 import cz.clovekvtisni.coordinator.android.util.*;
 import cz.clovekvtisni.coordinator.api.request.EventPoiCreateRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventPoiTransitionRequestParams;
 import cz.clovekvtisni.coordinator.api.response.EventPoiResponseData;
+import cz.clovekvtisni.coordinator.domain.EventLocation;
 import cz.clovekvtisni.coordinator.domain.Poi;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
@@ -118,10 +120,34 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 
 		initPoiInfo(view);
 
+        centerMapOnEvent(((EventActivity)getActivity()).getEvent().getLocationList());
+
 		return view;
 	}
 
-	@Override
+    private void centerMapOnEvent(EventLocation[] locationList) {
+        if (Settings.hasMapSettings(getEventId())) {
+            Lg.MAP.i("Loading position from settings");
+            // let's zoom where we have been last time
+            float latitude = Settings.getMapSettingsLatitude(getEventId());
+            float longitude = Settings.getMapSettingsLongitude(getEventId());
+            float zoom = Settings.getMapSettingsZoom(getEventId());
+            osmMapView.setCenter(new LatLon(latitude, longitude));
+            osmMapView.setZoom(zoom);
+            return;
+        }
+        if (locationList == null || locationList.length == 0) {
+            return;
+        }
+        Lg.MAP.i("Loading position from "+locationList[0]);
+        osmMapView.setCenter(new LatLon(locationList[0].getLatitude(), locationList[0].getLongitude()));
+    }
+
+    private long getEventId() {
+        return ((EventActivity)getActivity()).getEventId();
+    }
+
+    @Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		((EventActivity) getActivity()).onMapFragmentReady();
@@ -131,9 +157,6 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_my_location:
-			goToMyLocation();
-			break;
-		case R.id.menu_add_place:
 			goToMyLocation();
 			break;
 		case R.id.menu_filter_places:
@@ -308,6 +331,14 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 
     public void zoomToPoi(Long zoomToPoi) {
         this.zoomToPoi = zoomToPoi;
+    }
+
+    public void saveMapSettings() {
+        Settings.setMapSettings(getEventId(),
+                (float)osmMapView.getCenter().getLat(),
+                (float)osmMapView.getCenter().getLon(),
+                (float)osmMapView.getZoom()
+        );
     }
 
     @Override

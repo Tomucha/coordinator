@@ -88,6 +88,10 @@ public class OsmMapView extends View implements TouchHelper.OnMapTapListener, Ti
 		projection.setCenterLatLon(center);
 		invalidate();
 	}
+
+    public LatLon getCenter() {
+        return projection.getCenterLatLon();
+    }
 	
 	public void setNetTileLoader(NetworkTileLoader netTileLoader) {
 		TileCache cache;
@@ -106,6 +110,10 @@ public class OsmMapView extends View implements TouchHelper.OnMapTapListener, Ti
 		invalidate();
 	}
 
+    public double getZoom() {
+        return projection.getZoom();
+    }
+
 	private void initCache() {
 		int memClass = ((ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
 		int cacheSize = 1024 * 1024 * memClass / 3;
@@ -119,6 +127,7 @@ public class OsmMapView extends View implements TouchHelper.OnMapTapListener, Ti
 
 	private void initProjection() {
 		projection = new Projection(getResources().getDisplayMetrics().densityDpi);
+        // default, will be overriden by my parent
 		projection.setCenterLatLon(new LatLon(50.083333, 14.416667));
 		projection.setZoom(100000);
 	}
