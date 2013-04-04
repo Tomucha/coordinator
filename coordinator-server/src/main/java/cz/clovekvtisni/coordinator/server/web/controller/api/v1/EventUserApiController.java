@@ -41,7 +41,7 @@ public class EventUserApiController extends AbstractApiController {
         filter.setModifiedDateVal(params.getModifiedFrom());
         filter.setModifiedDateOp(Filter.Operator.GT);
         filter.setOrder("modifiedDate");
-        ResultList<UserInEventEntity> result = userInEventService.findByFilter(filter, 0, null, 0l);
+        ResultList<UserInEventEntity> result = userInEventService.findByFilter(filter, 0, null, UserInEventService.FLAG_FETCH_GROUPS);
         List<UserInEvent> userInEvents = new EntityTool().buildTargetEntities(result.getResult());
 
         return okResult(new EventUserListResponseData(userInEvents));

@@ -30,5 +30,9 @@
     </string>
     <string name="preload_button_no">Teď ne</string>
     <string name="preload_button_yes">OK, stahuj</string>
+    <string name="warning_no_groups_to_filter">Zobrazení uživatelé nejsou v žádných skupinách, podle kterých by šlo
+        filtrovat.
+    </string>
+    <string name="dialog_title_filter_people">Zobrazovat tyto lidi</string>
 
 </resources>

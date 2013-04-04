@@ -163,7 +163,7 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 			((EventActivity) getActivity()).showPoiFilterDialog();
 			break;
 		case R.id.menu_filter_people:
-			goToMyLocation();
+            ((EventActivity) getActivity()).showPeopleFilterDialog();
 			break;
 		}
 		return true;

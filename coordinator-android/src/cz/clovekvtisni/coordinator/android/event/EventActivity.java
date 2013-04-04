@@ -1,11 +1,7 @@
 package cz.clovekvtisni.coordinator.android.event;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -64,10 +60,7 @@ import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.api.response.EventPoiFilterResponseData;
 import cz.clovekvtisni.coordinator.api.response.EventUserListResponseData;
 import cz.clovekvtisni.coordinator.api.response.UserUpdatePositionResponseData;
-import cz.clovekvtisni.coordinator.domain.Event;
-import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
-import cz.clovekvtisni.coordinator.domain.Poi;
-import cz.clovekvtisni.coordinator.domain.UserInEvent;
+import cz.clovekvtisni.coordinator.domain.*;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 
 public class EventActivity extends SherlockFragmentActivity implements LocationTool.Listener {
@@ -83,12 +76,15 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	private ViewPager pager;
 
 	private Map<PoiCategory, Boolean> poiFilter;
+    private Map<UserGroup, Boolean> userFilter;
+
 	private Map<PoiCategory, Bitmap> poiIcons = new HashMap<PoiCategory, Bitmap>();
 	private Poi[] pois = new Poi[0];
 	private PoiCategory[] poiCategories;
     private Long zoomToPoi;
+    private List<UserInEvent> usersList;
 
-	private void initActionBar() {
+    private void initActionBar() {
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		actionBar.setLogo(new ColorDrawable(Color.TRANSPARENT));
@@ -287,7 +283,9 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		Workers.load(new EventUserListLoader(params), new EventUserListLoaderListener() {
 			@Override
 			public void onResult(EventUserListResponseData result) {
-				onUsersLoaded(result.getUserInEvents());
+                userFilter = new HashMap<UserGroup, Boolean>();
+                usersList = Lists.newArrayList(result.getUserInEvents());
+                updateFilteredUsers();
 			}
 
 			@Override
@@ -310,12 +308,6 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		loadPoiIcons();
 	}
 
-	private void onUsersLoaded(UserInEvent[] users) {
-		List<UserInEvent> usersList = Lists.newArrayList(users);
-		mapFragment.setFilteredUsers(usersList);
-		usersFragment.setFilteredUsers(usersList);
-	}
-
 	private void startMapPreload() {
 		final PreloadingDialog dialog = new PreloadingDialog();
 		dialog.show(getSupportFragmentManager(), PreloadingDialog.TAG);
@@ -334,6 +326,31 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		});
 		netTileLoader.preloadTiles(event.getLocationList());
 	}
+
+    private void updateFilteredUsers() {
+        List<UserInEvent> filteredUsers = new ArrayList<UserInEvent>();
+        if (userFilter.isEmpty()) {
+            mapFragment.setFilteredUsers(usersList);
+            usersFragment.setFilteredUsers(usersList);
+            return;
+        }
+
+        for (UserInEvent user : usersList) {
+            List<UserGroup> groups = user.getGroups();
+            if (groups != null) {
+                for (UserGroup group : groups) {
+                    if (userFilter.get(group)!=null && userFilter.get(group)) {
+                        filteredUsers.add(user);
+                        break;
+                    }
+                }
+            }
+        }
+
+        mapFragment.setFilteredUsers(filteredUsers);
+        usersFragment.setFilteredUsers(filteredUsers);
+    }
+
 
 	private void updateFilteredPois() {
 		List<Poi> filteredPois = new ArrayList<Poi>();
@@ -358,7 +375,12 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		new PoiFilterDialog().show(getSupportFragmentManager(), PoiFilterDialog.TAG);
 	}
 
-	public void showPoiOnMap(Poi poi) {
+    public void showPeopleFilterDialog() {
+        new UserFilterDialog().show(getSupportFragmentManager(), UserFilterDialog.TAG);
+    }
+
+
+    public void showPoiOnMap(Poi poi) {
 		mapFragment.showPoiOnMap(poi);
 		pager.setCurrentItem(0, true);
 	}
@@ -532,6 +554,88 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 			return checked;
 		}
 	}
+
+
+    public static class UserFilterDialog extends SherlockDialogFragment {
+
+        private static final String TAG = "user-filter-dialog";
+
+        @Override
+        public Dialog onCreateDialog(Bundle state) {
+            EventActivity activity = (EventActivity) getActivity();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(activity.getString(R.string.dialog_title_filter_people));
+
+            final UserGroup items[] = extractGroups(activity.usersList);
+            String[] names = new String[items.length];
+
+            if (items == null || items.length == 0) {
+                UiTool.toast(R.string.warning_no_groups_to_filter, getActivity().getApplicationContext());
+                dismiss();
+                return null;
+            }
+
+
+            for (int i = 0; i < items.length; i++) {
+                UserGroup item = items[i];
+                names[i] = item.getName();
+            }
+
+            boolean[] checkedItems = extractChecked(items, activity.userFilter);
+
+            builder.setMultiChoiceItems(names, checkedItems, new OnMultiChoiceClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                    EventActivity activity = (EventActivity) getActivity();
+                    if (isChecked) {
+                        activity.userFilter.put(items[which], true);
+                    } else {
+                        activity.userFilter.remove(items[which]);
+                    }
+                    activity.updateFilteredUsers();
+                }
+            });
+
+            builder.setPositiveButton("Hotovo", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+
+            return builder.create();
+        }
+
+        private UserGroup[] extractGroups(List<UserInEvent> users) {
+            Set<UserGroup> groups = new HashSet<UserGroup>();
+
+            for (UserInEvent user : users) {
+                Lg.APP.i("User groups: "+user+"  "+user.getGroups());
+                if (user.getGroups() != null && user.getGroups() != null) {
+                    groups.addAll(user.getGroups());
+                }
+            }
+
+            UserGroup[] result = groups.toArray(new UserGroup[0]);
+
+            Arrays.sort(result, new Comparator<UserGroup>() {
+                @Override
+                public int compare(UserGroup userGroup, UserGroup userGroup2) {
+                    return userGroup.getName().compareTo(userGroup2.getName());
+                }
+            });
+
+            return result;
+        }
+
+        private boolean[] extractChecked(UserGroup[] userGroups, Map<UserGroup, Boolean> userFilter) {
+            boolean[] checked = new boolean[userGroups.length];
+            for (int i = 0; i < userGroups.length; i++) {
+                checked[i] = userFilter.get(userGroups[i]) != null && userFilter.get(userGroups[i]);
+            }
+            return checked;
+        }
+    }
 
 	public static class IntentHelper {
 		private static final String EXTRA_EVENT = "event";

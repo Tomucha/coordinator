@@ -60,7 +60,7 @@ public class UsersFragment extends SherlockFragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_filter_users:
-			activity.showPoiFilterDialog();
+			activity.showPeopleFilterDialog();
 			break;
 		}
 		return true;
