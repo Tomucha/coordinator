@@ -9,25 +9,11 @@ import java.util.List;
 
 public class EventFilterResponseData implements ApiResponseData {
 
-    private Event[] events;
-
     private OrganizationInEvent[] organizationInEvents;
 
     private UserInEvent[] userInEvents;
 
     public EventFilterResponseData() {
-    }
-
-    public Event[] getEvents() {
-        return events;
-    }
-
-    public void setEvents(List<Event> events) {
-        this.events = events.toArray(new Event[0]);
-    }
-
-    public void setEvents(Event[] users) {
-        this.events = users;
     }
 
     public OrganizationInEvent[] getOrganizationInEvents() {

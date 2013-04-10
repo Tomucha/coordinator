@@ -26,7 +26,7 @@ public class WizardModel implements ModelCallbacks {
 	private List<ModelCallbacks> mListeners = new ArrayList<ModelCallbacks>();
 	private PageList mRootPageList;
 
-	public WizardModel(Context context, Organization organization, ConfigResponse config) {
+	public WizardModel(Context context, Organization organization, ConfigResponse config, User user) {
 		mContext = context;
 
 		Page personalInfo = new PersonalInfoPage(this, "Osobní údaje").setRequired(true);
@@ -52,12 +52,22 @@ public class WizardModel implements ModelCallbacks {
 		Page skills = new SkillsPage(this, "Dovednosti").setSkills(skillList);
 
 		mRootPageList = new PageList(personalInfo, address, equipment, skills);
+
+        if (user != null) {
+            loadFromUser(user);
+        }
 	}
 
 	public void saveToUser(User user) {
 		for (Page page : mRootPageList)
 			page.saveToUser(user);
 	}
+
+    public void loadFromUser(User user) {
+        for (Page page : mRootPageList)
+            page.loadFromUser(user);
+    }
+
 
 	@Override
 	public void onPageDataChanged(Page page) {

@@ -105,7 +105,7 @@ public class GCMIntentService extends GCMBaseIntentService {
                         }
                         cache.put(apiCall.getCacheKey(), eventFilterResponseData);
                         notifyMessage(type, poiName, poiId,
-                                findEvent(eventId, eventFilterResponseData.getEvents()),
+                                findEvent(eventId, eventFilterResponseData.getOrganizationInEvents()),
                                 findOrganizationInEvent(organizationId, eventId, eventFilterResponseData.getOrganizationInEvents())
                         );
                     }
@@ -113,7 +113,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
             } else {
                 notifyMessage(type, poiName, poiId,
-                        findEvent(eventId, item.getValue().getEvents()),
+                        findEvent(eventId, item.getValue().getOrganizationInEvents()),
                         findOrganizationInEvent(organizationId, eventId, item.getValue().getOrganizationInEvents())
                 );
             }
@@ -124,6 +124,8 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     }
 
+
+
     private OrganizationInEvent findOrganizationInEvent(String organizationId, long eventId, OrganizationInEvent[] organizationInEvents) {
         for (OrganizationInEvent organizationInEvent : organizationInEvents) {
             if (organizationInEvent.getEventId() == eventId && organizationInEvent.getOrganizationId().equals(organizationId)) return organizationInEvent;
@@ -131,9 +133,9 @@ public class GCMIntentService extends GCMBaseIntentService {
         return null;
     }
 
-    private Event findEvent(long eventId, Event[] events) {
-        for (Event event : events) {
-            if (eventId == event.getId()) return event;
+    private Event findEvent(long eventId, OrganizationInEvent[] events) {
+        for (OrganizationInEvent event : events) {
+            if (eventId == event.getEventId()) return event.getEvent();
         }
         return null;
     }

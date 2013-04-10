@@ -8,7 +8,9 @@ import com.google.common.collect.Lists;
 import android.support.v4.app.Fragment;
 import cz.clovekvtisni.coordinator.android.register.wizard.ui.SkillsFragment;
 import cz.clovekvtisni.coordinator.domain.User;
+import cz.clovekvtisni.coordinator.domain.UserEquipment;
 import cz.clovekvtisni.coordinator.domain.UserSkill;
+import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.domain.config.Skill;
 
 public class SkillsPage extends Page {
@@ -68,5 +70,25 @@ public class SkillsPage extends Page {
 
 		user.setSkillList(selectedSkills);
 	}
+
+    @Override
+    public void loadFromUser(User user) {
+        ArrayList<Integer> selections = new ArrayList<Integer>();
+        int a=0;
+        for (Skill skill : skillsList) {
+            if (contains(user, skill)) {
+                selections.add(new Integer(a));
+            }
+            a++;
+        }
+        mData.putIntegerArrayList(Page.SIMPLE_DATA_KEY, selections);
+    }
+
+    private boolean contains(User user, Skill skill) {
+        for (UserSkill e : user.getSkillList()) {
+            if (e.getSkillId().equals(skill.getId())) return true;
+        }
+        return false;
+    }
 
 }

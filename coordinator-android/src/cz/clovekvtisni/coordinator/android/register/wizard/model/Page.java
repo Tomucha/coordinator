@@ -82,4 +82,6 @@ public abstract class Page implements PageTreeNode {
         mRequired = required;
         return this;
     }
+
+    public abstract void loadFromUser(User user);
 }

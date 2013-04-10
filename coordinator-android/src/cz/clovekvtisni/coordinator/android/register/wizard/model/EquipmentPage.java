@@ -69,4 +69,24 @@ public class EquipmentPage extends Page {
 		user.setEquipmentList(selectedEquipment);
 	}
 
+    @Override
+    public void loadFromUser(User user) {
+        ArrayList<Integer> selections = new ArrayList<Integer>();
+        int a=0;
+        for (Equipment equipment : equipmentsList) {
+            if (contains(user, equipment)) {
+                selections.add(new Integer(a));
+            }
+            a++;
+        }
+        mData.putIntegerArrayList(Page.SIMPLE_DATA_KEY, selections);
+    }
+
+    private boolean contains(User user, Equipment equipment) {
+        for (UserEquipment e : user.getEquipmentList()) {
+            if (e.getEquipmentId().equals(equipment.getId())) return true;
+        }
+        return false;
+    }
+
 }

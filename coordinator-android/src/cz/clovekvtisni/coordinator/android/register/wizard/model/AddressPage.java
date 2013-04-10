@@ -44,4 +44,12 @@ public class AddressPage extends Page {
     	user.setCity(mData.getString(CITY_DATA_KEY));
     	user.setZip(mData.getString(ZIP_CODE_DATA_KEY));
     }
+
+    @Override
+    public void loadFromUser(User user) {
+        mData.putString(STREET_DATA_KEY, user.getAddressLine());
+        mData.putString(CITY_DATA_KEY, user.getCity());
+        mData.putString(ZIP_CODE_DATA_KEY, user.getZip());
+
+    }
 }

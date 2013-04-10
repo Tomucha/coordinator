@@ -52,4 +52,11 @@ public class PersonalInfoPage extends Page {
     	
     	user.setPhone(mData.getString(PHONE_DATA_KEY));
     }
+
+    @Override
+    public void loadFromUser(User user) {
+        mData.putString(NAME_DATA_KEY, user.getFullName());
+        mData.putString(EMAIL_DATA_KEY, user.getEmail());
+        mData.putString(PHONE_DATA_KEY, user.getPhone());
+    }
 }

@@ -174,6 +174,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             public UserEntity run() {
                 // TODO co kdyz appengina nic nevrati? vyhodit vyjimku?
                 // only special method is able to change password
+                // FIXME: a zase - nacteni a update musi byt v transakci
                 user.setPassword(old.getPassword());
                 updateSystemFields(user, old);
                 systemService.deleteUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, old.getEmail());
@@ -382,12 +383,16 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         if (!isForceRegistration && (info == null
             || (info.getDateClosedRegistration() != null && info.getDateClosedRegistration().compareTo(new Date()) < 0)
             || !user.getOrganizationId().equals(info.getOrganizationId())
-        ))
+        )) {
             throw MaPermissionDeniedException.registrationNotAllowed();
+        }
 
         return ofy().transact(new Work<UserInEventEntity>() {
             @Override
             public UserInEventEntity run() {
+                // FIXME: tohle je taky zhovadily: user a userinevent maji vzniknout v jedny transakci,
+                // pokud uz existuji, meli by se rozumne updatnout
+
                 UserEntity connectedUser = user.isNew() ? createUser(user) : user;
 
                 inEvent.setParentKey(connectedUser.getKey());

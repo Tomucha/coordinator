@@ -13,6 +13,8 @@
         <b>Vyberte si prosím, pod kterou z těchto organizací chcete pomáhat.</b>
     </string>
 
+    <string name="app_welcome_description_wait">Stahuji aktuální stav, prosím o strpení ...</string>
+
     <string name="error_no_internet">Vypadá to, že jsme bez internetu. Ale teď ho bohužel potřebujeme.</string>
     <string name="error_server">Něco nám nefunguje na straně serveru, zkus to prosím za chvíli :-/</string>
 

@@ -10,6 +10,7 @@ import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.OrganizationFilter;
 import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
+import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
 import cz.clovekvtisni.coordinator.server.service.OrganizationService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
@@ -28,6 +29,9 @@ import java.util.Map;
  */
 @Service("organizationInEventService")
 public class OrganizationInEventServiceImpl extends AbstractEntityServiceImpl implements OrganizationInEventService {
+
+    @Autowired
+    private EventService eventService;
 
     @Override
     public OrganizationInEventEntity findById(Long id, long flags) {
@@ -52,13 +56,7 @@ public class OrganizationInEventServiceImpl extends AbstractEntityServiceImpl im
         if ((flags & FLAG_FETCH_EVENT) != 0) {
             Map<Key<EventEntity>, OrganizationInEventEntity> inEventMap = new HashMap<Key<EventEntity>, OrganizationInEventEntity>(result.size());
             for (OrganizationInEventEntity inEvent : result) {
-                Key<EventEntity> key = Key.create(EventEntity.class, inEvent.getEventId());
-                inEventMap.put(key, inEvent);
-            }
-            Map<Key<EventEntity>, EventEntity> entityMap = ofy().get(inEventMap.keySet());
-            for (Map.Entry<Key<EventEntity>, EventEntity> entry : entityMap.entrySet()) {
-                if (entry.getValue().isDeleted()) continue;
-                inEventMap.get(entry.getKey()).setEventEntity(entry.getValue());
+                inEvent.setEventEntity(eventService.findById(inEvent.getEventId(), EventService.FLAG_FETCH_LOCATIONS));
             }
         }
 

@@ -1,9 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.controller.api.v1;
 
-import cz.clovekvtisni.coordinator.api.request.LoginRequestParams;
-import cz.clovekvtisni.coordinator.api.request.RegisterRequestParams;
-import cz.clovekvtisni.coordinator.api.request.UserByIdRequestParams;
-import cz.clovekvtisni.coordinator.api.request.UserListRequestParams;
+import cz.clovekvtisni.coordinator.api.request.*;
 import cz.clovekvtisni.coordinator.api.response.*;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
@@ -64,11 +61,15 @@ public class UserApiController extends AbstractApiController {
         final UserEntity newUserEntity = new UserEntity().populateFrom(newUser);
 
         // this method is only for new users. For existed users will be method /add-to-event
-        if (!newUserEntity.isNew()) {
-            throw MaPermissionDeniedException.registrationNotAllowed();
-        }
 
-        newUserEntity.setRoleIdList(new String[] {AuthorizationTool.ANONYMOUS});
+        UserEntity loggedUser = getLoggedUser();
+
+        if (loggedUser == null) {
+            newUserEntity.setRoleIdList(new String[] {AuthorizationTool.ANONYMOUS});
+        } else {
+            // it's not new
+            newUserEntity.setId(loggedUser.getId());
+        }
         UserInEvent inEvent = params.getUserInEvent();
 
         UserEntity user;
@@ -82,8 +83,11 @@ public class UserApiController extends AbstractApiController {
         }
 
         RegisterResponseData responseData = new RegisterResponseData(user.buildTargetEntity());
-        UserAuthKey authKey = userService.createAuthKey(user);
-        responseData.setAuthKey(authKey.getAuthKey());
+
+        if (loggedUser == null) {
+            UserAuthKey authKey = userService.createAuthKey(user);
+            responseData.setAuthKey(authKey.getAuthKey());
+        }
 
         return okResult(responseData);
     }
@@ -106,6 +110,14 @@ public class UserApiController extends AbstractApiController {
         return okResult(new UserFilterResponseData(users));
     }
 
+    @RequestMapping(value = "/myself", method = RequestMethod.POST)
+    public @ResponseBody ApiResponse myself(HttpServletRequest request) {
+        parseRequest(request, EmptyRequestParams.class);
+        UserEntity logged = userService.findById(getLoggedUser().getId(), UserService.FLAG_FETCH_EQUIPMENT | UserService.FLAG_FETCH_SKILLS);
+        User u = logged.buildTargetEntity();
+        return okResult(new UserByIdResponseData(u));
+    }
+
     @RequestMapping(value = "/by-id", method = RequestMethod.POST)
     public @ResponseBody ApiResponse byId(HttpServletRequest request) {
         UserByIdRequestParams params = parseRequest(request, UserByIdRequestParams.class);
@@ -117,4 +129,12 @@ public class UserApiController extends AbstractApiController {
 
         return okResult(new UserByIdResponseData(result));
     }
+
+    @RequestMapping(value = "/register-push-token-android", method = RequestMethod.POST)
+    public @ResponseBody ApiResponse registerPushTokenAndroid(HttpServletRequest request) {
+        UserPushTokenRequestParams params = parseRequest(request, UserPushTokenRequestParams.class);
+        userService.registerPushTokenAndroid(params.getToken());
+        return okResult(null);
+    }
+
 }

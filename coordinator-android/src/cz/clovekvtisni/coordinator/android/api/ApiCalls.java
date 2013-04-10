@@ -1,14 +1,7 @@
 package cz.clovekvtisni.coordinator.android.api;
 
 import cz.clovekvtisni.coordinator.api.request.*;
-import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
-import cz.clovekvtisni.coordinator.api.response.EmptyResponseData;
-import cz.clovekvtisni.coordinator.api.response.EventFilterResponseData;
-import cz.clovekvtisni.coordinator.api.response.EventPoiFilterResponseData;
-import cz.clovekvtisni.coordinator.api.response.EventPoiResponseData;
-import cz.clovekvtisni.coordinator.api.response.EventUserListResponseData;
-import cz.clovekvtisni.coordinator.api.response.RegisterResponseData;
-import cz.clovekvtisni.coordinator.api.response.UserUpdatePositionResponseData;
+import cz.clovekvtisni.coordinator.api.response.*;
 
 public class ApiCalls {
 
@@ -70,8 +63,16 @@ public class ApiCalls {
 	public static class UserPushTokenCall extends
 			ApiCall<UserPushTokenRequestParams, EmptyResponseData> {
 		public UserPushTokenCall(UserPushTokenRequestParams requestParams) {
-			super("event/user/register-push-token-android", requestParams, EmptyResponseData.class);
+			super("user/register-push-token-android", requestParams, EmptyResponseData.class);
 		}
 	}
+
+    public static class UserInfoCall extends
+            ApiCall<EmptyRequestParams, UserByIdResponseData> {
+        public UserInfoCall() {
+            super("user/myself", new EmptyRequestParams(), UserByIdResponseData.class);
+        }
+    }
+
 
 }

@@ -16,9 +16,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.fhucho.android.workers.Loader;
 import com.fhucho.android.workers.Workers;
 
 import cz.clovekvtisni.coordinator.android.R;
+import cz.clovekvtisni.coordinator.android.api.ApiLoader;
+import cz.clovekvtisni.coordinator.android.api.ApiLoaders;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventRegisteredLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventRegisteredLoaderListener;
 import cz.clovekvtisni.coordinator.android.event.EventActivity;
@@ -28,6 +31,7 @@ import cz.clovekvtisni.coordinator.api.request.EventFilterRequestParams;
 import cz.clovekvtisni.coordinator.api.response.EventFilterResponseData;
 import cz.clovekvtisni.coordinator.domain.Event;
 import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
+import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 
@@ -37,13 +41,13 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 
 	private EventsAdapter adapter;
 	private Organization organization;
-	private OrganizationInEvent[] orgInEvents;
+	private OrganizationInEvent[] orgInEvents = new OrganizationInEvent[0];
 	private Set<Long> registeredEventIds = new HashSet<Long>();
 	private View preregister;
 
-	private Event[] events = new Event[0];
+    private User user;
 
-	private void initEvents() {
+    private void initEvents() {
 		adapter = new EventsAdapter();
 
 		ListView listView = (ListView) findViewById(R.id.events);
@@ -52,15 +56,12 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Context c = OrganizationActivity.this;
-				Event event = events[position];
-				boolean registered = registeredEventIds.contains(event.getId());
+                OrganizationInEvent event = orgInEvents[position];
+				boolean registered = registeredEventIds.contains(event.getEventId());
 				if (registered) {
-					startActivity(EventActivity.IntentHelper.create(c, events[position],
-							orgInEvents[position]));
+					startActivity(EventActivity.IntentHelper.create(c, event.getEvent(), event));
 				} else {
-					startActivityForResult(
-							RegisterActivity.IntentHelper.create(c, organization, event),
-							REQUEST_REGISTER);
+					startActivityForResult(RegisterActivity.IntentHelper.create(c, organization, event.getEvent(), user), REQUEST_REGISTER);
 				}
 			}
 		});
@@ -72,7 +73,7 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 			@Override
 			public void onClick(View v) {
 				startActivity(RegisterActivity.IntentHelper.create(getBaseContext(), organization,
-						null));
+						null, user));
 			}
 		});
 	}
@@ -95,10 +96,7 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 				OrganizationInEvent[] orgInEvents = result.getOrganizationInEvents();
 				if (orgInEvents == null) orgInEvents = new OrganizationInEvent[0];
 
-				Event[] events = result.getEvents();
-				if (events == null) events = new Event[0];
-
-				onEventsLoaded(events, userInEvents, orgInEvents);
+				onEventsLoaded(userInEvents, orgInEvents);
 			}
 		}, this);
 	}
@@ -109,32 +107,28 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 			EventFilterRequestParams params = new EventFilterRequestParams();
 			params.setOrganizationId(organization.getId());
 
-			Workers.load(new EventRegisteredLoader(params), new EventRegisteredLoaderListener() {
-				@Override
-				public void onInternetException(Exception e) {
+            EventRegisteredLoader loader = (EventRegisteredLoader) Workers.load(new EventRegisteredLoader(params), new EventRegisteredLoaderListener() {
+                @Override
+                public void onInternetException(Exception e) {
                     UiTool.toast(R.string.error_no_internet, getApplicationContext());
-				}
+                }
 
-				@Override
-				public void onResult(EventFilterResponseData result) {
-					UserInEvent[] userInEvents = result.getUserInEvents();
-					if (userInEvents == null) userInEvents = new UserInEvent[0];
+                @Override
+                public void onResult(EventFilterResponseData result) {
+                    UserInEvent[] userInEvents = result.getUserInEvents();
+                    if (userInEvents == null) userInEvents = new UserInEvent[0];
 
-					OrganizationInEvent[] orgInEvents = result.getOrganizationInEvents();
-					if (orgInEvents == null) orgInEvents = new OrganizationInEvent[0];
+                    OrganizationInEvent[] orgInEvents = result.getOrganizationInEvents();
+                    if (orgInEvents == null) orgInEvents = new OrganizationInEvent[0];
 
-					Event[] events = result.getEvents();
-					if (events == null) events = new Event[0];
-
-					onEventsLoaded(events, userInEvents, orgInEvents);
-				}
-			}, this);
+                    onEventsLoaded(userInEvents, orgInEvents);
+                }
+            }, this);
+            loader.reload();
 		}
 	}
 
-	private void onEventsLoaded(Event[] events, UserInEvent[] userInEvents,
-			OrganizationInEvent[] orgInEvents) {
-		this.events = events;
+	private void onEventsLoaded(UserInEvent[] userInEvents, OrganizationInEvent[] orgInEvents) {
 		this.orgInEvents = orgInEvents;
 		
 		registeredEventIds.clear();
@@ -143,7 +137,7 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 		}
 
 		adapter.notifyDataSetChanged();
-		if (events.length == 0) preregister.setVisibility(View.VISIBLE);
+		if (orgInEvents.length == 0) preregister.setVisibility(View.VISIBLE);
 	}
 
 	@Override
@@ -152,6 +146,7 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 		setContentView(R.layout.activity_organization);
 
 		organization = IntentHelper.getOrganization(getIntent());
+        user = IntentHelper.getUser(getIntent());
 
 		getSupportActionBar().setTitle(organization.getName());
 
@@ -171,12 +166,12 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 
 		@Override
 		public int getCount() {
-			return events.length;
+			return orgInEvents.length;
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return events[position];
+			return orgInEvents[position];
 		}
 
 		@Override
@@ -190,8 +185,8 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 				convertView = getLayoutInflater().inflate(android.R.layout.simple_list_item_2, parent, false);
 			}
 
-			Event event = events[position];
-			boolean registered = registeredEventIds.contains(event.getId());
+			OrganizationInEvent event = orgInEvents[position];
+			boolean registered = registeredEventIds.contains(event.getEventId());
 
 			TextView title = (TextView) convertView.findViewById(android.R.id.text1);
 			title.setText(event.getName() + (registered ? " (zaregistrován)" : ""));
@@ -206,16 +201,23 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 
 	public static class IntentHelper {
 		private static final String EXTRA_ORGANIZATION = "organization";
+        private static final String EXTRA_USER = "user";
 
-		public static Intent create(Context c, Organization o) {
+		public static Intent create(Context c, Organization o, User myself) {
 			Intent i = new Intent(c, OrganizationActivity.class);
 			i.putExtra(EXTRA_ORGANIZATION, o);
+            i.putExtra(EXTRA_USER, myself);
 			return i;
 		}
 
 		public static Organization getOrganization(Intent i) {
 			return (Organization) i.getSerializableExtra(EXTRA_ORGANIZATION);
 		}
+
+        public static User getUser(Intent i) {
+            return (User) i.getSerializableExtra(EXTRA_USER);
+        }
+
 	}
 
 }

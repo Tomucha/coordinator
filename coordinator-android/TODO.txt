@@ -30,3 +30,4 @@ Pridat POI
 Preload map
 Pady
 Aktualizovat uzivatele i kdyz odejde z app
+v seznamu eventu zobrazovat jen ty, kde jsem registrovany, nebo kam se LZE registrovat

@@ -17,6 +17,10 @@ public class CloneTool {
 
     @SuppressWarnings({"unchecked"})
     public static <T extends Serializable> T deepClone(T toClone) {
+        // FIXME: tohle je uplne nahovno, rozhodne neni dobrej napad pouzivat to pri updatech entit
+        // melo by byt jasne viditelny a DANY co update(entity) dela a mely by existovat bud flagy,
+        // nebo ruzny update metody, ktery upravi jen to co je potreba
+
         //return cloner.deepClone(toClone);
         if (toClone == null) return null;
         try {

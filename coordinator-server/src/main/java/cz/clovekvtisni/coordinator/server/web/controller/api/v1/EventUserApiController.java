@@ -69,12 +69,4 @@ public class EventUserApiController extends AbstractApiController {
         return okResult(new UserUpdatePositionResponseData(updated.buildTargetEntity()));
     }
 
-    @RequestMapping(value = "/register-push-token-android", method = RequestMethod.POST)
-    public @ResponseBody ApiResponse registerPushTokenAndroid(HttpServletRequest request) {
-        UserPushTokenRequestParams params = parseRequest(request, UserPushTokenRequestParams.class);
-        userService.registerPushTokenAndroid(params.getToken());
-        return okResult(null);
-    }
-
-
 }

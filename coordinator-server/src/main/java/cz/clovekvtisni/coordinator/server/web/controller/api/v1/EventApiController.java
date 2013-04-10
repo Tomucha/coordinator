@@ -70,18 +70,13 @@ public class EventApiController extends AbstractApiController {
             responseData.setOrganizationInEvents(getEventsByOrganizationId(params.getOrganizationId(), eventIds));
         }
 
-        if (eventIds.size() > 0) {
-            List<EventEntity> events = eventService.findByIds(EventService.FLAG_FETCH_LOCATIONS, eventIds.toArray(new Long[0]));
-            responseData.setEvents(new EntityTool().buildTargetEntities(events));
-        }
-
         return okResult(responseData);
     }
 
     private List<OrganizationInEvent> getEventsByOrganizationId(String organizationId, Set<Long> eventIds) {
         OrganizationInEventFilter filter = new OrganizationInEventFilter();
         filter.setOrganizationIdVal(organizationId);
-        ResultList<OrganizationInEventEntity> eventsByOrg = organizationInEventService.findByFilter(filter, 0, null, 0l);
+        ResultList<OrganizationInEventEntity> eventsByOrg = organizationInEventService.findByFilter(filter, 0, null, OrganizationInEventService.FLAG_FETCH_EVENT);
         for (OrganizationInEventEntity entity : eventsByOrg.getResult()) {
             eventIds.add(entity.getEventId());
         }

@@ -67,9 +67,10 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 	private Organization organization;
 
 	private ConfigResponse config;
+    private User user;
 
-	private void initWizardModel(Bundle state) {
-		mWizardModel = new WizardModel(this, organization, config);
+    private void initWizardModel(Bundle state) {
+		mWizardModel = new WizardModel(this, organization, config, user);
 		if (state != null) mWizardModel.load(state.getBundle("model"));
 		mWizardModel.registerListener(this);
 		mCurrentPageSequence = mWizardModel.getCurrentPageSequence();
@@ -128,6 +129,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 		Intent intent = getIntent();
 		organization = IntentHelper.getOrganization(intent);
 		event = IntentHelper.getEvent(intent);
+        user = IntentHelper.getUser(intent);
 
 		getSupportActionBar().setTitle(event == null ? "Předregistrace" : event.getName());
 
@@ -157,6 +159,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 
 			@Override
 			public void onInternetException(Exception e) {
+                Lg.API.e("Cannot load config: "+e, e);
                 UiTool.toast(R.string.error_no_internet, getApplicationContext());
 			}
 		}, this);
@@ -288,7 +291,11 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 		protected void doInBackground() {
 			try {
 				RegisterResponseData result = new UserRegisterCall(params).call();
-				Settings.setAuthKey(result.getAuthKey());
+
+                if (result.getAuthKey() != null) {
+                    // auth key was changed
+				    Settings.setAuthKey(result.getAuthKey());
+                }
 				
 				try {
 					String regId = Settings.getGcmRegistrationId();
@@ -392,17 +399,23 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 	public static class IntentHelper {
 		private static final String EXTRA_EVENT = "event";
 		private static final String EXTRA_ORGANIZATION = "organization";
+        private static final String EXTRA_USER = "user";
 
-		public static Intent create(Context c, Organization o, Event e) {
+        public static Intent create(Context c, Organization o, Event e, User user) {
 			Intent i = new Intent(c, RegisterActivity.class);
 			i.putExtra(EXTRA_ORGANIZATION, o);
 			i.putExtra(EXTRA_EVENT, e);
+            i.putExtra(EXTRA_USER, user);
 			return i;
 		}
 
 		public static Event getEvent(Intent i) {
 			return (Event) i.getSerializableExtra(EXTRA_EVENT);
 		}
+
+        public static User getUser(Intent i) {
+            return (User) i.getSerializableExtra(EXTRA_USER);
+        }
 
 		public static Organization getOrganization(Intent i) {
 			return (Organization) i.getSerializableExtra(EXTRA_ORGANIZATION);
