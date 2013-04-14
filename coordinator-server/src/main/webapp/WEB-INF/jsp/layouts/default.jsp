@@ -24,7 +24,7 @@
             <div class="row-fluid">
 
                 <div class="span3">
-                    <div class="activityPanel well sidebar-nav">
+                    <div class="activityPanel well sidebar-nav" style="width:15em">
                         <h3><s:message code="title.activityFeed"/></h3>
                         <c:choose>
                             <c:when test="${not empty activity}">
