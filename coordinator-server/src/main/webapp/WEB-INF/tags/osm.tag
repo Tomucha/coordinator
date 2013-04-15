@@ -142,14 +142,25 @@
     var currentPopupUrl;
     var points = {};
 
+    var DONT_SAVE = true;
+
     var CoordinatorMap = {
 
         clickHandlers: {},
 
         limits: {},
 
-        goTo: function(lon, lat) {
-            map.setCenter(CoordinatorMap.position(lon, lat));
+        saveUserPreset: function() {
+            var zoom = map.getZoom();
+            var lonLat = map.getCenter();
+            $.cookie(eventId+"mapPreset", zoom+"/"+lonLat.lon+"/"+lonLat.lat, { expires: 30, path: '/' });
+        },
+
+        goTo: function(lon, lat, zoom, dontSave) {
+            map.setCenter(CoordinatorMap.position(lon, lat), zoom);
+            if (dontSave != DONT_SAVE) {
+                CoordinatorMap.saveUserPreset();
+            }
         },
 
         position: function(lon, lat) {
@@ -305,7 +316,21 @@
         setOnClickAddPoint: function(popupUrl) {
             CoordinatorMap.setState(STATE_SET_LOCATION);
             currentPopupUrl = popupUrl;
+        },
+
+        onMapChanged: function() {
+            CoordinatorMap.saveUserPreset();
+            refreshMarkers();
+            osmCallback.onMapChange();
+        },
+
+        goToUserPreset: function() {
+            var value = $.cookie(eventId+"mapPreset");
+            if (value == undefined) return;
+            var values = value.split("/");
+            map.setCenter(new OpenLayers.LonLat(parseFloat(values[1]), parseFloat(values[2])), parseInt(values[0]));
         }
+
     };
 
     // click control
@@ -362,22 +387,24 @@
         map.addLayer(markerLayer);
         map.addLayer(singleMarkerLayer);
 
-        map.events.register('zoomend', null, function() { refreshMarkers(); osmCallback.onMapChange();} );
-        map.events.register('moveend', null, function() { refreshMarkers(); osmCallback.onMapChange();} );
-
         var click = new OpenLayers.Control.Click();
         map.addControl(click);
         click.activate();
 
-        map.setCenter(CoordinatorMap.position(${!empty longitude ? longitude : 14.4489967}, ${!empty latitude ? latitude : 50.0789306}), <c:out value="${!empty zoom ? zoom : 15}"/>);
+        CoordinatorMap.goTo(${!empty longitude ? longitude : 14.4489967}, ${!empty latitude ? latitude : 50.0789306}, ${!empty zoom ? zoom : 15}, DONT_SAVE);
+
+        CoordinatorMap.goToUserPreset();
 
         osmCallback.onLoad();
+
+        map.events.register('zoomend', null, CoordinatorMap.onMapChanged );
+        map.events.register('moveend', null, CoordinatorMap.onMapChanged );
 
     });
 
     function searchAddress(address) {
         $.getJSON("${root}/admin/event/map/api/address?query="+address, function(response) {
-            map.setCenter(CoordinatorMap.position(response.longitude, response.latitude, 15));
+            goTo(response.longitude, response.latitude, 15);
         });
     }
 
