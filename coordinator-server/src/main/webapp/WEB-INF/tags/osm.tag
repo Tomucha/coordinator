@@ -397,6 +397,8 @@
 
         osmCallback.onLoad();
 
+        refreshMarkers();
+
         map.events.register('zoomend', null, CoordinatorMap.onMapChanged );
         map.events.register('moveend', null, CoordinatorMap.onMapChanged );
 

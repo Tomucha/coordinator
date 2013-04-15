@@ -13,22 +13,21 @@
 </script>
 <script type="text/javascript">
 
-    function onNewPoint(point) {
+    osmCallback.onNewPoint = function(point) {
         $("#latitudeInput").val(point.latitude);
         $("#longitudeInput").val(point.longitude);
     }
 
-    function initialize() {
-        CoordinatorMap.setOnClickAddPoint(TYPE_POI);
+    osmCallback.onLoad = function() {
+        CoordinatorMap.setOnClickAddPoint();
 
         <c:if test="${!empty form.lastLocationLatitude and !empty form.lastLocationLongitude}">
-        CoordinatorMap.addPoint({
-            type: TYPE_POI,
-            icon: ICON_GENERIC,
+        CoordinatorMap.addSinglePoint({
             poiId: <c:out value="${form.id}"/>,
             longitude: <c:out value="${form.lastLocationLongitude}"/>,
             latitude: <c:out value="${form.lastLocationLatitude}"/>
         });
+        CoordinatorMap.goTo(<c:out value="${form.lastLocationLongitude}"/>, <c:out value="${form.lastLocationLatitude}"/>);
         </c:if>
     }
 
