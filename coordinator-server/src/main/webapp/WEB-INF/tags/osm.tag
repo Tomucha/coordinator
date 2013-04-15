@@ -4,11 +4,6 @@
         attribute name="zoom" required="false" type="java.lang.Integer" %><%@
         attribute name="longitude" required="false" %><%@
         attribute name="latitude" required="false" %><%@
-        attribute name="onMapChange" required="false" %><%@
-        attribute name="onLoad" required="false" %><%@
-        attribute name="onNewPoint" required="false" %><%@
-        attribute name="buttons" required="false" %><%@
-        attribute name="maxPoints" required="false" %><%@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags"
 %>
@@ -25,6 +20,92 @@
 <!--<script type="text/javascript" src="${root}/js/osm/OpenLayers.js"></script>-->
 <script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
 <script type="text/javascript" src="${root}/js/openlayers-plugin.js"></script>
+
+
+<script type="text/javascript">
+
+    var eventId = ${event.id};
+
+    function refreshMarkers() {
+        CoordinatorMap.clearMarkers();
+        var bounds = map.getExtent();
+        var proj = new OpenLayers.Projection("EPSG:4326");
+        bounds.transform(map.getProjectionObject(), proj);
+
+        if ($("#showpois").prop("checked")) {
+            fillPoiMarkers(bounds);
+            //$("#poisFilter").slideDown();
+        } else {
+            //$("#poisFilter").slideUp();
+        }
+
+        if ($("#showusers").prop("checked")) {
+            fillUserMarkers(bounds);
+            //$("#usersFilter").slideDown();
+        } else {
+            //$("#usersFilter").slideUp();
+        }
+    }
+
+    function fillPoiMarkers(bounds) {
+        var url = root+"/admin/event/map/api/poi";
+
+        var arrBounds = bounds.toArray(); //array order: left, bottom, right, top
+        var request = {
+            eventId: eventId,
+            latS : arrBounds[1], latN : arrBounds[3],
+            lonW: arrBounds[0], lonE : arrBounds[2],
+            // let's add also the filter
+            workflowId: $("#workflowId").val(),
+            workflowStateId: $("#workflowStateId").val()
+        };
+        var decodedRequest = $.param(request);
+
+        $.getJSON(url, decodedRequest, function(response, txt) {
+            $.each(response, function(i, item) {
+                item.popupUrl = "${root}/admin/event/map/popup/poi?poiId="+item.id+"&eventId=${event.id}",
+                        item.type = TYPE_POI;
+                item.icon = ICON_POI[item.poiCategoryId];
+                CoordinatorMap.addPoint(item);
+            });
+        });
+    }
+
+    function fillUserMarkers(bounds) {
+        var url = root+"/admin/event/map/api/user";
+
+        var arrBounds = bounds.toArray(); //array order: left, bottom, right, top
+        var request = {
+            eventId: eventId,
+            latS : arrBounds[1], latN : arrBounds[3],
+            lonW: arrBounds[0], lonE : arrBounds[2]
+        };
+        var decodedRequest = $.param(request);
+        $.getJSON(url, decodedRequest, function(response, txt) {
+            $.each(response, function(i, item) {
+                item.name = item.userEntity.fullName;
+                item.popupUrl = "${root}/admin/event/map/popup/user?userId="+item.userId+"&eventId=${event.id}",
+                        item.type = TYPE_USER;
+                item.icon = ICON_USER;
+                item.latitude = item.lastLocationLatitude;
+                item.longitude = item.lastLocationLongitude;
+                CoordinatorMap.addPoint(item);
+            });
+        });
+    }
+
+/*
+    //osmCallback.onLoad = function() {
+        //CoordinatorMap.setOnClickAddPoint(TYPE_POI, "${root}/admin/event/map/popup/poi?eventId=${event.id}");
+        //refreshMarkers();
+    }
+
+    osmCallback.onMapChange = function() {
+        refreshMarkers();
+    }
+*/
+
+</script>
 
 <script>
     var map, mapLayer, markerLayer, fromProjection, toProjection;
@@ -67,6 +148,10 @@
         clickHandlers: {},
 
         limits: {},
+
+        goTo: function(lon, lat) {
+            map.setCenter(CoordinatorMap.position(lon, lat));
+        },
 
         position: function(lon, lat) {
             return new OpenLayers.LonLat(lon, lat).transform( fromProjection, toProjection);
@@ -119,9 +204,7 @@
 
             markerLayer.addMarker(marker);
 
-            <c:if test="${!empty onNewPoint}">
-            ${onNewPoint}(point);
-            </c:if>
+            osmCallback.onNewPoint(point);
 
             return point;
         },
@@ -209,16 +292,6 @@
         }
     };
 
-    <c:if test="${!empty maxPoints}">
-    var tok = "<c:out value="${maxPoints}"/>".split(",");
-    for (i in tok) {
-        var vals = tok[i].split("=");
-        if (vals.length == 2) {
-            CoordinatorMap.limits[vals[0].replace(/\s*/, "")] = parseInt(vals[1].replace(/\s*/, ""));
-        }
-    }
-    </c:if>
-
     // click control
     OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
         defaultHandlerOptions: {
@@ -267,10 +340,8 @@
         map.addLayer(mapLayer);
         map.addLayer(markerLayer);
 
-        <c:if test="${not empty onMapChange}">
-        map.events.register('zoomend', null, function() { ${onMapChange} });
-        map.events.register('moveend', null, function() { ${onMapChange} });
-        </c:if>
+        map.events.register('zoomend', null, function() { refreshMarkers(); osmCallback.onMapChange();} );
+        map.events.register('moveend', null, function() { refreshMarkers(); osmCallback.onMapChange();} );
 
         var click = new OpenLayers.Control.Click();
         map.addControl(click);
@@ -278,9 +349,8 @@
 
         map.setCenter(CoordinatorMap.position(${!empty longitude ? longitude : 14.4489967}, ${!empty latitude ? latitude : 50.0789306}), <c:out value="${!empty zoom ? zoom : 15}"/>);
 
-        <c:if test="${!empty onLoad}">
-            <c:out value="${onLoad}"/>;
-        </c:if>
+        osmCallback.onLoad();
+
     });
 
     function searchAddress(address) {
@@ -304,47 +374,11 @@
     <div id="mapPopupContainer"></div>
 </div>
 
-<%--
-<div id="locationEditForm" style="display: none;">
-    <div>
-        <p><b><s:message code="label.eventLocation"/></b></p>
-        <input type="hidden" name="id"/>
-        <input name="radius" size="4"/> km
+<div class="row-fluid">
+    <div class="span2">
+        <label class="checkbox"><input type="checkbox" id="showusers" onchange="refreshMarkers()" checked="checked"/> <s:message code="label.showUsers"/></label>
     </div>
-    <div>
-        <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
-        <button type="button" onclick="CoordinatorMap.closeAndSavePopup()"><s:message code="button.ok"/></button>
+    <div class="span2">
+        <label class="checkbox"><input type="checkbox" id="showpois" onchange="refreshMarkers()" checked="checked"/> <s:message code="label.showPois"/></label>
     </div>
 </div>
-
-<div id="userForm" style="display: none;">
-    <div>
-        <p><b><s:message code="label.userLastLocation"/></b></p>
-        <input type="hidden" name="id"/>
-        <input name="name" readonly="readonly" size="4"/>
-        <form action="${root}/admin/event/user/edit">
-            <div>
-                <input type="hidden" name="userId"/>
-                <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
-                <button type="submit"><s:message code="button.edit"/></button>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-<div id="poiForm" style="display: none;">
-    <div>
-        <p><b><s:message code="label.poi"/></b></p>
-        <input type="hidden" name="id"/>
-        <input name="description" readonly="readonly"/>
-        <form action="${root}/admin/event/poi/edit">
-            <div>
-                <input type="hidden" name="poiId"/>
-                <input type="hidden" name="eventId"/>
-                <button type="button" onclick="CoordinatorMap.closePopup()"><s:message code="button.cancel"/></button>
-                <button type="submit"><s:message code="button.edit"/></button>
-            </div>
-        </form>
-    </div>
-</div>--%>

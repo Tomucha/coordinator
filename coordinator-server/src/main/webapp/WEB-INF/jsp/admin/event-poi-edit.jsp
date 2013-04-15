@@ -6,6 +6,8 @@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %><script type="text/javascript">
 
+    $
+
     function onNewPoint(point) {
        $("#latitudeInput").val(point.latitude);
        $("#longitudeInput").val(point.longitude);
@@ -33,7 +35,6 @@
 
 <div class="fluid">
     <div class="row-fluid">
-        <div class="mini-layout span4">
             <sf:form method="POST" action="${root}/admin/event/poi/edit" modelAttribute="form">
 
                 <sf:errors />
@@ -106,21 +107,6 @@
 
 
             </sf:form>
-        </div>
-        <div class="mini-layout span4">
-            <tags:osm
-                    width="400px"
-                    height="300px"
-                    longitude="${!empty form.longitude ? form.longitude : event.firstEventLocation.longitude}"
-                    latitude="${!empty form.latitude ? form.latitude : event.firstEventLocation.latitude}"
-                    zoom="13"
-                    onLoad="initialize()"
-                    onNewPoint="onNewPoint"
-                    maxPoints="poi=1"
-                    buttons="addPoi"
-                    />
-
-        </div>
     </div>
 </div>
 

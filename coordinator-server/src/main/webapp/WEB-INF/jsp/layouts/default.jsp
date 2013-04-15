@@ -23,8 +23,8 @@
         <div class="container-fluid">
             <div class="row-fluid">
 
-                <div class="span3">
-                    <div class="activityPanel well sidebar-nav" style="width:15em">
+                <div class="span2">
+                    <div class="activityPanel well sidebar-nav">
                         <h3><s:message code="title.activityFeed"/></h3>
                         <c:choose>
                             <c:when test="${not empty activity}">
@@ -43,7 +43,7 @@
                 </div>
                 <!--/span-->
 
-                <div class="span9">
+                <div class="span5">
                     <ul class="nav nav-pills">
                         <c:if test="${!empty breadcrumbs}">
                             <c:forEach items="${breadcrumbs}" var="breadcrumb">
@@ -64,6 +64,16 @@
                     </div>
 
                 </div>
+
+                <div class="span5">
+                    <tags:osm
+                        width="95%"
+                        height="600px"
+                        latitude="${event.firstEventLocation.latitude}"
+                        longitude="${event.firstEventLocation.longitude}"
+                    />
+                </div>
+
             </div>
         </div>
     </body>

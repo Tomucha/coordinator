@@ -35,7 +35,7 @@
                     <c:otherwise>
                         <ul>
                             <c:forEach items="${currentEvents}" var="event">
-                                <li><a href="${root}/admin/event/map?eventId=${event.id}"><c:out value="${event.name}"/></a><br/>
+                                <li><a href="${root}/admin/event/poi/list?eventId=${event.id}"><c:out value="${event.name}"/></a><br/>
                                    <c:out value="${event.description}"/></li>
                             </c:forEach>
                          </ul>

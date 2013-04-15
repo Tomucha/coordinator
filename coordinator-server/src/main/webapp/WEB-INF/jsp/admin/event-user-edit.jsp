@@ -50,7 +50,7 @@
 
             <div class="fluid">
                 <div class="row-fluid">
-                    <div class="mini-layout span3">
+                    <div class="mini-layout span6">
                         <div>
                             <c:choose>
                                 <c:when test="${can:isSuperadmin() and empty form.id}">
@@ -154,7 +154,7 @@
                         </div>
                     </div>
 
-                    <div class="mini-layout span3">
+                    <div class="mini-layout span6">
 
                         <div class="panel checkboxList">
                             <h3><s:message code="header.equipmentList"/></h3>
@@ -179,19 +179,6 @@
 
                     </div>
 
-                    <div class="mini-layout span3">
-                        <tags:osm
-                                width="400px"
-                                height="300px"
-                                longitude="${!empty form.lastLocationLongitude ? form.lastLocationLongitude : event.firstEventLocation.longitude}"
-                                latitude="${!empty form.lastLocationLatitude ? form.lastLocationLatitude : event.firstEventLocation.latitude}"
-                                zoom="13"
-                                onLoad="initialize()"
-                                onNewPoint="onNewPoint"
-                                maxPoints="poi=1"
-                                buttons="addPoi"
-                                />
-                    </div>
                 </div>
             </div>
 

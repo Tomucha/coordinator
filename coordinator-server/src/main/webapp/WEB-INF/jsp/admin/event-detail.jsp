@@ -4,14 +4,12 @@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
-%><c:choose>
-    <c:when test="${!form.new or !empty eventList}">
+%>
         <script>
             $(function() {
                 $( "#datePublishInput" ).datepicker({dateFormat: "dd.mm.yy"});
                 $( "#dateClosedInput" ).datepicker({dateFormat: "dd.mm.yy"});
                 $( "#dateClosedRegistrationInput" ).datepicker({dateFormat: "dd.mm.yy"});
-            });
         </script>
 
         <sf:form method="POST" modelAttribute="form">
@@ -47,7 +45,7 @@
 
             <div class="fluid">
                 <div class="row-fluid">
-                    <div class="mini-layout span4">
+                    <div class="mini-layout span6">
                         <div>
                             <tags:input field="name" modelAttribute="form" captionCode="OrganizationInEventEntity.name">
                                 <sf:input path="name"/>
@@ -85,7 +83,7 @@
                         </div>
                     </div>
 
-                    <div class="mini-layout span4">
+                    <div class="mini-layout span6">
                         <div class="panel checkboxList">
                             <h4><s:message code="header.equipmentList"/></h4>
                             <sf:checkboxes path="registrationEquipment" items="${config.equipmentList}" itemLabel="name" itemValue="id"/>
@@ -103,8 +101,3 @@
                 <button type="submit" class="btn btn-primary"><span class="icon-ok icon-white"></span> <s:message code="button.save"/></button>
             </div>
         </sf:form>
-    </c:when>
-    <c:otherwise>
-        <p><s:message code="msg.noEventsFound"/></p>
-    </c:otherwise>
-</c:choose>

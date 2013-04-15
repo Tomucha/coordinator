@@ -17,15 +17,12 @@ Tag renders user list header or a line with detail.
     <c:when test="${renderHeader}">
         <th><s:message code="label.name"/></th>
         <th><s:message code="label.phone"/></th>
-        <th><s:message code="label.status"/></th>
         <th><s:message code="label.lastTask"/></th>
         <th><s:message code="label.roles"/></th>
         <th><s:message code="label.userGroups"/></th>
     </c:when>
     <c:otherwise>
-        <th><img src="${root}/images/icons/male-2.png" class="pull-left"/><c:out value="${user.userEntity.fullName}"/></th>
-        <td><c:out value="${user.userEntity.phone}"/></td>
-        <td>
+        <td><img src="${root}/images/icons/male-2.png" class="pull-left"/><strong><c:out value="${user.userEntity.fullName}"/></strong><br/>
             <c:choose>
                 <c:when test="${user.userEntity.suspended}">
                                             <span class="alert alert-error"
@@ -37,6 +34,7 @@ Tag renders user list header or a line with detail.
                 </c:when>
             </c:choose>
         </td>
+        <td><c:out value="${user.userEntity.phone}"/></td>
         <td>
             <c:if test="${!empty user.lastPoiEntity}">
                 <a href="<s:url value="${root}/admin/event/poi/edit?eventId=${user.lastPoiEntity.eventId}&poiId=${user.lastPoiEntity.id}"/>"><c:out value="${user.lastPoiEntity.name}"/></a>

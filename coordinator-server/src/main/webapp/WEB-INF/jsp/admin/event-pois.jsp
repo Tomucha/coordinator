@@ -33,6 +33,7 @@
 
     <div class="searchFormPanel" id="searchFormPanel" style="display: none;">
         <sf:form action="" modelAttribute="params" method="get">
+
             <tags:hiddenEvent/>
             <label><s:message code="label.workflow"/>:</label>
             <sf:select path="workflowId">
@@ -65,47 +66,36 @@
                             <th></th>
                             <th><s:message code="PoiEntity.name"/></th>
                             <th><s:message code="PoiEntity.poiCategory"/></th>
-                            <th><s:message code="label.locality"/></th>
-                            <th><s:message code="PoiEntity.userCount"/></th>
                             <th><s:message code="PoiEntity.workflow"/></th>
-                            <th><s:message code="PoiEntity.workflowState"/></th>
                             <th><s:message code="label.action"/></th>
                         </tr>
                         </thead>
                         <tbody>
                         <c:forEach items="${poiList}" var="poi" varStatus="i">
-                            <tr>
+                            <tr onclick="CoordinatorMap.goTo(${poi.longitude}, ${poi.latitude});">
                                 <td><input type="checkbox" name="selectedPois[${i.index}]" value="${poi.id}"/>
 
                                 </td>
                                 <td><img src="${root}${poi.poiCategory.icon}" class="pull-left"/>
-                                    <b><c:out value="${poi.name}"/></b>
+                                    <b title="<c:out value="${poi.description}"/>"><c:out value="${poi.name}"/></b>
                                     <tags:poiStatusIcon poi="${poi}"/>
-                                    <br/>
-                                    <small><c:out value="${poi.description}"/></small>
                                 </td>
                                 <td>
-                                    <c:out value="${poi.poiCategory.name}"/>
-                                    <br/>
-                                    <small><c:out value="${poi.poiCategory.description}"/></small>
+                                    <span title="<c:out value="${poi.poiCategory.description}"/>"><c:out value="${poi.poiCategory.name}"/></span>
                                 </td>
-                                <td><tags:gps longitude="${poi.longitude}" latitude="${poi.latitude}"/></td>
-                                <td><c:out value="${poi.userCount}"/></td>
-                                <td><c:out value="${poi.workflow.name}"/><br/>
-                                    <small><c:out value="${poi.workflow.description}"/></small>
-                                </td>
+                                <%--<td><tags:gps longitude="${poi.longitude}" latitude="${poi.latitude}"/></td>--%>
                                 <td>
                                     <c:if test="${!empty poi.workflowId}">
+                                    <span title="<c:out value="${poi.workflow.description}"/>"></span><c:out value="${poi.workflow.name}"/> (<c:out value="${poi.userCount}"/>)</span>
+                                    <br/>
                                         <a href="${root}/admin/event/poi/workflow?poiId=<c:out value='${poi.id}'/>&eventId=${event.id}">
-                                           <c:out value="${poi.workflowState.name}"/><br/>
-                                           <small><c:out value="${poi.workflowState.description}"/></small>
+                                           <span title="<c:out value="${poi.workflowState.description}"/>"><c:out value="${poi.workflowState.name}"/></span>
                                         </a>
                                     </c:if>
                                 </td>
                                 <td>
                                     <a class="btn"
-                                       href="<s:url value="${root}/admin/event/poi/edit?eventId=${poi.eventId}&poiId=${poi.id}"/>"><span class=" icon-pencil"></span> <s:message
-                                            code="button.edit"/></a>
+                                       href="<s:url value="${root}/admin/event/poi/edit?eventId=${poi.eventId}&poiId=${poi.id}"/>"><span class=" icon-pencil"></span> <s:message code="button.edit"/></a>
                                 </td>
                             </tr>
                         </c:forEach>
