@@ -35,7 +35,7 @@
 
     <workflow_list>
 
-        <workflow id="wkfl_zdravotnik" name="Zdravotnické úkoly" can_be_started_by="ANONYMOUS">
+        <workflow id="wkfl_zdravotnik" name="Zdravotnický úkol" can_be_started_by="ANONYMOUS">
             <description>Zdravotnické úkoly</description>
             <state id="wkfl_zdrv_state1" name="Nový zdravotnický úkol" visible_for_role="COORDINATOR, ZDRAVOTNIK"
                    editable_for_role="COORDINATOR, ZDRAVOTNIK" type="STARTED">
@@ -72,7 +72,7 @@
             </state>
         </workflow>
 
-        <workflow id="wkfl_prace" name="Běžné pracovní úkoly" can_be_started_by="BACKEND">
+        <workflow id="wkfl_prace" name="Pracovní úkol" can_be_started_by="BACKEND">
             <description>Běžné pracovní úkoly</description>
             <state id="wkfl_prace_state1" name="Nový úkol" visible_for_role="COORDINATOR, BACKEND"
                    editable_for_role="COORDINATOR, BACKEND" type="STARTED">
@@ -158,17 +158,17 @@
     </organization_list>
 
     <poi_category_list>
-        <poi_category id="poiZdravotnik" name="Zdravotníka" icon="/images/icons/firstaid.png"
+        <poi_category id="poiZdravotnik" name="Zdravotník" icon="/images/icons/firstaid.png"
                       workflow_id="wkfl_zdravotnik">
             Práce pro zdravotníka
         </poi_category>
 
-        <poi_category id="poiPsychosoc" name="Psychosociálního šetření" icon="/images/icons/communitycentre.png"
+        <poi_category id="poiPsychosoc" name="Psychosociální šetření" icon="/images/icons/communitycentre.png"
                       workflow_id="wkfl_prace">
             Úkol v rámci psychosociálního šetření
         </poi_category>
 
-        <poi_category id="poiPsycho" name="Psychologická první pomoc" icon="/images/icons/sozialeeinrichtung.png"
+        <poi_category id="poiPsycho" name="Psychologická pomoc" icon="/images/icons/sozialeeinrichtung.png"
                       workflow_id="wkfl_prace">
             Psychologická první pomoc
         </poi_category>

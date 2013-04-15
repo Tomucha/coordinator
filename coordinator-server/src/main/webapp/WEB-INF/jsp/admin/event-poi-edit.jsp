@@ -6,25 +6,22 @@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %><script type="text/javascript">
 
-    $
-
-    function onNewPoint(point) {
+    osmCallback.onNewPoint = function(point) {
        $("#latitudeInput").val(point.latitude);
        $("#longitudeInput").val(point.longitude);
     }
 
-    function initialize() {
-        CoordinatorMap.setOnClickAddPoint(TYPE_POI);
+    osmCallback.onLoad = function() {
+        CoordinatorMap.setOnClickAddPoint();
 
         <c:if test="${!empty form.latitude and !empty form.longitude}">
-            CoordinatorMap.addPoint({
-                type: TYPE_POI,
-                icon: ICON_GENERIC,
+            CoordinatorMap.addSinglePoint({
                 poiId: <c:out value="${form.id}"/>,
                 longitude: <c:out value="${form.longitude}"/>,
                 latitude: <c:out value="${form.latitude}"/>
             });
-            </c:if>
+            CoordinatorMap.goTo(<c:out value="${form.longitude}"/>, <c:out value="${form.latitude}"/>);
+        </c:if>
     }
 
 </script>

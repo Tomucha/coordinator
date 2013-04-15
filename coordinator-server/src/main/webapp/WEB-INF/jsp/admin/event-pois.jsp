@@ -14,6 +14,14 @@
 
 <%--@elvariable id="config" type="cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig"--%>
 
+<script type="text/javascript">
+
+    osmCallback.onLoad = function() {
+        CoordinatorMap.setOnClickAddPoint("${root}/admin/event/map/popup/poi?eventId=${event.id}");
+    }
+
+</script>
+
 <h2><s:message code="header.poiList"/></h2>
 
 <div class="mainPanel">

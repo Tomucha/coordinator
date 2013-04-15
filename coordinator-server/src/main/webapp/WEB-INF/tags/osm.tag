@@ -108,7 +108,7 @@
 </script>
 
 <script>
-    var map, mapLayer, markerLayer, fromProjection, toProjection;
+    var map, mapLayer, markerLayer, singleMarkerLayer, fromProjection, toProjection;
 
     var idCounter = 0;
 
@@ -139,7 +139,6 @@
     var popup = null;
     var editedLocationMarker = null;
     var selectedPointId = null;
-    var currentPointType;
     var currentPopupUrl;
     var points = {};
 
@@ -167,13 +166,6 @@
 
         getState: function() {
             return state;
-        },
-
-        // @deprecated
-        disablePopup: function(pointType) {
-            CoordinatorMap.clickHandlers[pointType] = function(point) {
-                return null;
-            };
         },
 
         addPoint: function(point) {
@@ -204,17 +196,43 @@
 
             markerLayer.addMarker(marker);
 
+            return point;
+        },
+
+        addSinglePoint: function(point) {
+            singleMarkerLayer.clearMarkers();
+            var lonLat = CoordinatorMap.position(point.longitude, point.latitude);
+            var marker = new OpenLayers.Marker(lonLat, ICON_GENERIC.clone());
+            point.id = marker.id = "pointSingle" + (idCounter++);
+
+            if (point.popupUrl) {
+                marker.events.register("click", marker, function (event) {
+                    CoordinatorMap.closePopup();
+                    var url = point.popupUrl;
+                    url += url.substring("?") == -1 ? "?" : "&";
+                    url += "latitude=" + point.latitude + "&longitude=" + point.longitude;
+                    $("#mapPopupContainer").load(url, function () {
+                        popup = new OpenLayers.Popup(
+                                point.name,
+                                marker.lonlat,
+                                new OpenLayers.Size(250, 200),
+                                $("#mapPopupWindow").html()
+                        );
+                        map.addPopup(popup);
+                        popup.show();
+                    });
+                });
+            }
+
+            singleMarkerLayer.addMarker(marker);
+
             osmCallback.onNewPoint(point);
 
             return point;
         },
 
         clearMarkers: function() {
-            var length = markerLayer.markers.length;
-            var marker = null;
-            for (var i = 0 ; i < length ; i++) {
-                markerLayer.removeMarker(markerLayer.markers[0]);
-            }
+            markerLayer.clearMarkers();
         },
 
         getPointById: function(id) {
@@ -242,7 +260,7 @@
             delete points[id];
         },
 
-        trimLocations: function() {
+/*        trimLocations: function() {
             var counting = {};
             for (var i in points) {
                 var type = points[i].type;
@@ -268,7 +286,7 @@
                     }
                 }
             }
-        },
+        },*/
 
         getPoints: function() {
             return points;
@@ -279,16 +297,14 @@
                 map.removePopup(popup);
                 popup = null;
                 return true;
-            } else
+            } else {
                 return false;
+            }
         },
 
-        setOnClickAddPoint: function(type, popupUrl) {
-            if (CoordinatorMap.getState() != STATE_SET_LOCATION) {
-                CoordinatorMap.setState(STATE_SET_LOCATION);
-                currentPointType = type;
-                currentPopupUrl = popupUrl;
-            }
+        setOnClickAddPoint: function(popupUrl) {
+            CoordinatorMap.setState(STATE_SET_LOCATION);
+            currentPopupUrl = popupUrl;
         }
     };
 
@@ -307,24 +323,23 @@
             OpenLayers.Control.prototype.initialize.apply(this, arguments);
             this.handler = new OpenLayers.Handler.Click(
                     this, {
-                        'click': this.trigger
+                        'click': this.onMapClick
                     }, this.handlerOptions
             );
         },
 
-        trigger: function(event) {
-            if (!CoordinatorMap.closePopup() && CoordinatorMap.getState() == STATE_SET_LOCATION) {
+        onMapClick: function(event) {
+            if (CoordinatorMap.closePopup()) return;
+            if (CoordinatorMap.getState() == STATE_SET_LOCATION) {
                 var lonLat = CoordinatorMap.fromProjection(map.getLonLatFromPixel(event.xy));
                 var point = {
-                    type: currentPointType,
                     latitude: lonLat.lat,
-                    longitude: lonLat.lon,
-                    icon: ICON_GENERIC
+                    longitude: lonLat.lon
                 };
-                if (currentPopupUrl)
+                if (currentPopupUrl) {
                     point.popupUrl = currentPopupUrl;
-                CoordinatorMap.addPoint(point);
-                CoordinatorMap.trimLocations();
+                }
+                CoordinatorMap.addSinglePoint(point);
             }
         }
 
@@ -333,12 +348,19 @@
     $(document).ready(function() {
         map             = new OpenLayers.Map("mapContainer");
         mapLayer        = new OpenLayers.Layer.OSM();
+
+        // layer for loaded markers
         markerLayer     = new OpenLayers.Layer.Markers("markers");
+
+        // layer for one and only editable marker
+        singleMarkerLayer = new OpenLayers.Layer.Markers("singleMarker");
+
         fromProjection  = new OpenLayers.Projection("EPSG:4326");   // Transform from WGS 1984
         toProjection    = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
 
         map.addLayer(mapLayer);
         map.addLayer(markerLayer);
+        map.addLayer(singleMarkerLayer);
 
         map.events.register('zoomend', null, function() { refreshMarkers(); osmCallback.onMapChange();} );
         map.events.register('moveend', null, function() { refreshMarkers(); osmCallback.onMapChange();} );
