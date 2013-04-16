@@ -62,27 +62,35 @@ public class EventUserGroupEditController extends AbstractEventController {
 
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid UserGroupForm form, BindingResult bindingResult, Model model) {
-        if (form.getRetUrl() == null)
+        if (form.getRetUrl() == null) {
             form.setRetUrl("/admin/event/user/list");
+        }
 
         if (bindingResult.hasErrors()) {
+            logger.info("Has errors");
+
             // FIXME: refaktoring
 
             // populateEventModel(model, new EventFilterParams(form.getEventKey()));
             return "admin/event-usergroup-edit";
         }
 
-        if ("".equals(form.getRoleId()))
+        if ("".equals(form.getRoleId())) {
             form.setRoleId(null);
+        }
         UserGroupEntity userGroupEntity = new UserGroupEntity().populateFrom(form);
 
         try {
-            if (userGroupEntity.isNew())
+            if (userGroupEntity.isNew()) {
+                logger.info("Create new group: "+userGroupEntity);
                 userGroupEntity = userGroupService.createUserGroup(userGroupEntity);
-            else
+            } else {
+                logger.info("Update group: "+userGroupEntity);
                 userGroupEntity = userGroupService.updateUserGroup(userGroupEntity);
+            }
 
         } catch (UniqueKeyViolation e) {
+            logger.error("Unique key violation "+e);
             addFieldError(bindingResult, "form", "name", form.getName(), "error.UNIQUE_KEY_VIOLATION");
             return "admin/event-usergroup-edit";
         }

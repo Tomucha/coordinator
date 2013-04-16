@@ -13,7 +13,8 @@ import cz.clovekvtisni.coordinator.android.event.map.view.TileId;
 import cz.clovekvtisni.coordinator.domain.EventLocation;
 
 public class PreloadTool {
-	private static final int DEFAULT_RADIUS_METERS = 400;
+
+	private static final int DEFAULT_RADIUS_METERS = 2000;
 	private static final int MIN_OSM_ZOOM = 10;
 	private static final int MAX_OSM_ZOOM = 18;
 

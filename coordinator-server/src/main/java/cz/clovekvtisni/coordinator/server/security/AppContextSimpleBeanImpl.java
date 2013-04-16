@@ -1,8 +1,10 @@
 package cz.clovekvtisni.coordinator.server.security;
 
+import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 
 import java.util.Locale;
 
@@ -21,6 +23,8 @@ public class AppContextSimpleBeanImpl implements AppContext {
 
     /** If event is requested in URL, activeOrganizationInEvent for loggetUser is set */
     private OrganizationInEventEntity activeOrganizationInEvent;
+
+    private UserInEventEntity activeUserInEvent;
 
     private Locale locale;
 
@@ -60,6 +64,14 @@ public class AppContextSimpleBeanImpl implements AppContext {
     @Override
     public void setActiveOrganizationInEvent(OrganizationInEventEntity organizationInEvent) {
         this.activeOrganizationInEvent = organizationInEvent;
+    }
+
+    public UserInEventEntity getActiveUserInEvent() {
+        return activeUserInEvent;
+    }
+
+    public void setActiveUserInEvent(UserInEventEntity activeUserInEvent) {
+        this.activeUserInEvent = activeUserInEvent;
     }
 
     @Override

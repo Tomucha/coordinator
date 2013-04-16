@@ -28,18 +28,6 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
     private OrganizationInEventService organizationInEventService;
 
     @Override
-    public EventEntity findByEventId(String id, long flags) {
-        EventFilter filter = new EventFilter();
-        filter.setEventIdVal(id);
-        ResultList<EventEntity> result = ofy().findByFilter(filter, null, 1);
-        if (result.getResultSize() == 0) return null;
-        EventEntity event = result.firstResult();
-        populate(Arrays.asList(new EventEntity[] {event}), flags);
-
-        return  event;
-    }
-
-    @Override
     public EventEntity findById(Long id, long flags) {
         EventEntity entity = ofy().get(Key.create(EventEntity.class, id));
         if (entity != null)
@@ -88,7 +76,7 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
     @Override
     public EventEntity updateEvent(final EventEntity entity) {
         logger.debug("updating " + entity);
-        final EventEntity old = findByEventId(entity.getEventKey(), EventService.FLAG_FETCH_LOCATIONS);
+        final EventEntity old = findById(entity.getId(), EventService.FLAG_FETCH_LOCATIONS);
         return ofy().transact(new Work<EventEntity>() {
             @Override
             public EventEntity run() {
@@ -108,7 +96,7 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
         for (EventLocationEntity location : entity.getEventLocationEntityList()) {
             if (oldEntity == null)
                 location.setId(null);
-            location.setEventId(entity.getEventKey());
+            location.setEventId(entity.getId());
             location.setParentKey(entity.getKey());
             updateSystemFields(location, null);
             if (location.isDeleted())
@@ -123,7 +111,7 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
         // TODO
     }
 
-    private List<EventLocationEntity> getEventLocations(String eventId) {
+    private List<EventLocationEntity> getEventLocations(long eventId) {
         EventLocationFilter filter = new EventLocationFilter();
         filter.setEventIdVal(eventId);
 
@@ -136,7 +124,7 @@ public class EventServiceImpl extends AbstractEntityServiceImpl implements Event
         for (EventEntity entity : events) {
             if ((flags & EventService.FLAG_FETCH_LOCATIONS) != 0) {
                 EventLocationFilter filter = new EventLocationFilter();
-                filter.setEventIdVal(entity.getEventKey());
+                filter.setEventIdVal(entity.getId());
                 ResultList<EventLocationEntity> result = ofy().findByFilter(filter, null, 0);
                 entity.setEventLocationEntityList(result.getResult().toArray(new EventLocationEntity[0]));
             }

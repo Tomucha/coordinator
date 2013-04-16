@@ -52,7 +52,15 @@
         $("#groupId").change(function() {
             $("#assignGroupConfirm").hide();
         });
+
+
     });
+
+    osmCallback.onLoad = function() {
+        <c:if test="${!empty poi.latitude and !empty poi.longitude}">
+            CoordinatorMap.goTo(<c:out value="${poi.longitude}"/>, <c:out value="${poi.latitude}"/>);
+        </c:if>
+    }
 
 </script>
 
@@ -60,6 +68,10 @@
     <div class="eventForm">
 
         <sf:errors />
+
+        <c:if test="${!empty poi.latitude and !empty poi.longitude}">
+            <tags:zoomButton latitude="${poi.latitude}" longitude="${poi.longitude}"/>
+        </c:if>
 
         <tags:poiDetail poi="${poi}"/>
 

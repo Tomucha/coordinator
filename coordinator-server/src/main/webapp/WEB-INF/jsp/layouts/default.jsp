@@ -44,7 +44,7 @@
                 <!--/span-->
 
                 <div class="span5">
-                    <ul class="nav nav-pills">
+                    <ul class="nav nav-pills event-menu">
                         <c:if test="${!empty breadcrumbs}">
                             <c:forEach items="${breadcrumbs}" var="breadcrumb">
                                 <c:if test="${can:viewBreadcrumb(breadcrumb)}">

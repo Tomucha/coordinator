@@ -16,7 +16,6 @@ Tag renders user list header or a line with detail.
 <c:choose>
     <c:when test="${renderHeader}">
         <th><s:message code="label.name"/></th>
-        <th><s:message code="label.phone"/></th>
         <th><s:message code="label.lastTask"/></th>
         <th><s:message code="label.roles"/></th>
         <th><s:message code="label.userGroups"/></th>
@@ -33,8 +32,8 @@ Tag renders user list header or a line with detail.
                     <s:message code="RegistrationStatus.${user.status}"/>
                 </c:when>
             </c:choose>
+            <c:if test="${not empty user.userEntity.phone}"><br/><c:out value="${user.userEntity.phone}"/></c:if>
         </td>
-        <td><c:out value="${user.userEntity.phone}"/></td>
         <td>
             <c:if test="${!empty user.lastPoiEntity}">
                 <a href="<s:url value="${root}/admin/event/poi/edit?eventId=${user.lastPoiEntity.eventId}&poiId=${user.lastPoiEntity.id}"/>"><c:out value="${user.lastPoiEntity.name}"/></a>

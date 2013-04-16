@@ -5,6 +5,7 @@ import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 
 import java.util.Locale;
 
@@ -31,4 +32,9 @@ public interface AppContext {
     OrganizationInEventEntity getActiveOrganizationInEvent();
 
     void setActiveOrganizationInEvent(OrganizationInEventEntity organizationInEvent);
+
+    UserInEventEntity getActiveUserInEvent();
+
+    void setActiveUserInEvent(UserInEventEntity activeUserInEvent);
+
 }

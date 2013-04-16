@@ -22,9 +22,6 @@ public interface EventService extends Service {
     public static final long FLAG_FETCH_LOCATIONS = 1l;
 
     @FilterResult("#helper.canRead(#entity)")
-    EventEntity findByEventId(String id, long flags);
-
-    @FilterResult("#helper.canRead(#entity)")
     EventEntity findById(Long id, long flags);
 
     @FilterResult("#helper.canRead(#entity)")

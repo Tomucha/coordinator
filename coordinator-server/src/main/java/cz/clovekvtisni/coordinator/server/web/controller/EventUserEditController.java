@@ -62,14 +62,13 @@ public class EventUserEditController extends AbstractEventController {
             form.populateFrom(user);
             form.setUserId(user.getId());
             UserInEventEntity inEvent = fetchUserInEvent(params.getEventId(), userId);
-            if (inEvent == null)
-                NotFoundException.idNotExist();
-            form.setEventId(inEvent.getEventId());
-            form.setLastLocationLatitude(inEvent.getLastLocationLatitude());
-            form.setLastLocationLongitude(inEvent.getLastLocationLongitude());
+            form.setEventId(appContext.getActiveEvent().getId());
             if (inEvent != null) {
-                if (inEvent.getGroupIdList() != null)
+                if (inEvent.getGroupIdList() != null) {
                     form.setGroupIdList(Arrays.asList(inEvent.getGroupIdList()));
+                }
+                form.setLastLocationLatitude(inEvent.getLastLocationLatitude());
+                form.setLastLocationLongitude(inEvent.getLastLocationLongitude());
             }
         } else {
             form.setOrganizationId(getLoggedUser().getOrganizationId());

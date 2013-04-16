@@ -32,6 +32,13 @@
     }
 
 </script>
+
+
+<c:if test="${!empty form.lastLocationLatitude and !empty form.lastLocationLongitude}">
+    <tags:zoomButton latitude="${form.lastLocationLatitude}" longitude="${form.lastLocationLongitude}"/>
+</c:if>
+
+
 <h2>
     <c:choose>
         <c:when test="${empty form.id}"><s:message code="header.userCreate"/></c:when>

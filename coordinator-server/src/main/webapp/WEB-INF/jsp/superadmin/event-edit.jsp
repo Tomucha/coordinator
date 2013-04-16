@@ -1,44 +1,44 @@
 <%@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
+        taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags" %><%@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %><script type="text/javascript">
-    function fetchLocations() {
-        var points = CoordinatorMap.getPoints();
-        var cont = $("#hiddenInputContainer");
-        var i = 0;
-        for (var id in points) {
-            var location = points[id];
-            if (location.type != TYPE_LOCATION) continue;
-            $('<input>').attr({
-                <%-- TODO json --%>
-                eventKey: "<c:out value="${form.eventKey}" escapeXml="true"/>",
-                type: 'hidden',
-                name: 'eventLocationEntityList[' + i + '].longitude',
-                value: location.longitude
-            }).appendTo(cont);
-            $('<input>').attr({
-                eventKey: "<c:out value="${form.eventKey}" escapeXml="true"/>",
-                type: 'hidden',
-                name: 'eventLocationEntityList[' + i + '].latitude',
-                value: location.latitude
-            }).appendTo(cont);
-            $('<input>').attr({
-                eventKey: "<c:out value="${form.eventKey}" escapeXml="true"/>",
-                type: 'hidden',
-                name: 'eventLocationEntityList[' + i + '].radius',
-                value: location.radius
-            }).appendTo(cont);
-            i++;
-        }
 
-        return true;
+    var hiddenCount = 0;
+    <c:if test="${!empty form.eventLocationEntityList}">
+        hiddenCount = ${fn:length(form.eventLocationEntityList)};
+    </c:if>
+
+    function addLocation(point) {
+        var cont = $("#hiddenInputContainer");
+        $('<input>').attr({
+                type: 'hidden',
+                name: 'eventLocationEntityList[' + hiddenCount + '].longitude',
+                value: point.longitude
+        }).appendTo(cont);
+        $('<input>').attr({
+                type: 'hidden',
+                name: 'eventLocationEntityList[' + hiddenCount + '].latitude',
+                value: point.latitude
+        }).appendTo(cont);
+        $('<input>').attr({
+                type: 'hidden',
+                name: 'eventLocationEntityList[' + hiddenCount + '].radius',
+                value: 2000
+        }).appendTo(cont);
+        hiddenCount++;
     }
 
-    function initialize() {
-        CoordinatorMap.setOnClickAddPoint(TYPE_LOCATION);
+    osmCallback.onNewPoint = function(point) {
+        CoordinatorMap.addPoint(point);
+        addLocation(point);
+    }
+
+    osmCallback.onLoad = function() {
+        CoordinatorMap.setOnClickAddPoint(null);
 
         <c:if test="${!empty form.eventLocationEntityList}">
             <c:forEach items="${form.eventLocationEntityList}" var="eventLocation">
@@ -47,8 +47,7 @@
                          type: TYPE_LOCATION,
                          icon: ICON_GENERIC,
                          longitude: <c:out value="${eventLocation.longitude}"/>,
-                         latitude: <c:out value="${eventLocation.latitude}"/>,
-                         radius: <c:out value="${!empty eventLocation.radius ? eventLocation.radius : 'null'}"/>
+                         latitude: <c:out value="${eventLocation.latitude}"/>
                     });
                 </c:if>
             </c:forEach>
@@ -71,16 +70,18 @@
 
             <sf:hidden path="id"/>
 
-            <div style="display:${form.new ? 'block' : 'none'}">
-                <tags:input field="eventKey" modelAttribute="form" captionCode="label.eventKey">
-                    <sf:input path="eventKey" />
-                </tags:input>
-            </div>
+            <tags:input field="name" modelAttribute="form" captionCode="label.name">
+                <sf:input path="name"/>
+            </tags:input>
 
             <div id="hiddenInputContainer">
-                <tags:input field="name" modelAttribute="form" captionCode="label.name">
-                    <sf:input path="name"/>
-                </tags:input>
+                <c:if test="${!empty form.eventLocationEntityList}">
+                    <c:forEach items="${form.eventLocationEntityList}" var="eventLocation" varStatus="c">
+                        <input type="hidden" name="eventLocationEntityList[${c.count-1}].longitude" value="${eventLocation.longitude}"/>
+                        <input type="hidden" name="eventLocationEntityList[${c.count-1}].latitude" value="${eventLocation.latitude}"/>
+                        <input type="hidden" name="eventLocationEntityList[${c.count-1}].radius" value="${eventLocation.radius}"/>
+                    </c:forEach>
+                </c:if>
             </div>
 
             <div>
@@ -99,11 +100,10 @@
     <tags:osm
             width="100%"
             height="400px"
+            hideMarkers="true"
             longitude="${!empty form.firstEventLocation and form.firstEventLocation.longitude > 0.0 ? form.firstEventLocation.longitude : null}"
             latitude="${!empty form.firstEventLocation and form.firstEventLocation.latitude > 0.0 ? form.firstEventLocation.latitude : null}"
             zoom="13"
-            onLoad="initialize()"
-            buttons="addLocation"
             />
 
 </div>

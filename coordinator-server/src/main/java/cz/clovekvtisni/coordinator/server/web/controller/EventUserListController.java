@@ -9,6 +9,7 @@ import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import cz.clovekvtisni.coordinator.server.web.EventPrerequisitiesRequired;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.SelectedUserAction;
 import cz.clovekvtisni.coordinator.server.web.model.UserMultiSelection;
@@ -31,6 +32,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/admin/event/user/list")
+@EventPrerequisitiesRequired
 public class EventUserListController extends AbstractEventController {
 
     @Autowired

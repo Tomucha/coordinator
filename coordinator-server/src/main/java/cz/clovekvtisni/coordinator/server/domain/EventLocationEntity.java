@@ -20,7 +20,7 @@ public class EventLocationEntity extends AbstractPersistentEntity<EventLocation,
     private Key<EventEntity> parentKey;
 
     @Index
-    private String eventId;
+    private long eventId;
 
     private Double latitude;
 
@@ -49,11 +49,11 @@ public class EventLocationEntity extends AbstractPersistentEntity<EventLocation,
         this.id = id;
     }
 
-    public String getEventId() {
+    public long getEventId() {
         return eventId;
     }
 
-    public void setEventId(String eventId) {
+    public void setEventId(long eventId) {
         this.eventId = eventId;
     }
 

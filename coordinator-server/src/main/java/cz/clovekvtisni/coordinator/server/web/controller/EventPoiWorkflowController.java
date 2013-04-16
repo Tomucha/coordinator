@@ -4,6 +4,7 @@ import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
+import cz.clovekvtisni.coordinator.server.web.EventPrerequisitiesRequired;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Controller
 @RequestMapping("/admin/event/poi/workflow")
+@EventPrerequisitiesRequired
 public class EventPoiWorkflowController extends AbstractEventController {
 
     @Autowired

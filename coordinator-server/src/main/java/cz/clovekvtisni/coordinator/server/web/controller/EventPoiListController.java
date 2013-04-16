@@ -7,6 +7,7 @@ import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import cz.clovekvtisni.coordinator.server.web.EventPrerequisitiesRequired;
 import cz.clovekvtisni.coordinator.server.web.model.*;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
 import cz.clovekvtisni.coordinator.util.ValueTool;
@@ -29,6 +30,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/admin/event/poi/list")
+@EventPrerequisitiesRequired
 public class EventPoiListController extends AbstractEventController {
 
     @Autowired

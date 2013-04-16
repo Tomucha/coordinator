@@ -53,6 +53,8 @@ public class EventDetailController extends AbstractEventController {
                 registration.setEventEntity(appContext.getActiveEvent());
                 registration.setEventId(params.getEventId());
                 registration.setOrganizationId(user.getOrganizationId());
+                registration.setName(appContext.getActiveEvent().getName());
+                registration.setDescription(appContext.getActiveEvent().getDescription());
             }
             model.addAttribute("form", new OrganizationInEventForm().populateFrom(registration));
 
@@ -95,7 +97,7 @@ public class EventDetailController extends AbstractEventController {
             return "admin/event-detail";
         }
 
-        return "redirect:/admin/event/map?eventId="+form.getEventId();
+        return "redirect:/admin/event/poi/list?eventId="+form.getEventId();
     }
 
     protected void populateModel(Model model) {

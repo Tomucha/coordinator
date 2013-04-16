@@ -22,10 +22,6 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
     @Id
     private Long id;
 
-    @Index
-    @NotEmpty
-    private String eventKey;
-
     @NotEmpty
     private String name;
 
@@ -54,14 +50,6 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getEventKey() {
-        return eventKey;
-    }
-
-    public void setEventKey(String id) {
-        this.eventKey = id;
     }
 
     public String getName() {
@@ -111,7 +99,6 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
     public String toString() {
         return "EventEntity{" +
                 "id=" + id +
-                ", eventKey='" + eventKey + '\'' +
                 ", name='" + name + '\'' +
                 '}';
     }

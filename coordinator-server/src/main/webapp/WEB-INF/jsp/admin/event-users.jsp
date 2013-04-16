@@ -89,7 +89,11 @@
                         </thead>
                         <tbody>
                         <c:forEach items="${userInEvents}" var="userInEvent" begin="0" step="1" varStatus="i">
-                            <tr>
+                            <tr
+                                <c:if test="${!empty userInEvent.lastLocationLatitude and !empty userInEvent.lastLocationLongitude}">
+                                    onclick="CoordinatorMap.goTo(${userInEvent.lastLocationLongitude}, ${userInEvent.lastLocationLatitude});"
+                                </c:if>
+                            >
                                 <td><input type="checkbox" name="selectedUsers[${i.index}]"
                                            value="${userInEvent.userId}"/></td>
                                 <tags:eventUserList renderHeader="false" user="${userInEvent}"/>

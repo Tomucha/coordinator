@@ -15,6 +15,11 @@
 
     <mvc:annotation-driven conversion-service="conversionService" validator="validator" />
 
+    <mvc:interceptors>
+        <bean class="cz.clovekvtisni.coordinator.server.web.LoggerInterceptor" />
+        <bean class="cz.clovekvtisni.coordinator.server.web.EventPrerequisitiesInterceptor"/>
+    </mvc:interceptors>
+
     <mvc:default-servlet-handler />
 
     <util:list id="tilesDefs">

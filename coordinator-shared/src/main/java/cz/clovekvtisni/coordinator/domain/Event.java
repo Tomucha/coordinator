@@ -2,21 +2,11 @@ package cz.clovekvtisni.coordinator.domain;
 
 public class Event extends AbstractModifiableEntity {
 
-    private String eventId;
-
     private String name;
 
     private String description;
 
     private EventLocation[] locationList;
-
-    public String getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
 
     public String getName() {
         return name;
@@ -46,7 +36,6 @@ public class Event extends AbstractModifiableEntity {
     public String toString() {
         return "Event{" +
                 "id=" + id +
-                ", eventId='" + eventId + '\'' +
                 ", name='" + name + '\'' +
                 '}';
     }

@@ -29,7 +29,6 @@ public class EventServiceImplTest extends LocalDatastoreTest {
     public void testCreate() throws Exception {
         assertNotNull(eventService);
         final EventEntity event = new EventEntity();
-        final String testEventId = "event.test." + System.currentTimeMillis();
         final String testDescription = "foo";
         List<EventLocationEntity> locationList = new ArrayList<EventLocationEntity>(1);
         EventLocationEntity locationEntity = new EventLocationEntity();
@@ -38,7 +37,6 @@ public class EventServiceImplTest extends LocalDatastoreTest {
         locationEntity.setRadius(3l);
         locationList.add(locationEntity);
 
-        event.setEventKey(testEventId);
         event.setDescription(testDescription);
         event.setEventLocationEntityList(locationList.toArray(new EventLocationEntity[0]));
 
@@ -46,10 +44,9 @@ public class EventServiceImplTest extends LocalDatastoreTest {
             @Override
             public Object run() {
                 EventEntity res = eventService.createEvent(event);
-                res = eventService.findByEventId(res.getEventKey(), EventService.FLAG_FETCH_LOCATIONS);
+                res = eventService.findById(res.getId(), EventService.FLAG_FETCH_LOCATIONS);
                 assertNotNull(res);
                 assertEquals(testDescription, res.getDescription());
-                assertEquals(testEventId, res.getEventKey());
                 assertNotNull(res.getEventLocationEntityList());
                 assertEquals(1, res.getEventLocationEntityList().length);
                 return null;

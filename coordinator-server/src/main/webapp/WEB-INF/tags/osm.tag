@@ -4,6 +4,7 @@
         attribute name="zoom" required="false" type="java.lang.Integer" %><%@
         attribute name="longitude" required="false" %><%@
         attribute name="latitude" required="false" %><%@
+        attribute name="hideMarkers" required="false" type="java.lang.Boolean" %><%@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags"
 %>
@@ -24,9 +25,14 @@
 
 <script type="text/javascript">
 
-    var eventId = ${event.id};
+    var eventId = ${empty event.id ? "null" : event.id};
+
+    var hideMarkers = ${(not empty hideMarkers && hideMarkers) ? "true" : "false"};
 
     function refreshMarkers() {
+        if (eventId == null) return;
+        if (hideMarkers) return;
+
         CoordinatorMap.clearMarkers();
         var bounds = map.getExtent();
         var proj = new OpenLayers.Projection("EPSG:4326");
@@ -48,6 +54,8 @@
     }
 
     function fillPoiMarkers(bounds) {
+        if (eventId == null) return;
+        if (hideMarkers) return;
         var url = root+"/admin/event/map/api/poi";
 
         var arrBounds = bounds.toArray(); //array order: left, bottom, right, top
@@ -72,6 +80,8 @@
     }
 
     function fillUserMarkers(bounds) {
+        if (eventId == null) return;
+        if (hideMarkers) return;
         var url = root+"/admin/event/map/api/user";
 
         var arrBounds = bounds.toArray(); //array order: left, bottom, right, top
@@ -215,6 +225,7 @@
             var lonLat = CoordinatorMap.position(point.longitude, point.latitude);
             var marker = new OpenLayers.Marker(lonLat, ICON_GENERIC.clone());
             point.id = marker.id = "pointSingle" + (idCounter++);
+            point.icon = ICON_GENERIC;
 
             if (point.popupUrl) {
                 marker.events.register("click", marker, function (event) {
@@ -320,7 +331,9 @@
 
         onMapChanged: function() {
             CoordinatorMap.saveUserPreset();
-            refreshMarkers();
+            if (eventId != null) {
+                refreshMarkers();
+            }
             osmCallback.onMapChange();
         },
 
@@ -406,7 +419,7 @@
 
     function searchAddress(address) {
         $.getJSON("${root}/admin/event/map/api/address?query="+address, function(response) {
-            goTo(response.longitude, response.latitude, 15);
+            CoordinatorMap.goTo(response.longitude, response.latitude, 15);
         });
     }
 

@@ -4,6 +4,7 @@ import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 
 import java.util.Locale;
@@ -58,5 +59,15 @@ public class AppContextTestImpl implements AppContext {
     @Override
     public void setActiveOrganizationInEvent(OrganizationInEventEntity organizationInEvent) {
         // TODO
+    }
+
+    @Override
+    public UserInEventEntity getActiveUserInEvent() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void setActiveUserInEvent(UserInEventEntity activeUserInEvent) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

@@ -63,3 +63,8 @@ div.dropdown-menu {
 .clickable {
     cursor: pointer;
 }
+.event-menu {
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid #aaa ;
+}

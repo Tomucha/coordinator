@@ -48,7 +48,7 @@
     </div>
 
     <div>
-        <tags:input field="description" modelAttribute="form" captionCode="PoiEntity.description" fluid="true">
+        <tags:input field="description" modelAttribute="form" captionCode="PoiEntity.descriptionShort" fluid="true">
             <sf:textarea id="description" path="description" rows="2"  cssClass="input-medium"/>
         </tags:input>
     </div>

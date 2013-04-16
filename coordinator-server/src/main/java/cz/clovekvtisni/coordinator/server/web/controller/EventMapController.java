@@ -15,6 +15,7 @@ import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.util.Location;
+import cz.clovekvtisni.coordinator.server.web.EventPrerequisitiesRequired;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.PoiForm;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
@@ -75,6 +76,7 @@ public class EventMapController extends AbstractEventController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
+    @EventPrerequisitiesRequired
     public String map(@ModelAttribute("params") EventFilterParams params, Model model) {
         if (params.getEventId() == null)
             throw NotFoundException.idNotExist();

@@ -1,15 +1,14 @@
 package cz.clovekvtisni.coordinator.server.web.filter;
 
 
+import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
-import cz.clovekvtisni.coordinator.server.service.EventService;
-import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
-import cz.clovekvtisni.coordinator.server.service.SystemService;
-import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.server.service.*;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.web.RequestKeys;
 import cz.clovekvtisni.coordinator.server.web.SessionKeys;
@@ -33,6 +32,10 @@ import java.util.regex.Pattern;
  */
 public class ApplicationInitFilter implements Filter {
 
+    /**
+     * scope=request, see applicationContext.xml
+     * <bean id="appContext" class="cz.clovekvtisni.coordinator.server.security.AppContextSimpleBeanImpl" scope="request">
+     */
     @Autowired
     private AppContext appContext;
 
@@ -50,6 +53,9 @@ public class ApplicationInitFilter implements Filter {
 
     @Autowired
     private OrganizationInEventService organizationInEventService;
+
+    @Autowired
+    private UserInEventService userInEventService;
 
     private static boolean appInitialized = false;
 
@@ -89,16 +95,19 @@ public class ApplicationInitFilter implements Filter {
                 return;
             }
 
-            // check event authorize rights
+            // FIXME: kde se bere logged user? je v tom bordel, predelat do interceptoru rikam ja
             UserEntity loggedUser = appContext.getLoggedUser();
             EventEntity activeEvent = appContext.getActiveEvent();
-            if (loggedUser != null && activeEvent != null) {
-                OrganizationInEventEntity organizationInEventEntity = organizationInEventService.findEventInOrganization(activeEvent.getId(), loggedUser.getOrganizationId(), 0l);
-                if (organizationInEventEntity == null && !loggedUser.isSuperadmin() && !"/admin/event-register".equals(pathUri))
-                    redirectWithBacklink("/admin/event-register?eventId=" + activeEvent.getId(), hRequest, hResponse);
+            OrganizationInEventEntity organizationInEventEntity = null;
+            UserInEventEntity userInEventEntity = null;
 
-                appContext.setActiveOrganizationInEvent(organizationInEventEntity);
+            if (loggedUser != null && activeEvent != null) {
+                organizationInEventEntity = organizationInEventService.findEventInOrganization(activeEvent.getId(), loggedUser.getOrganizationId(), 0l);
+                userInEventEntity = userInEventService.findById(activeEvent.getId(), loggedUser.getId(), 0l);
             }
+
+            appContext.setActiveOrganizationInEvent(organizationInEventEntity);
+            appContext.setActiveUserInEvent(userInEventEntity);
 
             chain.doFilter(request, response);
         } finally {
@@ -115,7 +124,7 @@ public class ApplicationInitFilter implements Filter {
         }
     }
 
-    private boolean isApiCall(HttpServletRequest hRequest) {
+    public static boolean isApiCall(HttpServletRequest hRequest) {
         return isUriStartsWith(hRequest,  "/api");
     }
 
@@ -127,7 +136,7 @@ public class ApplicationInitFilter implements Filter {
         if (session != null) {
             loggedUserId = (Long) session.getAttribute(SessionKeys.LOGGED_USER_ID);
             if (loggedUserId != null) {
-                UserEntity userEntity = userService.findById(loggedUserId, 0l);
+                UserEntity userEntity = userService.findById(loggedUserId, UserService.FLAG_FETCH_SKILLS | UserService.FLAG_FETCH_EQUIPMENT);
                 if (userEntity == null) {
                     session.removeAttribute(SessionKeys.LOGGED_USER_ID);
                     loggedUserId = null;
@@ -141,7 +150,7 @@ public class ApplicationInitFilter implements Filter {
         return loggedUserId;
     }
 
-    private String getNormalizedUri(HttpServletRequest hr) {
+    public static String getNormalizedUri(HttpServletRequest hr) {
         String uri = (String) hr.getAttribute(RequestKeys.NORMALIZED_URI);
         if (uri == null) {
             uri = hr.getRequestURI();
@@ -159,7 +168,7 @@ public class ApplicationInitFilter implements Filter {
         return isUriMatch(hr, withoutLoginPattern);
     }
 
-    private boolean isUriStartsWith(HttpServletRequest hr, String prefix) {
+    public static boolean isUriStartsWith(HttpServletRequest hr, String prefix) {
         final String uriWithoutContext = getNormalizedUri(hr);
         return uriWithoutContext.startsWith(prefix);
     }

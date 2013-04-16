@@ -12,7 +12,7 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.NoDeletedFilter;
  */
 public class EventLocationFilter extends NoDeletedFilter<EventLocationEntity> {
 
-    private String eventIdVal;
+    private Long eventIdVal;
 
     private Operator eventIdOp = Operator.EQ;
 
@@ -21,11 +21,11 @@ public class EventLocationFilter extends NoDeletedFilter<EventLocationEntity> {
         return EventLocationEntity.class;
     }
 
-    public String getEventIdVal() {
+    public Long getEventIdVal() {
         return eventIdVal;
     }
 
-    public void setEventIdVal(String eventIdVal) {
+    public void setEventIdVal(Long eventIdVal) {
         this.eventIdVal = eventIdVal;
     }
 

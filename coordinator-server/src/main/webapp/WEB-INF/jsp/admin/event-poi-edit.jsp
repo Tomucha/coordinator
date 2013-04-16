@@ -26,6 +26,11 @@
 
 </script>
 
+
+<c:if test="${!empty form.latitude and !empty form.longitude}">
+    <tags:zoomButton latitude="${form.latitude}" longitude="${form.longitude}"/>
+</c:if>
+
 <h2>
     <s:message code="${form.new ? 'header.poiCreate' : 'header.poiEdit'}"/>
 </h2>
