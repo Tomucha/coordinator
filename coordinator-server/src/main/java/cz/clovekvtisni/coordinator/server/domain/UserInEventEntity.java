@@ -66,6 +66,7 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     private Long[] groupIdList;
 
     @Load
+    @JsonIgnore
     Ref<UserEntity> refToUser;
 
     @Ignore

@@ -82,9 +82,11 @@
             height="500px"
             latitude="${event.firstEventLocation.latitude}"
             longitude="${event.firstEventLocation.longitude}"
-            onLoad="initialize()"
-            onMapChange="refreshMarkers()"
             />
+<%--
+        onLoad="initialize()"
+        onMapChange="refreshMarkers()"
+--%>
     <sf:form modelAttribute="params" id="filterForm" onsubmit="return false">
         <div class="container-fluid">
             <tags:hiddenEvent/>

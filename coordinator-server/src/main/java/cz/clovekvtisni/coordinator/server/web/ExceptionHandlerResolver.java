@@ -27,6 +27,7 @@ public class ExceptionHandlerResolver extends DefaultHandlerExceptionResolver {
 
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        logger.error("Exception: "+ex, ex);
 
         ModelAndView modelAndView = super.resolveException(request, response, handler, ex);
         if (modelAndView != null) {

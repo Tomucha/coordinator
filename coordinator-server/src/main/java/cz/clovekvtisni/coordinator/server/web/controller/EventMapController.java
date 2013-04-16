@@ -3,6 +3,8 @@ package cz.clovekvtisni.coordinator.server.web.controller;
 import com.google.appengine.api.urlfetch.HTTPResponse;
 import com.google.appengine.api.urlfetch.URLFetchService;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
+import cz.clovekvtisni.coordinator.domain.User;
+import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
@@ -14,6 +16,7 @@ import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import cz.clovekvtisni.coordinator.server.util.EntityTool;
 import cz.clovekvtisni.coordinator.server.util.Location;
 import cz.clovekvtisni.coordinator.server.web.EventPrerequisitiesRequired;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
@@ -31,6 +34,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -108,14 +112,15 @@ public class EventMapController extends AbstractEventController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/api/user")
-    public @ResponseBody List<UserInEventEntity> listUsers(
+    public @ResponseBody List<UserInEvent> listUsers(
             @ModelAttribute("params") EventFilterParams params,
             @RequestParam(required = true) double latN,
             @RequestParam(required = true) double lonE,
             @RequestParam(required = true) double latS,
             @RequestParam(required = true) double lonW
     ) {
-        return userInEventService.findByFilterAndBox(params.populateUserInEventFilter(new UserInEventFilter()), latN, lonE, latS, lonW, 0l);
+        List<UserInEventEntity> result = userInEventService.findByFilterAndBox(params.populateUserInEventFilter(new UserInEventFilter()), latN, lonE, latS, lonW, 0l);
+        return new EntityTool().buildTargetEntities(result);
     }
 
 

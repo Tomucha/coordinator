@@ -93,7 +93,7 @@
         var decodedRequest = $.param(request);
         $.getJSON(url, decodedRequest, function(response, txt) {
             $.each(response, function(i, item) {
-                item.name = item.userEntity.fullName;
+                item.name = item.user.firstName +" "+item.user.lastName;
                 item.popupUrl = "${root}/admin/event/map/popup/user?userId="+item.userId+"&eventId=${event.id}",
                         item.type = TYPE_USER;
                 item.icon = ICON_USER;

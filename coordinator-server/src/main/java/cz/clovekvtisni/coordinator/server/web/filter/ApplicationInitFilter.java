@@ -14,6 +14,8 @@ import cz.clovekvtisni.coordinator.server.web.RequestKeys;
 import cz.clovekvtisni.coordinator.server.web.SessionKeys;
 import cz.clovekvtisni.coordinator.util.Url;
 import cz.clovekvtisni.coordinator.util.ValueTool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -31,6 +33,8 @@ import java.util.regex.Pattern;
  * Time: 4:39 PM
  */
 public class ApplicationInitFilter implements Filter {
+
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * scope=request, see applicationContext.xml
@@ -110,6 +114,9 @@ public class ApplicationInitFilter implements Filter {
             appContext.setActiveUserInEvent(userInEventEntity);
 
             chain.doFilter(request, response);
+        } catch (Throwable e) {
+            logger.error("Error in request: "+e, e);
+            throw new IllegalStateException(e);
         } finally {
             if (appContext.getLoggedUser() == null || appContext.getLoggedUser().getId() == null) {
                 HttpSession session = hRequest.getSession(false);
@@ -162,7 +169,7 @@ public class ApplicationInitFilter implements Filter {
         return uri;
     }
 
-    private Pattern withoutLoginPattern = Pattern.compile("^/(?:login|logout|api|_ah|css|js|bootstrap|images|coordinator-android.apk)(?:/|$)");
+    private Pattern withoutLoginPattern = Pattern.compile("^/(?:login|logout|api|_ah|css|js|bootstrap|images|coordinator-android.apk|favicon.ico)(?:/|$)");
 
     private boolean isWithoutLoginRequest(HttpServletRequest hr) {
         return isUriMatch(hr, withoutLoginPattern);
