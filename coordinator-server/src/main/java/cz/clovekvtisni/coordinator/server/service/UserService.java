@@ -60,6 +60,9 @@ public interface UserService extends Service {
     @CheckPermission("@appContext.loggedUser != null")
     void logout();
 
+    @CheckPermission("#helper.canDo(new cz.clovekvtisni.coordinator.server.security.permission.MassMailPermission(\"userEntity\"))")
+    void emailAllUsers(String subject, String htmlBody, String cursor);
+
     @Anonymous
     UserAuthKey createAuthKey(UserEntity user);
 
@@ -74,4 +77,6 @@ public interface UserService extends Service {
 
     void registerPushTokenAndroid(String token);
 
+    @Anonymous
+    boolean unsubscribe(String email, String signature);
 }

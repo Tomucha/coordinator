@@ -28,6 +28,8 @@ public class AppContextSimpleBeanImpl implements AppContext {
 
     private Locale locale;
 
+    private boolean isSystemCall = false;
+
     @Override
     public void setLoggedUser(UserEntity loggedUser) {
         this.loggedUser = loggedUser;
@@ -72,6 +74,14 @@ public class AppContextSimpleBeanImpl implements AppContext {
 
     public void setActiveUserInEvent(UserInEventEntity activeUserInEvent) {
         this.activeUserInEvent = activeUserInEvent;
+    }
+
+    public boolean isSystemCall() {
+        return isSystemCall;
+    }
+
+    public void setSystemCall(boolean systemCall) {
+        isSystemCall = systemCall;
     }
 
     @Override

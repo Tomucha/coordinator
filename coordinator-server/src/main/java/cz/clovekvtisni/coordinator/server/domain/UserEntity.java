@@ -62,6 +62,9 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     private Set<String> pushTokensAndroid;
 
+    @Index
+    private Boolean unsubscribed = Boolean.FALSE;
+
     @Ignore
     private UserEquipmentEntity[] equipmentEntityList;
 
@@ -310,6 +313,14 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     public boolean isSuperadmin() {
         return roleIdList != null && Arrays.asList(roleIdList).contains(AuthorizationTool.SUPERADMIN);
+    }
+
+    public boolean isUnsubscribed() {
+        return unsubscribed == null ? false : unsubscribed;
+    }
+
+    public void setUnsubscribed(boolean unsubscribed) {
+        this.unsubscribed = unsubscribed;
     }
 
     @Override

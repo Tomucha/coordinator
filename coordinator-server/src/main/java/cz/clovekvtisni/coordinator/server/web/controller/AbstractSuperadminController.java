@@ -42,7 +42,8 @@ public abstract class AbstractSuperadminController extends AbstractController {
     public final Breadcrumb[] breadcrumbs() {
         return new Breadcrumb[] {
                 UserListController.getBreadcrumb(),
-                EventListController.getBreadcrumb()
+                EventListController.getBreadcrumb(),
+                MassMailController.getBreadcrumb()
         };
     }
 

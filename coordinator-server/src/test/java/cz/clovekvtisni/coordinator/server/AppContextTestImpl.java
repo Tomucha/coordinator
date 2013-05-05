@@ -70,4 +70,14 @@ public class AppContextTestImpl implements AppContext {
     public void setActiveUserInEvent(UserInEventEntity activeUserInEvent) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    @Override
+    public boolean isSystemCall() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void setSystemCall(boolean systemCall) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

@@ -12,6 +12,7 @@
         <property name="java.util.logging.config.file" value="WEB-INF/classes/logging.properties" />
         <property name="default.admin.email" value="admin@m-atelier.cz" />
         <property name="default.admin.password" value="admin" />
+        <property name="cz.clovekvtisni.coordinator.urlRoot" value="http://coordinator-test.appspot.com/"/>
     </system-properties>
 
     <sessions-enabled>true</sessions-enabled>

@@ -37,4 +37,9 @@ public interface AppContext {
 
     void setActiveUserInEvent(UserInEventEntity activeUserInEvent);
 
+    boolean isSystemCall();
+
+    void setSystemCall(boolean systemCall);
+
+
 }

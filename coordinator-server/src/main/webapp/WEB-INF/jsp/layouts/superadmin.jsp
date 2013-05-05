@@ -59,6 +59,11 @@
             </ul>
 
             <div class="tabContent">
+
+                <c:if test="${not empty globalMessage}">
+                    <p class="well"><span class="icon-warning-sign"></span><c:out value="${globalMessage}"/></p>
+                </c:if>
+
                 <tiles:insertAttribute name="content"/>
             </div>
 

@@ -1,8 +1,13 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
+import com.google.appengine.api.datastore.Cursor;
+import com.google.appengine.api.datastore.QueryResultIterator;
+import com.google.appengine.api.taskqueue.*;
+import com.google.appengine.api.taskqueue.Queue;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.VoidWork;
 import com.googlecode.objectify.Work;
+import com.googlecode.objectify.cmd.Query;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.exception.ValidationError;
@@ -11,10 +16,7 @@ import cz.clovekvtisni.coordinator.server.filter.UserEquipmentFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserSkillFilter;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
-import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
-import cz.clovekvtisni.coordinator.server.service.OrganizationService;
-import cz.clovekvtisni.coordinator.server.service.UserInEventService;
-import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.server.service.*;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.util.CloneTool;
 import cz.clovekvtisni.coordinator.util.SignatureTool;
@@ -34,12 +36,16 @@ import java.util.*;
 public class UserServiceImpl extends AbstractEntityServiceImpl implements UserService {
 
     private static final String PASSWORD_SEED = "e{\"DFGP:2354\":asdlghH%$~23'5;'";
+    private static final long LIMIT_MILLIS = 1000 * 25;
 
     @Autowired
     private OrganizationService organizationService;
 
     @Autowired
     private UserInEventService userInEventService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private OrganizationInEventService organizationInEventService;
@@ -163,9 +169,9 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
         if (authorizationTool.hasRole(AuthorizationTool.SUPERADMIN, getLoggedUser())) {
             // superadmin is allowed to change organization
-           if (updated.getOrganizationId() != null) {
-               user.setOrganizationId(updated.getOrganizationId());
-           }
+            if (updated.getOrganizationId() != null) {
+                user.setOrganizationId(updated.getOrganizationId());
+            }
         }
 
         logger.debug("updating " + user);
@@ -197,7 +203,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             public UserEntity run() {
                 user.setId(null);
                 if (user.getRoleIdList() == null)
-                    user.setRoleIdList(new String[] {AuthorizationTool.ANONYMOUS});
+                    user.setRoleIdList(new String[]{AuthorizationTool.ANONYMOUS});
                 UserEntity created = createUser(user);
 
                 inEventEntity.setParentKey(user.getKey());
@@ -224,9 +230,9 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 copy.setPhone(newUser.getPhone());
                 copy.setEmail(ValueTool.normalizeEmail(newUser.getEmail()));
                 copy.setBirthday(newUser.getBirthday());
-                 copy.setAddressLine(newUser.getAddressLine());
-                 copy.setCity(newUser.getCity());
-                 copy.setZip(newUser.getZip());
+                copy.setAddressLine(newUser.getAddressLine());
+                copy.setCity(newUser.getCity());
+                copy.setZip(newUser.getZip());
                 copy.setCountry(newUser.getCountry());
                 copy.setModifiedDate(new Date());
 
@@ -252,12 +258,15 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 }
 
 
-                return updated;             }
-         });
+                return updated;
+            }
+        });
 
-  }
+    }
 
-    /** updated "verify" fields is ignored here */
+    /**
+     * updated "verify" fields is ignored here
+     */
     private void saveFields(UserEntity entity, UserEntity old) {
         UserEquipmentEntity[] newEquipmentList = entity.getEquipmentEntityList();
         if (newEquipmentList != null) {
@@ -333,6 +342,45 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     @Override
+    public void emailAllUsers(String subject, String htmlBody, String queryToken) {
+
+        long startTime = System.currentTimeMillis();
+
+        Query<UserEntity> query = ofy().load().type(UserEntity.class);
+        query = query.order("email");
+
+        if (queryToken != null) {
+            Cursor cursor = Cursor.fromWebSafeString(queryToken);
+            query = query.startAt(cursor);
+        }
+
+        QueryResultIterator<UserEntity> result = query.iterator();
+
+        while (result.hasNext()) {
+            UserEntity userEntity = result.next();
+            if (!userEntity.isUnsubscribed() && userEntity.getEmail().toLowerCase().contains("tomucha.cz")) {
+                logger.info("Sending email to " + userEntity.getEmail());
+                emailService.sendEmail(userEntity.getEmail(), subject, htmlBody);
+            }
+
+            if (System.currentTimeMillis() - startTime > LIMIT_MILLIS) {
+                Cursor cursor = result.getCursor();
+                logger.info("Adding cursor to queue: "+cursor.toWebSafeString());
+                Queue queue = QueueFactory.getQueue("mass-mail-queue");
+
+                TaskOptions task = TaskOptions.Builder.withUrl("/tools/massMailContinue");
+                task = task.param("cursor", cursor.toWebSafeString());
+                task = task.param("subject", subject);
+                task = task.param("htmlBody", htmlBody);
+                task = task.method(TaskOptions.Method.POST);
+
+                queue.add(task);
+                break;
+            }
+        }
+    }
+
+    @Override
     public UserAuthKey createAuthKey(UserEntity user) {
         String random = SignatureTool.md5Digest(user.getId() + user.getEmail() + Math.random());
         UserAuthKey authKey = new UserAuthKey();
@@ -381,8 +429,8 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         OrganizationInEventEntity info = organizationInEventService.findEventInOrganization(inEvent.getEventId(), organization.getId(), 0l);
 
         if (!isForceRegistration && (info == null
-            || (info.getDateClosedRegistration() != null && info.getDateClosedRegistration().compareTo(new Date()) < 0)
-            || !user.getOrganizationId().equals(info.getOrganizationId())
+                || (info.getDateClosedRegistration() != null && info.getDateClosedRegistration().compareTo(new Date()) < 0)
+                || !user.getOrganizationId().equals(info.getOrganizationId())
         )) {
             throw MaPermissionDeniedException.registrationNotAllowed();
         }
@@ -421,6 +469,13 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             }
         });
 
+    }
+
+    @Override
+    public boolean unsubscribe(String email, String signature) {
+        // FIXME: unsubscribe
+
+        return false;
     }
 
     @Override

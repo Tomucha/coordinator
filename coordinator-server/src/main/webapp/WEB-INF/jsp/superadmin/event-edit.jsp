@@ -62,7 +62,7 @@
 <div class="mainPanel">
 
     <div class="eventForm">
-        <sf:form method="POST" action="${root}/superadmin/event/edit" modelAttribute="form" onsubmit="return fetchLocations()">
+        <sf:form method="POST" action="${root}/superadmin/event/edit" modelAttribute="form">
 
             <sf:errors />
 

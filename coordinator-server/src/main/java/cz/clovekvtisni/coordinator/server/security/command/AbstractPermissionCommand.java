@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class AbstractPermissionCommand<E extends CoordinatorEntity> implements PermissionCommand<E> {
 
-    private AppContext appContext;
+    protected AppContext appContext;
 
     protected AbstractPermissionCommand() {
     }

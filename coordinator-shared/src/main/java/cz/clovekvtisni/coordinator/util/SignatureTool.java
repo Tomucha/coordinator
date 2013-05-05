@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.util;
 
+import cz.clovekvtisni.coordinator.SecretInfo;
 import cz.clovekvtisni.coordinator.domain.CanBeSigned;
 
 import java.io.UnsupportedEncodingException;
@@ -17,8 +18,6 @@ public class SignatureTool {
 
     private static Logger logger = Logger.getLogger(SignatureTool.class.getName());
 	
-	private static final String SECRET_SEED = "lj543sew;@'\\;dsa';42";
-
 	public static String asHex (byte[] buf) {
         StringBuilder strbuf = new StringBuilder(buf.length * 2);
 		int i;
@@ -54,7 +53,7 @@ public class SignatureTool {
 	
 
 	public static String sign(Object what) {
-		String whatToSign = ""+what+SECRET_SEED;
+		String whatToSign = ""+what+ SecretInfo.SECRET_SIGNATURE_KEY;
 		String digest = md5Digest(whatToSign);
 		String whatToSignForSecondTime = digest.substring(5,19);
 		return md5Digest(whatToSignForSecondTime).substring(8,18).toUpperCase();
