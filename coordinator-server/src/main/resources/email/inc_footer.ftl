@@ -8,7 +8,8 @@
 				</td>
 			</tr>
 			<tr>
-				<td style="padding: 0; margin: 0; vertical-align: top; text-align: center; font:  11px/16px  Arial, Sans-serif;" colspan="2">
+                <td></td>
+				<td style="padding: 0; margin: 0; vertical-align: top; text-align: left; font:  11px/16px  Arial, Sans-serif;">
                     Tento email jste obdržel(a), protože jste zaregistrován v aplikaci Koordinátor jako dobrovolník.<br/>
 					[#if unsubscribeUrl?? ]
 						<strong>Odhlášení:</strong> Žádné další emaily mi <a href="${unsubscribeUrl}">prosím nezasílejte</a>.
