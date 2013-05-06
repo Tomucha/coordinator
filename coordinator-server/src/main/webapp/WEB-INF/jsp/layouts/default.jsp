@@ -65,14 +65,16 @@
 
                 </div>
 
-                <div class="span5">
-                    <tags:osm
-                        width="95%"
-                        height="600px"
-                        latitude="${event.firstEventLocation.latitude}"
-                        longitude="${event.firstEventLocation.longitude}"
-                    />
-                </div>
+                <c:if test="${empty disableMap or !disableMap}">
+                    <div class="span5">
+                        <tags:osm
+                            width="95%"
+                            height="600px"
+                            latitude="${event.firstEventLocation.latitude}"
+                            longitude="${event.firstEventLocation.longitude}"
+                        />
+                    </div>
+                </c:if>
 
             </div>
         </div>

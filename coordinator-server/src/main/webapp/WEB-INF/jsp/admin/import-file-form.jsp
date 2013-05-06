@@ -8,14 +8,20 @@
 %><h2><s:message code="header.importUsers"/></h2>
 
 <c:choose>
-    <c:when test="${isValid}">
+    <c:when test="${empty isValid or isValid}">
         <sf:form enctype="multipart/form-data" action="${root}/admin/import" modelAttribute="importFileForm">
 
             <sf:errors cssClass="alert alert-error" element="div" />
 
             <div class="importTablePanel">
                 <tags:hiddenEvent/>
+                <c:if test="${empty event.id}">
+                    <sf:hidden path="eventId"/>
+                </c:if>
                 <sf:hidden path="organizationId"/>
+
+                <p><s:message code="application.admin.importInfo"/></p>
+
                 <input type="file" name="csvFile"/>
             </div>
             <div>

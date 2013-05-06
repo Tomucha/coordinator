@@ -38,6 +38,7 @@ public class ImportController extends AbstractController {
     @RequestMapping(method = RequestMethod.GET)
     public String showForm(@ModelAttribute("importFileForm") @Valid ImportFileForm form, BindingResult bindingResult, Model model) {
         model.addAttribute("isValid", !bindingResult.hasErrors());
+        model.addAttribute("disableMap", true);
         return "admin/import-file-form";
     }
 
@@ -45,12 +46,20 @@ public class ImportController extends AbstractController {
     public String onPostCsvFile(@ModelAttribute("importFileForm") ImportFileForm fileForm, HttpServletRequest request, BindingResult bindingResult, Model model) {
 
         ImportUsersForm form = new ImportUsersForm();
+
         form.setEventId(fileForm.getEventId());
         form.setOrganizationId(fileForm.getOrganizationId());
         populateForm(form, request);
+        form.preSelectTypes(colTypes().keySet());
 
         if (form.getRowCount() == 0) {
+            model.addAttribute("disableMap", true);
             addFormError(bindingResult, "error.emptyCsvFile");
+            fileForm.setEventId(form.getEventId());
+            fileForm.setOrganizationId(form.getOrganizationId());
+            model.addAttribute("importFileForm", fileForm);
+
+            return "admin/import-file-form";
 
         } else if (form.getOrganizationId() == null) {
             throw NotFoundException.idNotExist("organization", null);
@@ -59,12 +68,14 @@ public class ImportController extends AbstractController {
             model.addAttribute("form", form);
         }
 
+        model.addAttribute("disableMap", true);
         return "admin/import-data-form";
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/data")
     public String onPostData(@ModelAttribute("form") @Valid ImportUsersForm usersForm, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("disableMap", true);
             return "admin/import-data-form";
         }
 
@@ -79,6 +90,8 @@ public class ImportController extends AbstractController {
                 continue;
             List<String> row = vals.get(i);
             UserEntity user = fetchUser(types, row);
+            if (user == null)
+                continue;
             user.setOrganizationId(usersForm.getOrganizationId());
             UserInEventEntity inEvent = new UserInEventEntity();
             inEvent.setEventId(usersForm.getEventId());
@@ -107,6 +120,7 @@ public class ImportController extends AbstractController {
                 checked.add(i);
             usersForm.setChecked(checked);
             model.addAttribute("errorMap", errorMap);
+            model.addAttribute("disableMap", true);
             return "admin/import-data-form";
 
         } else {
@@ -118,48 +132,62 @@ public class ImportController extends AbstractController {
         if (types.size() != row.size())
             return null;
         UserEntity user = new UserEntity();
+        boolean isValid = false;
         for (int i = 0; i < types.size(); i++) {
             String typeName = types.get(i);
+            if (typeName == null)
+                continue;
             String value = row.get(i);
             if ("UserEntity.firstName".equals(typeName)) {
                 user.setFirstName(value);
+                isValid = true;
 
             } else if ("UserEntity.lastName".equals(typeName)) {
                 user.setLastName(value);
+                isValid = true;
 
             } else if ("UserEntity.email".equals(typeName)) {
                 user.setEmail(value);
+                isValid = true;
 
             } else if ("UserEntity.phone".equals(typeName)) {
                 user.setPhone(value);
+                isValid = true;
 
-            } else if ("UserEntity.birthday".equals(typeName)) {
-                // TODO
+                /*
+                } else if ("UserEntity.birthday".equals(typeName)) {
+                    // TODO
+                */
 
             } else if ("UserEntity.addressLine".equals(typeName)) {
                 user.setAddressLine(value);
+                isValid = true;
 
             } else if ("UserEntity.city".equals(typeName)) {
                 user.setCity(value);
+                isValid = true;
 
             } else if ("UserEntity.zip".equals(typeName)) {
                 user.setZip(value);
+                isValid = true;
 
             } else if ("UserEntity.country".equals(typeName)) {
                 user.setCountry(value);
+                isValid = true;
             }
         }
-        return user;
+        return isValid ?  user : null;
     }
 
     @ModelAttribute("colTypes")
     public Map<String, String> colTypes() {
         Map<String, String> map = new LinkedHashMap<String, String>();
+        map.put(ImportUsersForm.EMPTY_TYPE, getMessage("label.ignored"));
         map.put("UserEntity.firstName", getMessage("UserEntity.firstName"));
         map.put("UserEntity.lastName", getMessage("UserEntity.lastName"));
         map.put("UserEntity.email", getMessage("UserEntity.email"));
         map.put("UserEntity.phone", getMessage("UserEntity.phone"));
-        map.put("UserEntity.birthday", getMessage("UserEntity.birthday"));
+        //map.put("UserEntity.birthday", getMessage("UserEntity.birthday"));
         map.put("UserEntity.addressLine", getMessage("UserEntity.addressLine"));
         map.put("UserEntity.city", getMessage("UserEntity.city"));
         map.put("UserEntity.zip", getMessage("UserEntity.zip"));

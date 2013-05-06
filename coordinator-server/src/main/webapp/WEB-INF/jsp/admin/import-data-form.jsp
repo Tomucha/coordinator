@@ -12,7 +12,6 @@
 </script>
 <h2><s:message code="header.importUsers"/></h2>
 
-<c:if test="${form.rowCount > 0}">
     <sf:form modelAttribute="form" action="${root}/admin/import/data">
         <div class="importTablePanel">
             <sf:hidden path="eventId"/>
@@ -25,7 +24,7 @@
                     <th style="width:2em"></th>
                     <c:forEach step="1" begin="0" end="${form.colCount - 1}" var="colIndex">
                         <th>
-                            <sf:select path="typ[${colIndex}]" items="${colTypes}"/>
+                            <sf:select path="typ[${colIndex}]" items="${colTypes}" />
                         </th>
                     </c:forEach>
                 </thead>
@@ -52,4 +51,3 @@
             <button class="btn" type="submit"><s:message code="button.submit"/></button>
         </div>
     </sf:form>
-</c:if>

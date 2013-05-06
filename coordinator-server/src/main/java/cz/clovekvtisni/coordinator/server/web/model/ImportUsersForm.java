@@ -1,7 +1,7 @@
 package cz.clovekvtisni.coordinator.server.web.model;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,6 +9,8 @@ import java.util.List;
  * Date: 21.12.12
  */
 public class ImportUsersForm {
+
+    public static final String EMPTY_TYPE = "0";
 
     private Long eventId;
 
@@ -42,7 +44,7 @@ public class ImportUsersForm {
     }
 
     public int getColCount() {
-        return val != null && val.get(0) != null ? val.get(0).size() : 0;
+        return val != null && val.size() > 0 && val.get(0) != null ? val.get(0).size() : 0;
     }
 
     public Long getEventId() {
@@ -67,5 +69,20 @@ public class ImportUsersForm {
 
     public void setChecked(List<Integer> checked) {
         this.checked = checked;
+    }
+
+    /** select 1th val on 1th column, 2nd val on 2nd colunn, etc. */
+    public void preSelectTypes(Collection<String> strings) {
+        List<String> l = new ArrayList<String>(strings.size());
+        for (String v : strings)
+            if (!EMPTY_TYPE.equals(v))
+                l.add(v);
+
+        List<String> vals = new ArrayList<String>(getColCount());
+        for (int i = 0; i < getColCount() ; i++) {
+            vals.add(i < l.size() ? l.get(i) : EMPTY_TYPE);
+        }
+
+        setTyp(vals);
     }
 }
