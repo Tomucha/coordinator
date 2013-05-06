@@ -17,6 +17,8 @@ import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
+import cz.clovekvtisni.coordinator.server.workflow.WorkflowCallbackAccessor;
+import cz.clovekvtisni.coordinator.server.workflow.callback.WorkflowCallback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +46,9 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private WorkflowCallbackAccessor callbackAccessor;
 
     @Override
     public PoiEntity findById(Long id, long flags) {
@@ -302,7 +307,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     }
 
     @Override
-    public PoiEntity transitWorkflowState(final PoiEntity entity, String transitionId, final long flags) {
+    public PoiEntity transitWorkflowState(PoiEntity entity, String transitionId, final long flags) {
         if (entity == null || transitionId == null)
             return entity;
         if (entity.getWorkflowStateId() == null || entity.getWorkflowState().getTransitions() == null)
@@ -311,12 +316,28 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
         if (transition == null)
             throw new IllegalArgumentException("no transition=" + transitionId + " in workflow state=" + entity.getWorkflowStateId());
 
+        final PoiEntity entityF;
+        String onBeforeCallbackKey = transition.getOnBeforeTransition();
+        if (onBeforeCallbackKey != null) {
+            WorkflowCallback beforeCallback = callbackAccessor.getCallbackByKey(onBeforeCallbackKey);
+            if (beforeCallback != null) {
+                boolean result = beforeCallback.onBeforeTransition(entity, transition);
+                if (!result)
+                    return entity;
+                entityF = findById(entity.getId(), 0L);
+            } else {
+                entityF = entity;
+            }
+        } else {
+            entityF = entity;
+        }
+
         return ofy().transact(new Work<PoiEntity>() {
             @Override
             public PoiEntity run() {
-                entity.setWorkflowState(null);
-                entity.setWorkflowStateId(transition.getToStateId());
-                PoiEntity updated = updatePoi(entity);
+                entityF.setWorkflowState(null);
+                entityF.setWorkflowStateId(transition.getToStateId());
+                PoiEntity updated = updatePoi(entityF);
 
                 if (transition.isForcesSingleAssignee() && (FLAG_DISABLE_FORCE_SINGLE_ASSIGN & flags) == 0) {
                     UserEntity loggedUser = appContext.getLoggedUser();

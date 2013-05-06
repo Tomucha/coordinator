@@ -86,7 +86,7 @@
                    visible_for_role="ANONYMOUS, BACKEND"
                    editable_for_role="ANONYMOUS" type="IN_PROGRESS">
                 <description>popis state</description>
-                <transition id="wkfl_prace_state1_trans2" name="Odmítnout" to_state_id="wkfl_prace_state1"
+                <transition id="wkfl_prace_state1_trans2" name="Odmítnout" on_before_transition="lastUserClosesDoor" to_state_id="wkfl_prace_state1"
                             allowed_for_role="ANONYMOUS, BACKEND">
                     Odmítnout
                 </transition>

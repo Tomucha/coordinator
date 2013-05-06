@@ -1,6 +1,5 @@
 package cz.clovekvtisni.coordinator.domain.config;
 
-import cz.clovekvtisni.coordinator.domain.config.AbstractStaticEntity;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Text;
@@ -36,6 +35,9 @@ public class WorkflowTransition extends AbstractStaticEntity {
     @Attribute(name = "forces_single_assignee", required = false)
     private boolean forcesSingleAssignee;
 
+    @Attribute(name = "on_before_transition", required = false)
+    private String onBeforeTransition;
+
     public String getId() {
         return id;
     }
@@ -62,6 +64,10 @@ public class WorkflowTransition extends AbstractStaticEntity {
 
     public boolean isForcesSingleAssignee() {
         return forcesSingleAssignee;
+    }
+
+    public String getOnBeforeTransition() {
+        return onBeforeTransition;
     }
 
     @Override
