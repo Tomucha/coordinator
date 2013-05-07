@@ -319,6 +319,19 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
         this.lastPoiEntity = lastPoiEntity;
     }
 
+    public boolean hasSameGroup(UserInEventEntity otherInEvent) {
+        if (otherInEvent == null || groupIdList == null || otherInEvent.getGroupIdList() == null)
+            return false;
+        if (equals(otherInEvent))
+            return true;
+        List<Long> otherGroupList = Arrays.asList(otherInEvent.getGroupIdList());
+        for (Long myGroupId : groupIdList) {
+            if (otherGroupList.contains(myGroupId))
+                return true;
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         return "UserInEventEntity{" +

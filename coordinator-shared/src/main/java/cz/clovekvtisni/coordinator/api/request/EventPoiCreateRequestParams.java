@@ -5,7 +5,7 @@ package cz.clovekvtisni.coordinator.api.request;
  * User: jka
  * Date: 11.12.12
  */
-public class EventPoiCreateRequestParams implements RequestParams {
+public class EventPoiCreateRequestParams implements EventRequestParams {
 
     private long eventId;
 
@@ -27,7 +27,8 @@ public class EventPoiCreateRequestParams implements RequestParams {
         this.description = description;
     }
 
-    public long getEventId() {
+    @Override
+    public Long getEventId() {
         return eventId;
     }
 

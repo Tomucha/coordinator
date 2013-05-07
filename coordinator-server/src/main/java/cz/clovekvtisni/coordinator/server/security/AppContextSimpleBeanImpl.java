@@ -50,10 +50,12 @@ public class AppContextSimpleBeanImpl implements AppContext {
         this.locale = locale;
     }
 
+    @Override
     public EventEntity getActiveEvent() {
         return activeEvent;
     }
 
+    @Override
     public void setActiveEvent(EventEntity activeEvent) {
         this.activeEvent = activeEvent;
     }
@@ -68,18 +70,22 @@ public class AppContextSimpleBeanImpl implements AppContext {
         this.activeOrganizationInEvent = organizationInEvent;
     }
 
+    @Override
     public UserInEventEntity getActiveUserInEvent() {
         return activeUserInEvent;
     }
 
+    @Override
     public void setActiveUserInEvent(UserInEventEntity activeUserInEvent) {
         this.activeUserInEvent = activeUserInEvent;
     }
 
+    @Override
     public boolean isSystemCall() {
         return isSystemCall;
     }
 
+    @Override
     public void setSystemCall(boolean systemCall) {
         isSystemCall = systemCall;
     }

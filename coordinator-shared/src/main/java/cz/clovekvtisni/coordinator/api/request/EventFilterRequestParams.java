@@ -1,7 +1,5 @@
 package cz.clovekvtisni.coordinator.api.request;
 
-import java.util.Date;
-
 /**
  * Created with IntelliJ IDEA.
  * User: jka

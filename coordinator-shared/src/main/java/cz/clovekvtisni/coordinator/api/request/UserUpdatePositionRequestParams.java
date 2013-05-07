@@ -5,7 +5,7 @@ package cz.clovekvtisni.coordinator.api.request;
  * User: jka
  * Date: 11.12.12
  */
-public class UserUpdatePositionRequestParams implements RequestParams {
+public class UserUpdatePositionRequestParams implements EventRequestParams {
 
     private Double latitude;
 
@@ -29,6 +29,7 @@ public class UserUpdatePositionRequestParams implements RequestParams {
         this.longitude = longitude;
     }
 
+    @Override
     public Long getEventId() {
         return eventId;
     }

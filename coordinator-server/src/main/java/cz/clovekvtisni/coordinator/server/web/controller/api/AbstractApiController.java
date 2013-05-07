@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.controller.api;
 
+import cz.clovekvtisni.coordinator.api.request.EventRequestParams;
 import cz.clovekvtisni.coordinator.api.request.RequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
@@ -9,9 +10,13 @@ import cz.clovekvtisni.coordinator.exception.MaParseException;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.SecurityTool;
+import cz.clovekvtisni.coordinator.server.security.plugin.UserInEventSecurityPlugin;
+import cz.clovekvtisni.coordinator.server.service.UserInEventService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.util.RunnableWithResult;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -51,6 +56,9 @@ public abstract class AbstractApiController {
 
     @Autowired
     protected UserService userService;
+
+    @Autowired
+    protected UserInEventService userInEventService;
 
     @Autowired
     protected SecurityTool securityTool;
@@ -128,6 +136,13 @@ public abstract class AbstractApiController {
                 if (appContext.getLoggedUser() == null) {
                     logger.error("unknown auth key {}", authKey);
                     throw MaPermissionDeniedException.permissionDenied();
+                }
+                if (params != null && params instanceof EventRequestParams) {
+                    final Long eventId = ((EventRequestParams) params).getEventId();
+                    if (eventId != null) {
+                        UserInEventEntity inEvent = userInEventService.findById(eventId, appContext.getLoggedUser().getId(), 0L);
+                        appContext.setActiveUserInEvent(inEvent);
+                    }
                 }
             }
 

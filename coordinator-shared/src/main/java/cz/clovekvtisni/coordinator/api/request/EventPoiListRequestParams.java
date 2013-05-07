@@ -7,12 +7,13 @@ import java.util.Date;
  * User: jka
  * Date: 11.12.12
  */
-public class EventPoiListRequestParams implements RequestParams {
+public class EventPoiListRequestParams implements EventRequestParams {
 
     private Long eventId;
 
     private Date modifiedFrom;
 
+    @Override
     public Long getEventId() {
         return eventId;
     }

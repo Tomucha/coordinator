@@ -7,7 +7,7 @@ import java.util.Date;
  * User: jka
  * Date: 11.12.12
  */
-public class EventPoiTransitionRequestParams implements RequestParams {
+public class EventPoiTransitionRequestParams implements EventRequestParams {
 
     private long eventId;
 
@@ -15,7 +15,8 @@ public class EventPoiTransitionRequestParams implements RequestParams {
 
     private String transitionId;
 
-    public long getEventId() {
+    @Override
+    public Long getEventId() {
         return eventId;
     }
 
