@@ -307,7 +307,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     }
 
     @Override
-    public PoiEntity transitWorkflowState(PoiEntity entity, String transitionId, final long flags) {
+    public PoiEntity transitWorkflowState(final PoiEntity entity, String transitionId, final long flags) {
         if (entity == null || transitionId == null)
             return entity;
         if (entity.getWorkflowStateId() == null || entity.getWorkflowState().getTransitions() == null)
@@ -316,25 +316,25 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
         if (transition == null)
             throw new IllegalArgumentException("no transition=" + transitionId + " in workflow state=" + entity.getWorkflowStateId());
 
-        final PoiEntity entityF;
-        String onBeforeCallbackKey = transition.getOnBeforeTransition();
-        if (onBeforeCallbackKey != null) {
-            WorkflowCallback beforeCallback = callbackAccessor.getCallbackByKey(onBeforeCallbackKey);
-            if (beforeCallback != null) {
-                boolean result = beforeCallback.onBeforeTransition(entity, transition);
-                if (!result)
-                    return entity;
-                entityF = findById(entity.getId(), 0L);
-            } else {
-                entityF = entity;
-            }
-        } else {
-            entityF = entity;
-        }
-
         return ofy().transact(new Work<PoiEntity>() {
             @Override
             public PoiEntity run() {
+                PoiEntity entityF;
+                String onBeforeCallbackKey = transition.getOnBeforeTransition();
+                if (onBeforeCallbackKey != null) {
+                    WorkflowCallback beforeCallback = callbackAccessor.getCallbackByKey(onBeforeCallbackKey);
+                    if (beforeCallback != null) {
+                        boolean result = beforeCallback.onBeforeTransition(entity, transition);
+                        if (!result)
+                            return entity;
+                        entityF = findById(entity.getId(), 0L);
+                    } else {
+                        entityF = entity;
+                    }
+                } else {
+                    entityF = entity;
+                }
+
                 entityF.setWorkflowState(null);
                 entityF.setWorkflowStateId(transition.getToStateId());
                 PoiEntity updated = updatePoi(entityF);
