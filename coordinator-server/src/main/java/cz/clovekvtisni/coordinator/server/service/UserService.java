@@ -28,6 +28,9 @@ public interface UserService extends Service {
     public static final long FLAG_FORCE_REGISTRATION = 4l;
 
     @Anonymous
+    void lostPassword(String email);
+
+    @Anonymous
     UserEntity login(String login, String password, String... hasRoles) throws MaPermissionDeniedException;
 
     @FilterResult("#helper.canRead(#entity)")

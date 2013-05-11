@@ -36,7 +36,7 @@ public class ToolsController extends AbstractController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/unsubscribe")
-    public String massMailContinue(
+    public String unsubscribe(
             @RequestParam(value = "email", required = false) String email,
             @RequestParam(value = "signature", required = false) String signature,
             Model model) {

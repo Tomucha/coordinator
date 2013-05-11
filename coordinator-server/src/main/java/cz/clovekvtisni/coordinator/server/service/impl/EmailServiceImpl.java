@@ -32,13 +32,15 @@ public class EmailServiceImpl extends AbstractServiceImpl implements EmailServic
 
     @Override
     public void sendEmail(String to, String subject, String body) {
+        Map<String, Object> context = new HashMap<String, Object>();
+        context.put("body", body);
+        sendEmail(to, subject, "generic_body", context);
+    }
+
+
+    @Override
+    public void sendEmail(String to, String subject, String templateName, Map<String, Object> contextParams) {
         logger.info("Sending email: " + to + " " + subject);
-/*
-        if (isDevelopmentServer()) {
-			log.info("mail '" + subject + "' to " + to + " wasn't sent because we're on development server:\n----\n" + htmlBody + "\n-----\n\n");
-			return;
-		}
-*/
 
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
@@ -52,10 +54,10 @@ public class EmailServiceImpl extends AbstractServiceImpl implements EmailServic
             Multipart mp = new MimeMultipart();
 
             Map<String, Object> context = buildTemplateContext(to);
-            context.put("body", body);
+            context.putAll(contextParams);
             String emailBody;
             try {
-                emailBody = TemplateTool.getInstance().processTemplate("generic_body", context, Locale.getDefault());
+                emailBody = TemplateTool.getInstance().processTemplate(templateName, context, Locale.getDefault());
             } catch (Exception e) {
                 throw new IllegalStateException("can't parse template", e);
             }
@@ -90,7 +92,7 @@ public class EmailServiceImpl extends AbstractServiceImpl implements EmailServic
         return context;
     }
 
-    private String buildUnsubscribeSignature(String emailTo) {
+    public String buildUnsubscribeSignature(String emailTo) {
         return SignatureTool.sign(emailTo);
     }
 
