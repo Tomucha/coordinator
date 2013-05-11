@@ -11,6 +11,8 @@ coordinator-server/src/main/webapp/WEB-INF/classes/
 # Local configuration file (sdk path, etc)
 .idea
 *.iml
+.DS_Store
+*/.DS_Store
 coordinator-server/.classpath
 coordinator-server/.project
 coordinator-server/.settings/
