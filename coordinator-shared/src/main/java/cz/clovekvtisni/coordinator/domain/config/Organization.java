@@ -22,6 +22,9 @@ public class Organization extends AbstractStaticEntity {
     @Text(required = false)
     private String description;
 
+    @Attribute(name = "short_description")
+    private String shortDescription;
+
     @Attribute(name = "color_primary")
     private String colorPrimary;
 
@@ -89,6 +92,14 @@ public class Organization extends AbstractStaticEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getShortDescription() {
+        return shortDescription;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
     }
 
     @Override

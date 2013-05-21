@@ -46,25 +46,27 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 	private View preregister;
 
     private User user;
+    private ListView eventsListView;
 
     private void initEvents() {
 		adapter = new EventsAdapter();
 
-		ListView listView = (ListView) findViewById(R.id.events);
-		listView.setAdapter(adapter);
-		listView.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Context c = OrganizationActivity.this;
+        findViewById(R.id.events_wrapper).setVisibility(View.GONE);
+		eventsListView = (ListView) findViewById(R.id.events);
+		eventsListView.setAdapter(adapter);
+		eventsListView.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Context c = OrganizationActivity.this;
                 OrganizationInEvent event = orgInEvents[position];
-				boolean registered = registeredEventIds.contains(event.getEventId());
-				if (registered) {
-					startActivity(EventActivity.IntentHelper.create(c, event.getEvent(), event));
-				} else {
-					startActivityForResult(RegisterActivity.IntentHelper.create(c, organization, event.getEvent(), user), REQUEST_REGISTER);
-				}
-			}
-		});
+                boolean registered = registeredEventIds.contains(event.getEventId());
+                if (registered) {
+                    startActivity(EventActivity.IntentHelper.create(c, event.getEvent(), event));
+                } else {
+                    startActivityForResult(RegisterActivity.IntentHelper.create(c, organization, event.getEvent(), user), REQUEST_REGISTER);
+                }
+            }
+        });
 	}
 
 	private void initPreregisterButton() {
@@ -137,7 +139,11 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 		}
 
 		adapter.notifyDataSetChanged();
-		if (orgInEvents.length == 0) preregister.setVisibility(View.VISIBLE);
+		if (orgInEvents.length == 0) {
+            preregister.setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.events_wrapper).setVisibility(View.VISIBLE);
+        }
 	}
 
 	@Override

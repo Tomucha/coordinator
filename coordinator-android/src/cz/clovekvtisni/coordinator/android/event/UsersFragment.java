@@ -2,6 +2,8 @@ package cz.clovekvtisni.coordinator.android.event;
 
 import java.util.List;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import com.actionbarsherlock.view.MenuItem;
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.util.BetterArrayAdapter;
 import cz.clovekvtisni.coordinator.android.util.FindView;
+import cz.clovekvtisni.coordinator.android.util.UiTool;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 
@@ -41,11 +44,28 @@ public class UsersFragment extends SherlockFragment {
 				onUserClick(adapter.getItem(position));
 			}
 		});
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
+                return onUserLongClick(adapter.getItem(position));
+            }
+        });
 
 		return listView;
 	}
 
-	@Override
+    private boolean onUserLongClick(UserInEvent item) {
+        String phone = item.getUser().getPhone();
+        if (phone != null) {
+            Intent callIntent = new Intent(Intent.ACTION_VIEW);
+            callIntent.setData(Uri.parse("tel:" + phone));
+            startActivity(callIntent);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.users, menu);
 	}
@@ -53,7 +73,9 @@ public class UsersFragment extends SherlockFragment {
 	private void onUserClick(UserInEvent userInEvent) {
 		if (userInEvent.getLastLocationLatitude() != null) {
 			activity.showUserOnMap(userInEvent);
-		}
+		} else {
+            UiTool.toast(R.string.message_user_position_unknown, getActivity().getApplicationContext());
+        }
 	}
 
 	@Override

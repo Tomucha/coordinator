@@ -1,22 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="64dp"
-    android:gravity="center_vertical" >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:gravity="center_vertical">
 
     <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginLeft="8dp"
-        android:textStyle="bold"
-        android:textSize="18sp" />
-    
-    <ImageView
-        android:id="@+id/icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:scaleType="fitXY" />
+            android:id="@+id/title"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
 
-</LinearLayout>
+    <TextView
+            android:id="@+id/short_description"
+            android:layout_below="@id/title"
+            android:layout_alignParentLeft="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:textSize="12sp"/>
+
+    <ImageView
+            android:id="@+id/icon"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_launcher"
+            android:scaleType="fitXY"/>
+
+</RelativeLayout>

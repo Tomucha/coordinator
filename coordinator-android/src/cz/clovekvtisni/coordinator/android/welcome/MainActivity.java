@@ -8,10 +8,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Window;
 import com.fhucho.android.workers.Workers;
 import com.fhucho.android.workers.simple.ActivityWorker2;
 import com.google.android.gcm.GCMRegistrar;
 import cz.clovekvtisni.coordinator.SecretInfo;
+import cz.clovekvtisni.coordinator.android.BaseActivity;
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiCall;
 import cz.clovekvtisni.coordinator.android.api.ApiCalls;
@@ -32,7 +34,7 @@ import cz.clovekvtisni.coordinator.domain.config.Organization;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends SherlockFragmentActivity {
+public class MainActivity extends BaseActivity {
 
     private final Map<Organization, Bitmap> organizationIcons = new HashMap<Organization, Bitmap>();
     private OrganizationAdapter adapter;
@@ -65,15 +67,19 @@ public class MainActivity extends SherlockFragmentActivity {
     }
 
     private void loadOrganizations() {
+        setWorking(true);
         Workers.load(new ConfigLoader(), new ConfigLoaderListener() {
             @Override
             public void onResult(ConfigResponse result) {
+                setWorking(false);
                 onOrganizationsLoaded(result.getOrganizationList());
             }
 
             @Override
             public void onInternetException(Exception e) {
+                setWorking(false);
                 UiTool.toast(R.string.error_no_internet, getApplicationContext());
+                finish();
             }
         }, this);
     }
@@ -100,6 +106,7 @@ public class MainActivity extends SherlockFragmentActivity {
     }
 
     private void loadMyself() {
+        setWorking(true);
         Workers.start(new UserInfoTask(), this);
     }
 
@@ -121,11 +128,13 @@ public class MainActivity extends SherlockFragmentActivity {
 
         @Override
         public void onSuccess(UserByIdResponseData result) {
+            setWorking(false);
             onUserLoaded(result.getFirst());
         }
 
         @Override
         public void onException(Exception e) {
+            setWorking(false);
             Lg.API.e("Cannot load myself: "+e, e);
             UiTool.toast(R.string.error_no_internet, getActivity().getApplicationContext());
         }
@@ -194,6 +203,7 @@ public class MainActivity extends SherlockFragmentActivity {
         @Override
         protected void setUpView(Organization organization, View view) {
             FindView.textView(view, R.id.title).setText(organization.getName());
+            FindView.textView(view, R.id.short_description).setText(organization.getShortDescription());
             FindView.imageView(view, R.id.icon).setImageBitmap(organizationIcons.get(organization));
         }
     }

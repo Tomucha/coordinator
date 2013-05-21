@@ -37,4 +37,6 @@
     </string>
     <string name="dialog_title_filter_people">Zobrazovat tyto lidi</string>
 
+    <string name="message_user_position_unknown">Poloha uživatele není známá.</string>
+
 </resources>

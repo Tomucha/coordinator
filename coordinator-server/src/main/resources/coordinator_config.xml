@@ -83,8 +83,8 @@
                 </transition>
             </state>
             <state id="wkfl_prace_state2" name="Přidělený úkol" requires_assignment="true"
-                   visible_for_role="ANONYMOUS, BACKEND"
-                   editable_for_role="ANONYMOUS" type="IN_PROGRESS">
+                   visible_for_role="BACKEND"
+                   editable_for_role="BACKEND" type="IN_PROGRESS">
                 <description>popis state</description>
                 <transition id="wkfl_prace_state1_trans2" name="Odmítnout" on_before_transition="lastUserClosesDoor" to_state_id="wkfl_prace_state1"
                             allowed_for_role="ANONYMOUS, BACKEND">
@@ -114,6 +114,7 @@
         <organization
                 id="org1"
                 name="Člověk v tísni"
+                short_description="Zaměřuje se na psychosociální pomoc, vítání jsou především odborníci na tuto problematiku."
                 color_primary="#RRGGBB"
                 color_secondary="#RRGGBB"
                 allows_registration="true"
@@ -121,12 +122,12 @@
                 pre_registration_equipment="eq1, eq2"
                 pre_registration_skill="general, zdravotnik, psycholog, krizovy_intervent, socialni_pracovnik, pedagog"
                 icon="/images/logos/cvt.png"
-                >
-            Člověk v tísni poskytuje okamžitou humanitární pomoc lidem v nouzi při přírodních katastrofách nebo ve válečných krizích. Zároveň se zaměřuje se na dlouhodobou pomoc lidem žijícím v chudobě a špatných životních podmínkách. V zemích Afriky, Asie a Evropy realizuje rozvojové programy, které se snaží zlepšit přístup obyvatel ke vzdělání, zdravotní péči, dostupnost pitné vody, dodržování hygieny, rozvoj místních zdrojů obživy i zapojení lidí do procesů ovlivňujících dění v jejich zemi.
+                >Člověk v tísni poskytuje okamžitou humanitární pomoc lidem v nouzi při přírodních katastrofách nebo ve válečných krizích. Zároveň se zaměřuje se na dlouhodobou pomoc lidem žijícím v chudobě a špatných životních podmínkách. V zemích Afriky, Asie a Evropy realizuje rozvojové programy, které se snaží zlepšit přístup obyvatel ke vzdělání, zdravotní péči, dostupnost pitné vody, dodržování hygieny, rozvoj místních zdrojů obživy i zapojení lidí do procesů ovlivňujících dění v jejich zemi.
         </organization>
         <organization
                 id="org2"
                 name="Adra"
+                short_description="Koordinuje poctivou dobrovolnickou práci. Pokud chcete prostě pomáhat a nebojíte se práce, Adra Vám poskytne potřebné zázemí."
                 color_primary="#RRGGBB"
                 color_secondary="#RRGGBB"
                 allows_registration="true"
@@ -134,16 +135,12 @@
                 pre_registration_equipment="eq1, eq2"
                 pre_registration_skill="general, stavar, statik, krizovy_intervent, socialni_pracovnik, pedagog"
                 icon="/images/logos/adra.png"
-                >
-            ADRA pomáhá jak při mimořádných událostech (živelné pohromy, jako jsou povodně či zemětřesení, válečné
-            konflikty apod.), tak při realizaci dlouhodobých rozvojových projektů (podpora vzdělání, zaměstnanosti,
-            zemědělství atd.). ADRA realizovala nebo realizuje projekty v Bangladéši, Barmě, Bosně a Hercegovině, Číně,
-            Bulharsku, Indii, Indonésii, Kambodži, Keni, Libanonu, Moldavsku, Mongolsku, Nepálu, Pákistánu, Rusku,
-            Řecku, Srbsku, Srí Lance, Thajsku, Vietnamu, USA, Uzbekistánu, Zambii a v řadě dalších zemí.
+                >ADRA pomáhá jak při mimořádných událostech (živelné pohromy, jako jsou povodně či zemětřesení, válečné konflikty apod.), tak při realizaci dlouhodobých rozvojových projektů (podpora vzdělání, zaměstnanosti, zemědělství atd.). ADRA realizovala nebo realizuje projekty v Bangladéši, Barmě, Bosně a Hercegovině, Číně, Bulharsku, Indii, Indonésii, Kambodži, Keni, Libanonu, Moldavsku, Mongolsku, Nepálu, Pákistánu, Rusku, Řecku, Srbsku, Srí Lance, Thajsku, Vietnamu, USA, Uzbekistánu, Zambii a v řadě dalších zemí.
         </organization>
         <organization
                 id="org3"
                 name="Český červený kříž"
+                short_description="Jste-li zdravotník nebo odpovídající vzdělání, ČČK je ta organizace, kam se registrovat."
                 color_primary="#RRGGBB"
                 color_secondary="#RRGGBB"
                 allows_registration="true"
@@ -151,9 +148,7 @@
                 pre_registration_equipment="eq1, eq2"
                 pre_registration_skill="skill1, skill2"
                 icon="/images/logos/cck.png"
-                >
-            ČČK působí v oblasti civilní obrany a ochrany obyvatelstva a poskytuje pomoc v případech katastrof a jiných
-            mimořádných událostí; a poskytuje zdravotnické, záchranné, sociální a další humanitární služby;
+                >ČČK působí v oblasti civilní obrany a ochrany obyvatelstva a poskytuje pomoc v případech katastrof a jiných mimořádných událostí; a poskytuje zdravotnické, záchranné, sociální a další humanitární služby.
         </organization>
     </organization_list>
 

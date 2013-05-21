@@ -14,10 +14,11 @@ public class AdminController extends AbstractEventController {
 
     @RequestMapping
     public String show(@ModelAttribute("params") EventFilterParams params, Model model) {
-        if (params.getEventId() != null)
-            return "redirect:/admin/event/map?eventId="+params.getEventId();
-        else
+        if (params.getEventId() != null) {
+            return "redirect:/admin/event/poi/list?eventId="+params.getEventId();
+        } else {
             return "redirect:/superadmin/event/list";
+        }
     }
 
     public static Breadcrumb getBreadcrumb(EventEntity event) {

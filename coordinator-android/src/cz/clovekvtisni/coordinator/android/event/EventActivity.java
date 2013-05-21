@@ -572,8 +572,6 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 
             if (items == null || items.length == 0) {
                 UiTool.toast(R.string.warning_no_groups_to_filter, getActivity().getApplicationContext());
-                dismiss();
-                return null;
             }
 
 

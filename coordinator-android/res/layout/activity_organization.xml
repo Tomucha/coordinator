@@ -14,6 +14,8 @@
         <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
+                android:layout_weight="1"
+                android:scrollbarFadeDuration="1000"
                 >
 
             <TextView
@@ -23,28 +25,37 @@
                     android:layout_weight="1"/>
         </ScrollView>
 
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:paddingBottom="4dp"
-                android:paddingLeft="4dp"
-                android:text="@string/label_events"
-                android:textColor="#444"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
-
-        <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#222"/>
-
-        <ListView
-                android:id="@+id/events"
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                tools:listitem="@android:layout/simple_list_item_2"/>
+                android:layout_weight="2"
+                android:orientation="vertical"
+                android:id="@+id/events_wrapper">
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:paddingBottom="4dp"
+                    android:paddingLeft="4dp"
+                    android:text="@string/label_events"
+                    android:textColor="#444"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#222"/>
+
+            <ListView
+                    android:id="@+id/events"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    tools:listitem="@android:layout/simple_list_item_2"/>
+
+        </LinearLayout>
 
         <Button
                 android:id="@+id/preregister"
