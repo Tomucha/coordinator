@@ -2,7 +2,7 @@ package cz.clovekvtisni.coordinator.domain;
 
 public class EventLocation extends AbstractModifiableEntity {
 
-    private String eventId;
+    private long eventId;
 
     private Double latitude;
 
@@ -10,11 +10,11 @@ public class EventLocation extends AbstractModifiableEntity {
 
     private Long radius;
 
-    public String getEventId() {
+    public long getEventId() {
         return eventId;
     }
 
-    public void setEventId(String eventId) {
+    public void setEventId(long eventId) {
         this.eventId = eventId;
     }
 

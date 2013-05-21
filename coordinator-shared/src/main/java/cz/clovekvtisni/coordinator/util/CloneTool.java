@@ -52,8 +52,10 @@ public class CloneTool {
                 dstSetterMap.put(name.substring(3), method);
             }
         }
+        Method currentMethod = null;
         try {
             for (Method method : srcMethods) {
+                currentMethod = method;
                 String name = method.getName();
                 int length = name.length();
                 if (name.startsWith("get") && length > 3) {
@@ -68,7 +70,7 @@ public class CloneTool {
                 }
             }
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException(e+"( "+currentMethod+")");
         }
     }
 

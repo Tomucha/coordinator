@@ -127,7 +127,7 @@
         <organization
                 id="org2"
                 name="Adra"
-                short_description="Koordinuje poctivou dobrovolnickou práci. Pokud chcete prostě pomáhat a nebojíte se práce, Adra Vám poskytne potřebné zázemí."
+                short_description="Koordinuje poctivou dobrovolnickou práci. Pokud chcete pomáhat a nebojíte se pracovat rukama, Adra Vám poskytne potřebné zázemí."
                 color_primary="#RRGGBB"
                 color_secondary="#RRGGBB"
                 allows_registration="true"
@@ -140,7 +140,7 @@
         <organization
                 id="org3"
                 name="Český červený kříž"
-                short_description="Jste-li zdravotník nebo odpovídající vzdělání, ČČK je ta organizace, kam se registrovat."
+                short_description="Jste-li zdravotník nebo máte odpovídající vzdělání, ČČK je ta organizace, kam se registrovat."
                 color_primary="#RRGGBB"
                 color_secondary="#RRGGBB"
                 allows_registration="true"
