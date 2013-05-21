@@ -5,6 +5,7 @@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
         taglib prefix="app" uri="/WEB-INF/www.tld" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags" %><%@
+        taglib prefix="can" uri="/WEB-INF/permissions.tld" %><%@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form"
 %>
 
@@ -17,8 +18,10 @@
     <p class="navbar-text pull-right">
         <c:if test="${!empty loggedUser}">
             <c:out value="${loggedUser.email}" />
-            <a href="<s:url value="/logout"/>"><s:message code="logout"/></a>,
-            <a href="<s:url value="/superadmin"/>"><s:message code="superadmin"/></a>
+            <a href="<s:url value="/logout"/>"><s:message code="logout"/></a>
+            <c:if test="${can:hasRole('BACKEND')}">
+                , <a href="<s:url value="/superadmin"/>"><s:message code="superadmin"/></a>
+            </c:if>
         </c:if>
     </p>
 </div><!--/.nav-collapse -->

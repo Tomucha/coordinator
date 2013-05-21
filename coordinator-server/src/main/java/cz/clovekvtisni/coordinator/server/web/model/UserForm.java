@@ -10,6 +10,7 @@ import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserSkillEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
+import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.context.MessageSource;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -73,7 +74,10 @@ public class UserForm extends UserEntity {
     }
 
     public void postValidate(BindingResult bindingResult, MessageSource messageSource, Locale locale) {
-        if (getPassword() != null && !getPassword().equals(getConfirmPassword())) {
+        if (isNew() && ValueTool.isEmpty(getPassword())) {
+            bindingResult.addError(new FieldError("form", "password", getPassword(), false, null, null, messageSource.getMessage("javax.validation.constraints.NotNull.message", null, locale)));
+
+        } else if (getPassword() != null && !getPassword().equals(getConfirmPassword())) {
             bindingResult.addError(new FieldError("form", "confirmPassword", getPassword(), false, null, null, messageSource.getMessage("error.PASSWORD_CONFIRM_FAILED", null, locale)));
         }
     }
