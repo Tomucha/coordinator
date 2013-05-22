@@ -2,6 +2,7 @@ package cz.clovekvtisni.coordinator.server.web.controller;
 
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.service.UserGroupService;
+import cz.clovekvtisni.coordinator.server.web.EventPrerequisitiesRequired;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.SelectedUserAction;
 import cz.clovekvtisni.coordinator.server.web.util.Breadcrumb;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/admin/event/user-group/list")
+@EventPrerequisitiesRequired
 public class EventUserGroupListController extends AbstractEventController {
 
     @Autowired

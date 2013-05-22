@@ -6,11 +6,9 @@
         taglib prefix="tags" tagdir="/WEB-INF/tags" %><%@
         taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %><%@
         taglib prefix="can" uri="/WEB-INF/permissions.tld"
-%><script>
-    $(function() {
-        $( "#birthdayInput" ).datepicker({dateFormat: "dd.mm.yy"});
-    });
-</script>
+%>
+<tags:initDatePicker element="#birthdayInput"/>
+
 <script type="text/javascript">
 
     osmCallback.onNewPoint = function(point) {

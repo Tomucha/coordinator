@@ -5,12 +5,7 @@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %>
-        <script>
-            $(function() {
-                $( "#datePublishInput" ).datepicker({dateFormat: "dd.mm.yy"});
-                $( "#dateClosedInput" ).datepicker({dateFormat: "dd.mm.yy"});
-                $( "#dateClosedRegistrationInput" ).datepicker({dateFormat: "dd.mm.yy"});
-        </script>
+        <tags:initDatePicker element="#datePublishInput, #dateClosedInput, #dateClosedRegistrationInput"/>
 
         <sf:form method="POST" modelAttribute="form">
 

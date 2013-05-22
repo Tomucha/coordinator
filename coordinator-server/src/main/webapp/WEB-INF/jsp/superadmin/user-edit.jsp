@@ -5,11 +5,9 @@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags" %><%@
         taglib prefix="can" uri="/WEB-INF/permissions.tld"
-%><script>
-    $(function() {
-        $( "#birthdayInput" ).datepicker({dateFormat: "dd.mm.yy"});
-    });
-</script>
+%>
+<tags:initDatePicker element="#birthdayInput"/>
+
 <h2>
     <c:choose>
         <c:when test="${empty form.id}"><s:message code="header.userCreate"/></c:when>
