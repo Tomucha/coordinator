@@ -96,6 +96,7 @@ public class EventMapController extends AbstractEventController {
         model.addAttribute("poiList", pois.getResult());
 
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
+        model.addAttribute("disableMap", true);
 
         return "admin/event-map";
     }

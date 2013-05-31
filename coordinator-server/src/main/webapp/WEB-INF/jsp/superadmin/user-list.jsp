@@ -10,10 +10,12 @@
 
 <h2><s:message code="header.userList"/></h2>
 
-<div class="buttonPanel">
-    <c:if test="${can:create('userEntity')}">
-        <a class="btn" href="${root}/superadmin/user/edit"><i class="icon-plus"></i> <i class="icon-user"></i> <s:message code="button.createUser"/></a>
-    </c:if>
+<div class="buttonPanel btn-toolbar">
+    <div class="btn-group">
+        <c:if test="${can:create('userEntity')}">
+            <a class="btn" href="${root}/superadmin/user/edit"><i class="icon-plus"></i> <i class="icon-user"></i> <s:message code="button.createUser"/></a>
+        </c:if>
+    </div>
 </div>
 
 <div class="eventListTable">

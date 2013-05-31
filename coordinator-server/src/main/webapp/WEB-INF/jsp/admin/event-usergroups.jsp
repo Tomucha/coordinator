@@ -18,14 +18,15 @@
 <%--@elvariable id="config" type="cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig"--%>
 
 <div class="mainPanel">
-    <div class="btn-toolbar">
-        <c:choose>
-            <c:when test="${can:hasRole('BACKEND')}">
-                <a class="btn" href="<s:url value="/admin/event/user-group/edit?eventId=${params.eventId}&retUrl=/admin/event/user-group/list"/>"><i class="icon-plus"></i> <s:message
-                        code="button.addNewUserGroup"/></a>
-            </c:when>
-        </c:choose>
-
+    <div class="buttonPanel btn-toolbar">
+        <div class="btn-group">
+            <c:choose>
+                <c:when test="${can:hasRole('BACKEND')}">
+                    <a class="btn" href="<s:url value="/admin/event/user-group/edit?eventId=${params.eventId}&retUrl=/admin/event/user-group/list"/>"><i class="icon-plus"></i> <s:message
+                            code="button.addNewUserGroup"/></a>
+                </c:when>
+            </c:choose>
+        </div>
     </div>
 
     <c:choose>
