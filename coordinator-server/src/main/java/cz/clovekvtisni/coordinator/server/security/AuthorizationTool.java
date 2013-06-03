@@ -26,6 +26,8 @@ public class AuthorizationTool {
 
     public static final String BACKEND = "BACKEND";
 
+    public static final String COORDINATOR = "COORDINATOR";
+
     public static final String ANONYMOUS = "ANONYMOUS";
 
     private Map<String, Role> roleMap;
@@ -63,16 +65,18 @@ public class AuthorizationTool {
         return true;
     }
 
-    // TODO prejmenovat na isAuthorized()
+    @Deprecated
     public boolean hasRole(String roleId, UserEntity user) {
         if (user == null || user.getRoleIdList() == null) return roleId == null;
         return isAuthorized(Arrays.asList(new String[] {roleId}), Arrays.asList(user.getRoleIdList()));
     }
 
+    @Deprecated
     public boolean isAuthorized(String[] roles, UserEntity user) {
         return isAuthorized(Arrays.asList(roles), user != null && user.getRoleIdList() != null ? Arrays.asList(user.getRoleIdList()) : null);
     }
 
+    @Deprecated
     public boolean isAuthorized(List<String> needOneOfRoles, List<String>... hasAllRoles) {
         if (needOneOfRoles == null) return true;
         if (hasAllRoles == null) return needOneOfRoles.size() == 0;

@@ -128,14 +128,17 @@ public abstract class AbstractController {
         return appContext.getLoggedUser();
     }
 
+    @Deprecated
     protected boolean isSuperAdmin(UserEntity user) {
         return authorizationTool.hasRole(AuthorizationTool.SUPERADMIN, user);
     }
 
+    @Deprecated
     protected boolean isAdmin(UserEntity user) {
         return authorizationTool.hasRole(AuthorizationTool.ADMIN, user);
     }
 
+    @Deprecated
     protected boolean isBackendAdmin(UserEntity user) {
         return authorizationTool.hasRole(AuthorizationTool.BACKEND, user);
     }

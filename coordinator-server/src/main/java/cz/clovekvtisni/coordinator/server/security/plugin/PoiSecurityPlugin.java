@@ -34,17 +34,17 @@ public class PoiSecurityPlugin extends SecurityPlugin {
                 return entity == null || authorizationTool.isVisibleFor(entity, loggedUser());
             }
         };
-        PermissionCommand<PoiEntity> isBackendCommand = new HasRoleCommand<PoiEntity>(appContext, authorizationTool, Arrays.asList(new String[]{AuthorizationTool.BACKEND}));
+        PermissionCommand<PoiEntity> canCreateCommand = new HasRoleCommand<PoiEntity>(appContext, authorizationTool, Arrays.asList(new String[]{AuthorizationTool.BACKEND, AuthorizationTool.COORDINATOR}));
         PermissionCommand<PoiEntity> isLogged = new UserLoggedCommand<PoiEntity>(appContext);
 
         registerPermissionCommand(PoiEntity.class, ReadPermission.class, isVisibleCommand);
         registerPermissionCommand("poiEntity", ReadPermission.class, isVisibleCommand);
-        registerPermissionCommand(PoiEntity.class, CreatePermission.class, isLogged);
-        registerPermissionCommand("poiEntity", CreatePermission.class, isLogged);
-        registerPermissionCommand(PoiEntity.class, UpdatePermission.class, isBackendCommand);
-        registerPermissionCommand("poiEntity", UpdatePermission.class, isBackendCommand);
-        registerPermissionCommand(PoiEntity.class, DeletePermission.class, isBackendCommand);
-        registerPermissionCommand("poiEntity", DeletePermission.class, isBackendCommand);
+        registerPermissionCommand(PoiEntity.class, CreatePermission.class, canCreateCommand);
+        registerPermissionCommand("poiEntity", CreatePermission.class, canCreateCommand);
+        registerPermissionCommand(PoiEntity.class, UpdatePermission.class, canCreateCommand);
+        registerPermissionCommand("poiEntity", UpdatePermission.class, canCreateCommand);
+        registerPermissionCommand(PoiEntity.class, DeletePermission.class, canCreateCommand);
+        registerPermissionCommand("poiEntity", DeletePermission.class, canCreateCommand);
     }
 
 }

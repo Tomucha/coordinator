@@ -31,7 +31,7 @@ public class UserGroupSecurityPlugin extends SecurityPlugin {
     @Override
     protected void register() {
         PermissionCommand<UserGroupEntity> permittedCommand = new PermittedCommand<UserGroupEntity>();
-        PermissionCommand<UserGroupEntity> isBackendCommand = new HasRoleCommand<UserGroupEntity>(appContext, authorizationTool, Arrays.asList(new String[]{AuthorizationTool.BACKEND}));
+        PermissionCommand<UserGroupEntity> isBackendCommand = new HasRoleCommand<UserGroupEntity>(appContext, authorizationTool, Arrays.asList(new String[]{AuthorizationTool.BACKEND, AuthorizationTool.COORDINATOR}));
 
         registerPermissionCommand(UserGroupEntity.class, ReadPermission.class, permittedCommand);
         registerPermissionCommand("userGroupEntity", ReadPermission.class, permittedCommand);
@@ -42,5 +42,4 @@ public class UserGroupSecurityPlugin extends SecurityPlugin {
         registerPermissionCommand(UserGroupEntity.class, DeletePermission.class, isBackendCommand);
         registerPermissionCommand("userGroupEntity", DeletePermission.class, isBackendCommand);
     }
-
 }

@@ -36,24 +36,25 @@
 <div class="mainPanel">
     <div class="buttonPanel btn-toolbar">
         <div class="btn-group">
-            <c:choose>
-                <c:when test="${can:hasRole('BACKEND')}">
-                    <c:set var="isFilter" value="${!empty params.groupId or !empty params.userFulltext}"/>
+            <c:set var="isFilter" value="${!empty params.groupId or !empty params.userFulltext}"/>
 
-                    <button accesskey="f" class="btn${isFilter ? ' btn-danger' : ''}" onclick="$('#searchFormPanel').slideToggle();"><i class="icon-filter${isFilter ? ' icon-white' : ''}"></i> <s:message code="button.filterList"/> <span class="caret"></span></button>
+            <button accesskey="f" class="btn${isFilter ? ' btn-danger' : ''}" onclick="$('#searchFormPanel').slideToggle();"><i class="icon-filter${isFilter ? ' icon-white' : ''}"></i> <s:message code="button.filterList"/> <span class="caret"></span></button>
 
-                    <a class="btn" href="<s:url value="/admin/event/user/edit?eventId=${params.eventId}"/>"><i class=" icon-plus"></i> <i class="icon-user"></i> <s:message
+            <c:if test="${can:create('userEntity')}">
+                <a class="btn" href="<s:url value="/admin/event/user/edit?eventId=${params.eventId}"/>"><i class=" icon-plus"></i> <i class="icon-user"></i> <s:message
                             code="button.addNewUser"/></a>
-                    <a class="btn" href="<s:url value="/admin/event/user-group/edit?eventId=${params.eventId}"/>"><i class="icon-plus"></i> <s:message
-                            code="button.addNewUserGroup"/></a>
+            </c:if>
 
-                    <c:if test="${!empty loggedUser.organizationId}">
-                        <a class="btn"
-                           href="<s:url value="/admin/import?eventId=${params.eventId}&organizationId=${loggedUser.organizationId}"/>"><i class=" icon-folder-open"></i> <s:message
-                                code="button.import"/></a>
-                    </c:if>
-                </c:when>
-            </c:choose>
+            <c:if test="${can:create('userGroupEntity')}">
+                <a class="btn" href="<s:url value="/admin/event/user-group/edit?eventId=${params.eventId}"/>"><i class="icon-plus"></i> <s:message
+                            code="button.addNewUserGroup"/></a>
+            </c:if>
+
+            <c:if test="${!empty loggedUser.organizationId and can:create('userEntity')}">
+                <a class="btn"
+                   href="<s:url value="/admin/import?eventId=${params.eventId}&organizationId=${loggedUser.organizationId}"/>"><i class=" icon-folder-open"></i> <s:message
+                        code="button.import"/></a>
+            </c:if>
         </div>
     </div>
 

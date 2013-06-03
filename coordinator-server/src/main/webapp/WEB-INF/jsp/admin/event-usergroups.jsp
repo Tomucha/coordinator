@@ -21,7 +21,7 @@
     <div class="buttonPanel btn-toolbar">
         <div class="btn-group">
             <c:choose>
-                <c:when test="${can:hasRole('BACKEND')}">
+                <c:when test="${can:create('userGroupEntity')}">
                     <a class="btn" href="<s:url value="/admin/event/user-group/edit?eventId=${params.eventId}&retUrl=/admin/event/user-group/list"/>"><i class="icon-plus"></i> <s:message
                             code="button.addNewUserGroup"/></a>
                 </c:when>

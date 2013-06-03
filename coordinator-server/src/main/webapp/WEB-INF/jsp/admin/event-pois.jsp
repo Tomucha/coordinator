@@ -28,16 +28,14 @@
 
     <div class="buttonPanel btn-toolbar">
         <div class="btn-group">
-            <c:choose>
-                <c:when test="${can:hasRole('BACKEND')}">
-                    <c:set var="isFilter" value="${!empty params.workflowId or !empty params.workflowStateId}"/>
+            <c:set var="isFilter" value="${!empty params.workflowId or !empty params.workflowStateId}"/>
 
-                    <button accesskey="f" class="btn${isFilter ? ' btn-danger' : ''}" onclick="$('#searchFormPanel').slideToggle();"><i class="icon-filter${isFilter ? ' icon-white' : ''}"></i> <s:message code="button.filterList"/> <span class="caret"></span></button>
+            <button accesskey="f" class="btn${isFilter ? ' btn-danger' : ''}" onclick="$('#searchFormPanel').slideToggle();"><i class="icon-filter${isFilter ? ' icon-white' : ''}"></i> <s:message code="button.filterList"/> <span class="caret"></span></button>
 
-                    <a class="btn" href="<s:url value="/admin/event/poi/edit?eventId=${params.eventId}"/>"><span class="icon-plus"></span> <span class="icon-map-marker"></span> <s:message
+            <c:if test="${can:create('poiEntity')}">
+                <a class="btn" href="<s:url value="/admin/event/poi/edit?eventId=${params.eventId}"/>"><span class="icon-plus"></span> <span class="icon-map-marker"></span> <s:message
                             code="button.addNew"/></a>
-                </c:when>
-            </c:choose>
+            </c:if>
         </div>
     </div>
 

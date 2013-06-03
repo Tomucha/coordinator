@@ -25,11 +25,10 @@ public class UserSecurityPlugin extends SecurityPlugin {
 
     @Override
     protected void register() {
-        //TODO: realni prava
         PermissionCommand<UserEntity> permittedCommand = new PermittedCommand<UserEntity>();
         SystemCallCommand<UserEntity> systemCallCommand = new SystemCallCommand<UserEntity>(appContext);
         PermissionCommand<UserEntity> userLoggedCommand = new UserLoggedCommand<UserEntity>(appContext);
-        HasRoleCommand<UserEntity> isAdmin = new HasRoleCommand<UserEntity>(appContext, authorizationTool, Arrays.asList(new String[]{"BACKEND"}));
+        HasRoleCommand<UserEntity> isAdmin = new HasRoleCommand<UserEntity>(appContext, authorizationTool, Arrays.asList(new String[]{AuthorizationTool.BACKEND, AuthorizationTool.COORDINATOR}));
         HasRoleCommand<UserEntity> isSuperuser = new HasRoleCommand<UserEntity>(appContext, authorizationTool, Arrays.asList(new String[]{"SUPERADMIN"}));
 
         registerPermissionCommand(UserEntity.class, MassMailPermission.class, new OrCommand(isSuperuser, systemCallCommand));

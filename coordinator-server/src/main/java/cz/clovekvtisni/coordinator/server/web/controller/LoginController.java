@@ -52,7 +52,7 @@ public class LoginController extends AbstractSuperadminController {
                     AuthorizationTool.SUPERADMIN,
                     AuthorizationTool.ADMIN,
                     AuthorizationTool.BACKEND,
-                    "COORDINATOR");
+                    AuthorizationTool.COORDINATOR);
 
             retUrl = loginForm.retUrl;
             if (ValueTool.isEmpty(retUrl)) {

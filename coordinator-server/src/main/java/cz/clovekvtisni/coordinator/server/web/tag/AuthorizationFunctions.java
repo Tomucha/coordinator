@@ -68,18 +68,22 @@ public class AuthorizationFunctions {
         return securityTool.check(new CreatePermission(entityName));
     }
 
+    @Deprecated
     public static boolean isSuperAdmin() {
         return hasRole(AuthorizationTool.SUPERADMIN);
     }
 
+    @Deprecated
     public static boolean isAdmin() {
         return hasRole(AuthorizationTool.ADMIN);
     }
 
+    @Deprecated
     public static boolean isBackend() {
         return hasRole(AuthorizationTool.BACKEND);
     }
 
+    @Deprecated
     public static boolean hasRole(String roleId) {
         UserEntity user = appContext.getLoggedUser();
         if (appContext == null )
