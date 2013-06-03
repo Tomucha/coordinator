@@ -110,6 +110,8 @@ public class CoordinatorConfig {
         if (roleList != null) {
             for (Role role : roleList) {
                 checkKeysExist(roleMap, role.getExtendsRoleId());
+                List<Role> parents = parentsRole(role);
+
             }
         }
         if (workflowList != null) {
@@ -156,6 +158,17 @@ public class CoordinatorConfig {
                 throw new IllegalStateException("Inconsistent configuration. Key=" + key + " does not exist.");
             }
         }
+    }
+
+    private List<Role> parentsRole(Role role) {
+        Map<String, Role> roleMap = getRoleMap();
+        List<Role> parents = new ArrayList<Role>();
+        Role next = role;
+        while (next != null && next.getExtendsRoleId() != null) {
+            next = roleMap.get(next.getExtendsRoleId());
+            parents.add(next);
+        }
+        return parents;
     }
 
     public Map<String, Organization> getOrganizationMap() {

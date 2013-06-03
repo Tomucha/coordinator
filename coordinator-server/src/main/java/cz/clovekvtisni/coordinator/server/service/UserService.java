@@ -27,11 +27,16 @@ public interface UserService extends Service {
 
     public static final long FLAG_FORCE_REGISTRATION = 4l;
 
+    public static final long FLAG_CHECK_WEB_PERMISSION = 8l;
+
     @Anonymous
     void lostPassword(String email);
 
     @Anonymous
-    UserEntity login(String login, String password, String... hasRoles) throws MaPermissionDeniedException;
+    UserEntity loginWeb(String login, String password) throws MaPermissionDeniedException;
+
+    @Anonymous
+    UserEntity loginApi(String login, String password) throws MaPermissionDeniedException;
 
     @FilterResult("#helper.canRead(#entity)")
     UserEntity findById(Long id, long flags);

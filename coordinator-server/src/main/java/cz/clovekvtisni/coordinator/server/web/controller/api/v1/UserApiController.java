@@ -41,7 +41,7 @@ public class UserApiController extends AbstractApiController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody ApiResponse login(HttpServletRequest request) {
         LoginRequestParams params = parseRequestAnonymous(request, LoginRequestParams.class);
-        UserEntity user = userService.login(params.getLogin(), params.getPassword());
+        UserEntity user = userService.loginApi(params.getLogin(), params.getPassword());
         if (user == null) {
             throw MaPermissionDeniedException.wrongCredentials();
         }

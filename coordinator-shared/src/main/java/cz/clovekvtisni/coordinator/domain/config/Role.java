@@ -1,9 +1,11 @@
 package cz.clovekvtisni.coordinator.domain.config;
 
-import cz.clovekvtisni.coordinator.domain.config.AbstractStaticEntity;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Text;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,6 +27,9 @@ public class Role extends AbstractStaticEntity {
     @Attribute(name = "extends_role_id", required = false)
     private String extendsRoleId;
 
+    @Attribute(required = false)
+    private RolePermission[] permissions;
+
     public String getId() {
         return id;
     }
@@ -39,6 +44,22 @@ public class Role extends AbstractStaticEntity {
 
     public String getExtendsRoleId() {
         return extendsRoleId;
+    }
+
+    public RolePermission[] getPermissions() {
+        return permissions;
+    }
+
+    public boolean hasAnyPermission(RolePermission... needed) {
+        if (permissions == null)
+            return false;
+
+        List<RolePermission> havePermissions = Arrays.asList(permissions);
+        for (RolePermission permission : needed) {
+            if (havePermissions.contains(permission))
+                return true;
+        }
+        return false;
     }
 
     @Override

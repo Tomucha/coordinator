@@ -1,11 +1,10 @@
 package cz.clovekvtisni.coordinator.server.security;
 
 import cz.clovekvtisni.coordinator.domain.config.Role;
+import cz.clovekvtisni.coordinator.domain.config.RolePermission;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
-import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
-import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.*;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,10 +48,37 @@ public class AuthorizationTool {
         }
     }
 
+    public boolean hasAnyPermission(UserEntity user, RolePermission... permissions) {
+        String[] roleIdList = user.getRoleIdList();
+        if (roleIdList == null)
+            return false;
+        for (String roleId : roleIdList) {
+            Role role = roleMap.get(roleId);
+            if (role.hasAnyPermission(permissions))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean hasAnyPermission(UserInEventEntity inEventEntity, RolePermission... permissions) {
+        if (hasAnyPermission(inEventEntity.getUserEntity(), permissions))
+            return true;
+        for (UserGroupEntity userGroup : inEventEntity.getGroupEntities()) {
+            if (userGroup.getRoleId() == null)
+                continue;
+            Role role = roleMap.get(userGroup.getRoleId());
+            if (role.hasAnyPermission(permissions))
+                return true;
+        }
+        return false;
+    }
+
+    @Deprecated
     public boolean canCreate(String roleId, String[] creatorRoles) {
         return canCreate(roleId, Arrays.asList(creatorRoles));
     }
 
+    @Deprecated
     public boolean canCreate(String roleId, List<String> creatorRoles) {
         if (roleId == null || creatorRoles == null) return false;
         if (roleId.equals(SUPERADMIN) || roleId.equals(ADMIN))
@@ -64,6 +90,7 @@ public class AuthorizationTool {
     }
 
     // TODO prejmenovat na isAuthorized()
+    @Deprecated
     public boolean hasRole(String roleId, UserEntity user) {
         if (user == null || user.getRoleIdList() == null) return roleId == null;
         return isAuthorized(Arrays.asList(new String[] {roleId}), Arrays.asList(user.getRoleIdList()));

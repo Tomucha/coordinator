@@ -57,6 +57,9 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     @Autowired
     protected MessageSource messageSource;
 
+    @Autowired
+    private CoordinatorConfig config;
+
     @Override
     public void lostPassword(String email) {
         final UserEntity toChangePassword = findByEmail(email);
@@ -82,8 +85,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         return query.first().get();
     }
 
-    @Override
-    public UserEntity login(String email, String password, String... hasRoles) {
+    private UserEntity login(String email, String password, long flags) {
         Key<UserEntity> userKey = systemService.findUniqueValueOwner(ofy(), UniqueIndexEntity.Property.EMAIL, ValueTool.normalizeEmail(email));
         if (userKey == null) {
             throw MaPermissionDeniedException.wrongCredentials();
@@ -94,16 +96,8 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             throw MaPermissionDeniedException.wrongCredentials();
         }
 
-        if (hasRoles != null && hasRoles.length > 0) {
-            boolean isPermited = false;
-            for (String hasRole : hasRoles) {
-                if (authorizationTool.hasRole(hasRole, userEntity)) {
-                    isPermited = true;
-                    break;
-                }
-            }
-            if (!isPermited)
-                throw MaPermissionDeniedException.permissionDenied();
+        if ((flags & FLAG_CHECK_WEB_PERMISSION) != 0) {
+
         }
 
         appContext.setLoggedUser(userEntity);

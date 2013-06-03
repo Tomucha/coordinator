@@ -1,6 +1,5 @@
 package cz.clovekvtisni.coordinator.server.service.impl;
 
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
 import cz.clovekvtisni.coordinator.server.domain.AbstractPersistentEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.service.SystemService;

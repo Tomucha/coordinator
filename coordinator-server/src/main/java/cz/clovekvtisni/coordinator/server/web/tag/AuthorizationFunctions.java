@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.tag;
 
+import cz.clovekvtisni.coordinator.domain.config.RolePermission;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorEntity;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
