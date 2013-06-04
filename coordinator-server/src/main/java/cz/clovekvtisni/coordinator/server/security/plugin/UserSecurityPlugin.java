@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.security.plugin;
 
+import cz.clovekvtisni.coordinator.domain.config.RolePermission;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
@@ -43,5 +44,13 @@ public class UserSecurityPlugin extends SecurityPlugin {
         registerPermissionCommand(UserEntity.class, DeletePermission.class, isAdmin);
         registerPermissionCommand("userEntity", DeletePermission.class, isAdmin);
         registerPermissionCommand(UserEntity.class, ViewUsersPermission.class, isAdmin);
+        registerPermissionCommand(UserEntity.class, LoginAdminPermission.class, new CanLoginAdmin());
+    }
+
+    private class CanLoginAdmin extends AbstractPermissionCommand<UserEntity> {
+        @Override
+        public boolean isPermitted(UserEntity entity, String entityName) {
+            return authorizationTool.hasAnyPermission(entity, RolePermission.CAN_LOGIN);
+        }
     }
 }

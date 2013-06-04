@@ -110,8 +110,16 @@ public class CoordinatorConfig {
         if (roleList != null) {
             for (Role role : roleList) {
                 checkKeysExist(roleMap, role.getExtendsRoleId());
-                List<Role> parents = parentsRole(role);
-
+                List<Role> parents = roleWithParents(role);
+                Set<RolePermission> perms = new HashSet<RolePermission>();
+                for (Role parent : parents) {
+                    if (parent.getPermissions() != null) {
+                        for (RolePermission permission : parent.getPermissions()) {
+                            perms.add(permission);
+                        }
+                    }
+                }
+                role.setPermissions(perms.toArray(new RolePermission[0]));
             }
         }
         if (workflowList != null) {
@@ -160,9 +168,12 @@ public class CoordinatorConfig {
         }
     }
 
-    private List<Role> parentsRole(Role role) {
+    private List<Role> roleWithParents(Role role) {
         Map<String, Role> roleMap = getRoleMap();
         List<Role> parents = new ArrayList<Role>();
+        if (role == null)
+            return parents;
+        parents.add(role);
         Role next = role;
         while (next != null && next.getExtendsRoleId() != null) {
             next = roleMap.get(next.getExtendsRoleId());

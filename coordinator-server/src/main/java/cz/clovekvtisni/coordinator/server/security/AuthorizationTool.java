@@ -1,11 +1,10 @@
 package cz.clovekvtisni.coordinator.server.security;
 
 import cz.clovekvtisni.coordinator.domain.config.Role;
+import cz.clovekvtisni.coordinator.domain.config.RolePermission;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
-import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
-import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserEntity;
+import cz.clovekvtisni.coordinator.server.domain.*;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,6 +48,31 @@ public class AuthorizationTool {
                 parentId = parent.getExtendsRoleId();
             }
         }
+    }
+
+    public boolean hasAnyPermission(UserEntity user, RolePermission... permissions) {
+        String[] roleIdList = user.getRoleIdList();
+        if (roleIdList == null)
+            return false;
+        for (String roleId : roleIdList) {
+            Role role = roleMap.get(roleId);
+            if (role.hasAnyPermission(permissions))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean hasAnyPermission(UserInEventEntity inEventEntity, RolePermission... permissions) {
+        if (hasAnyPermission(inEventEntity.getUserEntity(), permissions))
+            return true;
+        for (UserGroupEntity userGroup : inEventEntity.getGroupEntities()) {
+            if (userGroup.getRoleId() == null)
+                continue;
+            Role role = roleMap.get(userGroup.getRoleId());
+            if (role.hasAnyPermission(permissions))
+                return true;
+        }
+        return false;
     }
 
     public boolean canCreate(String roleId, String[] creatorRoles) {

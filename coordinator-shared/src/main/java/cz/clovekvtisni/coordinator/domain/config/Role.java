@@ -50,6 +50,10 @@ public class Role extends AbstractStaticEntity {
         return permissions;
     }
 
+    public void setPermissions(RolePermission[] permissions) {
+        this.permissions = permissions;
+    }
+
     public boolean hasAnyPermission(RolePermission... needed) {
         if (permissions == null)
             return false;

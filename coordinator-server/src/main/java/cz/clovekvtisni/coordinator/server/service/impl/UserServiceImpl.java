@@ -16,6 +16,8 @@ import cz.clovekvtisni.coordinator.server.filter.UserEquipmentFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserSkillFilter;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
+import cz.clovekvtisni.coordinator.server.security.SecurityTool;
+import cz.clovekvtisni.coordinator.server.security.permission.LoginAdminPermission;
 import cz.clovekvtisni.coordinator.server.service.*;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.util.CloneTool;
@@ -57,6 +59,9 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     @Autowired
     protected MessageSource messageSource;
 
+    @Autowired
+    protected SecurityTool securityTool;
+
     @Override
     public void lostPassword(String email) {
         final UserEntity toChangePassword = findByEmail(email);
@@ -94,16 +99,8 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             throw MaPermissionDeniedException.wrongCredentials();
         }
 
-        if (hasRoles != null && hasRoles.length > 0) {
-            boolean isPermited = false;
-            for (String hasRole : hasRoles) {
-                if (authorizationTool.hasRole(hasRole, userEntity)) {
-                    isPermited = true;
-                    break;
-                }
-            }
-            if (!isPermited)
-                throw MaPermissionDeniedException.permissionDenied();
+        if (!securityTool.check(new LoginAdminPermission(userEntity))) {
+            throw MaPermissionDeniedException.permissionDenied();
         }
 
         appContext.setLoggedUser(userEntity);
