@@ -127,10 +127,10 @@ public class EventUserEditController extends AbstractEventController {
         try {
             UserEntity user = new UserEntity().populateFrom(form);
             if (form.getUserId() == null) {
-                user = userService.createUserInEvent(user, form.buildUserInEventEntity());
+                userService.createUserInEvent(user, form.buildUserInEventEntity());
             } else {
                 user.setId(form.getUserId());
-                user = userService.updateUserInEvent(user, form.buildUserInEventEntity());
+                userService.updateUserInEvent(user, form.buildUserInEventEntity());
             }
 
             return "redirect:/admin/event/user/list?eventId=" + form.getEventId();

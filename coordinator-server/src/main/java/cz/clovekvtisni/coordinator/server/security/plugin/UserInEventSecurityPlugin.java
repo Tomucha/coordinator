@@ -84,6 +84,13 @@ public class UserInEventSecurityPlugin extends SecurityPlugin {
         @Override
         public boolean isPermitted(UserInEventEntity entity, String entityName) {
             UserEntity loggedUser = appContext.getLoggedUser();
+
+            if (entity == null && entityName != null)
+                return authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER, RolePermission.EDIT_USER_IN_ORG);
+
+            if (loggedUser.equals(entity.getUserEntity()))
+                return true;
+
             if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER))
                 return true;
 
