@@ -31,7 +31,7 @@ public interface UserService extends Service {
     void lostPassword(String email);
 
     @Anonymous
-    UserEntity login(String login, String password, String... hasRoles) throws MaPermissionDeniedException;
+    UserEntity login(String login, String password) throws MaPermissionDeniedException;
 
     @FilterResult("#helper.canRead(#entity)")
     UserEntity findById(Long id, long flags);

@@ -46,13 +46,7 @@ public class LoginController extends AbstractSuperadminController {
 
         String retUrl;
         try {
-            userService.login(
-                    loginForm.email,
-                    loginForm.password,
-                    AuthorizationTool.SUPERADMIN,
-                    AuthorizationTool.ADMIN,
-                    AuthorizationTool.BACKEND,
-                    AuthorizationTool.COORDINATOR);
+            userService.login(loginForm.email, loginForm.password);
 
             retUrl = loginForm.retUrl;
             if (ValueTool.isEmpty(retUrl)) {
