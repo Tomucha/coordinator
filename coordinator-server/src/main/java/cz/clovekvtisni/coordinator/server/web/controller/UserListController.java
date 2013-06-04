@@ -27,7 +27,7 @@ public class UserListController extends AbstractSuperadminController {
         UserEntity admin = getLoggedUser();
         UserFilter filter = new UserFilter();
 
-        if (!isSuperAdmin(admin)) {
+        if (!admin.isSuperadmin()) {
             filter.setOrganizationIdVal(admin.getOrganizationId());
         }
 

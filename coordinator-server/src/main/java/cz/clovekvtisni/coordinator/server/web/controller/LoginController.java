@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.server.web.controller;
 
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.util.ValueTool;
@@ -46,7 +47,7 @@ public class LoginController extends AbstractSuperadminController {
 
         String retUrl;
         try {
-            userService.login(loginForm.email, loginForm.password);
+            UserEntity loggedUser = userService.login(loginForm.email, loginForm.password);
 
             retUrl = loginForm.retUrl;
             if (ValueTool.isEmpty(retUrl)) {

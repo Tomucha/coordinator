@@ -1,21 +1,18 @@
 package cz.clovekvtisni.coordinator.server.security.plugin;
 
+import cz.clovekvtisni.coordinator.domain.config.RolePermission;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.security.command.AbstractPermissionCommand;
-import cz.clovekvtisni.coordinator.server.security.command.HasRoleCommand;
 import cz.clovekvtisni.coordinator.server.security.command.PermissionCommand;
-import cz.clovekvtisni.coordinator.server.security.command.PermittedCommand;
 import cz.clovekvtisni.coordinator.server.security.permission.CreatePermission;
 import cz.clovekvtisni.coordinator.server.security.permission.DeletePermission;
 import cz.clovekvtisni.coordinator.server.security.permission.ReadPermission;
 import cz.clovekvtisni.coordinator.server.security.permission.UpdatePermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
 
 @Component
 public class UserInEventSecurityPlugin extends SecurityPlugin {
@@ -33,16 +30,16 @@ public class UserInEventSecurityPlugin extends SecurityPlugin {
     @Override
     protected void register() {
         PermissionCommand<UserInEventEntity> canReadCommand = new CanReadCommand();
-        PermissionCommand<UserInEventEntity> isAdminCommand = new HasRoleCommand<UserInEventEntity>(appContext, authorizationTool, Arrays.asList(new String[]{AuthorizationTool.ADMIN}));
+        PermissionCommand<UserInEventEntity> canEditCommand = new CanEditCommand();
 
         registerPermissionCommand(UserInEventEntity.class, ReadPermission.class, canReadCommand);
         registerPermissionCommand("userInEventEntity", ReadPermission.class, canReadCommand);
-        registerPermissionCommand(UserInEventEntity.class, CreatePermission.class, isAdminCommand);
-        registerPermissionCommand("userInEventEntity", CreatePermission.class, isAdminCommand);
-        registerPermissionCommand(UserInEventEntity.class, UpdatePermission.class, isAdminCommand);
-        registerPermissionCommand("userInEventEntity", UpdatePermission.class, isAdminCommand);
-        registerPermissionCommand(UserInEventEntity.class, DeletePermission.class, isAdminCommand);
-        registerPermissionCommand("userInEventEntity", DeletePermission.class, isAdminCommand);
+        registerPermissionCommand(UserInEventEntity.class, CreatePermission.class, canEditCommand);
+        registerPermissionCommand("userInEventEntity", CreatePermission.class, canEditCommand);
+        registerPermissionCommand(UserInEventEntity.class, UpdatePermission.class, canEditCommand);
+        registerPermissionCommand("userInEventEntity", UpdatePermission.class, canEditCommand);
+        registerPermissionCommand(UserInEventEntity.class, DeletePermission.class, canEditCommand);
+        registerPermissionCommand("userInEventEntity", DeletePermission.class, canEditCommand);
     }
 
     private class CanReadCommand implements PermissionCommand<UserInEventEntity> {
@@ -52,23 +49,28 @@ public class UserInEventSecurityPlugin extends SecurityPlugin {
             if (loggedUser == null)
                 return false;
 
-            // superadmin can read everything
-            if (authorizationTool.hasRole(AuthorizationTool.SUPERADMIN, loggedUser))
+            if (entity == null && entityName != null)
                 return true;
 
             // user entity type can read everyone logged user
-            if (entity == null)
+            // superadmin can read everything
+            if (entity == null || loggedUser.isSuperadmin())
                 return true;
 
+            // owner can read entity
             if (loggedUser.getId().equals(entity.getUserId()))
                 return true;
 
-            // admin can read everyone in his organization
-            if (authorizationTool.isAuthorized(new String[]{AuthorizationTool.ADMIN, AuthorizationTool.BACKEND}, loggedUser)) {
+            // read permissions
+            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.READ_USER, RolePermission.EDIT_USER))
+                return true;
+
+            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.READ_USER_IN_GROUP, RolePermission.EDIT_USER_IN_ORG)) {
                 if (loggedUser.getOrganizationId() != null && loggedUser.getOrganizationId().equals(entity.getUserEntity().getOrganizationId()))
                     return true;
             }
 
+            // user can see other users in the same group
             UserInEventEntity activeUserInEvent = appContext.getActiveUserInEvent();
 
             if (activeUserInEvent != null && activeUserInEvent.hasSameGroup(entity))
@@ -78,4 +80,18 @@ public class UserInEventSecurityPlugin extends SecurityPlugin {
         }
     }
 
+    private class CanEditCommand implements PermissionCommand<UserInEventEntity> {
+        @Override
+        public boolean isPermitted(UserInEventEntity entity, String entityName) {
+            UserEntity loggedUser = appContext.getLoggedUser();
+            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER))
+                return true;
+
+            UserEntity user = entity.getUserEntity();
+            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER_IN_ORG))
+                return user.getOrganizationId() != null && user.getOrganizationId().equals(loggedUser.getOrganizationId());
+
+            return false;
+        }
+    }
 }

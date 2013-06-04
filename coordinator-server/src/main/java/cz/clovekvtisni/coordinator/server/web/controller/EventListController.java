@@ -31,7 +31,7 @@ public class EventListController extends AbstractSuperadminController {
 
         UserEntity loggedUser = getLoggedUser();
         ResultList<EventEntity> events;
-        if (isSuperAdmin(loggedUser)) {
+        if (loggedUser.isSuperadmin()) {
             events = eventService.findByFilter(new EventFilter(), DEFAULT_LIST_LENGTH, bookmark, EventService.FLAG_FETCH_LOCATIONS);
 
         } else {

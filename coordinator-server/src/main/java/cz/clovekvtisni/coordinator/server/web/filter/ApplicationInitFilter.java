@@ -8,10 +8,12 @@ import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
+import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.*;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.server.web.RequestKeys;
 import cz.clovekvtisni.coordinator.server.web.SessionKeys;
+import cz.clovekvtisni.coordinator.util.RunnableWithResult;
 import cz.clovekvtisni.coordinator.util.Url;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.slf4j.Logger;
@@ -60,6 +62,9 @@ public class ApplicationInitFilter implements Filter {
 
     @Autowired
     private UserInEventService userInEventService;
+
+    @Autowired
+    private SecurityTool securityTool;
 
     private static boolean appInitialized = false;
 
@@ -125,7 +130,8 @@ public class ApplicationInitFilter implements Filter {
                 }
             }
             else if (!appContext.getLoggedUser().getId().equals(loggedUserId)) {
-                hRequest.getSession().setAttribute(SessionKeys.LOGGED_USER_ID, appContext.getLoggedUser().getId());
+                Long userId = appContext.getLoggedUser().getId();
+                hRequest.getSession().setAttribute(SessionKeys.LOGGED_USER_ID, userId);
             }
             appContext.setLocale(null);
         }
@@ -138,23 +144,27 @@ public class ApplicationInitFilter implements Filter {
     protected Long findLoggedUserId(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
 
-        Long loggedUserId = null;
-
         if (session != null) {
-            loggedUserId = (Long) session.getAttribute(SessionKeys.LOGGED_USER_ID);
+            final Long loggedUserId = (Long) session.getAttribute(SessionKeys.LOGGED_USER_ID);
             if (loggedUserId != null) {
-                UserEntity userEntity = userService.findById(loggedUserId, UserService.FLAG_FETCH_SKILLS | UserService.FLAG_FETCH_EQUIPMENT);
+                UserEntity userEntity = securityTool.runWithDisabledSecurity(new RunnableWithResult<UserEntity>() {
+                    @Override
+                    public UserEntity run() {
+                        return userService.findById(loggedUserId, UserService.FLAG_FETCH_SKILLS | UserService.FLAG_FETCH_EQUIPMENT);
+                    }
+                });
                 if (userEntity == null) {
                     session.removeAttribute(SessionKeys.LOGGED_USER_ID);
-                    loggedUserId = null;
+                    return null;
                 }
                 else {
                     appContext.setLoggedUser(userEntity);
+                    return userEntity.getId();
                 }
             }
         }
 
-        return loggedUserId;
+        return null;
     }
 
     public static String getNormalizedUri(HttpServletRequest hr) {
