@@ -239,7 +239,11 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 systemService.deleteUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, old.getEmail());
                 systemService.saveUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, user.getEmail(), user.getKey());
 
-                user.setEmail(ValueTool.normalizeEmail(user.getEmail()));
+                if (!user.getEmail().equals(old.getEmail())) {
+                    user.setEmail(ValueTool.normalizeEmail(user.getEmail()));
+                    systemService.saveUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, user.getEmail(), user.getKey());
+                    systemService.deleteUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, old.getEmail());
+                }
                 UserEntity created = ofy().put(user);
 
                 saveFields(created, old);

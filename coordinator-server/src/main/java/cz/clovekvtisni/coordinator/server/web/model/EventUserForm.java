@@ -3,9 +3,14 @@ package cz.clovekvtisni.coordinator.server.web.model;
 import com.googlecode.objectify.Key;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
+import cz.clovekvtisni.coordinator.util.ValueTool;
+import org.springframework.context.MessageSource;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created with IntelliJ IDEA.
@@ -79,5 +84,14 @@ public class EventUserForm extends UserForm {
 
     public void setLastLocationLongitude(Double lastLocationLongitude) {
         this.lastLocationLongitude = lastLocationLongitude;
+    }
+
+    public void postValidate(BindingResult bindingResult, MessageSource messageSource, Locale locale) {
+        if (getUserId() == null && ValueTool.isEmpty(getPassword())) {
+            bindingResult.addError(new FieldError("form", "password", getPassword(), false, null, null, messageSource.getMessage("javax.validation.constraints.NotNull.message", null, locale)));
+
+        } else if (getUserId() == null && getPassword() != null && !getPassword().equals(getConfirmPassword())) {
+            bindingResult.addError(new FieldError("form", "confirmPassword", getPassword(), false, null, null, messageSource.getMessage("error.PASSWORD_CONFIRM_FAILED", null, locale)));
+        }
     }
 }
