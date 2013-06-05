@@ -72,10 +72,10 @@ public class UserSecurityPlugin extends SecurityPlugin {
                 return true;
 
             // read permissions
-            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.READ_USER, RolePermission.EDIT_USER))
+            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER))
                 return true;
 
-            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.READ_USER_IN_ORG, RolePermission.EDIT_USER_IN_ORG)) {
+            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER_IN_ORG)) {
                 if (loggedUser.getOrganizationId() != null && loggedUser.getOrganizationId().equals(entity.getOrganizationId()))
                     return true;
             }

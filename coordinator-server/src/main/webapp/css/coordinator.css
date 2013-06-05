@@ -68,3 +68,7 @@ div.dropdown-menu {
     margin-bottom: 0.5em;
     border-bottom: 1px solid #aaa ;
 }
+
+form .alert-error {
+    display: inline-block;
+}

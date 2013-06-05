@@ -15,7 +15,7 @@
     <div class="mailForm">
         <sf:form method="POST" action="${root}/superadmin/mail" modelAttribute="params">
 
-            <sf:errors />
+            <sf:errors cssClass="alert alert-error" />
 
             <tags:input field="subject" modelAttribute="params" captionCode="label.subject">
                 <sf:input path="subject"/>

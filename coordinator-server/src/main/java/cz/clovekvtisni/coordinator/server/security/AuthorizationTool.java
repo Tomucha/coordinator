@@ -127,25 +127,6 @@ public class AuthorizationTool {
         return false;
     }
 
-    // TODO zohlednit userGroup
-    public boolean isVisibleFor(PoiEntity poi, UserEntity user) {
-        if (ValueTool.isEmpty(poi.getWorkflowStateId()))
-            return true;
-        WorkflowState state = poi.getWorkflowState();
-        String[] visibleForRole = state.getVisibleForRole();
-        if (visibleForRole == null)
-            return true;
-
-        if (poi.getUserIdList().contains(user.getId())) {
-            // FIXME: to ze to na me assignovane, neznamena, ze to vidim
-            return true;
-        }
-        String[] editableForRole = state.getEditableForRole();
-        if (editableForRole != null && isAuthorized(editableForRole, user))
-            return true;
-        return isAuthorized(new String[] {BACKEND, ADMIN}, user) || isAuthorized(visibleForRole, user);
-    }
-
     public boolean isCanBeStartedBy(PoiEntity poi, UserEntity user) {
         Workflow workflow = poi.getWorkflow();
         if (workflow == null)

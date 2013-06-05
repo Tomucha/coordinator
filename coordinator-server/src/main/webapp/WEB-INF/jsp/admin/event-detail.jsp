@@ -9,7 +9,7 @@
 
         <sf:form method="POST" modelAttribute="form">
 
-            <sf:errors />
+            <sf:errors cssClass="alert alert-error" />
 
             <%--
             <c:if test="${empty form.organizationId}">

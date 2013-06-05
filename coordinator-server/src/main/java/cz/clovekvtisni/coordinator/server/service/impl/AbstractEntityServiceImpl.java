@@ -2,6 +2,7 @@ package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.google.appengine.repackaged.com.google.common.collect.Lists;
 import cz.clovekvtisni.coordinator.server.domain.AbstractPersistentEntity;
+import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class AbstractEntityServiceImpl extends AbstractServiceImpl {
 
     @Autowired
     protected AppContext appContext;
+
+    @Autowired
+    protected CoordinatorConfig config;
 
     protected <T extends AbstractPersistentEntity> List<T> mergeEntities(T[] oldList, T[] newList) {
         if (oldList == null)

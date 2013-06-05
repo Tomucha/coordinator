@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {ElementType.METHOD})
-public @interface CheckPermission {
+public @interface   CheckPermission {
 
     /**
      * SpEL vyraz - muze pristupovat k parametrum metody - tyto jsou v promennych #p0, #p1, ..., v pripade ze je

@@ -246,6 +246,12 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
         this.description = description;
     }
 
+    public boolean isAssigned(UserEntity user) {
+        if (userIdList == null || user == null)
+            return false;
+        return getUserIdList().contains(user.getId());
+    }
+
     @Override
     public String toString() {
         return "PoiEntity{" +

@@ -26,7 +26,7 @@
 </script>
 
 <sf:form action="${root}/admin/event/map/ajax/poi-update" modelAttribute="poiForm" onsubmit="return poiPopupNewSubmit($(this))" method="post">
-    <sf:errors />
+    <sf:errors cssClass="alert alert-error" />
 
     <div>
     <sf:hidden path="id"/>

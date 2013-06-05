@@ -39,7 +39,7 @@
     <div class="row-fluid">
             <sf:form method="POST" action="${root}/admin/event/poi/edit" modelAttribute="form">
 
-                <sf:errors />
+                <sf:errors cssClass="alert alert-error"  />
 
                 <div>
                     <sf:hidden path="id"/>

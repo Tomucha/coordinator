@@ -38,6 +38,8 @@ public class CoordinatorConfig {
 
     private HashMap<String, String> countryMap;
 
+    private Map<String, List<String>> roleParentMap;
+
     public List<Role> getRoleList() {
         return roleList;
     }
@@ -484,6 +486,19 @@ public class CoordinatorConfig {
                     return o1.getName() != null ? o1.getName().compareTo(o2.getName()) : -1;
                 }
             });
+
+            Map<String, Role> roleMap = getRoleMap();
+            roleParentMap = new HashMap<String, List<String>>(roleMap.size());
+            for (Role role : roleMap.values()) {
+                List<String> ids = new ArrayList<String>();
+                roleParentMap.put(role.getId(), ids);
+                String parentId = role.getExtendsRoleId();
+                while (parentId != null) {
+                    ids.add(parentId);
+                    Role parent = roleMap.get(parentId);
+                    parentId = parent.getExtendsRoleId();
+                }
+            }
         }
         if (skillList != null) {
             Collections.sort(skillList, new Comparator<Skill>() {
@@ -517,6 +532,10 @@ public class CoordinatorConfig {
                 }
             });
         }
+    }
+
+    public Map<String, List<String>> getRoleParentMap() {
+        return roleParentMap;
     }
 
     @Override

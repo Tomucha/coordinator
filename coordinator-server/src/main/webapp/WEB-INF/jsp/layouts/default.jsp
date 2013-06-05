@@ -30,7 +30,9 @@
                             <c:when test="${not empty activity}">
                                 <div class="activityList">
                                     <c:forEach items="${activity}" var="activityRow">
-                                        <p><tags:renderActivity activity="${activityRow}"/></p>
+                                        <c:if test="${!empty activityRow.poiEntity}">
+                                            <p><tags:renderActivity activity="${activityRow}"/></p>
+                                        </c:if>
                                     </c:forEach>
                                 </div>
                             </c:when>

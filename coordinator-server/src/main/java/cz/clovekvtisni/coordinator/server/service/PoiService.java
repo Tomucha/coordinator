@@ -46,7 +46,7 @@ public interface PoiService extends Service {
     ResultList<PoiEntity> findLastByEventId(Long eventId);
 
     // FIXME: prava, ted jsou jen pro Backend ale musi to jit posunovat i z mobilu, kdyz to na me je assignovane
-    //@CheckPermission("#helper.canUpdate(#p0)")
+    @CheckPermission("#helper.canDo(new cz.clovekvtisni.coordinator.server.security.permission.TransitionPermission(#p0, #p1)")
     PoiEntity transitWorkflowState(PoiEntity entity, String transitionId, long flags);
 
     @CheckPermission("#helper.canUpdate(#p0)")

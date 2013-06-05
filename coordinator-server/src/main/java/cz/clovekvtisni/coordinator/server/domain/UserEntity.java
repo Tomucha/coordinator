@@ -5,6 +5,7 @@ import com.googlecode.objectify.annotation.*;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserEquipment;
 import cz.clovekvtisni.coordinator.domain.UserSkill;
+import cz.clovekvtisni.coordinator.domain.config.Role;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -70,6 +71,12 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     @Ignore
     private UserSkillEntity[] skillEntityList;
+
+    /**
+     * All roles, include extended.
+     */
+    @Ignore
+    private Set<String> allRoles;
 
     public UserEntity() {
     }
@@ -321,6 +328,24 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     public void setUnsubscribed(boolean unsubscribed) {
         this.unsubscribed = unsubscribed;
+    }
+
+    public boolean hasAnyRole(String... roles) {
+        if (roleIdList == null)
+            return false;
+        for (String role : roles) {
+            if (allRoles.contains(role))
+                return true;
+        }
+        return false;
+    }
+
+    public Set<String> getAllRoles() {
+        return allRoles;
+    }
+
+    public void setAllRoles(Set<String> allRoles) {
+        this.allRoles = allRoles;
     }
 
     @Override

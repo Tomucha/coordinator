@@ -17,7 +17,7 @@
             <sf:hidden path="eventId"/>
             <sf:hidden path="organizationId"/>
 
-            <sf:errors />
+            <sf:errors cssClass="alert alert-error" />
 
             <table class="table">
                 <thead>

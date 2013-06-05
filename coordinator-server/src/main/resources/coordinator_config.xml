@@ -2,13 +2,12 @@
 <!-- verze konfiguracniho souboru 2013-01-04 -->
 <coordinator>
     <role_list>
-        <role id="ANONYMOUS" name="Anonymous">Anonymous</role>
-        <role id="COORDINATOR" name="Coordinator" extends_role_id="ANONYMOUS" permissions="CAN_LOGIN,EDIT_USER_IN_ORG">Koordinátor v terénu</role>
+        <role id="ANONYMOUS" name="Anonymous" permissions="READ_USER_IN_GROUP,TRANS_POI_ASSIGNED">Anonymous</role>
+        <role id="COORDINATOR" name="Coordinator" extends_role_id="ANONYMOUS" permissions="CAN_LOGIN,EDIT_USER_IN_ORG,EDIT_POI_IN_ORG">Koordinátor v terénu</role>
         <role id="ZDRAVOTNIK" name="Medic" extends_role_id="ANONYMOUS">Zdravotník v terénu</role>
-        <role id="BACKEND" name="Backend" extends_role_id="ANONYMOUS" permissions="CAN_LOGIN,READ_USER_IN_ORG">Backend</role>
-        <role id="ADMIN" name="Admin" extends_role_id="BACKEND" permissions="EDIT_USER_IN_ORG">Admin</role>
-        <role id="SUPERADMIN" name="SuperAdmin" extends_role_id="ADMIN" permissions="READ_USER,EDIT_USER">Super admin</role>
-        <role id="EDITOR" name="Editor" extends_role_id="BACKEND">Editor</role>
+        <role id="BACKEND" name="Backend" extends_role_id="ANONYMOUS" permissions="CAN_LOGIN">Backend</role>
+        <role id="ADMIN" name="Admin" extends_role_id="BACKEND" permissions="EDIT_EVENT_IN_ORG,EDIT_USER_IN_ORG,EDIT_POI_IN_ORG">Admin</role>
+        <role id="SUPERADMIN" name="SuperAdmin" extends_role_id="ADMIN" permissions="EDIT_USER,EDIT_EVENT">Super admin</role>
     </role_list>
 
     <skill_list>

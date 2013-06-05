@@ -77,7 +77,7 @@ public class UserForm extends UserEntity {
         if (isNew() && ValueTool.isEmpty(getPassword())) {
             bindingResult.addError(new FieldError("form", "password", getPassword(), false, null, null, messageSource.getMessage("javax.validation.constraints.NotNull.message", null, locale)));
 
-        } else if (getPassword() != null && !getPassword().equals(getConfirmPassword())) {
+        } else if (isNew() && getPassword() != null && !getPassword().equals(getConfirmPassword())) {
             bindingResult.addError(new FieldError("form", "confirmPassword", getPassword(), false, null, null, messageSource.getMessage("error.PASSWORD_CONFIRM_FAILED", null, locale)));
         }
     }

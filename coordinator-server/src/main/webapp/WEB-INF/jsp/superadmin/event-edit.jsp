@@ -64,7 +64,7 @@
     <div class="eventForm">
         <sf:form method="POST" action="${root}/superadmin/event/edit" modelAttribute="form">
 
-            <sf:errors />
+            <sf:errors cssClass="alert alert-error" />
 
             <tags:hiddenEvent/>
 

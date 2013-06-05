@@ -67,7 +67,7 @@
 <div class="mainPanel">
     <div class="eventForm">
 
-        <sf:errors />
+        <sf:errors cssClass="alert alert-error" />
 
         <c:if test="${!empty poi.latitude and !empty poi.longitude}">
             <tags:zoomButton latitude="${poi.latitude}" longitude="${poi.longitude}"/>

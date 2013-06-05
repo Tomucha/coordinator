@@ -127,7 +127,6 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
                 ofy().put(entity);
 
-
                 ActivityEntity a = new ActivityEntity();
                 a.setPoiId(entity.getId());
                 a.setEventId(entity.getEventId());

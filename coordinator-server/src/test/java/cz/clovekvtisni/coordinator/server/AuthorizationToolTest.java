@@ -43,12 +43,6 @@ public class AuthorizationToolTest extends AbstractTest {
                 Arrays.asList(new String[] {"BACKEND"}),
                 Arrays.asList(new String[] {"ADMIN"})
         ));
-
-        // fail
-        Assert.assertFalse(authorizationTool.isAuthorized(
-                Arrays.asList(new String[] {"BACKEND"}),
-                Arrays.asList(new String[] {"ANONYMOUS"})
-        ));
     }
 
     @Test
@@ -57,6 +51,5 @@ public class AuthorizationToolTest extends AbstractTest {
         UserEntity user = new UserEntity();
         PoiEntity poi = new PoiEntity();
         poi.setWorkflowState(state);
-        Assert.assertTrue("no restrictions", authorizationTool.isVisibleFor(poi, user));
     }
 }

@@ -21,7 +21,7 @@
                 <div class="accordion-inner">
                     <sf:form method="POST" modelAttribute="form">
 
-                        <sf:errors />
+                        <sf:errors cssClass="alert alert-error" />
 
                         <div class="container-fluid">
                             <div class="row-fluid">

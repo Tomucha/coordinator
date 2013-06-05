@@ -2,8 +2,9 @@ package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
-import com.google.appengine.api.taskqueue.*;
 import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.VoidWork;
 import com.googlecode.objectify.Work;
@@ -120,7 +121,18 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     private void populate(Collection<UserEntity> entities, long flags) {
+        Map<String, List<String>> roleParentMap = config.getRoleParentMap();
         for (UserEntity userEntity : entities) {
+            Set<String> allRoles = new HashSet<String>();
+            if (userEntity.getRoleIdList() != null) {
+                for (String role : userEntity.getRoleIdList()) {
+                    allRoles.add(role);
+                    if (roleParentMap.get(role) != null)
+                        allRoles.addAll(roleParentMap.get(role));
+                }
+                userEntity.setAllRoles(allRoles);
+            }
+
             if ((flags & FLAG_FETCH_EQUIPMENT) != 0) {
                 UserEquipmentFilter filter = new UserEquipmentFilter();
                 filter.setUserIdVal(userEntity.getId());

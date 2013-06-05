@@ -89,7 +89,7 @@ public class EventPoiEditController extends AbstractEventController {
             return "redirect:/admin/event/poi/list?eventId=" + poiEntity.getEventId();
 
         } catch (MaPermissionDeniedException e) {
-            addFormError(bindingResult, e);
+            addFormError(bindingResult, "error.poi.PERMISSION_DENIED");
 
             // FIXME: refaktoring
             // populateEventModel(model, new EventFilterParams(form.getEventKey()));

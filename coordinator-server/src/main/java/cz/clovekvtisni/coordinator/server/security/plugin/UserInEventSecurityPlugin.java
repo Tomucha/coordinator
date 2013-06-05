@@ -62,7 +62,7 @@ public class UserInEventSecurityPlugin extends SecurityPlugin {
                 return true;
 
             // read permissions
-            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.READ_USER, RolePermission.EDIT_USER))
+            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER))
                 return true;
 
             if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.READ_USER_IN_GROUP, RolePermission.EDIT_USER_IN_ORG)) {
@@ -70,11 +70,13 @@ public class UserInEventSecurityPlugin extends SecurityPlugin {
                     return true;
             }
 
-            // user can see other users in the same group
-            UserInEventEntity activeUserInEvent = appContext.getActiveUserInEvent();
+            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.READ_USER_IN_GROUP)) {
+                // user can see other users in the same group
+                UserInEventEntity activeUserInEvent = appContext.getActiveUserInEvent();
 
-            if (activeUserInEvent != null && activeUserInEvent.hasSameGroup(entity))
-                return true;
+                if (activeUserInEvent != null && activeUserInEvent.hasSameGroup(entity))
+                    return true;
+            }
 
             return false;
         }

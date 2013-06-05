@@ -10,7 +10,7 @@
     <div class="eventForm">
         <sf:form method="POST" action="${root}/admin/event/user-group/edit" modelAttribute="form">
 
-            <sf:errors />
+            <sf:errors cssClass="alert alert-error" />
 
             <div>
                 <sf:hidden path="id"/>

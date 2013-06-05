@@ -287,7 +287,6 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
         this.groupEntities = groupEntities;
     }
 
-
     public String[] getRoles() {
         Set<String> roles = new HashSet<String>();
         if (getUserEntity() != null && getUserEntity().getRoleIdList() != null) {
@@ -301,6 +300,15 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
             }
         }
         return roles.toArray(new String[0]);
+    }
+
+    public boolean hasAnyRole(String... roles) {
+        List<String> have = Arrays.asList(getRoles());
+        for (String role : roles) {
+            if (have.contains(role))
+                return true;
+        }
+        return false;
     }
 
     public List<String> getLastLocationGeoCells() {
