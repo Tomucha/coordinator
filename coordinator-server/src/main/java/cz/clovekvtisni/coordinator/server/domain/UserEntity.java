@@ -331,7 +331,7 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     }
 
     public boolean hasAnyRole(String... roles) {
-        if (roleIdList == null)
+        if (allRoles == null)
             return false;
         for (String role : roles) {
             if (allRoles.contains(role))

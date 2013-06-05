@@ -145,8 +145,8 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                     if (roleParentMap.get(role) != null)
                         allRoles.addAll(roleParentMap.get(role));
                 }
-                userEntity.setAllRoles(allRoles);
             }
+            userEntity.setAllRoles(allRoles);
 
             if ((flags & FLAG_FETCH_EQUIPMENT) != 0) {
                 UserEquipmentFilter filter = new UserEquipmentFilter();
@@ -199,6 +199,8 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
                 entity.setId(null);
                 entity.setEmail(ValueTool.normalizeEmail(entity.getEmail()));
+                if (entity.getRoleIdList() == null)
+                    entity.setRoleIdList(new String[] {AuthorizationTool.ANONYMOUS});
                 updateSystemFields(entity, null);
                 ofy().put(entity);
 
