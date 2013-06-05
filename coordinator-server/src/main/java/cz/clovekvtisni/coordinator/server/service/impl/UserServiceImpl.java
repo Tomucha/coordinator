@@ -89,7 +89,28 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     @Override
-    public UserEntity login(String email, String password) {
+    public UserEntity loginWeb(String email, String password) {
+        UserEntity userEntity = loadByLogin(email, password);
+
+        if (!securityTool.check(new LoginAdminPermission(userEntity))) {
+            throw MaPermissionDeniedException.permissionDenied();
+        }
+
+        appContext.setLoggedUser(userEntity);
+
+        return userEntity;
+    }
+
+    @Override
+    public UserEntity loginApi(String email, String password) {
+        UserEntity userEntity = loadByLogin(email, password);
+
+        appContext.setLoggedUser(userEntity);
+
+        return userEntity;
+    }
+
+    private UserEntity loadByLogin(String email, String password) {
         Key<UserEntity> userKey = systemService.findUniqueValueOwner(ofy(), UniqueIndexEntity.Property.EMAIL, ValueTool.normalizeEmail(email));
         if (userKey == null) {
             throw MaPermissionDeniedException.wrongCredentials();
@@ -99,12 +120,6 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         if (userEntity == null || password == null || !passwordHash(userEntity.getId(), password).equals(userEntity.getPassword())) {
             throw MaPermissionDeniedException.wrongCredentials();
         }
-
-        if (!securityTool.check(new LoginAdminPermission(userEntity))) {
-            throw MaPermissionDeniedException.permissionDenied();
-        }
-
-        appContext.setLoggedUser(userEntity);
 
         return userEntity;
     }

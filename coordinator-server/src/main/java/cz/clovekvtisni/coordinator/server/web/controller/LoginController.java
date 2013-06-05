@@ -47,7 +47,7 @@ public class LoginController extends AbstractSuperadminController {
 
         String retUrl;
         try {
-            UserEntity loggedUser = userService.login(loginForm.email, loginForm.password);
+            UserEntity loggedUser = userService.loginWeb(loginForm.email, loginForm.password);
 
             retUrl = loginForm.retUrl;
             if (ValueTool.isEmpty(retUrl)) {
