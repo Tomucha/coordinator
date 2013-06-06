@@ -1,6 +1,8 @@
 package cz.clovekvtisni.coordinator.server.security.plugin;
 
+import cz.clovekvtisni.coordinator.domain.config.RolePermission;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.security.AppContext;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.security.command.IsSuperadminCommand;
@@ -30,16 +32,24 @@ public class EventSecurityPlugin extends SecurityPlugin {
     @Override
     protected void register() {
         PermissionCommand<EventEntity> permittedCommand = new PermittedCommand<EventEntity>();
-        PermissionCommand<EventEntity> isSuperadminCommand = new IsSuperadminCommand(appContext);
+        PermissionCommand<EventEntity> canCreateCommand = new CanCreateCommand();
 
         registerPermissionCommand(EventEntity.class, ReadPermission.class, permittedCommand);
         registerPermissionCommand("eventEntity", ReadPermission.class, permittedCommand);
-        registerPermissionCommand(EventEntity.class, CreatePermission.class, isSuperadminCommand);
-        registerPermissionCommand("eventEntity", CreatePermission.class, isSuperadminCommand);
-        registerPermissionCommand(EventEntity.class, UpdatePermission.class, isSuperadminCommand);
-        registerPermissionCommand("eventEntity", UpdatePermission.class, isSuperadminCommand);
-        registerPermissionCommand(EventEntity.class, DeletePermission.class, isSuperadminCommand);
-        registerPermissionCommand("eventEntity", DeletePermission.class, isSuperadminCommand);
+        registerPermissionCommand(EventEntity.class, CreatePermission.class, canCreateCommand);
+        registerPermissionCommand("eventEntity", CreatePermission.class, canCreateCommand);
+        registerPermissionCommand(EventEntity.class, UpdatePermission.class, canCreateCommand);
+        registerPermissionCommand("eventEntity", UpdatePermission.class, canCreateCommand);
+        registerPermissionCommand(EventEntity.class, DeletePermission.class, canCreateCommand);
+        registerPermissionCommand("eventEntity", DeletePermission.class, canCreateCommand);
     }
 
+    private class CanCreateCommand implements PermissionCommand<EventEntity> {
+        @Override
+        public boolean isPermitted(EventEntity entity, String entityName) {
+            UserEntity loggedUser = appContext.getLoggedUser();
+
+            return loggedUser != null && authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_EVENT);
+        }
+    }
 }

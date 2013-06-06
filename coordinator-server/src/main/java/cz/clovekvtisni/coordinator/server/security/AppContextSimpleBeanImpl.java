@@ -21,7 +21,7 @@ public class AppContextSimpleBeanImpl implements AppContext {
     /** If event is requested in URL, activeEvent is set */
     private EventEntity activeEvent;
 
-    /** If event is requested in URL, activeOrganizationInEvent for loggetUser is set */
+    /** If event is requested in URL, activeOrganizationInEvent for loggedUser is set */
     private OrganizationInEventEntity activeOrganizationInEvent;
 
     private UserInEventEntity activeUserInEvent;
