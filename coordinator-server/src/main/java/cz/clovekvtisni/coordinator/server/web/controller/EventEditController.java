@@ -57,8 +57,4 @@ public class EventEditController extends AbstractSuperadminController {
 
         return "redirect:/superadmin/event/list";
     }
-
-    public static Breadcrumb getBreadcrumb(EventEntity params) {
-        return new Breadcrumb(params, "/superadmin/event/edit", "breadcrumb.eventEdit", AuthorizationTool.SUPERADMIN);
-    }
 }

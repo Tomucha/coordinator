@@ -139,10 +139,6 @@ public class EventUserListController extends AbstractEventController {
         return "redirect:/admin/event/user/list?eventId=" + selection.getEventId();
     }
 
-    public static Breadcrumb getBreadcrumb(EventEntity activeEvent) {
-        return new Breadcrumb(activeEvent, "/admin/event/user/list", "breadcrumb.eventUsers");
-    }
-
     @ModelAttribute("selectedUserActions")
     public SelectedUserAction[] selectedUserActions() {
         return SelectedUserAction.values();

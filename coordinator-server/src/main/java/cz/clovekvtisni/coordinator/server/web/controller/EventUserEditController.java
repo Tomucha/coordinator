@@ -162,8 +162,4 @@ public class EventUserEditController extends AbstractEventController {
 
         return inEventEntity;
     }
-
-    public static Breadcrumb getBreadcrumb(EventEntity event) {
-        return new Breadcrumb(event, "/admin/event/user/list", "breadcrumb.eventUsers");
-    }
 }

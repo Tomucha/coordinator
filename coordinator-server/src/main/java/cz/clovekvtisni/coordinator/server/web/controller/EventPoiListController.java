@@ -81,10 +81,6 @@ public class EventPoiListController extends AbstractEventController {
         return "redirect: /admin/event/poi/list?eventId=" + selection.getEventId();
     }
 
-    public static Breadcrumb getBreadcrumb(EventEntity params) {
-        return new Breadcrumb(params, "/admin/event/poi/list", "breadcrumb.eventPois");
-    }
-
     @ModelAttribute("selectedPoiActions")
     public SelectedPoiAction[] selectedPoiActions() {
         return SelectedPoiAction.values();

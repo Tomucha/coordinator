@@ -36,10 +36,4 @@ public class MassMailController extends AbstractSuperadminController {
         setGlobalMessage(getMessage("msg.sendingEmails"), model);
         return "superadmin/mail";
     }
-
-
-    public static Breadcrumb getBreadcrumb() {
-        return new Breadcrumb(null, "/superadmin/mail", "breadcrumb.mail");
-    }
-
 }

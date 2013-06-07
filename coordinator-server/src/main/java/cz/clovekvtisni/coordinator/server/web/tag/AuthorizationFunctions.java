@@ -49,17 +49,6 @@ public class AuthorizationFunctions {
         return securityTool.check(new ReadPermission(entity));
     }
 
-    public static boolean canRead(Breadcrumb link) {
-        if (link.isVisibleFor().size() == 0)
-            return true;
-
-        for (String roleId : link.isVisibleFor()) {
-            if (hasRole(roleId))
-                return true;
-        }
-        return false;
-    }
-
     public static boolean canCreate(CoordinatorEntity entity) {
         return securityTool.check(new CreatePermission(entity));
     }

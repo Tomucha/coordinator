@@ -47,13 +47,10 @@
 
                 <div class="span5">
                     <ul class="nav nav-pills event-menu">
-                        <c:if test="${!empty breadcrumbs}">
-                            <c:forEach items="${breadcrumbs}" var="breadcrumb">
-                                <c:if test="${can:viewBreadcrumb(breadcrumb)}">
-                                    <li class="${requestScope['javax.servlet.forward.request_uri'] == (fn:indexOf(breadcrumb.linkUrl, '?') == -1 ? breadcrumb.linkUrl : fn:substring(breadcrumb.linkUrl, 0, fn:indexOf(breadcrumb.linkUrl, '?'))) ? 'active' : ''}"><a href="<s:url value="${breadcrumb.linkUrl}"/>"><s:message code="${breadcrumb.labelCode}"/></a></li>
-                                </c:if>
-                            </c:forEach>
-                        </c:if>
+                        <tags:breadcrumb url="/admin/event/poi/list" labelCode="breadcrumb.eventPois" visible="${can:read('poiEntity')}"/>
+                        <tags:breadcrumb url="/admin/event/user/list" labelCode="breadcrumb.eventUsers" visible="${can:read('userEntity')}"/>
+                        <tags:breadcrumb url="/admin/event/user-group/list" labelCode="breadcrumb.eventUserGroups" visible="${can:read('userGroupEntity')}"/>
+                        <tags:breadcrumb url="/admin/event/detail" labelCode="breadcrumb.eventDetail" visible="${can:create('organizationInEventEntity')}"/>
                     </ul>
 
                     <div class="tabContent">

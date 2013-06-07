@@ -35,9 +35,4 @@ public class UserListController extends AbstractSuperadminController {
 
         return "superadmin/user-list";
     }
-
-    public static Breadcrumb getBreadcrumb() {
-        return new Breadcrumb(null, "/superadmin/user/list", "breadcrumb.userList");
-    }
-
 }

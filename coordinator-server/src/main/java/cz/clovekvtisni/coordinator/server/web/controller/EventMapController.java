@@ -207,10 +207,4 @@ public class EventMapController extends AbstractEventController {
         model.addAttribute("userInEvent", u);
         return "ajax/user-popup";
     }
-
-
-    public static Breadcrumb getBreadcrumb(EventEntity params) {
-        return new Breadcrumb(params, "/admin/event/map", "breadcrumb.eventMap");
-    }
-
 }

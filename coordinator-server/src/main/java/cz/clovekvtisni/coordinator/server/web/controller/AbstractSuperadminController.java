@@ -36,15 +36,4 @@ public abstract class AbstractSuperadminController extends AbstractController {
         // TODO: pouze aktivni eventy
         return eventService.findByFilter(new EventFilter(), 10, null, 0).getResult();
     }
-
-
-    @ModelAttribute("breadcrumbs")
-    public final Breadcrumb[] breadcrumbs() {
-        return new Breadcrumb[] {
-                UserListController.getBreadcrumb(),
-                EventListController.getBreadcrumb(),
-                MassMailController.getBreadcrumb()
-        };
-    }
-
 }

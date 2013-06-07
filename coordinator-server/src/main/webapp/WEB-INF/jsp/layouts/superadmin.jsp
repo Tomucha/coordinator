@@ -47,15 +47,9 @@
 
         <div class="span9">
             <ul class="nav nav-pills">
-                <c:if test="${!empty breadcrumbs}">
-                    <c:forEach items="${breadcrumbs}" var="breadcrumb">
-                        <c:if test="${can:viewBreadcrumb(breadcrumb)}">
-                            <li class="${requestScope['javax.servlet.forward.request_uri'] == (fn:indexOf(breadcrumb.linkUrl, '?') == -1 ? breadcrumb.linkUrl : fn:substring(breadcrumb.linkUrl, 0, fn:indexOf(breadcrumb.linkUrl, '?'))) ? 'active' : ''}">
-                                <a href="<s:url value="${breadcrumb.linkUrl}"/>"><s:message
-                                        code="${breadcrumb.labelCode}"/></a></li>
-                        </c:if>
-                    </c:forEach>
-                </c:if>
+                <tags:breadcrumb url="/superadmin/user/list" labelCode="breadcrumb.userList" visible="${can:read('userEntity')}"/>
+                <tags:breadcrumb url="/superadmin/event/list" labelCode="breadcrumb.eventList" visible="${can:read('eventEntity')}"/>
+                <tags:breadcrumb url="/superadmin/mail" labelCode="breadcrumb.mail" visible="${can:read('userEntity')}"/>
             </ul>
 
             <div class="tabContent">

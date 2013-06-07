@@ -47,18 +47,18 @@ public class LoginController extends AbstractSuperadminController {
 
         String retUrl;
         try {
-            UserEntity loggedUser = userService.loginWeb(loginForm.email, loginForm.password);
+            userService.loginWeb(loginForm.email, loginForm.password);
 
             retUrl = loginForm.retUrl;
             if (ValueTool.isEmpty(retUrl)) {
-                retUrl = SuperadminController.getBreadcrumb().getUrl();
+                retUrl = "/superadmin";
             }
         } catch (MaPermissionDeniedException ex) {
             addFormError(errors, ex);
             return "public/login";
         }
 
-        return "redirect:/superadmin";
+        return "redirect:" + retUrl;
     }
 
 

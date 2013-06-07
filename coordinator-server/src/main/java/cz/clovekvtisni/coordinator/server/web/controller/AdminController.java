@@ -20,9 +20,4 @@ public class AdminController extends AbstractEventController {
             return "redirect:/superadmin/event/list";
         }
     }
-
-    public static Breadcrumb getBreadcrumb(EventEntity event) {
-        return new Breadcrumb(event, "/admin", "breadcrumb.admin");
-    }
-
 }

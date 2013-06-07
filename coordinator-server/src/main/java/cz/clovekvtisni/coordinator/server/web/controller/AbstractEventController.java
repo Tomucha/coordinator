@@ -34,16 +34,4 @@ public abstract class AbstractEventController extends AbstractController {
         logger.info("Activity to model: "+result);
         return result;
     }
-
-    @ModelAttribute("breadcrumbs")
-    protected Breadcrumb[] breadcrumbs() {
-        return new Breadcrumb[]{
-                // EventMapController.getBreadcrumb(appContext.getActiveEvent()),
-                EventPoiListController.getBreadcrumb(appContext.getActiveEvent()),
-                EventUserListController.getBreadcrumb(appContext.getActiveEvent()),
-                EventUserGroupListController.getBreadcrumb(appContext.getActiveEvent()),
-                EventDetailController.getBreadcrumb(appContext.getActiveEvent())
-        };
-    }
-
 }

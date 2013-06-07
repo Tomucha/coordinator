@@ -36,9 +36,6 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     private CoordinatorConfig config;
 
     @Autowired
-    private AuthorizationTool authorizationTool;
-
-    @Autowired
     private ActivityService activityService;
 
     @Autowired

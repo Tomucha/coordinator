@@ -115,8 +115,4 @@ public class EventDetailController extends AbstractEventController {
 
         model.addAttribute("eventList", result);
     }
-
-    public static Breadcrumb getBreadcrumb(EventEntity params) {
-        return new Breadcrumb(params, "/admin/event/detail", "breadcrumb.eventDetail", AuthorizationTool.ADMIN);
-    }
 }

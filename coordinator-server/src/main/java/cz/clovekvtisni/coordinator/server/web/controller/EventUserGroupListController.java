@@ -28,8 +28,4 @@ public class EventUserGroupListController extends AbstractEventController {
 
         return "admin/event-usergroups";
     }
-
-    public static Breadcrumb getBreadcrumb(EventEntity activeEvent) {
-        return new Breadcrumb(activeEvent, "/admin/event/user-group/list", "breadcrumb.eventUserGroups");
-    }
 }
