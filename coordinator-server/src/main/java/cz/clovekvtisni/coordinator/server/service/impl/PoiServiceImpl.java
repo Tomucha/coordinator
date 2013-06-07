@@ -47,6 +47,9 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     @Autowired
     private WorkflowCallbackAccessor callbackAccessor;
 
+    @Autowired
+    private AuthorizationTool authorizationTool;
+
     @Override
     public PoiEntity findById(Long id, long flags) {
         PoiEntity poi = ofy().get(Key.create(PoiEntity.class, id));
@@ -122,6 +125,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                     entity.setWorkflowState(w.getStartState());
                 }
 
+                entity.setVisibleForRole(authorizationTool.findRolesWithReadPermission(entity));
                 ofy().put(entity);
 
                 ActivityEntity a = new ActivityEntity();
@@ -333,6 +337,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
                 entityF.setWorkflowState(null);
                 entityF.setWorkflowStateId(transition.getToStateId());
+                entityF.setVisibleForRole(authorizationTool.findRolesWithReadPermission(entityF));
                 PoiEntity updated = updatePoi(entityF);
 
                 if (transition.isForcesSingleAssignee() && (FLAG_DISABLE_FORCE_SINGLE_ASSIGN & flags) == 0) {

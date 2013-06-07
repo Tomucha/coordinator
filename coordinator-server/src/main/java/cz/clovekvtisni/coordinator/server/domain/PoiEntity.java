@@ -76,6 +76,9 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     @Ignore
     private WorkflowState workflowState;
 
+    @Index
+    private Set<String> visibleForRole;
+
     public PoiEntity() {
     }
 
@@ -250,6 +253,14 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
         if (userIdList == null || user == null)
             return false;
         return getUserIdList().contains(user.getId());
+    }
+
+    public Set<String> getVisibleForRole() {
+        return visibleForRole;
+    }
+
+    public void setVisibleForRole(Set<String> visibleForRole) {
+        this.visibleForRole = visibleForRole;
     }
 
     @Override

@@ -92,8 +92,13 @@ public class ApplicationInitFilter implements Filter {
             String eventId = hRequest.getParameter("eventId");
             if (!ValueTool.isEmpty(eventId)) {
                 // we have an active event in URL
-                Long eventIdNum = Long.parseLong(eventId);
-                EventEntity e = eventService.findById(eventIdNum, 0);
+                final Long eventIdNum = Long.parseLong(eventId);
+                EventEntity e = securityTool.runWithDisabledSecurity(new RunnableWithResult<EventEntity>() {
+                    @Override
+                    public EventEntity run() {
+                        return eventService.findById(eventIdNum, 0);
+                    }
+                });
                 appContext.setActiveEvent(e);
             }
         }
@@ -112,7 +117,14 @@ public class ApplicationInitFilter implements Filter {
 
             if (loggedUser != null && activeEvent != null) {
                 organizationInEventEntity = organizationInEventService.findEventInOrganization(activeEvent.getId(), loggedUser.getOrganizationId(), 0l);
-                userInEventEntity = userInEventService.findById(activeEvent.getId(), loggedUser.getId(), 0l);
+                final Long fActiveEventId = activeEvent.getId();
+                final Long fLoggedUserId = loggedUser.getId();
+                userInEventEntity = securityTool.runWithDisabledSecurity(new RunnableWithResult<UserInEventEntity>() {
+                    @Override
+                    public UserInEventEntity run() {
+                        return userInEventService.findById(fActiveEventId, fLoggedUserId, UserInEventService.FLAG_FETCH_GROUPS);
+                    }
+                });
             }
 
             appContext.setActiveOrganizationInEvent(organizationInEventEntity);

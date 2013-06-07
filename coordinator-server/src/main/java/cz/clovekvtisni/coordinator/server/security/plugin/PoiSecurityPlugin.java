@@ -17,6 +17,8 @@ import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
+
 @Component
 public class PoiSecurityPlugin extends SecurityPlugin {
 
@@ -74,31 +76,11 @@ public class PoiSecurityPlugin extends SecurityPlugin {
                     return true;
             }
 
-            if (!ValueTool.isEmpty(entity.getWorkflowStateId())) {
-                WorkflowState state = entity.getWorkflowState();
-                String[] visibleForRole = state.getVisibleForRole();
-
-                UserInEventEntity activeUserInEvent = appContext.getActiveUserInEvent();
-
-                if (visibleForRole != null &&
-                    (
-                        loggedUser.hasAnyRole(visibleForRole) ||
-                        (activeUserInEvent != null && activeUserInEvent.hasAnyRole(visibleForRole))
-                    )
-                )
-                    return true;
-
-                String[] editableForRole = state.getEditableForRole();
-                if (editableForRole != null &&
-                    (
-                        loggedUser.hasAnyRole(editableForRole) ||
-                        (activeUserInEvent != null && activeUserInEvent.hasAnyRole(editableForRole))
-                    )
-                )
-                    return true;
-            }
-
-            return false;
+            String[] rolesWithReadPermission = authorizationTool.findRolesWithReadPermission(entity).toArray(new String[0]);
+            UserInEventEntity activeUserInEvent = appContext.getActiveUserInEvent();
+            return
+                loggedUser.hasAnyRole(rolesWithReadPermission) ||
+                (activeUserInEvent != null && activeUserInEvent.hasAnyRole(rolesWithReadPermission));
         }
     }
 

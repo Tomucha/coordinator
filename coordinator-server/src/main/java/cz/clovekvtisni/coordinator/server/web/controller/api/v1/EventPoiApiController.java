@@ -7,8 +7,11 @@ import cz.clovekvtisni.coordinator.api.response.ApiResponse;
 import cz.clovekvtisni.coordinator.api.response.EventPoiFilterResponseData;
 import cz.clovekvtisni.coordinator.api.response.EventPoiResponseData;
 import cz.clovekvtisni.coordinator.domain.Poi;
+import cz.clovekvtisni.coordinator.domain.config.RolePermission;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
+import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
+import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
@@ -30,6 +33,9 @@ public class EventPoiApiController extends AbstractApiController {
     @Autowired
     private PoiService poiService;
 
+    @Autowired
+    private AuthorizationTool authorizationTool;
+
     @RequestMapping(method = RequestMethod.POST, value = "/list")
     public @ResponseBody ApiResponse filter(HttpServletRequest request) {
         EventPoiListRequestParams params = parseRequest(request, EventPoiListRequestParams.class);
@@ -39,6 +45,10 @@ public class EventPoiApiController extends AbstractApiController {
             filter.setModifiedDateVal(params.getModifiedFrom());
             filter.setModifiedDateOp(Filter.Operator.GT);
         }
+        UserEntity loggedUser = getLoggedUser();
+        if (!authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_POI_IN_ORG))
+            filter.setVisibleForRolesVal(loggedUser.getRoleIdList());
+
         filter.setOrder("modifiedDate");
 
         ResultList<PoiEntity> result = poiService.findByFilter(filter, 0, null, 0l);

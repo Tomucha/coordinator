@@ -133,4 +133,31 @@ public class AuthorizationTool {
             return true;
         return  isAuthorized(workflow.getCanBeStartedBy(), user);
     }
+
+    public Set<String> findRolesWithReadPermission(PoiEntity poi) {
+        Set<String> roles = new HashSet<String>();
+
+        if (!ValueTool.isEmpty(poi.getWorkflowStateId())) {
+            WorkflowState state = poi.getWorkflowState();
+            String[] visibleForRole = state.getVisibleForRole();
+            if (visibleForRole != null)
+                roles.addAll(Arrays.asList(visibleForRole));
+            String[] editableForRole = state.getEditableForRole();
+            if (editableForRole != null)
+                roles.addAll(Arrays.asList(editableForRole));
+        }
+
+        // children included
+        Set<String> children = new HashSet<String>();
+        for (String parentRoleId : roles) {
+            for (Map.Entry<String, List<String>> entry : roleParentMap.entrySet()) {
+                if (!parentRoleId.equals(entry.getKey()) && entry.getValue().contains(parentRoleId)) {
+                    children.add(parentRoleId);
+                }
+            }
+        }
+        roles.addAll(children);
+
+        return roles;
+    }
 }

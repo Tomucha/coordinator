@@ -140,7 +140,12 @@ public abstract class AbstractApiController {
                 if (params != null && params instanceof EventRequestParams) {
                     final Long eventId = ((EventRequestParams) params).getEventId();
                     if (eventId != null) {
-                        UserInEventEntity inEvent = userInEventService.findById(eventId, appContext.getLoggedUser().getId(), 0L);
+                        UserInEventEntity inEvent = securityTool.runWithDisabledSecurity(new RunnableWithResult<UserInEventEntity>() {
+                            @Override
+                            public UserInEventEntity run() {
+                                return userInEventService.findById(eventId, appContext.getLoggedUser().getId(), UserInEventService.FLAG_FETCH_GROUPS);
+                            }
+                        });
                         appContext.setActiveUserInEvent(inEvent);
                     }
                 }

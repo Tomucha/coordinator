@@ -7,6 +7,7 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.NoDeletedFilter;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -38,6 +39,10 @@ public class PoiFilter extends NoDeletedFilter<PoiEntity> {
     private List<String> geoCellsVal;
 
     private Operator geoCellsOp = Operator.IN;
+    
+    private String[] visibleForRolesVal;
+    
+    private Operator visibleForRolesOp = Operator.IN;
 
     public Long getEventIdVal() {
         return eventIdVal;
@@ -133,6 +138,22 @@ public class PoiFilter extends NoDeletedFilter<PoiEntity> {
 
     public void setGeoCellsOp(Operator geoCellsOp) {
         this.geoCellsOp = geoCellsOp;
+    }
+
+    public Operator getVisibleForRolesOp() {
+        return visibleForRolesOp;
+    }
+
+    public void setVisibleForRolesOp(Operator visibleForRolesOp) {
+        this.visibleForRolesOp = visibleForRolesOp;
+    }
+
+    public String[] getVisibleForRolesVal() {
+        return visibleForRolesVal;
+    }
+
+    public void setVisibleForRolesVal(String[] visibleForRolesVal) {
+        this.visibleForRolesVal = visibleForRolesVal;
     }
 
     @Override
