@@ -105,7 +105,7 @@
                 </div>
 
                 <div class="buttonPanel">
-                    <button type="submit" ${can:create("poiEntity") ? '' : 'disabled="disabled"'} class="btn btn-primary"><span class="icon-ok icon-white"></span> <s:message code="button.save"/></button>
+                    <button type="submit" ${can:create('poiEntity') ? '' : 'disabled="disabled"'} class="btn btn-primary"><span class="icon-ok icon-white"></span> <s:message code="button.save"/></button>
                 </div>
 
 

@@ -92,7 +92,7 @@ public class PoiSecurityPlugin extends SecurityPlugin {
                 return false;
 
             if (entity == null && entityName != null)
-                return true;
+                return authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_POI_IN_ORG);
 
             if (!authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_POI_IN_ORG) ||
                 loggedUser.getOrganizationId() == null ||

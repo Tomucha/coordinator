@@ -3,6 +3,7 @@
         taglib prefix="s" uri="http://www.springframework.org/tags" %><%@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
+        taglib prefix="can" uri="/WEB-INF/permissions.tld" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
 %><h2><s:message code="${form.new ? 'header.userGroupCreate' : 'header.userGroupEdit'}"/></h2>
 
@@ -36,7 +37,7 @@
             </div>
 
             <div class="buttonPanel">
-                <button type="submit" class="btn btn-primary"><span class="icon-ok icon-white"></span> <s:message code="button.save"/></button>
+                <button type="submit" ${!can:create('userGroupEntity') ? 'disabled="disabled"' : ''} class="btn btn-primary"><span class="icon-ok icon-white"></span> <s:message code="button.save"/></button>
             </div>
 
         </sf:form>

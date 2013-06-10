@@ -193,7 +193,7 @@
             </div>
 
             <div class="buttonPanel">
-                <sf:button class="btn btn-primary"><span class="icon-ok icon-white"></span> <s:message code="button.save"/></sf:button>
+                <sf:button class="btn btn-primary" disabled="${!can:create('userEntity')}" ><span class="icon-ok icon-white"></span> <s:message code="button.save"/></sf:button>
             </div>
         </sf:form>
     </div>
