@@ -71,6 +71,12 @@
                         </div>
 
                         <div>
+                            <tags:input field="roleIdList" modelAttribute="" captionCode="UserEntity.roles">
+                                <sf:select path="roleIdList" multiple="true" items="${form.acceptableRoleMap}"/>
+                            </tags:input>
+                        </div>
+
+                        <div>
                             <tags:hiddenEvent/>
                             <sf:hidden path="userId"/>
                             <sf:hidden path="createdDate"/>

@@ -7,6 +7,7 @@ import com.googlecode.objectify.Work;
 import cz.clovekvtisni.coordinator.domain.NotificationType;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
+import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowTransition;
 import cz.clovekvtisni.coordinator.server.domain.*;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
@@ -335,8 +336,8 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                     entityF = entity;
                 }
 
-                entityF.setWorkflowState(null);
-                entityF.setWorkflowStateId(transition.getToStateId());
+                Workflow workflow = config.getWorkflowMap().get(entityF.getWorkflowId());
+                entityF.setWorkflowState(workflow.getStateMap().get(transition.getToStateId()));
                 entityF.setVisibleForRole(authorizationTool.findRolesWithReadPermission(entityF));
                 PoiEntity updated = updatePoi(entityF);
 

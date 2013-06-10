@@ -21,21 +21,22 @@
 
             <sf:errors cssClass="alert alert-error" element="div" />
 
-            <div class="fluid">
+            <div class="fluid panels">
                 <div class="row-fluid">
                     <div class="mini-layout span3">
-                        <c:choose>
-                            <c:when test="${can:isSuperadmin() and (empty form.id or empty form.organizationId)}">
-                                <div>
-                                    <tags:input field="organizationId" modelAttribute="form" captionCode="UserEntity.organization">
+                        <div>
+                            <tags:input field="organizationId" modelAttribute="form" captionCode="UserEntity.organization">
+                                <c:choose>
+                                    <c:when test="${form.canAddToOrg and (empty form.id or empty form.organizationId)}">
                                         <sf:select path="organizationId" items="${config.organizationMap}" itemLabel="name"/>
-                                    </tags:input>
-                                </div>
-                            </c:when>
-                            <c:otherwise>
-                                <input type="hidden" name="organizationId" value="${loggedUser.organizationId}"/>
-                            </c:otherwise>
-                        </c:choose>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <input type="text" readonly="readonly" value="<c:out value="${config.organizationMap[loggedUser.organizationId].name}"/>"/>
+                                        <input type="hidden" name="organizationId" value="${loggedUser.organizationId}"/>
+                                    </c:otherwise>
+                                </c:choose>
+                            </tags:input>
+                        </div>
 
                         <div>
                             <tags:input field="roleIdList" modelAttribute="" captionCode="UserEntity.roles">

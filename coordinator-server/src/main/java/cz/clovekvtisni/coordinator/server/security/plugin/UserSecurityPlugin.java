@@ -60,7 +60,7 @@ public class UserSecurityPlugin extends SecurityPlugin {
                 return false;
 
             if (entity == null && entityName != null)
-                return true;
+                return authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER, RolePermission.EDIT_USER_IN_ORG);
 
             // user entity type can read everyone logged user
             // superadmin can read everything

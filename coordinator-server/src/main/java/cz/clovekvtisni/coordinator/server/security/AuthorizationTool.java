@@ -83,7 +83,7 @@ public class AuthorizationTool {
         if (roleId == null || creatorRoles == null) return false;
         if (roleId.equals(SUPERADMIN) || roleId.equals(ADMIN))
             return isAuthorized(Arrays.asList(new String[] {SUPERADMIN}), creatorRoles);
-        if (roleId.equals(BACKEND))
+        if (roleId.equals(COORDINATOR))
             return isAuthorized(Arrays.asList(new String[] {ADMIN}), creatorRoles);
 
         return true;

@@ -72,3 +72,6 @@ div.dropdown-menu {
 form .alert-error {
     display: inline-block;
 }
+.fluid.panels .mini-layout {
+    margin-right: 16px;
+}

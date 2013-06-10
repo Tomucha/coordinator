@@ -294,6 +294,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
                 copy.setZip(newUser.getZip());
                 copy.setCountry(newUser.getCountry());
                 copy.setModifiedDate(new Date());
+                copy.setRoleIdList(newUser.getRoleIdList());
 
                 systemService.deleteUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, copy.getEmail());
                 systemService.saveUniqueIndexOwner(ofy(), UniqueIndexEntity.Property.EMAIL, copy.getEmail(), copy.getKey());

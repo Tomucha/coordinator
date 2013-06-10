@@ -1,9 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.model;
 
-import cz.clovekvtisni.coordinator.domain.config.Equipment;
-import cz.clovekvtisni.coordinator.domain.config.Organization;
-import cz.clovekvtisni.coordinator.domain.config.Role;
-import cz.clovekvtisni.coordinator.domain.config.Skill;
+import cz.clovekvtisni.coordinator.domain.config.*;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEquipmentEntity;
@@ -34,10 +31,14 @@ public class UserForm extends UserEntity {
 
     private List<Skill> allSkillList;
 
+    private boolean canAddToOrg;
+
     public void injectConfigValues(AppContext appContext, AuthorizationTool authorizationTool, CoordinatorConfig config) {
         List<Organization> organizations = config.getOrganizationList();
         List<Role> roles = config.getRoleList();
         UserEntity editor = appContext.getLoggedUser();
+
+        canAddToOrg = authorizationTool.hasAnyPermission(editor, RolePermission.EDIT_USER);
 
         acceptableRoleMap = new HashMap<String, String>();
         if (roles != null) {
@@ -142,4 +143,7 @@ public class UserForm extends UserEntity {
         this.organizationId = organizationId;
     }
 
+    public boolean isCanAddToOrg() {
+        return canAddToOrg;
+    }
 }
