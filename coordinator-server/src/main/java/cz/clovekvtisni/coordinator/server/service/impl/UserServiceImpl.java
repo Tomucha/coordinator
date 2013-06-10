@@ -136,7 +136,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     }
 
     private void populate(Collection<UserEntity> entities, long flags) {
-        Map<String, List<String>> roleParentMap = config.getRoleParentMap();
+            Map<String, List<String>> roleParentMap = config.getRoleParentMap();
         for (UserEntity userEntity : entities) {
             Set<String> allRoles = new HashSet<String>();
             if (userEntity.getRoleIdList() != null) {

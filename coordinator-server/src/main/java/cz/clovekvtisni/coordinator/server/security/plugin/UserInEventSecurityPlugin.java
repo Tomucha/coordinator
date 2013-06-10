@@ -65,7 +65,7 @@ public class UserInEventSecurityPlugin extends SecurityPlugin {
             if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER))
                 return true;
 
-            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.READ_USER_IN_GROUP, RolePermission.EDIT_USER_IN_ORG)) {
+            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER_IN_ORG)) {
                 if (loggedUser.getOrganizationId() != null && loggedUser.getOrganizationId().equals(entity.getUserEntity().getOrganizationId()))
                     return true;
             }
@@ -89,9 +89,6 @@ public class UserInEventSecurityPlugin extends SecurityPlugin {
 
             if (entity == null && entityName != null)
                 return authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER, RolePermission.EDIT_USER_IN_ORG);
-
-            if (loggedUser.equals(entity.getUserEntity()))
-                return true;
 
             if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER))
                 return true;

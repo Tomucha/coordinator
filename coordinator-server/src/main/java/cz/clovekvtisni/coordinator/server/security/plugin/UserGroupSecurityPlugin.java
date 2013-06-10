@@ -68,12 +68,7 @@ public class UserGroupSecurityPlugin extends SecurityPlugin {
             if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER))
                 return true;
 
-            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER_IN_ORG)) {
-                if (loggedUser.getOrganizationId() != null && loggedUser.getOrganizationId().equals(entity.getOrganizationId()))
-                    return true;
-            }
-
-            return false;
+            return loggedUser.getOrganizationId() != null && loggedUser.getOrganizationId().equals(entity.getOrganizationId());
         }
     }
 

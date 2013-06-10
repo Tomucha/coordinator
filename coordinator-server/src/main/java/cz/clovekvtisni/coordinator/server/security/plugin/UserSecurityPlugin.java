@@ -60,7 +60,7 @@ public class UserSecurityPlugin extends SecurityPlugin {
                 return false;
 
             if (entity == null && entityName != null)
-                return authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER, RolePermission.EDIT_USER_IN_ORG);
+                return true;
 
             // user entity type can read everyone logged user
             // superadmin can read everything
@@ -79,8 +79,7 @@ public class UserSecurityPlugin extends SecurityPlugin {
                 if (loggedUser.getOrganizationId() != null && loggedUser.getOrganizationId().equals(entity.getOrganizationId()))
                     return true;
             }
-
-            return false;
+                return false;
         }
     }
 
@@ -92,9 +91,6 @@ public class UserSecurityPlugin extends SecurityPlugin {
 
             if (entity == null && entityName != null)
                 return authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER, RolePermission.EDIT_USER_IN_ORG);
-
-            if (loggedUser.equals(entity))
-                return true;
 
             if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_USER))
                 return true;

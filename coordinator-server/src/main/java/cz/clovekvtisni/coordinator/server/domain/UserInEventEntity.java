@@ -341,6 +341,27 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserInEventEntity)) return false;
+
+        UserInEventEntity that = (UserInEventEntity) o;
+
+        if (eventId != null ? !eventId.equals(that.eventId) : that.eventId != null) return false;
+        if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (eventId != null ? eventId.hashCode() : 0);
+        result = 31 * result + (userId != null ? userId.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "UserInEventEntity{" +
                 "userId=" + userId +

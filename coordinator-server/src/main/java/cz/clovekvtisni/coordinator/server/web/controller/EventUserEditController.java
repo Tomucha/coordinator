@@ -58,10 +58,10 @@ public class EventUserEditController extends AbstractEventController {
         EventUserForm form = new EventUserForm();
 
         if (userId != null) {
-            UserEntity user = loadUserById(userId, UserService.FLAG_FETCH_EQUIPMENT | UserService.FLAG_FETCH_SKILLS);
+            UserInEventEntity inEvent = fetchUserInEvent(params.getEventId(), userId);
+            UserEntity user = inEvent.getUserEntity();
             form.populateFrom(user);
             form.setUserId(user.getId());
-            UserInEventEntity inEvent = fetchUserInEvent(params.getEventId(), userId);
             form.setEventId(appContext.getActiveEvent().getId());
             if (inEvent != null) {
                 if (inEvent.getGroupIdList() != null) {
