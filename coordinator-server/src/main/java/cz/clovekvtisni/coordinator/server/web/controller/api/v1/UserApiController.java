@@ -51,6 +51,13 @@ public class UserApiController extends AbstractApiController {
         return okResult(responseData);
     }
 
+    @RequestMapping(value = "/forgotten-password", method = RequestMethod.POST)
+    public @ResponseBody ApiResponse forgottenPassword(HttpServletRequest request) {
+        LoginRequestParams params = parseRequestAnonymous(request, LoginRequestParams.class);
+        userService.lostPassword(params.getLogin());
+        return okResult(null);
+    }
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public @ResponseBody ApiResponse register(HttpServletRequest request) {
         RegisterRequestParams params = parseRequestAnonymous(request, RegisterRequestParams.class);

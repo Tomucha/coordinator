@@ -53,6 +53,13 @@ public class ApiCalls {
 		}
 	}
 
+    public static class UserLoginCall extends
+            ApiCall<LoginRequestParams, LoginResponseData> {
+        public UserLoginCall(LoginRequestParams requestParams) {
+            super("user/login", requestParams, LoginResponseData.class);
+        }
+    }
+
 	public static class UserUpdatePositionCall extends
 			ApiCall<UserUpdatePositionRequestParams, UserUpdatePositionResponseData> {
 		public UserUpdatePositionCall(UserUpdatePositionRequestParams requestParams) {

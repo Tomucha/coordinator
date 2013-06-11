@@ -17,7 +17,11 @@
 
     <string name="error_no_internet">Vypadá to, že jsme bez internetu. Ale teď ho bohužel potřebujeme.</string>
     <string name="error_server">Něco nám nefunguje na straně serveru, zkus to prosím za chvíli :-/</string>
+    <string name="error_missing_value">Vyplňte prosím pole.</string>
+    <string name="error_wrong_credentials">Neplatný email nebo heslo, asi ho zadáváte špatně.</string>
 
+    <string name="ok">OK</string>
+    <string name="cancel">Zrušit</string>
 
     <string name="ok_poi_saved">Nové POI je uloženo!</string>
 
@@ -37,6 +41,25 @@
     </string>
     <string name="dialog_title_filter_people">Zobrazovat tyto lidi</string>
 
+    <string name="help_general">
+        A tady je nápověda, vysvětlení, další informace najdete.
+        A tady je nápověda, vysvětlení, další informace najdete.
+        A tady je nápověda, vysvětlení, další informace najdete.\n\n
+
+        A tady je nápověda, vysvětlení, další informace najdete.
+        A tady je nápověda, vysvětlení, další informace najdete.
+        A tady je nápověda, vysvětlení, další informace najdete.
+        A tady je nápověda, vysvětlení, další informace najdete.
+    </string>
+
     <string name="message_user_position_unknown">Poloha uživatele není známá.</string>
+    <string name="message_logged">Jste přihlášen!</string>
+    <string name="message_password_changed">Heslo jsme Vám změnili a poslali na email.</string>
+    <string name="menu_synchronize">Synchronizovat</string>
+    <string name="menu_help">Nápověda</string>
+    <string name="menu_login">Přihlásit se</string>
+    <string name="email">Email</string>
+    <string name="password">Heslo</string>
+    <string name="forgotten_password"><u>Zapomněl jsem heslo!</u></string>
 
 </resources>

@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
+import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.config.Equipment;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
@@ -26,7 +27,7 @@ public class WizardModel implements ModelCallbacks {
 	private List<ModelCallbacks> mListeners = new ArrayList<ModelCallbacks>();
 	private PageList mRootPageList;
 
-	public WizardModel(Context context, Organization organization, ConfigResponse config, User user) {
+	public WizardModel(Context context, Organization organization, OrganizationInEvent organizationInEvent, ConfigResponse config, User user) {
 		mContext = context;
 
 		Page personalInfo = new PersonalInfoPage(this, "Osobní údaje").setRequired(true);
@@ -34,7 +35,7 @@ public class WizardModel implements ModelCallbacks {
 		Page address = new AddressPage(this, "Bydliště").setRequired(true);
 
 		List<Equipment> equipmentList = Lists.newArrayList();
-		Set<String> equipmentIds = Sets.newHashSet(organization.getPreRegistrationEquipment());
+		Set<String> equipmentIds = Sets.newHashSet(organizationInEvent == null ? organization.getPreRegistrationEquipment() : organizationInEvent.getRegistrationEquipment());
 		for (Equipment equipment : config.getEquipmentList()) {
 			if (equipmentIds.contains(equipment.getId())) {
 				equipmentList.add(equipment);
@@ -43,7 +44,7 @@ public class WizardModel implements ModelCallbacks {
 		Page equipment = new EquipmentPage(this, "Vybavení").setEquipments(equipmentList);
 
 		List<Skill> skillList = Lists.newArrayList();
-		Set<String> skillIds = Sets.newHashSet(organization.getPreRegistrationSkills());
+		Set<String> skillIds = Sets.newHashSet(organizationInEvent == null ? organization.getPreRegistrationSkills() : organizationInEvent.getRegistrationSkills());
 		for (Skill skill : config.getSkillList()) {
 			if (skillIds.contains(skill.getId())) {
 				skillList.add(skill);

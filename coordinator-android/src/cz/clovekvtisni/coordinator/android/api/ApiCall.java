@@ -14,10 +14,13 @@ import cz.clovekvtisni.coordinator.api.request.ApiRequest;
 import cz.clovekvtisni.coordinator.api.request.RequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse.Status;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
+import cz.clovekvtisni.coordinator.exception.ErrorCode;
 
 public abstract class ApiCall<RQ extends RequestParams, RP extends ApiResponseData> {
 
 	private static final String API_RESPONSE_STATUS = "status";
+    private static final String API_RESPONSE_ERROR_CODE = "errorCode";
+    private static final String API_RESPONSE_ERROR_MESSAGE = "errorMessage";
 	private static final String API_RESPONSE_DATA = "data";
 	private static final String URL_PREFIX = DeployEnvironment.SERVER_URL_PREFIX + "/api/v1/";
 
@@ -39,8 +42,6 @@ public abstract class ApiCall<RQ extends RequestParams, RP extends ApiResponseDa
 		} catch (JsonSyntaxException e) {
 			throw new ApiCallException(e);
 		} catch (HttpRequestException e) {
-			throw new ApiCallException(e);
-		} catch (ApiServerSideException e) {
 			throw new ApiCallException(e);
 		}
 	}
@@ -65,7 +66,9 @@ public abstract class ApiCall<RQ extends RequestParams, RP extends ApiResponseDa
 			return ApiUtils.GSON.fromJson(resultJson, responseClass);
 		} else {
             Lg.API.e("Server response: "+json);
-			throw new ApiServerSideException();
+            ErrorCode code = ApiUtils.GSON.fromJson(json.get(API_RESPONSE_ERROR_CODE), ErrorCode.class);
+            String message = json.has(API_RESPONSE_ERROR_MESSAGE) ? json.get(API_RESPONSE_ERROR_MESSAGE).getAsString() : null;
+			throw new ApiServerSideException(code, message);
 		}
 	}
 
@@ -92,14 +95,30 @@ public abstract class ApiCall<RQ extends RequestParams, RP extends ApiResponseDa
 	}
 
 	@SuppressWarnings("serial")
-	public static class ApiServerSideException extends Exception {
-	}
+	public static class ApiServerSideException extends ApiCallException {
+
+        private final ErrorCode code;
+
+        public ApiServerSideException(ErrorCode code, String message) {
+            super(message);
+            this.code = code;
+        }
+
+        public ErrorCode getCode() {
+            return code;
+        }
+    }
 
 	@SuppressWarnings("serial")
 	public static class ApiCallException extends RuntimeException {
+        public ApiCallException() { }
 		public ApiCallException(Throwable cause) {
 			super(cause);
 		}
-	}
+
+        public ApiCallException(String message) {
+            super(message);
+        }
+    }
 
 }

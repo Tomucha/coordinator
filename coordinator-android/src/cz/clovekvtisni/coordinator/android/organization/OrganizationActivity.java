@@ -26,6 +26,7 @@ import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventRegisteredLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventRegisteredLoaderListener;
 import cz.clovekvtisni.coordinator.android.event.EventActivity;
 import cz.clovekvtisni.coordinator.android.register.RegisterActivity;
+import cz.clovekvtisni.coordinator.android.util.FindView;
 import cz.clovekvtisni.coordinator.android.util.UiTool;
 import cz.clovekvtisni.coordinator.api.request.EventFilterRequestParams;
 import cz.clovekvtisni.coordinator.api.response.EventFilterResponseData;
@@ -63,7 +64,7 @@ public class OrganizationActivity extends SherlockFragmentActivity {
                 if (registered) {
                     startActivity(EventActivity.IntentHelper.create(c, event.getEvent(), event));
                 } else {
-                    startActivityForResult(RegisterActivity.IntentHelper.create(c, organization, event.getEvent(), user), REQUEST_REGISTER);
+                    startActivityForResult(RegisterActivity.IntentHelper.create(c, organization, event, event.getEvent(), user), REQUEST_REGISTER);
                 }
             }
         });
@@ -74,8 +75,7 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 		preregister.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(RegisterActivity.IntentHelper.create(getBaseContext(), organization,
-						null, user));
+				startActivity(RegisterActivity.IntentHelper.create(getBaseContext(), organization, null, null, user));
 			}
 		});
 	}
@@ -188,17 +188,15 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {
-				convertView = getLayoutInflater().inflate(android.R.layout.simple_list_item_2, parent, false);
+				convertView = getLayoutInflater().inflate(R.layout.item_with_icon, parent, false);
 			}
 
 			OrganizationInEvent event = orgInEvents[position];
 			boolean registered = registeredEventIds.contains(event.getEventId());
 
-			TextView title = (TextView) convertView.findViewById(android.R.id.text1);
-			title.setText(event.getName() + (registered ? " (zaregistrován)" : ""));
-
-			TextView desc = (TextView) convertView.findViewById(android.R.id.text2);
-			desc.setText(event.getDescription());
+            FindView.textView(convertView, R.id.title).setText(event.getName());
+            FindView.textView(convertView, R.id.short_description).setText(event.getDescription());
+            FindView.imageView(convertView, R.id.icon).setImageResource(registered ? R.drawable.ic_registered : R.drawable.ic_not_registered);
 
 			return convertView;
 		}

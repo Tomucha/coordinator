@@ -43,6 +43,7 @@ import cz.clovekvtisni.coordinator.api.request.UserPushTokenRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
 import cz.clovekvtisni.coordinator.api.response.RegisterResponseData;
 import cz.clovekvtisni.coordinator.domain.Event;
+import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
@@ -65,12 +66,13 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 
 	private Event event;
 	private Organization organization;
+    private OrganizationInEvent organizationInEvent;
 
 	private ConfigResponse config;
     private User user;
 
     private void initWizardModel(Bundle state) {
-		mWizardModel = new WizardModel(this, organization, config, user);
+		mWizardModel = new WizardModel(this, organization, organizationInEvent, config, user);
 		if (state != null) mWizardModel.load(state.getBundle("model"));
 		mWizardModel.registerListener(this);
 		mCurrentPageSequence = mWizardModel.getCurrentPageSequence();
@@ -128,6 +130,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 
 		Intent intent = getIntent();
 		organization = IntentHelper.getOrganization(intent);
+        organizationInEvent = IntentHelper.getOrganizationInEvent(intent);
 		event = IntentHelper.getEvent(intent);
         user = IntentHelper.getUser(intent);
 
@@ -399,11 +402,13 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 	public static class IntentHelper {
 		private static final String EXTRA_EVENT = "event";
 		private static final String EXTRA_ORGANIZATION = "organization";
+        private static final String EXTRA_ORGANIZATION_IN_EVENT = "organizationInEvent";
         private static final String EXTRA_USER = "user";
 
-        public static Intent create(Context c, Organization o, Event e, User user) {
+        public static Intent create(Context c, Organization o, OrganizationInEvent organizationInEvent, Event e, User user) {
 			Intent i = new Intent(c, RegisterActivity.class);
 			i.putExtra(EXTRA_ORGANIZATION, o);
+            i.putExtra(EXTRA_ORGANIZATION_IN_EVENT, organizationInEvent);
 			i.putExtra(EXTRA_EVENT, e);
             i.putExtra(EXTRA_USER, user);
 			return i;
@@ -420,5 +425,9 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 		public static Organization getOrganization(Intent i) {
 			return (Organization) i.getSerializableExtra(EXTRA_ORGANIZATION);
 		}
+
+        public static OrganizationInEvent getOrganizationInEvent(Intent i) {
+            return (OrganizationInEvent) i.getSerializableExtra(EXTRA_ORGANIZATION_IN_EVENT);
+        }
 	}
 }

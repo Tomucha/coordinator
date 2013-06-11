@@ -67,6 +67,8 @@ public class SkillsFragment extends ListFragment {
 			mChoices.add(page.getSkillsList().get(i).getName());
 		}
 
+        Lg.APP.i("Choices: "+mChoices);
+
 		((TextView) getView().findViewById(R.id.title)).setText(page.getTitle());
 
 		final ListView listView = (ListView) getView().findViewById(android.R.id.list);

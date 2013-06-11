@@ -1,14 +1,15 @@
 package cz.clovekvtisni.coordinator.android.welcome;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
-import android.widget.TextView;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Window;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.fhucho.android.workers.Workers;
 import com.fhucho.android.workers.simple.ActivityWorker2;
 import com.google.android.gcm.GCMRegistrar;
@@ -26,10 +27,14 @@ import cz.clovekvtisni.coordinator.android.util.BetterArrayAdapter;
 import cz.clovekvtisni.coordinator.android.util.FindView;
 import cz.clovekvtisni.coordinator.android.util.Lg;
 import cz.clovekvtisni.coordinator.android.util.UiTool;
+import cz.clovekvtisni.coordinator.api.request.LoginRequestParams;
+import cz.clovekvtisni.coordinator.api.request.UserPushTokenRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ConfigResponse;
+import cz.clovekvtisni.coordinator.api.response.LoginResponseData;
 import cz.clovekvtisni.coordinator.api.response.UserByIdResponseData;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
+import cz.clovekvtisni.coordinator.util.ValueTool;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -103,6 +108,203 @@ public class MainActivity extends BaseActivity {
         }
         initListView();
         initGCM();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getSupportMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_help: showHelp(); return true;
+            case R.id.menu_login: showLogin(); return true;
+        }
+        return super.onOptionsItemSelected(item);    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    private void showLogin() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.menu_login);
+
+        LayoutInflater inflater = getLayoutInflater();
+
+        View content = inflater.inflate(R.layout.dialog_login, null);
+        builder.setView(content);
+        final EditText email = (EditText) content.findViewById(R.id.email);
+        final EditText password = (EditText) content.findViewById(R.id.password);
+
+
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setPositiveButton(R.string.ok, null);
+
+        final AlertDialog dialog = builder.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String emailText = email.getText().toString();
+                if (ValueTool.isEmpty(emailText)) {
+                    email.requestFocus();
+                    UiTool.toast(R.string.error_missing_value, getApplicationContext());
+                    return;
+                }
+                String passwordText = password.getText().toString();
+                if (ValueTool.isEmpty(passwordText)) {
+                    password.requestFocus();
+                    UiTool.toast(R.string.error_missing_value, getApplicationContext());
+                    return;
+                }
+                LoginRequestParams p = new LoginRequestParams();
+                p.setLogin(emailText);
+                p.setPassword(passwordText);
+                Workers.start(new UserLoginTask(p, dialog), MainActivity.this);
+            }
+        });
+
+        TextView forgotten = (TextView) content.findViewById(R.id.forgotten_password);
+        forgotten.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String emailText = email.getText().toString();
+                        if (ValueTool.isEmpty(emailText)) {
+                            email.requestFocus();
+                            UiTool.toast(R.string.error_missing_value, getApplicationContext());
+                            return;
+                        }
+                        LoginRequestParams p = new LoginRequestParams();
+                        p.setLogin(emailText);
+                        Workers.start(new UserLoginTask(p, dialog), MainActivity.this);
+                    }
+                }
+        );
+
+    }
+
+    private class UserLoginTask extends
+            ActivityWorker2<MainActivity, LoginResponseData, Exception> {
+
+        private final LoginRequestParams params;
+        private final DialogInterface dialogToClose;
+
+        public UserLoginTask(LoginRequestParams params, DialogInterface dialogToClose) {
+            this.params = params;
+            this.dialogToClose = dialogToClose;
+        }
+
+        @Override
+        protected void doInBackground() {
+            try {
+                LoginResponseData result = new ApiCalls.UserLoginCall(params).call();
+
+                if (result.getAuthKey() != null) {
+                    // auth key was changed
+                    Settings.setAuthKey(result.getAuthKey());
+                }
+
+                try {
+                    String regId = Settings.getGcmRegistrationId();
+                    UserPushTokenRequestParams params = new UserPushTokenRequestParams(regId);
+                    new ApiCalls.UserPushTokenCall(params).call();
+                    Lg.GCM.d("Successfully uploaded registration id to the server.");
+                } catch (ApiCall.ApiCallException e) {
+                    Lg.GCM.w("Uploading registration id to the server unsuccessful.", e);
+                }
+                getListenerProxy().onSuccess(result);
+            } catch (final ApiCall.ApiServerSideException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        UiTool.showServerError(e, getApplicationContext());
+                    }
+                });
+
+            } catch (ApiCall.ApiCallException e) {
+                getListenerProxy().onException(e);
+            }
+        }
+
+        @Override
+        public void onSuccess(LoginResponseData result) {
+            UiTool.toast(R.string.message_logged, getApplicationContext());
+            onUserLoaded(result.getUser());
+            dialogToClose.dismiss();
+        }
+
+        @Override
+        public void onException(Exception e) {
+            Lg.APP.e("Chyba "+e, e);
+            Toast.makeText(getActivity(), "Chyba", Toast.LENGTH_SHORT).show();
+            dialogToClose.dismiss();
+        }
+
+    }
+
+    private class UserPasswordTask extends ActivityWorker2<MainActivity, Void, Exception> {
+
+        private final LoginRequestParams params;
+        private final DialogInterface dialogToClose;
+
+        public UserPasswordTask(LoginRequestParams params, DialogInterface dialogToClose) {
+            this.params = params;
+            this.dialogToClose = dialogToClose;
+        }
+
+        @Override
+        protected void doInBackground() {
+            try {
+                new ApiCalls.UserLoginCall(params).call();
+                getListenerProxy().onSuccess(null);
+            } catch (final ApiCall.ApiServerSideException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        UiTool.showServerError(e, getApplicationContext());
+                    }
+                });
+
+            } catch (ApiCall.ApiCallException e) {
+                getListenerProxy().onException(e);
+            }
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+            UiTool.toast(R.string.message_password_changed, getApplicationContext());
+        }
+
+        @Override
+        public void onException(Exception e) {
+            Lg.APP.e("Chyba "+e, e);
+            Toast.makeText(getActivity(), "Chyba", Toast.LENGTH_SHORT).show();
+            dialogToClose.dismiss();
+        }
+
+    }
+
+
+    private void showHelp() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(android.R.drawable.ic_menu_help);
+        builder.setTitle(R.string.menu_help);
+
+        builder.setMessage(R.string.help_general);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.show();
     }
 
     private void loadMyself() {
@@ -197,7 +399,7 @@ public class MainActivity extends BaseActivity {
 
     private class OrganizationAdapter extends BetterArrayAdapter<Organization> {
         public OrganizationAdapter() {
-            super(MainActivity.this, R.layout.item_organization);
+            super(MainActivity.this, R.layout.item_with_icon);
         }
 
         @Override

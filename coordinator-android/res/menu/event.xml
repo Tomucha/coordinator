@@ -5,6 +5,6 @@
         android:id="@+id/menu_sync"
         android:showAsAction="never"
         android:orderInCategory="10"
-        android:title="Synchronizovat"/>
+        android:title="@string/menu_synchronize"/>
 
 </menu>

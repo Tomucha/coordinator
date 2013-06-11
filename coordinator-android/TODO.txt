@@ -4,10 +4,10 @@ Vybirat tile server nahodne nebo rotovat?
 Divne chovani mapy pri velkym oddaleni
 Dpi mapy
 Double tap on map
-Kinetic scrolling
+>> NE-E: Kinetic scrolling
 Use higher level tiles
 Markery - pressed state
-Ukladat filtr mist na disk
+>> NE-E:Ukladat filtr mist na disk
 Kdyz kliknu na "moje poloha" tak zvolit priblizeni podle presnosti polohy
 Otevreni mapy je trochu pomaly
 Prejit na jiny system stahovani z netu
@@ -20,14 +20,14 @@ Moznost "synchronizovat"
 Predvyplnit registraci
 >> OPRAVENO: Vyberu ochorny clovek, zobrazi se krizovy intervent
 Moznost zobrazit poi info a user info v mape najednou
-Napojení na Inspecto - slibovali jsme
-OrganizationActivity: Logo a název orgaznizace, Text z konfigu, a seznam akcí, tak jak to je uz ted.
+>> OPRAVENO: OrganizationActivity: Logo a název orgaznizace, Text z konfigu, a seznam akcí, tak jak to je uz ted.
 
 DULEZITE
-GCM
+>> FUNGUJE: GCM
+WorkingIndicator - potrebval bych, aby workers pracovali s working indicatorem, abych mohl snadno ukazovat hodiny
 Dodelat workflow transition - ted se musi seznam poi nacist znovu, aby se to zmenilo i u uzivatele
 Pridat POI
 Preload map
-Pady
+>> CELKEM TO NEPADA: Pady
 Aktualizovat uzivatele i kdyz odejde z app
 v seznamu eventu zobrazovat jen ty, kde jsem registrovany, nebo kam se LZE registrovat
