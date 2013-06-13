@@ -76,7 +76,7 @@ public class AuthorizationTool {
     }
 
     public boolean canCreate(String roleId, String[] creatorRoles) {
-        return canCreate(roleId, Arrays.asList(creatorRoles));
+        return canCreate(roleId, creatorRoles != null ? Arrays.asList(creatorRoles) : new ArrayList<String>(0));
     }
 
     public boolean canCreate(String roleId, List<String> creatorRoles) {
@@ -136,6 +136,9 @@ public class AuthorizationTool {
 
     public Set<String> findRolesWithReadPermission(PoiEntity poi) {
         Set<String> roles = new HashSet<String>();
+
+        if (poi.isImportant())
+            roles.add(ANONYMOUS);
 
         if (!ValueTool.isEmpty(poi.getWorkflowStateId())) {
             WorkflowState state = poi.getWorkflowState();

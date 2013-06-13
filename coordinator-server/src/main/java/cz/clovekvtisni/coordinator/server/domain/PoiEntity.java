@@ -263,6 +263,10 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
         this.visibleForRole = visibleForRole;
     }
 
+    public boolean isImportant() {
+        return poiCategory != null ? poiCategory.isImportant() : false;
+    }
+
     @Override
     public String toString() {
         return "PoiEntity{" +

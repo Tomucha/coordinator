@@ -31,8 +31,8 @@
                                         <sf:select path="organizationId" items="${config.organizationMap}" itemLabel="name"/>
                                     </c:when>
                                     <c:otherwise>
-                                        <input type="text" readonly="readonly" value="<c:out value="${config.organizationMap[loggedUser.organizationId].name}"/>"/>
-                                        <input type="hidden" name="organizationId" value="${loggedUser.organizationId}"/>
+                                        <input type="text" readonly="readonly" value="<c:out value="${config.organizationMap[form.organizationId].name}"/>"/>
+                                        <input type="hidden" name="organizationId" value="${form.organizationId}"/>
                                     </c:otherwise>
                                 </c:choose>
                             </tags:input>

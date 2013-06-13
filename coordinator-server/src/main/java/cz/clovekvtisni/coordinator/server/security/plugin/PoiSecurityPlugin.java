@@ -68,6 +68,9 @@ public class PoiSecurityPlugin extends SecurityPlugin {
             if (loggedUser.getOrganizationId() == null || !loggedUser.getOrganizationId().equals(entity.getOrganizationId()))
                 return false;
 
+            if (entity.isImportant())
+                return true;
+
             if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_POI_IN_ORG))
                 return true;
 
