@@ -17,6 +17,7 @@ import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Set;
 
 @Component
@@ -43,6 +44,7 @@ public class PoiSecurityPlugin extends SecurityPlugin {
         PermissionCommand<PoiEntity> canReadCommand = new CanReadCommand();
         PermissionCommand<PoiEntity> canUpdateCommand = new CanUpdateCommand();
         PermissionCommand<PoiEntity> canCreateCommand = new CanCreateCommand();
+        PermissionCommand<PoiEntity> canDoTransitionCommand = new CanDoTransitionCommand();
 
         registerPermissionCommand(PoiEntity.class, ReadPermission.class, canReadCommand);
         registerPermissionCommand("poiEntity", ReadPermission.class, canReadCommand);
@@ -50,9 +52,11 @@ public class PoiSecurityPlugin extends SecurityPlugin {
         registerPermissionCommand("poiEntity", CreatePermission.class, canCreateCommand);
         registerPermissionCommand(PoiEntity.class, UpdatePermission.class, canUpdateCommand);
         registerPermissionCommand("poiEntity", UpdatePermission.class, canUpdateCommand);
+
         registerPermissionCommand(PoiEntity.class, DeletePermission.class, canCreateCommand);
         registerPermissionCommand("poiEntity", DeletePermission.class, canCreateCommand);
-        registerPermissionCommand(PoiEntity.class, TransitionPermission.class, canCreateCommand);
+
+        registerPermissionCommand(PoiEntity.class, TransitionPermission.class, canDoTransitionCommand);
     }
 
     private class CanReadCommand implements PermissionCommand<PoiEntity> {
@@ -128,17 +132,24 @@ public class PoiSecurityPlugin extends SecurityPlugin {
         @Override
         public boolean isPermitted(PoiEntity entity, String entityName) {
             UserEntity loggedUser = appContext.getLoggedUser();
-            if (loggedUser == null)
+            if (loggedUser == null) {
+                log.info("Logged user is null");
                 return false;
+            }
 
-            if (entity == null && entityName != null)
+            if (entity == null && entityName != null) {
+                log.info("Entity is null");
                 return true;
+            }
 
-            if (loggedUser.getOrganizationId() == null || !loggedUser.getOrganizationId().equals(entity.getOrganizationId()))
+            if (loggedUser.getOrganizationId() == null || !loggedUser.getOrganizationId().equals(entity.getOrganizationId())) {
+                log.info("Organization "+loggedUser.getOrganizationId()+" != "+entity.getOrganizationId());
                 return false;
+            }
 
-            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_POI_IN_ORG))
+            if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_POI_IN_ORG)) {
                 return true;
+            }
 
             String workflowId = entity.getWorkflowId();
             if (workflowId != null) {
@@ -146,6 +157,7 @@ public class PoiSecurityPlugin extends SecurityPlugin {
                 String workflowStateId = entity.getWorkflowStateId();
                 if (workflow != null && workflowStateId != null) {
                     WorkflowState workflowState = workflow.getStateMap().get(workflowStateId);
+                    log.info("Editable for roles: "+ Arrays.toString(workflowState.getEditableForRole()));
                     String[] editableForRole = workflowState.getEditableForRole();
                     UserInEventEntity activeUserInEvent = appContext.getActiveUserInEvent();
                     if (
