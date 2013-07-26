@@ -2,6 +2,7 @@ package cz.clovekvtisni.coordinator.server.service.impl;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Objectify;
+import cz.clovekvtisni.coordinator.SecretInfo;
 import cz.clovekvtisni.coordinator.server.domain.CoordinatorEntity;
 import cz.clovekvtisni.coordinator.server.domain.UniqueIndexEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
@@ -74,12 +75,12 @@ public class SystemServiceImpl extends AbstractServiceImpl implements SystemServ
             @Override
             public Void run() {
                 UserFilter filter = new UserFilter();
-                filter.setEmailVal(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
+                filter.setEmailVal(SecretInfo.FIRST_ADMIN_EMAIL);
                 UserEntity user = userService.findByFilter(filter, 1, null, 0l).singleResult();
                 if (user == null) {
                     user = new UserEntity();
-                    user.setPassword(System.getProperty("default.admin.password", "admin"));
-                    user.setEmail(System.getProperty("default.admin.email", "admin@m-atelier.cz"));
+                    user.setPassword(SecretInfo.FIRST_ADMIN_PASSWORD);
+                    user.setEmail(SecretInfo.FIRST_ADMIN_EMAIL);
                     user.setRoleIdList(new String[] {"SUPERADMIN"});
                     userService.createUser(user);
                 }

@@ -96,7 +96,7 @@ public class ApplicationInitFilter implements Filter {
                 EventEntity e = securityTool.runWithDisabledSecurity(new RunnableWithResult<EventEntity>() {
                     @Override
                     public EventEntity run() {
-                        return eventService.findById(eventIdNum, 0);
+                        return eventService.findById(eventIdNum, EventService.FLAG_FETCH_LOCATIONS);
                     }
                 });
                 appContext.setActiveEvent(e);
