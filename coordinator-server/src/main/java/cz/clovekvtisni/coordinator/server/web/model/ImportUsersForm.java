@@ -19,6 +19,9 @@ public class ImportUsersForm {
     private List<String> typ;
 
     @NotNull
+    private String charset;
+
+    @NotNull
     private List<List<String>> val;
 
     private List<Integer> checked;
@@ -84,5 +87,13 @@ public class ImportUsersForm {
         }
 
         setTyp(vals);
+    }
+
+    public String getCharset() {
+        return charset;
+    }
+
+    public void setCharset(String charset) {
+        this.charset = charset;
     }
 }

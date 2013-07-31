@@ -22,6 +22,16 @@
 
                 <p><s:message code="application.admin.importInfo"/></p>
 
+                <tags:input field="charset" modelAttribute="" captionCode="UserImport.charset">
+                    <sf:select path="charset">
+                        <sf:option value="windows-1250"/>
+                        <sf:option value="cp-1252"/>
+                        <sf:option value="MacCentralEurope"/>
+                        <sf:option value="UTF-8"/>
+                        <sf:option value="UTF-16LE"/>
+                    </sf:select>
+                </tags:input>
+
                 <input type="file" name="csvFile"/>
             </div>
             <div>

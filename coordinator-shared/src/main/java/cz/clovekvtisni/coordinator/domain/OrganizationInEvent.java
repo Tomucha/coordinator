@@ -114,6 +114,19 @@ public class OrganizationInEvent extends AbstractModifiableEntity {
         this.event = event;
     }
 
+    public boolean registrationPossible() {
+        if (datePublish == null && dateClosedRegistration == null) return true;
+        if (datePublish == null) {
+            if (dateClosedRegistration.getTime() > System.currentTimeMillis()) return true;
+            return false;
+        }
+        if (dateClosedRegistration == null) {
+            if (datePublish.getTime() < System.currentTimeMillis()) return true;
+            return false;
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         return "OrganizationInEvent{" +

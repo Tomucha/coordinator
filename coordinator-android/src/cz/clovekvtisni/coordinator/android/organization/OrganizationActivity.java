@@ -3,7 +3,9 @@ package cz.clovekvtisni.coordinator.android.organization;
 import java.util.HashSet;
 import java.util.Set;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -16,27 +18,35 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.fhucho.android.workers.Loader;
 import com.fhucho.android.workers.Workers;
 
+import com.google.android.gcm.GCMRegistrar;
+import cz.clovekvtisni.coordinator.android.BaseActivity;
 import cz.clovekvtisni.coordinator.android.R;
 import cz.clovekvtisni.coordinator.android.api.ApiLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventRegisteredLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventRegisteredLoaderListener;
 import cz.clovekvtisni.coordinator.android.event.EventActivity;
+import cz.clovekvtisni.coordinator.android.other.Settings;
 import cz.clovekvtisni.coordinator.android.register.RegisterActivity;
 import cz.clovekvtisni.coordinator.android.util.FindView;
 import cz.clovekvtisni.coordinator.android.util.UiTool;
+import cz.clovekvtisni.coordinator.android.welcome.MainActivity;
 import cz.clovekvtisni.coordinator.api.request.EventFilterRequestParams;
+import cz.clovekvtisni.coordinator.api.request.LoginRequestParams;
 import cz.clovekvtisni.coordinator.api.response.EventFilterResponseData;
 import cz.clovekvtisni.coordinator.domain.Event;
 import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
+import cz.clovekvtisni.coordinator.util.ValueTool;
 
-public class OrganizationActivity extends SherlockFragmentActivity {
+public class OrganizationActivity extends BaseActivity {
 
 	private static final int REQUEST_REGISTER = 0;
 
@@ -64,13 +74,55 @@ public class OrganizationActivity extends SherlockFragmentActivity {
                 if (registered) {
                     startActivity(EventActivity.IntentHelper.create(c, event.getEvent(), event));
                 } else {
-                    startActivityForResult(RegisterActivity.IntentHelper.create(c, organization, event, event.getEvent(), user), REQUEST_REGISTER);
+                    if (event.registrationPossible()) {
+                        startActivityForResult(RegisterActivity.IntentHelper.create(c, organization, event, event.getEvent(), user), REQUEST_REGISTER);
+                    } else {
+                        UiTool.toast(R.string.error_registration_not_possible, getApplicationContext());
+                    }
                 }
             }
         });
 	}
 
-	private void initPreregisterButton() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getSupportMenuInflater().inflate(R.menu.organization, menu);
+        menu.findItem(R.id.menu_logout).setVisible(Settings.getAuthKey() != null);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_help: showHelp(); return true;
+            case R.id.menu_logout: showLogout(); return true;
+        }
+        return super.onOptionsItemSelected(item);    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    private void showLogout() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.menu_logout);
+        builder.setMessage(R.string.message_logout);
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                Settings.clear();
+                GCMRegistrar.unregister(getApplicationContext());
+                finish();
+            }
+        });
+        final AlertDialog dialog = builder.show();
+    }
+
+    private void initPreregisterButton() {
 		preregister = findViewById(R.id.preregister);
 		preregister.setOnClickListener(new OnClickListener() {
 			@Override
@@ -132,7 +184,7 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 
 	private void onEventsLoaded(UserInEvent[] userInEvents, OrganizationInEvent[] orgInEvents) {
 		this.orgInEvents = orgInEvents;
-		
+
 		registeredEventIds.clear();
 		for (UserInEvent userInEvent : userInEvents) {
 			registeredEventIds.add(userInEvent.getId());
@@ -196,7 +248,13 @@ public class OrganizationActivity extends SherlockFragmentActivity {
 
             FindView.textView(convertView, R.id.title).setText(event.getName());
             FindView.textView(convertView, R.id.short_description).setText(event.getDescription());
-            FindView.imageView(convertView, R.id.icon).setImageResource(registered ? R.drawable.ic_registered : R.drawable.ic_not_registered);
+            if (registered) {
+                FindView.imageView(convertView, R.id.icon).setImageResource(R.drawable.ic_registered);
+            } else {
+                FindView.imageView(convertView, R.id.icon).setImageResource(
+                        event.registrationPossible() ? R.drawable.ic_not_registered : R.drawable.ic_registration_closed
+                );
+            }
 
 			return convertView;
 		}

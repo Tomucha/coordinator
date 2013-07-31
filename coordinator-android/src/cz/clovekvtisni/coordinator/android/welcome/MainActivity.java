@@ -166,6 +166,7 @@ public class MainActivity extends BaseActivity {
                 LoginRequestParams p = new LoginRequestParams();
                 p.setLogin(emailText);
                 p.setPassword(passwordText);
+                setWorking(true);
                 Workers.start(new UserLoginTask(p, dialog), MainActivity.this);
             }
         });
@@ -224,6 +225,7 @@ public class MainActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        setWorking(false);
                         UiTool.showServerError(e, getApplicationContext());
                     }
                 });
@@ -235,6 +237,7 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onSuccess(LoginResponseData result) {
+            setWorking(false);
             UiTool.toast(R.string.message_logged, getApplicationContext());
             onUserLoaded(result.getUser());
             dialogToClose.dismiss();
@@ -242,6 +245,7 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onException(Exception e) {
+            setWorking(false);
             Lg.APP.e("Chyba "+e, e);
             Toast.makeText(getActivity(), "Chyba", Toast.LENGTH_SHORT).show();
             dialogToClose.dismiss();
@@ -291,21 +295,6 @@ public class MainActivity extends BaseActivity {
 
     }
 
-
-    private void showHelp() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setIcon(android.R.drawable.ic_menu_help);
-        builder.setTitle(R.string.menu_help);
-
-        builder.setMessage(R.string.help_general);
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
-        builder.show();
-    }
 
     private void loadMyself() {
         setWorking(true);

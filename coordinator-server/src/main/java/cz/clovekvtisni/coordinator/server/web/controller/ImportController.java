@@ -49,6 +49,7 @@ public class ImportController extends AbstractController {
 
         form.setEventId(fileForm.getEventId());
         form.setOrganizationId(fileForm.getOrganizationId());
+        form.setCharset(fileForm.getCharset());
         populateForm(form, request);
         form.preSelectTypes(colTypes().keySet());
 
@@ -57,6 +58,7 @@ public class ImportController extends AbstractController {
             addFormError(bindingResult, "error.emptyCsvFile");
             fileForm.setEventId(form.getEventId());
             fileForm.setOrganizationId(form.getOrganizationId());
+            fileForm.setCharset(form.getCharset());
             model.addAttribute("importFileForm", fileForm);
 
             return "admin/import-file-form";
@@ -124,7 +126,7 @@ public class ImportController extends AbstractController {
             return "admin/import-data-form";
 
         } else {
-            return "redirect: /admin/event/user/list?eventId=" + usersForm.getEventId();
+            return "redirect:/admin/event/user/list?eventId=" + usersForm.getEventId();
         }
     }
 
@@ -207,7 +209,7 @@ public class ImportController extends AbstractController {
                 InputStream inputStream = item.openStream();
 
                 if (!item.isFormField() && name.equals("csvFile")) {
-                    CSVReader reader = new CSVReader(new InputStreamReader(inputStream), ';', '"');
+                    CSVReader reader = new CSVReader(new InputStreamReader(inputStream, form.getCharset()), ';', '"');
                     List<String[]> data = reader.readAll();
                     List<List<String>> vals = new ArrayList<List<String>>();
                     for (String[] cells : data) {
@@ -225,6 +227,10 @@ public class ImportController extends AbstractController {
                 } else if (name.equals("eventId")) {
                     String data = readStream(inputStream);
                     form.setEventId("".equals(data) ? null : Long.parseLong(data));
+
+                } else if (name.equals("charset")) {
+                    String data = readStream(inputStream);
+                    form.setCharset("".equals(data) ? null : data);
 
                 } else {
                     readStream(inputStream);

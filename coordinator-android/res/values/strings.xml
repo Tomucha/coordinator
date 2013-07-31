@@ -61,5 +61,8 @@
     <string name="email">Email</string>
     <string name="password">Heslo</string>
     <string name="forgotten_password"><u>Zapomněl jsem heslo!</u></string>
+    <string name="menu_logout">Odhlásit</string>
+    <string name="message_logout">Odhlásit z aplikace?</string>
+    <string name="error_registration_not_possible">Tato událost není otevřena pro registraci.</string>
 
 </resources>

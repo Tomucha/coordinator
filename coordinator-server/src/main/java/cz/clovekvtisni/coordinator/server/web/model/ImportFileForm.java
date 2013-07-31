@@ -19,6 +19,8 @@ public class ImportFileForm {
     @NotNull
     private String organizationId;
 
+    private String charset;
+
     private InputStream cvsFile;
 
     public Long getEventId() {
@@ -43,5 +45,13 @@ public class ImportFileForm {
 
     public void setCvsFile(InputStream cvsFile) {
         this.cvsFile = cvsFile;
+    }
+
+    public String getCharset() {
+        return charset;
+    }
+
+    public void setCharset(String charset) {
+        this.charset = charset;
     }
 }

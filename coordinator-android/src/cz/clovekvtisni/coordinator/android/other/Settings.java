@@ -93,7 +93,11 @@ public class Settings {
 		SharedPrefsCompat.apply(editor);
 	}
 
-	private static class SharedPrefsCompat {
+    public static void clear() {
+        getPrefs().edit().clear().commit();
+    }
+
+    private static class SharedPrefsCompat {
 		private static Method applyMethod;
 
 		static {

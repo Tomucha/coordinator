@@ -1,5 +1,7 @@
 package cz.clovekvtisni.coordinator.android;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Window;
@@ -18,6 +20,21 @@ public class BaseActivity extends SherlockFragmentActivity implements WorkingInd
         super.onCreate(state);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         getSupportActionBar();
+    }
+
+    protected void showHelp() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(android.R.drawable.ic_menu_help);
+        builder.setTitle(R.string.menu_help);
+
+        builder.setMessage(R.string.help_general);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.show();
     }
 
     private int workingCount = 0;

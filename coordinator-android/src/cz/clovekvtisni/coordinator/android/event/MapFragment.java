@@ -6,6 +6,7 @@ import java.util.Map;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +16,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -96,6 +98,7 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 				closeMarkerInfo();
 			}
 		});
+
 	}
 
 	@Override
@@ -293,7 +296,16 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 				});
 			}
 		}
-	}
+
+        poiInfo.findViewById(R.id.navigation).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = "http://maps.google.com/maps?saddr="+myLocation.getLatitude()+","+myLocation.getLongitude()+"&daddr="+poi.getLatitude()+","+poi.getLongitude();
+                Intent navIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(navIntent);
+            }
+        });
+    }
 
 	public void showPoiOnMap(Poi poi) {
 		LatLon latLon = new LatLon(poi.getLatitude(), poi.getLongitude());
