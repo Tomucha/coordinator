@@ -1,6 +1,8 @@
 <%@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
         taglib prefix="can" uri="/WEB-INF/permissions.tld" %><%@
+        taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
+        taglib prefix="tags" tagdir="/WEB-INF/tags" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags"
 
 %>
@@ -12,10 +14,28 @@
 
 <div class="buttonPanel btn-toolbar">
     <div class="btn-group">
+        <c:set var="isFilter" value="${!empty params.name or !empty params.email or !empty params.organizationId}"/>
+
+        <button accesskey="f" class="btn${isFilter ? ' btn-danger' : ''}" onclick="$('#searchFormPanel').slideToggle();"><i class="icon-filter${isFilter ? ' icon-white' : ''}"></i> <s:message code="button.filterList"/> <span class="caret"></span></button>
+
         <c:if test="${can:create('userEntity')}">
             <a class="btn" href="${root}/superadmin/user/edit"><i class="icon-plus"></i> <i class="icon-user"></i> <s:message code="button.createUser"/></a>
         </c:if>
     </div>
+</div>
+
+<div class="searchFormPanel" id="searchFormPanel" style="display: none;">
+    <sf:form action="" modelAttribute="params" method="get">
+        <c:if test="${can:isSuperadmin()}">
+            <sf:select path="organizationId">
+                <sf:option value=""/>
+                <sf:options items="${config.organizationMap}" itemLabel="name"/>
+            </sf:select>
+        </c:if>
+        <label><s:message code="label.name"/>:</label> <sf:input path="name"/>
+        <label><s:message code="label.email"/>:</label> <sf:input path="email"/>
+        <tags:filterSubmitButtons/>
+    </sf:form>
 </div>
 
 <div class="eventListTable">

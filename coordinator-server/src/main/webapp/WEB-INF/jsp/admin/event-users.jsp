@@ -68,7 +68,7 @@
                 </sf:select>
             <label><s:message code="label.name"/>:</label> <sf:input path="userFulltext"/>
 
-            <tags:filterSubmitButtons/>
+            <p><button type="submit" class="btn"><s:message code="button.filterList"/></button></p>
         </sf:form>
     </div>
 

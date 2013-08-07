@@ -6,6 +6,7 @@ function resetFilterForm(buttReset) {
     if (queryStart != -1)
         url = url.substring(0, queryStart);
     var eventId = form.find("input[name=eventId]").val();
-    url = url + "?eventId=" + eventId;
+    if (eventId)
+        url = url + "?eventId=" + eventId;
     window.location = url;
 }
