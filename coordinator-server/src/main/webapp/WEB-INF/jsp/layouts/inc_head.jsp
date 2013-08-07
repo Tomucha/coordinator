@@ -17,6 +17,8 @@
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
 
+        <script src="${root}/js/coordinator.js" type="text/javascript"></script>
+
         <script type="text/javascript">
                 var root = "${root}";
         </script>

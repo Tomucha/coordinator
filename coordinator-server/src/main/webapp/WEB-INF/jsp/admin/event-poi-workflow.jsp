@@ -21,6 +21,12 @@
         return false;
     }
 
+    function loadAllUsers() {
+        $("#groupId").val("");
+        $("#userFulltext").val("");
+        return loadUsers();
+    }
+
     function loadAssignedUsers() {
         $("#assignedUsers").load("${root}/admin/event/user/assigned?eventId=${event.id}&poiId="+${poi.id}+"&ajax=true");
     }
@@ -120,7 +126,8 @@
                     <label><s:message code="label.name"/>:</label> <input type="text" id="userFulltext"/>
 
                     <p>
-                        <button onclick="return loadUsers();" class="btn"><s:message code="button.filterList"/></button>
+                        <button onclick="return loadUsers();" class="btn btn-primary"><s:message code="button.filterList"/></button>
+                        <button onclick="return loadAllUsers();" class="btn"><s:message code="button.resetFilter"/></button>
                     </p>
                 </form>
             </div>

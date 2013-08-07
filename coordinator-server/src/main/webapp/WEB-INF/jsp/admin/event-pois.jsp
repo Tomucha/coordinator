@@ -58,7 +58,8 @@
                 </c:forEach>
             </sf:select>
 
-            <p><button type="submit" class="btn"><s:message code="button.filterList"/></button></p>
+            <tags:filterSubmitButtons/>
+
         </sf:form>
     </div>
 
