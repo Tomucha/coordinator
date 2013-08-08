@@ -122,7 +122,7 @@
                             <option value="${group.id}"><c:out value="${group.name}"/></option>
                         </c:forEach>
                     </select>
-                    <div style="display:none;width:220px" class="alert alert-success clickable" id="assignGroupConfirm"><s:message code="msg.assignGroupToPoi"/> [<a onclick="onUserGroupClick($('#groupId').val())"><s:message code="label.assign"/></a>].</div>
+                    <div style="display:none;width:220px" class="alert alert-success" id="assignGroupConfirm"><s:message code="msg.assignGroupToPoi"/> [<a onclick="onUserGroupClick($('#groupId').val())" class="clickable"><s:message code="label.assign"/></a>].</div>
                     <label><s:message code="label.name"/>:</label> <input type="text" id="userFulltext"/>
 
                     <p>

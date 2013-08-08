@@ -91,7 +91,7 @@
                         <c:forEach items="${userInEvents}" var="userInEvent" begin="0" step="1" varStatus="i">
                             <tr
                                 <c:if test="${!empty userInEvent.lastLocationLatitude and !empty userInEvent.lastLocationLongitude}">
-                                    onclick="CoordinatorMap.goTo(${userInEvent.lastLocationLongitude}, ${userInEvent.lastLocationLatitude});"
+                                    onclick="CoordinatorMap.goTo(${userInEvent.lastLocationLongitude}, ${userInEvent.lastLocationLatitude});" class="clickable"
                                 </c:if>
                             >
                                 <td><input type="checkbox" name="selectedUsers[${i.index}]"

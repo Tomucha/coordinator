@@ -434,7 +434,7 @@
 <div id="mapContainer" class="well"></div>
 <div id="mapPopupWindow" style="display: none;">
     <!--<p style="background-color: #ccc;"><span class="icon-remove" onclick="CoordinatorMap.closePopup();"></span></p>-->
-    <p><span class="icon-remove" onclick="CoordinatorMap.closePopup();"></span></p>
+    <p><span class="icon-remove clickable" onclick="CoordinatorMap.closePopup();"></span></p>
     <div id="mapPopupContainer"></div>
 </div>
 
