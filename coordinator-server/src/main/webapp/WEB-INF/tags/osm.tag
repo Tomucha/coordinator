@@ -29,17 +29,23 @@
 
     var hideMarkers = ${(not empty hideMarkers && hideMarkers) ? "true" : "false"};
 
+    var pointIdToFocus = null;
+
     var focusedMarker = null;
 
     function focusMarker(marker) {
         if (marker) {
+            if (focusedMarker && focusedMarker.id == marker.id)
+                return;
             $(marker.icon.imageDiv).prepend("<img src='/images/icons/focused-poi.png?5' alt='' class='focus' style='position:absolute;left:-6px;top:-6px'/>");
-            if (focusedMarker && focusedMarker != marker) {
+            if (focusedMarker)
                 $(focusedMarker.icon.imageDiv).find("img.focus").remove();
-            }
+            pointIdToFocus = marker.id;
             focusedMarker = marker;
+
         } else if (focusedMarker) {
             $(focusedMarker.icon.imageDiv).find("img.focus").remove();
+            pointIdToFocus = null;
             focusedMarker = null;
         }
     }
@@ -91,7 +97,23 @@
                 item.icon = ICON_POI[item.poiCategoryId];
                 CoordinatorMap.addPoint(item);
             });
+            refreshFocus();
         });
+    }
+
+    function refreshFocus() {
+        focusedMarker = null;
+        if (pointIdToFocus) {
+            var length = markerLayer.markers.length;
+            for (var i = 0 ; i < length ; i++) {
+                if (markerLayer.markers[i].id == pointIdToFocus) {
+                    focusMarker(markerLayer.markers[i]);
+                    break;
+                }
+            }
+
+        }
+
     }
 
     function fillUserMarkers(bounds) {
@@ -114,8 +136,10 @@
                 item.icon = ICON_USER;
                 item.latitude = item.lastLocationLatitude;
                 item.longitude = item.lastLocationLongitude;
+                item.id = item.userId;
                 CoordinatorMap.addPoint(item);
             });
+            refreshFocus();
         });
     }
 
@@ -188,6 +212,14 @@
             }
         },
 
+        goToPoint: function(pointId, zoom, dontSave) {
+            point = points[pointId];
+            if (point) {
+                pointIdToFocus = point.id;
+                CoordinatorMap.goTo(point.longitude, point.latitude, zoom, dontSave);
+            }
+        },
+
         position: function(lon, lat) {
             return new OpenLayers.LonLat(lon, lat).transform( fromProjection, toProjection);
         },
@@ -207,7 +239,8 @@
         addPoint: function(point) {
             var lonLat = CoordinatorMap.position(point.longitude, point.latitude);
             var marker = new OpenLayers.Marker(lonLat, point.icon.clone());
-            point.id = marker.id = "point" + (idCounter++);
+            point.id = point.type + point.id;
+            marker.id = point.id;
 
             if (point.popupUrl) {
                 marker.events.register("click", marker, function (event) {
@@ -266,6 +299,7 @@
             singleMarkerLayer.addMarker(marker);
 
             osmCallback.onNewPoint(point);
+            focusMarker(null);
 
             return point;
         },

@@ -81,7 +81,7 @@
                         </thead>
                         <tbody>
                         <c:forEach items="${poiList}" var="poi" varStatus="i">
-                            <tr onclick="CoordinatorMap.goTo(${poi.longitude}, ${poi.latitude});" class="clickable">
+                            <tr onclick="CoordinatorMap.goToPoint(TYPE_POI + ${poi.id});" class="clickable">
                                 <td><input type="checkbox" name="selectedPois[${i.index}]" value="${poi.id}"/>
 
                                 </td>

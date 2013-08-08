@@ -40,6 +40,7 @@
                 item.icon = ICON_USER;
                 item.latitude = item.lastLocationLatitude;
                 item.longitude = item.lastLocationLongitude;
+                item.id =  item.userId;
                 CoordinatorMap.addPoint(item);
             });
         });

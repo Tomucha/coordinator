@@ -44,6 +44,7 @@
             <c:forEach items="${form.eventLocationEntityList}" var="eventLocation">
                  <c:if test="${!empty eventLocation.longitude and !empty eventLocation.latitude}">
                      CoordinatorMap.addPoint({
+                         id: eventLocation.id,
                          type: TYPE_LOCATION,
                          icon: ICON_GENERIC,
                          longitude: <c:out value="${eventLocation.longitude}"/>,
