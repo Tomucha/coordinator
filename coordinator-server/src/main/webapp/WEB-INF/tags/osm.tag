@@ -29,6 +29,21 @@
 
     var hideMarkers = ${(not empty hideMarkers && hideMarkers) ? "true" : "false"};
 
+    var focusedMarker = null;
+
+    function focusMarker(marker) {
+        if (marker) {
+            $(marker.icon.imageDiv).prepend("<img src='/images/icons/focused-poi.png?5' alt='' class='focus' style='position:absolute;left:-6px;top:-6px'/>");
+            if (focusedMarker && focusedMarker != marker) {
+                $(focusedMarker.icon.imageDiv).find("img.focus").remove();
+            }
+            focusedMarker = marker;
+        } else if (focusedMarker) {
+            $(focusedMarker.icon.imageDiv).find("img.focus").remove();
+            focusedMarker = null;
+        }
+    }
+
     function refreshMarkers() {
         if (eventId == null) return;
         if (hideMarkers) return;
@@ -197,6 +212,8 @@
             if (point.popupUrl) {
                 marker.events.register("click", marker, function (event) {
                     CoordinatorMap.closePopup();
+                    focusMarker(marker);
+
                     var url = point.popupUrl;
                     url += url.substring("?") == -1 ? "?" : "&";
                     url += "latitude=" + point.latitude + "&longitude=" + point.longitude;
@@ -367,7 +384,10 @@
         },
 
         onMapClick: function(event) {
-            if (CoordinatorMap.closePopup()) return;
+            if (CoordinatorMap.closePopup()) {
+                focusMarker();
+                return;
+            }
             if (CoordinatorMap.getState() == STATE_SET_LOCATION) {
                 var lonLat = CoordinatorMap.fromProjection(map.getLonLatFromPixel(event.xy));
                 var point = {
