@@ -75,3 +75,7 @@ form .alert-error {
 .fluid.panels .mini-layout {
     margin-right: 16px;
 }
+
+.lostPassword {
+    margin-top: 1ex;
+}

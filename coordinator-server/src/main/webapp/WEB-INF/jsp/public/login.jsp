@@ -11,14 +11,28 @@
     <sf:errors cssClass="alert alert-error" element="div" />
 
     <tags:input field="email" modelAttribute="user">
-        <sf:input path="email" />
+        <sf:input path="email" cssClass="lostPasswordEmailVal"/>
     </tags:input>
 
     <tags:input field="password" modelAttribute="user">
         <sf:password path="password" />
     </tags:input>
 
-    <input type="submit" value="<s:message code="button.login"/>" class="btn btn-large btn-primary"/>
+    <div>
+        <input type="submit" value="<s:message code="button.login"/>" class="btn btn-large btn-primary"/>
+    </div>
 
-</sf:form>
+    <div class="lostPassword">
+        <div class="lostPasswordButton">
+            <a onclick="sentLostPassword();return false" class="clickable"><s:message code="label.sentLostPassword"/></a>
+        </div>
+
+        <div class="lostPasswordProgress" style="display: none">
+            <img src="${root}/images/icons/throbber.gif" alt=""/> <s:message code="msg.lostPasswordEmailSending"/>
+        </div>
+
+        <div class="lostPasswordResult"></div>
+    </div>
+
+    </sf:form>
 </div>

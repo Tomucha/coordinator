@@ -28,7 +28,7 @@ public interface UserService extends Service {
     public static final long FLAG_FORCE_REGISTRATION = 4l;
 
     @Anonymous
-    void lostPassword(String email);
+    boolean lostPassword(String email);
 
     @Anonymous
     UserEntity loginWeb(String login, String password) throws MaPermissionDeniedException;

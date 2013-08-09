@@ -64,14 +64,22 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
     protected SecurityTool securityTool;
 
     @Override
-    public void lostPassword(String email) {
+    public boolean lostPassword(String email) {
+        if (ValueTool.isEmpty(email))
+            return false;
+
         final UserEntity toChangePassword = findByEmail(email);
+
+        if (toChangePassword == null)
+            return false;
+
+        final String newPasswd = SignatureTool.sign(Math.random());
 
         UserEntity changed = ofy().transact(new Work<UserEntity>() {
             @Override
             public UserEntity run() {
                 UserEntity user = ofy().get(toChangePassword.getKey());
-                user.setPassword(SignatureTool.sign(Math.random()));
+                user.setPassword(passwordHash(user.getId(), newPasswd));
                 ofy().put(user);
                 return user;
             }
@@ -79,8 +87,10 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
 
         // changed, let's send email
         Map<String, Object> context = new HashMap<String, Object>();
-        context.put("password", changed.getPassword());
+        context.put("password", newPasswd);
         emailService.sendEmail(changed.getEmail(), messageSource.getMessage("email.subject.password", null, null), "lost_password", context);
+
+        return true;
     }
 
     private UserEntity findByEmail(String email) {

@@ -4,6 +4,7 @@ import cz.clovekvtisni.coordinator.api.request.*;
 import cz.clovekvtisni.coordinator.api.response.*;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
+import cz.clovekvtisni.coordinator.exception.ErrorCode;
 import cz.clovekvtisni.coordinator.exception.MaParseException;
 import cz.clovekvtisni.coordinator.exception.MaPermissionDeniedException;
 import cz.clovekvtisni.coordinator.server.domain.UserAuthKey;
@@ -54,8 +55,10 @@ public class UserApiController extends AbstractApiController {
     @RequestMapping(value = "/forgotten-password", method = RequestMethod.POST)
     public @ResponseBody ApiResponse forgottenPassword(HttpServletRequest request) {
         LoginRequestParams params = parseRequestAnonymous(request, LoginRequestParams.class);
-        userService.lostPassword(params.getLogin());
-        return okResult(null);
+        if (userService.lostPassword(params.getLogin()))
+            return okResult(null);
+        else
+            return errorResult(ErrorCode.WRONG_CREDENTIALS, null);
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)

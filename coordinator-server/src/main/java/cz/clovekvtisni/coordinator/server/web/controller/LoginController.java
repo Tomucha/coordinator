@@ -61,6 +61,15 @@ public class LoginController extends AbstractSuperadminController {
         return "redirect:" + retUrl;
     }
 
+    @RequestMapping(value = "/ajax/lost-password", method = RequestMethod.GET)
+    public String ajaxLostPassword(@RequestParam String email, Model model) {
+        if (!userService.lostPassword(email)) {
+            model.addAttribute("notExist", true);
+        }
+
+        return "ajax/lost-password";
+    }
+
 
     public static class LoginForm {
 

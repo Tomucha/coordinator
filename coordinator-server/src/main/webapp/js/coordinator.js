@@ -10,3 +10,18 @@ function resetFilterForm(buttReset) {
         url = url + "?eventId=" + eventId;
     window.location = url;
 }
+
+function sentLostPassword() {
+    var email = $("input.lostPasswordEmailVal").val();
+    if (!email || email.trim().length == 0) {
+        $("input.lostPasswordEmailVal").focus();
+        return;
+    }
+    $(".lostPasswordResult").hide();
+    $(".lostPasswordButton").hide();
+    $(".lostPasswordProgress").show();
+    $(".lostPasswordResult").load("/login/ajax/lost-password?email=" + email, function() {
+        $(".lostPasswordProgress").hide();
+        $(".lostPasswordResult").show();
+    });
+}
