@@ -16,11 +16,23 @@
             android:layout_marginTop="8dp"
             android:scaleType="centerInside"/>
 
+    <ImageView
+            android:id="@+id/icon2"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="48dp"
+            android:layout_marginTop="8dp"
+            android:visibility="invisible"
+            android:scaleType="centerInside"/>
+
     <TextView
             android:id="@+id/title"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@id/icon"
+            android:layout_toLeftOf="@id/icon2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"

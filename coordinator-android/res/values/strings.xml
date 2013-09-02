@@ -53,6 +53,7 @@
     </string>
 
     <string name="message_user_position_unknown">Poloha uživatele není známá.</string>
+    <string name="message_your_position_unknown">Vaše poloha není známá, asi vypnutá GPS?</string>
     <string name="message_logged">Jste přihlášen!</string>
     <string name="message_password_changed">Heslo jsme Vám změnili a poslali na email.</string>
     <string name="menu_synchronize">Synchronizovat</string>

@@ -60,13 +60,13 @@ public class InfoFragment extends SherlockFragment {
 	private class ImportantPoisAdapter extends BetterArrayAdapter<Poi> {
 
 		public ImportantPoisAdapter() {
-			super(getActivity(), android.R.layout.simple_list_item_2);
+			super(getActivity(), R.layout.item_with_icon);
 		}
 
 		@Override
 		protected void setUpView(Poi poi, View view) {
-			FindView.textView(view, android.R.id.text1).setText(poi.getName());
-			FindView.textView(view, android.R.id.text2).setText(poi.getDescription());
+			FindView.textView(view, R.id.title).setText(poi.getName());
+			FindView.textView(view, R.id.short_description).setText(poi.getDescription());
 		}
 
 	}

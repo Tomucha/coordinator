@@ -29,7 +29,7 @@ public class OsmMapView extends View implements TouchHelper.OnMapTapListener, Ti
 
 	private DiskTileLoader diskTileLoader;
 	private List<MapOverlay> overlays = Lists.newArrayList();
-	private LruCache<TileId, Bitmap> bitmapCache;
+	private static LruCache<TileId, Bitmap> bitmapCache;
 	private Projection projection;
 
     private OsmMapEventsListener osmMapEventsListener;
@@ -62,13 +62,17 @@ public class OsmMapView extends View implements TouchHelper.OnMapTapListener, Ti
 		double nearestDp = Integer.MAX_VALUE;
 		MapOverlay nearestOverlay = null;
 		for (MapOverlay overlay : overlays) {
-			Point p = projection.latLonToPixels(overlay.getLatLon());
-			int distancePx = (int) Math.sqrt(Math.pow((x - p.x), 2) + Math.pow((y - p.y), 2));
-			int distanceDp = (int) Utils.pxToDp(getResources(), distancePx);
-			if (distanceDp < 40 && distanceDp < nearestDp) {
-				nearestOverlay = overlay;
-				nearestDp = distanceDp;
-			}
+            if (overlay.getLatLon() != null) {
+			    Point p = projection.latLonToPixels(overlay.getLatLon());
+			    int distancePx = (int) Math.sqrt(Math.pow((x - p.x), 2) + Math.pow((y - p.y), 2));
+			    int distanceDp = (int) Utils.pxToDp(getResources(), distancePx);
+			    if (distanceDp < 40 && distanceDp < nearestDp) {
+				    nearestOverlay = overlay;
+				    nearestDp = distanceDp;
+			    }
+            } else {
+                // null LatLon in overlay, probably my position
+            }
 		}
 
 		if (nearestOverlay != null) nearestOverlay.onTap();
@@ -115,14 +119,16 @@ public class OsmMapView extends View implements TouchHelper.OnMapTapListener, Ti
     }
 
 	private void initCache() {
-		int memClass = ((ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
-		int cacheSize = 1024 * 1024 * memClass / 3;
-		bitmapCache = new LruCache<TileId, Bitmap>(cacheSize) {
-			@Override
-			protected int sizeOf(TileId key, Bitmap bitmap) {
-				return TILE_BITMAP_BYTES;
-			}
-		};
+        if (bitmapCache == null) {
+            int memClass = ((ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
+            int cacheSize = 1024 * 1024 * memClass / 3;
+            bitmapCache = new LruCache<TileId, Bitmap>(cacheSize) {
+                @Override
+                protected int sizeOf(TileId key, Bitmap bitmap) {
+                    return TILE_BITMAP_BYTES;
+                }
+            };
+        }
 	}
 
 	private void initProjection() {

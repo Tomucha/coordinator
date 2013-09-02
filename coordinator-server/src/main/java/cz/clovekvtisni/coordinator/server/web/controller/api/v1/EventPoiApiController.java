@@ -12,6 +12,8 @@ import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
+import cz.clovekvtisni.coordinator.server.security.SecurityTool;
+import cz.clovekvtisni.coordinator.server.security.permission.TransitionPermission;
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
@@ -24,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequestMapping("/api/v1/event/poi")
@@ -32,6 +34,9 @@ public class EventPoiApiController extends AbstractApiController {
 
     @Autowired
     private PoiService poiService;
+
+    @Autowired
+    private SecurityTool securityTool;
 
     @Autowired
     private AuthorizationTool authorizationTool;
@@ -52,9 +57,26 @@ public class EventPoiApiController extends AbstractApiController {
         filter.setOrder("modifiedDate");
 
         ResultList<PoiEntity> result = poiService.findByFilter(filter, 0, null, 0l);
-        List<Poi> pois = new EntityTool().buildTargetEntities(result.getResult());
 
-        return okResult(new EventPoiFilterResponseData(pois));
+        SecurityTool.SecurityHelper helper = securityTool.buildHelper();
+
+        List<Poi> poiList = new ArrayList<Poi>();
+
+        for (Iterator<PoiEntity> iterator = result.getResult().iterator(); iterator.hasNext(); ) {
+            PoiEntity next = iterator.next();
+            Poi p = buildDetailedPoiEntity(helper, next);
+            poiList.add(p);
+        }
+
+        return okResult(new EventPoiFilterResponseData(poiList));
+    }
+
+    private Poi buildDetailedPoiEntity(SecurityTool.SecurityHelper helper, PoiEntity next) {
+        Poi p = next.buildTargetEntity();
+        TransitionPermission transitionPermission = new TransitionPermission(next);
+        p.setCanEdit(helper.canUpdate(next));
+        p.setCanDoTransition(helper.canDo(transitionPermission));
+        return p;
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/transition")
@@ -64,7 +86,9 @@ public class EventPoiApiController extends AbstractApiController {
         PoiEntity poi = poiService.findById(params.getPoiId(), 0);
         poi = poiService.transitWorkflowState(poi, params.getTransitionId(), 0l);
 
-        return okResult(new EventPoiResponseData(poi.buildTargetEntity()));
+        SecurityTool.SecurityHelper helper = securityTool.buildHelper();
+
+        return okResult(new EventPoiResponseData(buildDetailedPoiEntity(helper, poi)));
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/create")
@@ -82,7 +106,9 @@ public class EventPoiApiController extends AbstractApiController {
 
         newPoi = poiService.createPoi(newPoi);
 
-        return okResult(new EventPoiResponseData(newPoi.buildTargetEntity()));
+        SecurityTool.SecurityHelper helper = securityTool.buildHelper();
+
+        return okResult(new EventPoiResponseData(buildDetailedPoiEntity(helper, newPoi)));
     }
 
 }

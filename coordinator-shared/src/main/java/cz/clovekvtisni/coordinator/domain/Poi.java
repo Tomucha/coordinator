@@ -22,6 +22,10 @@ public class Poi extends AbstractModifiableEntity {
 
     private String workflowStateId;
 
+    private boolean canDoTransition;
+
+    private boolean canEdit;
+
     private Long[] userId;
 
     private Double latitude;
@@ -156,6 +160,22 @@ public class Poi extends AbstractModifiableEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isCanDoTransition() {
+        return canDoTransition;
+    }
+
+    public void setCanDoTransition(boolean canDoTransition) {
+        this.canDoTransition = canDoTransition;
+    }
+
+    public boolean isCanEdit() {
+        return canEdit;
+    }
+
+    public void setCanEdit(boolean canEdit) {
+        this.canEdit = canEdit;
     }
 
     @Override

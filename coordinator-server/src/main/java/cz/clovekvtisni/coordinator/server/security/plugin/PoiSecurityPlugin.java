@@ -178,33 +178,41 @@ public class PoiSecurityPlugin extends SecurityPlugin {
     private class CanDoTransitionCommand implements PermissionCommand<PoiEntity> {
         @Override
         public boolean isPermitted(PoiEntity entity, String entityName) {
+            log.info("Can user perform transition? "+entity);
             UserEntity loggedUser = appContext.getLoggedUser();
-            if (loggedUser == null)
+            if (loggedUser == null) {
+                log.error("Null loggedUser");
                 return false;
+            }
 
-            if (entity == null && entityName != null)
+            if (entity == null && entityName != null) {
                 return true;
+            }
 
             if (
                 authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_POI_IN_ORG) &&
                 loggedUser.getOrganizationId() != null &&
                 loggedUser.getOrganizationId().equals(entity.getOrganizationId())
             ) {
+                log.info("Can edit POI");
                 return true;
             }
 
             if (entity.isAssigned(loggedUser)) {
-                if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.TRANS_POI_ASSIGNED))
+                if (authorizationTool.hasAnyPermission(loggedUser, RolePermission.TRANS_POI_ASSIGNED)) {
                     return true;
+                }
                 UserInEventEntity activeUserInEvent = appContext.getActiveUserInEvent();
                 if (
                     activeUserInEvent != null &&
                     activeUserInEvent.getEventId().equals(entity.getEventId()) &&
                     authorizationTool.hasAnyPermission(activeUserInEvent, RolePermission.TRANS_POI_ASSIGNED)
-                )
+                ) {
                     return true;
+                }
+                log.error("Assigned, but cannot "+loggedUser+" "+entity+" (roles: "+loggedUser.getAllRoles()+")");
             }
-
+            log.error("Not assigned");
             return false;
         }
     }

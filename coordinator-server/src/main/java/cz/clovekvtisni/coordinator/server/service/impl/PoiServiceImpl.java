@@ -325,6 +325,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 if (onBeforeCallbackKey != null) {
                     WorkflowCallback beforeCallback = callbackAccessor.getCallbackByKey(onBeforeCallbackKey);
                     if (beforeCallback != null) {
+                        logger.info("Running callback: "+beforeCallback);
                         boolean result = beforeCallback.onBeforeTransition(entity, transition);
                         if (!result)
                             return entity;

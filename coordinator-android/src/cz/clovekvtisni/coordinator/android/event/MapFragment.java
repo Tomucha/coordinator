@@ -84,9 +84,13 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 	}
 
 	private void goToMyLocation() {
-		LatLon latLon = new LatLon(myLocation.getLatitude(), myLocation.getLongitude());
-		osmMapView.setCenter(latLon);
-		osmMapView.setZoom(5000);
+        if (myLocation != null) {
+		    LatLon latLon = new LatLon(myLocation.getLatitude(), myLocation.getLongitude());
+		    osmMapView.setCenter(latLon);
+		    osmMapView.setZoom(5000);
+        } else {
+            UiTool.toast(R.string.message_your_position_unknown, getActivity().getApplicationContext());
+        }
 	}
 
 	private void initPoiInfo(View view) {
@@ -125,6 +129,8 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 
         centerMapOnEvent(((EventActivity)getActivity()).getEvent().getLocationList());
 
+        ((EventActivity) getActivity()).onMapFragmentReady();
+
 		return view;
 	}
 
@@ -153,10 +159,14 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
     @Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		((EventActivity) getActivity()).onMapFragmentReady();
 	}
 
-	@Override
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_my_location:
@@ -282,7 +292,7 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 
 		LinearLayout layout = (LinearLayout) poiInfo.findViewById(R.id.transitions);
 		layout.removeAllViews();
-		if (poi.getWorkflowState() != null) {
+		if (poi.getWorkflowState() != null && poi.isCanDoTransition()) {
 			for (final WorkflowTransition transition : poi.getWorkflowState().getTransitions()) {
 				Button button = new Button(getActivity());
 				button.setText(transition.getName());
@@ -300,9 +310,11 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
         poiInfo.findViewById(R.id.navigation).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = "http://maps.google.com/maps?saddr="+myLocation.getLatitude()+","+myLocation.getLongitude()+"&daddr="+poi.getLatitude()+","+poi.getLongitude();
-                Intent navIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(navIntent);
+                if (myLocation != null) {
+                    String url = "http://maps.google.com/maps?saddr="+myLocation.getLatitude()+","+myLocation.getLongitude()+"&daddr="+poi.getLatitude()+","+poi.getLongitude();
+                    Intent navIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(navIntent);
+                }
             }
         });
     }

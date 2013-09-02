@@ -8,6 +8,8 @@ import cz.clovekvtisni.coordinator.domain.Poi;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
+import cz.clovekvtisni.coordinator.server.security.SecurityTool;
+import cz.clovekvtisni.coordinator.util.CloneTool;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.NotBlank;
 

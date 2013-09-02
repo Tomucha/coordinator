@@ -96,14 +96,14 @@ public class UsersFragment extends SherlockFragment {
 	private class UserAdapter extends BetterArrayAdapter<UserInEvent> {
 
 		public UserAdapter() {
-			super(getActivity(), android.R.layout.simple_list_item_2);
+			super(getActivity(), R.layout.item_with_icon);
 		}
 
 		@Override
 		protected void setUpView(UserInEvent userInEvent, View view) {
 			User user = userInEvent.getUser();			
-			FindView.textView(view, android.R.id.text1).setText(user.getFullName());
-			FindView.textView(view, android.R.id.text2).setText(user.getPhone());
+			FindView.textView(view, R.id.title).setText(user.getFullName());
+			FindView.textView(view, R.id.short_description).setText(user.getPhone());
 		}
 
 	}

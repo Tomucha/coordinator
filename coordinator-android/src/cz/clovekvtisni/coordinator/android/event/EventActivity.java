@@ -318,9 +318,13 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 				if (dialog.getDialog() == null) return;
 				dialog.setRemainingTiles(remainingTiles);
 				if (remainingTiles == 0) {
-					dialog.dismiss();
 					Settings.setEventMapPreloaded(event.getId());
 					netTileLoader.removeRemainingTilesListener(this);
+                    try {
+                        dialog.dismiss();
+                    } catch (Exception e) {
+                        // asi uz jsme pryc
+                    }
 				}
 			}
 		});
@@ -359,7 +363,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		}
 
 		mapFragment.setFilteredPois(filteredPois, poiIcons);
-		tasksFragment.setFilteredPois(filteredPois);
+		tasksFragment.setFilteredPois(filteredPois, poiIcons);
 	}
 
 	private void updateImportantPois() {
