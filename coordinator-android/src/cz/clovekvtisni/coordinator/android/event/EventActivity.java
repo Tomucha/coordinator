@@ -184,7 +184,14 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
     @Override
     public void onStart() {
         super.onStart();
+    }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        // brutalni hack:
+        // https://app.crittercism.com/developers/crash-details/740902ad024da52e89dc436b399944254641ea40167d8c8476078821
+        try { finish(); } catch (Exception e) { }
     }
 
 	@Override
@@ -197,7 +204,6 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
         loadPoiCategories();
         */
         locationTool.resume();
-
 	}
 
 	@Override

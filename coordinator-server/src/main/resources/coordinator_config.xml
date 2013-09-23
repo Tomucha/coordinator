@@ -154,25 +154,30 @@
     <poi_category_list>
         <poi_category id="poiZdravotnik" name="Zdravotník" icon="/images/icons/firstaid.png"
                       workflow_id="wkfl_zdravotnik">
-            Práce pro zdravotníka
+            <description>Práce pro zdravotníka</description>
         </poi_category>
 
         <poi_category id="poiPsychosoc" name="Psychosociální šetření" icon="/images/icons/communitycentre.png"
                       workflow_id="wkfl_prace">
-            Úkol v rámci psychosociálního šetření
+            <description>Úkol v rámci psychosociálního šetření</description>
         </poi_category>
 
         <poi_category id="poiPsycho" name="Psychologická pomoc" icon="/images/icons/sozialeeinrichtung.png"
                       workflow_id="wkfl_prace">
-            Psychologická první pomoc
+            <description>Psychologická první pomoc</description>
         </poi_category>
 
         <poi_category id="poiPrace" name="Práce" icon="/images/icons/construction.png" workflow_id="wkfl_prace">
-            Úkoly pro dobrovolníky
+            <description>Úkoly pro dobrovolníky</description>
+            <sub_category id="road">Zablokovaná vozovka</sub_category>
+            <sub_category id="important">Nepřístupný významný objekt</sub_category>
+            <sub_category id="suplies">Omezení dodávky (energie, pitná voda)</sub_category>
+            <sub_category id="basement">Zaplavený sklep</sub_category>
+            <sub_category id="other">Jiný druh problému</sub_category>
         </poi_category>
 
         <poi_category id="general" name="POI" icon="/images/icons/star-3.png" important="true">
-            Důležitá místa
+            <description>Důležitá místa</description>
         </poi_category>
     </poi_category_list>
 

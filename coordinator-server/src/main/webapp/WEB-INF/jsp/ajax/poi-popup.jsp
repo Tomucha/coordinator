@@ -15,7 +15,10 @@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
         %>
 <h4><img src="${root}${poi.poiCategory.icon}" style="width:1.2em;"/> ${poi.name} <tags:poiStatusIcon poi="${poi}"/></h4>
-<p><small>${poi.description}<br/>${poi.poiCategory.name}</small></p>
+<p><strong><c:out value="${poi.poiCategory.name}"/>
+    <c:if test="${not empty poi.subCategoryId}">&gt; ${poi.poiCategory.subCategoriesMap[poi.subCategoryId].name}</c:if></strong></p>
+
+<p><small>${poi.description}</small></p>
 
 <c:if test="${not empty poi.workflow}">
     <p><a href="${root}/admin/event/poi/workflow?poiId=<c:out value='${poi.id}'/>&eventId=${poi.eventId}">

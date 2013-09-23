@@ -40,11 +40,12 @@ public class EventPoiWorkflowController extends AbstractEventController {
         return "admin/event-poi-workflow";
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/transition")
+    @RequestMapping(method = RequestMethod.POST, value = "/transition")
     public String changeWorkflowState(
             @RequestParam(value = "eventId", required = true) Long eventId,
             @RequestParam(value = "poiId", required = true) Long poiId,
             @RequestParam(value = "transitionId", required = true) String transitionId,
+            @RequestParam(value = "comment", required = false) String comment,
             Model model) {
         PoiEntity poi = poiService.findById(poiId, 0l);
 
@@ -57,7 +58,7 @@ public class EventPoiWorkflowController extends AbstractEventController {
             }
         }
 
-        poiService.transitWorkflowState(poi, transitionId, PoiService.FLAG_DISABLE_FORCE_SINGLE_ASSIGN);
+        poiService.transitWorkflowState(poi, transitionId, comment, PoiService.FLAG_DISABLE_FORCE_SINGLE_ASSIGN);
         return "redirect:/admin/event/poi/list?eventId=" + eventId;
 
     }

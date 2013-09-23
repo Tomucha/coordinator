@@ -13,11 +13,17 @@
 
 <s:message code="activity.${activity.type}"/>
 
+<c:if test="${activity.type eq 'WORKFLOW_TRANSITION'}">
+to "${activity.poiEntity.workflow.stateMap[activity.params[1]].name}"
+</c:if>
+
 <a href="<s:url value="${root}/admin/event/user/edit?eventId=${activity.poiEntity.eventId}&userId=${activity.userEntity.id}"/>"><c:out value="${activity.userEntity.fullName}"/></a><br/>
 <small class="pull-right light">
+    <c:if test="${not empty activity.comment}">
+        <i><c:out value="${activity.comment}"/></i><br/>
+    </c:if>
     <fmt:formatDate type="both" value="${activity.changeDate}" dateStyle="short" timeStyle="short"/>
     <s:message code="activity.author"/>
     <a href="<s:url value="${root}/admin/event/user/edit?eventId=${activity.poiEntity.eventId}&userId=${activity.changedByEntity.id}"/>"><c:out value="${activity.changedByEntity.fullName}"/></a>
-
 </small>
 <br style="clear: both;"/>

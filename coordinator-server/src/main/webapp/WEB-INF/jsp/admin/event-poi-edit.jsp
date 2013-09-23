@@ -50,8 +50,38 @@
                     <sf:hidden path="confirmed"/>
 
                     <tags:input field="poiCategoryId" modelAttribute="form" captionCode="PoiEntity.poiCategory">
-                        <sf:select path="poiCategoryId" items="${config.poiCategoryMap}" itemLabel="name"/>
+                        <sf:select path="poiCategoryId" items="${config.poiCategoryMap}" itemLabel="name" onchange="updateSubCategorySelect();"/>
                     </tags:input>
+
+                    <tags:input field="subCategoryId" modelAttribute="form" captionCode="PoiEntity.subCategory">
+                        <sf:select path="subCategoryId" />
+                    </tags:input>
+
+                    <script type="text/javascript">
+                        function updateSubCategorySelect() {
+                            <!-- FIXME: review -->
+                            <c:forEach var="cat" items="${config.poiCategoryList}">
+                            if ($("#poiCategoryId").val() == '${cat.id}') {
+                                <c:choose>
+                                    <c:when test="${empty cat.subCategories}">
+                                        $("#input-subCategoryId").hide();
+                                        $("#subCategoryId").html(" ");
+                                    </c:when>
+                                <c:otherwise>
+                                $("#input-subCategoryId").show();
+                                $("#subCategoryId").html(
+                                        <c:forEach var="subCat" items="${cat.subCategories}">
+                                        "<option value='${subCat.id}' <c:if test="${form.subCategoryId eq subCat.id}">selected='selected'</c:if> >${subCat.name}</option>" +
+                                                </c:forEach>
+                                                " ");
+                                </c:otherwise>
+                                </c:choose>
+                            }
+                            </c:forEach>
+                        }
+                        updateSubCategorySelect();
+
+                    </script>
 
                     <div>
                         <tags:input field="name" modelAttribute="form" captionCode="PoiEntity.name">

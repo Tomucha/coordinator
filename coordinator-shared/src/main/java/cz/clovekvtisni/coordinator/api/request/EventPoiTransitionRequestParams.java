@@ -15,6 +15,8 @@ public class EventPoiTransitionRequestParams implements EventRequestParams {
 
     private String transitionId;
 
+    private String comment;
+
     @Override
     public Long getEventId() {
         return eventId;
@@ -38,6 +40,14 @@ public class EventPoiTransitionRequestParams implements EventRequestParams {
 
     public void setTransitionId(String transitionId) {
         this.transitionId = transitionId;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     @Override

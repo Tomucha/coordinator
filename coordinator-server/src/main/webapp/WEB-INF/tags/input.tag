@@ -8,7 +8,7 @@
         taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
         taglib prefix="s" uri="http://www.springframework.org/tags" %><%@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form"
-%><div class="input ${fluid ? "row-fluid" : ""}<c:out value="${styleClass}"/>">
+%><div class="input ${fluid ? "row-fluid" : ""}<c:out value="${styleClass}"/>" <c:if test="${not empty field}">id="input-${field}"</c:if> >
     <label for="${field}" class="${fluid ? "span3" : ""}">
         <c:choose>
             <c:when test="${!empty captionCode}">

@@ -86,15 +86,27 @@
 
         <p><c:out value="${poi.workflow.name}"/></p>
 
-
         <p><c:out value="${poi.workflowState.name}"/> <span class="icon-arrow-right"></span></p>
 
         <div style="padding-left: 9em;">
+        <form action="/admin/event/poi/workflow/transition" method="POST">
+
+            <div>
+                <tags:input field="comment" modelAttribute="form" captionCode="Workflow.comment">
+                    <textarea name="comment" rows="2" cols="30" style="width: 100%; height: 2em;"></textarea>
+                </tags:input>
+            </div>
+
+            <tags:hiddenEvent/>
+            <input type="hidden" name="poiId" value="${poi.id}"/>
+
         <c:forEach items="${poi.workflowState.transitions}" var="trans">
-           <p><span class="icon-arrow-right"></span> <a class="btn" href="/admin/event/poi/workflow/transition?poiId=${poi.id}&eventId=${event.id}&transitionId=${trans.id}"><c:out value="${trans.name}"/></a><br/>
+           <p><span class="icon-arrow-right"></span>
+                <button class="btn" name="transitionId" value="${trans.id}"><c:out value="${trans.name}"/></button><br/>
                 <small><c:out value="${trans.description}"/></small>
            </p>
         </c:forEach>
+        </form>
         </div>
 
         <hr/>

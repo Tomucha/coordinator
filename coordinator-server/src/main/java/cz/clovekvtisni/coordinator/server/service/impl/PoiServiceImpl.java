@@ -308,7 +308,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
     }
 
     @Override
-    public PoiEntity transitWorkflowState(final PoiEntity entity, String transitionId, final long flags) {
+    public PoiEntity transitWorkflowState(final PoiEntity entity, final String transitionId, final String comment, final long flags) {
         if (entity == null || transitionId == null)
             return entity;
         if (entity.getWorkflowStateId() == null || entity.getWorkflowState().getTransitions() == null)
@@ -342,6 +342,16 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 entityF.setVisibleForRole(authorizationTool.findRolesWithReadPermission(entityF));
                 PoiEntity updated = updatePoi(entityF);
 
+                ActivityEntity a = new ActivityEntity();
+                a.setPoiId(updated.getId());
+                a.setEventId(updated.getEventId());
+                a.setType(ActivityEntity.ActivityType.WORKFLOW_TRANSITION);
+                a.setComment(comment);
+                a.setParams(new String[] { transition.getFromStateId(), transition.getToStateId() });
+                activityService.log(a);
+
+
+                // FIXME: prepsat na onBeforeCallBack
                 if (transition.isForcesSingleAssignee() && (FLAG_DISABLE_FORCE_SINGLE_ASSIGN & flags) == 0) {
                     UserEntity loggedUser = appContext.getLoggedUser();
                     updated = assignUserExclusive(updated, loggedUser.getId());

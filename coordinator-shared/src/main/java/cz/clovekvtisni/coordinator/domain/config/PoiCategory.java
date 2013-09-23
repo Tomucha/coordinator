@@ -1,14 +1,16 @@
 package cz.clovekvtisni.coordinator.domain.config;
 
 import cz.clovekvtisni.coordinator.domain.config.AbstractStaticEntity;
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Text;
+import org.simpleframework.xml.*;
+
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
  * User: jka
  * Date: 31.10.12
  */
+@Root(name = "poi_category")
 public class PoiCategory extends AbstractStaticEntity {
 
     @Attribute
@@ -17,7 +19,7 @@ public class PoiCategory extends AbstractStaticEntity {
     @Attribute
     private String name;
 
-    @Text(required = false)
+    @Element(required = false)
     private String description;
 
     @Attribute
@@ -28,6 +30,27 @@ public class PoiCategory extends AbstractStaticEntity {
 
     @Attribute(required = false)
     private boolean important;
+
+    @ElementList(type = SubCategory.class, name = "sub_category", inline = true, required = false)
+    private List<SubCategory> subCategories;
+
+    public List<SubCategory> getSubCategories() {
+        if (subCategories == null) return Collections.EMPTY_LIST;
+        return subCategories;
+    }
+
+    private Map<String, SubCategory> subCategoriesMap = null;
+
+    public Map<String, SubCategory> getSubCategoriesMap() {
+        if (subCategoriesMap == null) {
+            subCategoriesMap = new HashMap<String, SubCategory>();
+            for (SubCategory subCategory : subCategories) {
+                subCategoriesMap.put(subCategory.getId(), subCategory);
+            }
+        }
+        return subCategoriesMap;
+    }
+
 
     public String getId() {
         return id;
@@ -61,6 +84,8 @@ public class PoiCategory extends AbstractStaticEntity {
                 ", icon='" + icon + '\'' +
                 ", workflowId='" + workflowId + '\'' +
                 ", important=" + important +
+                ", subCategories=" + getSubCategories().size() +
                 '}';
     }
+
 }

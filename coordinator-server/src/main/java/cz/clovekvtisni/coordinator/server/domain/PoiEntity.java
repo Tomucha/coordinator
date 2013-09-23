@@ -47,6 +47,8 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     @NotNull
     private String poiCategoryId;
 
+    private String subCategoryId;
+
     @Index
     private String workflowId;
 
@@ -79,7 +81,9 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     private WorkflowState workflowState;
 
     @Index
+    // FIXME: pocitat onSave
     private Set<String> visibleForRole;
+
 
     public PoiEntity() {
     }
@@ -269,11 +273,19 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
         return poiCategory != null ? poiCategory.isImportant() : false;
     }
 
+    public String getSubCategoryId() {
+        return subCategoryId;
+    }
+
+    public void setSubCategoryId(String subCategoryId) {
+        this.subCategoryId = subCategoryId;
+    }
+
     @Override
     public String toString() {
         return "PoiEntity{" +
                 "id=" + id +
-                ", poiCategoryId=" + poiCategoryId +
+                ", poiCategoryId=" + poiCategoryId + (subCategoryId == null ? "" : ("/" + subCategoryId)) +
                 ", workflowId=" + workflowId +
                 ", workflowStateId=" + workflowStateId +
                 ", userId=" + (userIdList == null ? null : Arrays.asList(userIdList)) +

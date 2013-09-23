@@ -47,7 +47,7 @@ public interface PoiService extends Service {
 
     // FIXME: prava, ted jsou jen pro Backend ale musi to jit posunovat i z mobilu, kdyz to na me je assignovane
     @CheckPermission("#helper.canDo(new cz.clovekvtisni.coordinator.server.security.permission.TransitionPermission(#p0, #p1))")
-    PoiEntity transitWorkflowState(PoiEntity entity, String transitionId, long flags);
+    PoiEntity transitWorkflowState(PoiEntity entity, String transitionId, String comment, long flags);
 
     @CheckPermission("#helper.canUpdate(#p0)")
     PoiEntity assignUser(PoiEntity poi, Long userId);
