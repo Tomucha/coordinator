@@ -11,4 +11,10 @@
         <property name="modifiedDate" direction="asc"/>
     </datastore-index>
 
+    <datastore-index kind="Poi" ancestor="false" source="manual">
+        <property name="organizationId" direction="asc"/>
+        <property name="eventId" direction="asc"/>
+        <property name="publicExport" direction="asc"/>
+    </datastore-index>
+
 </datastore-indexes>

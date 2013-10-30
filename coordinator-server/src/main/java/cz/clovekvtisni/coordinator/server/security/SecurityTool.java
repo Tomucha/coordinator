@@ -88,9 +88,9 @@ public class SecurityTool implements BeanFactoryAware {
     }
 
     public boolean check(Permission permission) {
-        log.info("Checking "+permission);
+        // log.info("Checking "+permission);
         if (permission.getEntity() == null && permission.getEntityKindName() == null) {
-            log.info("permission denied because empty entity and name for {}", permission);
+            // log.info("permission denied because empty entity and name for {}", permission);
             return false;
         }
 
@@ -98,7 +98,7 @@ public class SecurityTool implements BeanFactoryAware {
         for (PermissionCommandFactoryKey key : keys) {
             PermissionCommand<CoordinatorEntity> command = permissionCommandFactoryMap.get(key);
             if (command != null) {
-                log.info("Trying command: "+command);
+                // log.info("Trying command: "+command);
                 boolean permitted = command.isPermitted(permission.getEntity(), permission.getEntityKindName());
                 if (!permitted) {
                     log.debug("permission denied for {} by command {} registered by {}", new Object[]{permission, command, commandRegistrarInfoMap.get(new CommandRegistrarKey(command))});

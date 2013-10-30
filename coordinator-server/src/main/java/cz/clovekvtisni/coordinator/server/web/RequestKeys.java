@@ -9,4 +9,5 @@ package cz.clovekvtisni.coordinator.server.web;
 public class RequestKeys {
     public static final String NORMALIZED_URI = "cz.clovekvtisni.coordinator.NORMALIZED_URI";
     public static final String ROOT = "root";
+    public static final String APP_CONTEXT = "appContext";
 }

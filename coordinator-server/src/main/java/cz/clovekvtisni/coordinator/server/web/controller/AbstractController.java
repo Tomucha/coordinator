@@ -73,6 +73,11 @@ public abstract class AbstractController {
         return System.currentTimeMillis();
     }
 
+    @ModelAttribute("helpId")
+    public String helpId() {
+        return getClass().getSimpleName().toLowerCase().replaceFirst("controller", "");
+    }
+
     @ModelAttribute("event")
     public EventEntity activeEvent() {
         return appContext.getActiveEvent();

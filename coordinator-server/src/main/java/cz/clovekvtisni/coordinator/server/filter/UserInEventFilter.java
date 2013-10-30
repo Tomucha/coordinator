@@ -1,10 +1,8 @@
 package cz.clovekvtisni.coordinator.server.filter;
 
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
-import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.NoDeletedFilter;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -27,9 +25,9 @@ public class UserInEventFilter extends NoDeletedFilter<UserInEventEntity> {
 
     private Operator modifiedDateOp = Operator.EQ;
 
-    private List<String> geoCellsVal;
+    private List<String> lastLocationGeoCellsVal;
 
-    private Operator geoCellsOp = Operator.IN;
+    private Operator lastLocationGeoCellsOp = Operator.IN;
 
     public Long getUserIdVal() {
         return userIdVal;
@@ -79,20 +77,20 @@ public class UserInEventFilter extends NoDeletedFilter<UserInEventEntity> {
         this.modifiedDateOp = modifiedDateOp;
     }
 
-    public List<String> getGeoCellsVal() {
-        return geoCellsVal;
+    public List<String> getLastLocationGeoCellsVal() {
+        return lastLocationGeoCellsVal;
     }
 
-    public void setGeoCellsVal(List<String> geoCellsVal) {
-        this.geoCellsVal = geoCellsVal;
+    public void setLastLocationGeoCellsVal(List<String> lastLocationGeoCellsVal) {
+        this.lastLocationGeoCellsVal = lastLocationGeoCellsVal;
     }
 
-    public Operator getGeoCellsOp() {
-        return geoCellsOp;
+    public Operator getLastLocationGeoCellsOp() {
+        return lastLocationGeoCellsOp;
     }
 
-    public void setGeoCellsOp(Operator geoCellsOp) {
-        this.geoCellsOp = geoCellsOp;
+    public void setLastLocationGeoCellsOp(Operator lastLocationGeoCellsOp) {
+        this.lastLocationGeoCellsOp = lastLocationGeoCellsOp;
     }
 
     @Override

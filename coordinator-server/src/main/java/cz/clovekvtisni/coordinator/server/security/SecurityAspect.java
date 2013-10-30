@@ -59,7 +59,7 @@ public class SecurityAspect implements Ordered {
         }
         try {
             serviceCallStack.set(serviceCallStack.get()+1);
-            log.info("Call stack: "+serviceCallStack.get());
+            //log.info("Call stack: "+serviceCallStack.get());
             Object toReturn;
 
             Anonymous anonymousAnnotation = securityTool.findAnonymousAnnotation(method);
@@ -117,7 +117,7 @@ public class SecurityAspect implements Ordered {
 
             return toReturn;
         } finally {
-            log.info("Call stack (dec): "+serviceCallStack.get());
+            //log.info("Call stack (dec): "+serviceCallStack.get());
             serviceCallStack.set(serviceCallStack.get()-1);
         }
     }

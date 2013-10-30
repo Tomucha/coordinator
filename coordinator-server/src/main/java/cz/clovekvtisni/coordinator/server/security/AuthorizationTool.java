@@ -33,9 +33,13 @@ public class AuthorizationTool {
 
     private Map<String, List<String>> roleParentMap;
 
+    private CoordinatorConfig config = null;
+
     @Autowired
     public void setConfig(CoordinatorConfig config) {
+        this.config = config;
         roleMap = config.getRoleMap();
+
 
         roleParentMap = new HashMap<String, List<String>>(roleMap.size());
         for (Role role : roleMap.values()) {
@@ -141,7 +145,7 @@ public class AuthorizationTool {
             roles.add(ANONYMOUS);
 
         if (!ValueTool.isEmpty(poi.getWorkflowStateId())) {
-            WorkflowState state = poi.getWorkflowState();
+            WorkflowState state = config.getWorkflowMap().get(poi.getWorkflowId()).getStateMap().get(poi.getWorkflowStateId());
             String[] visibleForRole = state.getVisibleForRole();
             if (visibleForRole != null)
                 roles.addAll(Arrays.asList(visibleForRole));

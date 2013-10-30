@@ -34,6 +34,9 @@ public class PoiCategory extends AbstractStaticEntity {
     @ElementList(type = SubCategory.class, name = "sub_category", inline = true, required = false)
     private List<SubCategory> subCategories;
 
+    @Attribute(required = false)
+    private boolean publicExport = false;
+
     public List<SubCategory> getSubCategories() {
         if (subCategories == null) return Collections.EMPTY_LIST;
         return subCategories;
@@ -44,8 +47,10 @@ public class PoiCategory extends AbstractStaticEntity {
     public Map<String, SubCategory> getSubCategoriesMap() {
         if (subCategoriesMap == null) {
             subCategoriesMap = new HashMap<String, SubCategory>();
-            for (SubCategory subCategory : subCategories) {
-                subCategoriesMap.put(subCategory.getId(), subCategory);
+            if (subCategories != null) {
+                for (SubCategory subCategory : subCategories) {
+                    subCategoriesMap.put(subCategory.getId(), subCategory);
+                }
             }
         }
         return subCategoriesMap;
@@ -74,6 +79,14 @@ public class PoiCategory extends AbstractStaticEntity {
 
     public boolean isImportant() {
         return important;
+    }
+
+    public boolean isPublicExport() {
+        return publicExport;
+    }
+
+    public void setPublicExport(boolean publicExport) {
+        this.publicExport = publicExport;
     }
 
     @Override

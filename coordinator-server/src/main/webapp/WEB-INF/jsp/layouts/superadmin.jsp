@@ -50,6 +50,7 @@
                 <tags:breadcrumb url="/superadmin/user/list" labelCode="breadcrumb.userList" visible="${can:read('userEntity')}"/>
                 <tags:breadcrumb url="/superadmin/event/list" labelCode="breadcrumb.eventList" visible="${can:read('eventEntity')}"/>
                 <tags:breadcrumb url="/superadmin/mail" labelCode="breadcrumb.mail" visible="${can:read('userEntity')}"/>
+                <tags:help/>
             </ul>
 
             <div class="tabContent">

@@ -44,6 +44,9 @@ public class WorkflowState extends AbstractStaticEntity {
 
     private WorkflowTransition[] transitions;
 
+    @Attribute(required = false)
+    private boolean publicExport = false;
+
     public String getId() {
         return id;
     }
@@ -110,6 +113,14 @@ public class WorkflowState extends AbstractStaticEntity {
 
     public void setWorkflowStateType(WorkflowStateType workflowStateType) {
         this.workflowStateType = workflowStateType;
+    }
+
+    public boolean isPublicExport() {
+        return publicExport;
+    }
+
+    public void setPublicExport(boolean publicExport) {
+        this.publicExport = publicExport;
     }
 
     @Override

@@ -8,7 +8,6 @@ import cz.clovekvtisni.coordinator.domain.RegistrationStatus;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.exception.NotFoundException;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserGroupEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
@@ -132,8 +131,8 @@ public class UserInEventServiceImpl extends AbstractEntityServiceImpl implements
         // Calculate the geocells list to be used in the queries (optimize list of cells that complete the given bounding box)
         List<String> cells = GeocellManager.bestBboxSearchCells(bb, null);
 
-        filter.setGeoCellsVal(cells);
-        filter.setGeoCellsOp(Filter.Operator.IN);
+        filter.setLastLocationGeoCellsVal(cells);
+        filter.setLastLocationGeoCellsOp(Filter.Operator.IN);
 
         ResultList<UserInEventEntity> result = ofy().findByFilter(filter, null, 0);
         populate(result.getResult(), flags);

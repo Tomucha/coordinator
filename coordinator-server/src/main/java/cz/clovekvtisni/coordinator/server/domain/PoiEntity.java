@@ -72,18 +72,23 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
     private boolean confirmed;
 
     @Ignore
+    @JsonIgnore
     private PoiCategory poiCategory;
 
     @Ignore
+    @JsonIgnore
     private Workflow workflow;
 
     @Ignore
+    @JsonIgnore
     private WorkflowState workflowState;
 
     @Index
     // FIXME: pocitat onSave
     private Set<String> visibleForRole;
 
+    @Index
+    private Boolean publicExport = false;
 
     public PoiEntity() {
     }
@@ -279,6 +284,34 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
 
     public void setSubCategoryId(String subCategoryId) {
         this.subCategoryId = subCategoryId;
+    }
+
+    public Boolean getPublicExport() {
+        return publicExport;
+    }
+
+    public void setPublicExport(Boolean publicExport) {
+        if (deletedDate != null) {
+            this.publicExport = false;
+        } else {
+            this.publicExport = publicExport;
+        }
+    }
+
+    @OnSave
+    public void updateDeletedState() {
+        if (deletedDate != null) {
+            setPublicExport(false);
+            // TODO: a co role?
+        }
+    }
+
+    public List<String> getGeoCells() {
+        return geoCells;
+    }
+
+    public void setGeoCells(List<String> geoCells) {
+        this.geoCells = geoCells;
     }
 
     @Override

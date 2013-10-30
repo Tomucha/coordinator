@@ -40,6 +40,8 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
 
     private String password;
 
+    private String newPassword;
+
     private String phone;
 
     @Index
@@ -258,7 +260,15 @@ public class UserEntity extends AbstractPersistentEntity<User, UserEntity> {
     public void setSkillEntityList(UserSkillEntity[] skillEntityList) {
         this.skillEntityList = skillEntityList;
     }
-    
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
     public Map<String, UserEquipmentEntity> getEquipmentEntityMap() {
         if (equipmentEntityList == null) return new HashMap<String, UserEquipmentEntity>(); 
         Map<String, UserEquipmentEntity> map = new HashMap<String, UserEquipmentEntity>(equipmentEntityList.length);

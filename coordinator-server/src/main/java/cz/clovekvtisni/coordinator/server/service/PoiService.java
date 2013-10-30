@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.service;
 
+import cz.clovekvtisni.coordinator.domain.Poi;
 import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.security.CheckPermission;
@@ -58,4 +59,5 @@ public interface PoiService extends Service {
     @CheckPermission("#helper.canUpdate(#p0)")
     PoiEntity unassignUser(PoiEntity poi, Long userInEventId);
 
+    List<PoiEntity> findPoisForExport(String organizationId, Long eventId);
 }

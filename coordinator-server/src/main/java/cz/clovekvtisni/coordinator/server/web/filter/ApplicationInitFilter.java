@@ -74,6 +74,7 @@ public class ApplicationInitFilter implements Filter {
         HttpServletResponse hResponse = (HttpServletResponse) response;
 
         appContext.setLocale(localeResolver.resolveLocale(hRequest));
+        hRequest.setAttribute(RequestKeys.APP_CONTEXT, appContext);
 
         synchronized (this.getClass()) {
             if (!appInitialized) {
@@ -192,7 +193,7 @@ public class ApplicationInitFilter implements Filter {
     }
 
     private Pattern withoutLoginPattern = Pattern.compile(
-            "^/(?:login|tools|logout|api|_ah|css|js|bootstrap|images|coordinator-android.apk|favicon.ico)(?:/|$)"
+            "^/(?:login|tools|logout|api|_ah|css|js|bootstrap|images|coordinator-android.apk|favicon.ico|export)(?:/|$)"
     );
 
     private boolean isWithoutLoginRequest(HttpServletRequest hr) {

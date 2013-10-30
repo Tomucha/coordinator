@@ -212,12 +212,8 @@
             }
         },
 
-        goToPoint: function(pointId, zoom, dontSave) {
-            point = points[pointId];
-            if (point) {
-                pointIdToFocus = point.id;
-                CoordinatorMap.goTo(point.longitude, point.latitude, zoom, dontSave);
-            }
+        focusPoint: function(pointId) {
+            pointIdToFocus = pointId;
         },
 
         position: function(lon, lat) {

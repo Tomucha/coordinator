@@ -3,7 +3,6 @@
 <coordinator>
     <role_list>
         <role id="ANONYMOUS" name="Anonymous" permissions="READ_USER_IN_GROUP,TRANS_POI_ASSIGNED">Anonymous</role>
-        <role id="TERENAK" name="Terenak" permissions="READ_USER_IN_GROUP,TRANS_POI_ASSIGNED">Terénní pracovník</role>
         <role id="COORDINATOR" name="Coordinator" extends_role_id="ANONYMOUS" permissions="CAN_LOGIN,EDIT_USER_IN_ORG,EDIT_POI_IN_ORG">Koordinátor v terénu</role>
         <role id="ZDRAVOTNIK" name="Medic" extends_role_id="ANONYMOUS">Zdravotník v terénu</role>
         <role id="BACKEND" name="Backend" extends_role_id="ANONYMOUS" permissions="CAN_LOGIN">Backend</role>
@@ -75,7 +74,7 @@
         <workflow id="wkfl_prace" name="Pracovní úkol" can_be_started_by="BACKEND">
             <description>Běžné pracovní úkoly</description>
             <state id="wkfl_prace_state1" name="Nový úkol" visible_for_role="COORDINATOR, BACKEND"
-                   editable_for_role="COORDINATOR, BACKEND" type="STARTED">
+                   editable_for_role="COORDINATOR, BACKEND" type="STARTED" publicExport="true">
                 <description>Nově vytvořený úkol</description>
                 <transition id="wkfl_prace_state1_trans1" name="Přidělit" to_state_id="wkfl_prace_state2"
                             allowed_for_role="COORDINATOR, BACKEND">
@@ -84,7 +83,7 @@
             </state>
             <state id="wkfl_prace_state2" name="Přidělený úkol" requires_assignment="true"
                    visible_for_role="BACKEND"
-                   editable_for_role="BACKEND" type="IN_PROGRESS">
+                   editable_for_role="BACKEND" type="IN_PROGRESS" publicExport="true">
                 <description>popis state</description>
                 <transition id="wkfl_prace_state1_trans2" name="Odmítnout" on_before_transition="lastUserClosesDoor" to_state_id="wkfl_prace_state1"
                             allowed_for_role="ANONYMOUS, BACKEND">
@@ -105,41 +104,6 @@
                 <transition id="wkfl_prace_state1_trans3" name="Znovu přidělit" to_state_id="wkfl_prace_state2"
                             allowed_for_role="BACKEND">
                     Znovu přidělit
-                </transition>
-            </state>
-        </workflow>
-        
-        <workflow id="wkfl_teren" name="Hlášení z terénu" can_be_started_by="TERENAK, COORDINATOR, BACKEND">
-            <description>Hlášení z terénu</description>
-            <state id="wkfl_teren_state1" name="Nové hlášení z terénu" visible_for_role="TERENAK, COORDINATOR, BACKEND"
-                   editable_for_role="COORDINATOR, TERENAK, BACKEND" type="STARTED">
-                <description>Nové hlášení z terénu</description>
-                <transition id="wkfl_teren_state1_trans2" name="Schválit" forces_single_assignee="false" to_state_id="wkfl_teren_state2"
-                            allowed_for_role="COORDINATOR, BACKEND">
-                    Schválit
-                </transition>
-                <transition id="wkfl_teren_state1_trans3" name="Neschválit" forces_single_assignee="false" to_state_id="wkfl_teren_state2"
-                            allowed_for_role="COORDINATOR, BACKEND">
-                    Neschválit
-                </transition>
-            </state>
-            
-            <state id="wkfl_teren_state2" name="Schválené hlášení z terénu" requires_assignment="false"
-                   visible_for_role="TERENAK, BACKEND, COORDINATOR"
-                   editable_for_role="ZDRAVOTNIK, BACKEND" type="FINISHED" publicExport="true">
-                <description>Schválené hlášení z terénu - pro export</description>
-                <transition id="wkfl_teren_state2_trans3" name="Neschválit" to_state_id="wkfl_teren_state3"
-                            allowed_for_role="BACKEND">
-                    Neschválit - zrušit exports
-                </transition>
-			</state>
-            
-            <state id="wkfl_teren_state3" name="Neschválené hlášení z terénu" visible_for_role="TERENAK, BACKEND, COORDINATOR"
-            	editable_for_role="BACKEND" type="FINISHED">
-                <description>Neschválené hlášení z terénu - neexportováno</description>
-                <transition id="wkfl_teren_state3_trans2" name="Schválit" to_state_id="wkfl_teren_state2"
-                            allowed_for_role="BACKEND">
-                    Schválit - exportovat
                 </transition>
             </state>
         </workflow>
@@ -211,13 +175,8 @@
             <sub_category id="basement">Zaplavený sklep</sub_category>
             <sub_category id="other">Jiný druh problému</sub_category>
         </poi_category>
-        
-        <poi_category id="poiTeren" name="Hlášení z terénu" icon="/images/icons/firstaid.png"
-                      workflow_id="wkfl_teren">
-            <description>Hlášení z terénu</description>
-        </poi_category>
-        
-        <poi_category id="general" name="POI" icon="/images/icons/star-3.png" important="true">
+
+        <poi_category id="general" name="POI" icon="/images/icons/star-3.png" important="true" publicExport="true">
             <description>Důležitá místa</description>
         </poi_category>
     </poi_category_list>

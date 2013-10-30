@@ -353,6 +353,8 @@ public class UserInEventEntity extends AbstractPersistentEntity<UserInEvent, Use
         return true;
     }
 
+
+
     @Override
     public int hashCode() {
         int result = super.hashCode();

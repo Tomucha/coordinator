@@ -5,6 +5,7 @@ import com.beoui.geocell.model.BoundingBox;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Work;
 import cz.clovekvtisni.coordinator.domain.NotificationType;
+import cz.clovekvtisni.coordinator.domain.Poi;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
@@ -129,6 +130,15 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 entity.setVisibleForRole(authorizationTool.findRolesWithReadPermission(entity));
                 ofy().put(entity);
 
+                if (w != null) {
+                    entity.setPublicExport(
+                            config.getPoiCategoryMap().get(entity.getPoiCategoryId()).isPublicExport() ? true :
+                                w.getStateMap().get(entity.getWorkflowStateId()).isPublicExport()
+                    );
+                } else {
+                    entity.setPublicExport(config.getPoiCategoryMap().get(entity.getPoiCategoryId()).isPublicExport());
+                }
+
                 ActivityEntity a = new ActivityEntity();
                 a.setPoiId(entity.getId());
                 a.setEventId(entity.getEventId());
@@ -157,6 +167,19 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 PoiEntity old = ofy().get(entity.getKey());
                 updateSystemFields(entity, old);
                 entity.setWorkflowId(old.getWorkflowId());
+
+                entity.setVisibleForRole(authorizationTool.findRolesWithReadPermission(entity));
+
+                Workflow workflow = config.getWorkflowMap().get(old.getWorkflowId());
+                if (workflow != null) {
+                    entity.setPublicExport(
+                            config.getPoiCategoryMap().get(entity.getPoiCategoryId()).isPublicExport() ? true :
+                                    workflow.getStateMap().get(entity.getWorkflowStateId()).isPublicExport()
+                    );
+                } else {
+                    entity.setPublicExport(config.getPoiCategoryMap().get(entity.getPoiCategoryId()).isPublicExport());
+                }
+
                 ofy().put(entity);
 
                 ActivityEntity a = new ActivityEntity();
@@ -239,6 +262,11 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
         notificationService.sendPoiNotification(NotificationType.UNASSIGN, updatedPoi, userId);
 
         return updatedPoi;
+    }
+
+    @Override
+    public List<PoiEntity> findPoisForExport(String organizationId, Long eventId) {
+        return ofy().load().type(PoiEntity.class).filter("organizationId", organizationId).filter("publicExport", true).filter("eventId", eventId).list();
     }
 
     @Override
@@ -340,6 +368,11 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 Workflow workflow = config.getWorkflowMap().get(entityF.getWorkflowId());
                 entityF.setWorkflowState(workflow.getStateMap().get(transition.getToStateId()));
                 entityF.setVisibleForRole(authorizationTool.findRolesWithReadPermission(entityF));
+                entityF.setPublicExport(
+                        config.getPoiCategoryMap().get(entityF.getPoiCategoryId()).isPublicExport() ? true :
+                        workflow.getStateMap().get(entityF.getWorkflowStateId()).isPublicExport()
+                );
+
                 PoiEntity updated = updatePoi(entityF);
 
                 ActivityEntity a = new ActivityEntity();

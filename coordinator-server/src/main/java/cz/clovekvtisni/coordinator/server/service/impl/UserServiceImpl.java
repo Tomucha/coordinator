@@ -79,7 +79,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             @Override
             public UserEntity run() {
                 UserEntity user = ofy().get(toChangePassword.getKey());
-                user.setPassword(passwordHash(user.getId(), newPasswd));
+                user.setNewPassword(passwordHash(user.getId(), newPasswd));
                 ofy().put(user);
                 return user;
             }
@@ -126,12 +126,30 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
             throw MaPermissionDeniedException.wrongCredentials();
         }
 
-        UserEntity userEntity = ofy().load().key(userKey).get();
-        if (userEntity == null || password == null || !passwordHash(userEntity.getId(), password).equals(userEntity.getPassword())) {
+        final UserEntity userEntity = ofy().load().key(userKey).get();
+        if (userEntity == null || password == null) {
             throw MaPermissionDeniedException.wrongCredentials();
         }
 
-        return userEntity;
+        if (passwordHash(userEntity.getId(), password).equals(userEntity.getPassword())) {
+            return userEntity;
+        }
+        // mozna je to zmeneny heslo
+        if (passwordHash(userEntity.getId(), password).equals(userEntity.getNewPassword())) {
+            // je to zmeneny heslo
+            ofy().transact(new VoidWork() {
+                @Override
+                public void vrun() {
+                    userEntity.setPassword(userEntity.getNewPassword());
+                    userEntity.setNewPassword(null);
+                    ofy().save().entity(userEntity);
+                }
+            });
+            return userEntity;
+        }
+
+
+        throw MaPermissionDeniedException.wrongCredentials();
     }
 
     @Override
