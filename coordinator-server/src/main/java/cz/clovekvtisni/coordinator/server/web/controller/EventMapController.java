@@ -68,7 +68,7 @@ public class EventMapController extends AbstractEventController {
 
         JsonNode node = objectMapper.readTree(data);
 
-        // FIXME: empty results
+        if ((node.isArray() && node.size()==0) || !node.isArray()) return null;
 
         double lat = Double.parseDouble(node.get(0).get("lat").getTextValue());
         double lon = Double.parseDouble(node.get(0).get("lon").getTextValue());

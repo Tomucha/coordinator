@@ -62,6 +62,8 @@ import cz.clovekvtisni.coordinator.api.response.EventUserListResponseData;
 import cz.clovekvtisni.coordinator.api.response.UserUpdatePositionResponseData;
 import cz.clovekvtisni.coordinator.domain.*;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
+import cz.clovekvtisni.coordinator.domain.config.Workflow;
+import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
 
 public class EventActivity extends SherlockFragmentActivity implements LocationTool.Listener {
 
@@ -74,6 +76,8 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	private TasksFragment tasksFragment;
 	private UsersFragment usersFragment;
 	private ViewPager pager;
+
+    private ConfigResponse config = null;
 
 	private Map<PoiCategory, Boolean> poiFilter;
     private Map<UserGroup, Boolean> userFilter;
@@ -272,6 +276,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 			public void onResult(ConfigResponse result) {
 				poiCategories = result.getPoiCategoryList();
 				onPoiCategoriesLoaded(poiCategories);
+                config = result;
 			}
 
 			@Override
@@ -365,7 +370,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	private void updateFilteredPois() {
 		List<Poi> filteredPois = new ArrayList<Poi>();
 		for (Poi poi : pois) {
-			if (poiFilter.get(poi.getPoiCategory())) filteredPois.add(poi);
+			if (poiFilter.get( findPoiCategory(poi.getPoiCategoryId())  )) filteredPois.add(poi);
 		}
 
 		mapFragment.setFilteredPois(filteredPois, poiIcons);
@@ -375,7 +380,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	private void updateImportantPois() {
 		List<Poi> importantPois = new ArrayList<Poi>();
 		for (Poi poi : pois) {
-			if (poi.getPoiCategory().isImportant()) importantPois.add(poi);
+			if (findPoiCategory(poi.getPoiCategoryId()).isImportant()) importantPois.add(poi);
 		}
 
 		infoFragment.setImportantPois(importantPois);
@@ -428,6 +433,25 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 
     public Event getEvent() {
         return event;
+    }
+
+    public PoiCategory findPoiCategory(String poiCategoryId) {
+        for (PoiCategory poiCategory : poiCategories) {
+            if (poiCategoryId.equals(poiCategory.getId())) return poiCategory;
+        }
+        throw new IllegalStateException("Unknown POI category: "+poiCategoryId);
+    }
+
+    public WorkflowState findWorkflowState(Poi poi) {
+        Workflow w = findWorkflow(poi);
+        return w.getStateMap().get(poi.getWorkflowStateId());
+    }
+
+    private Workflow findWorkflow(Poi poi) {
+        for (Workflow workflow : config.getWorkflowList()) {
+            if (workflow.getId().equals(poi.getWorkflowId())) return workflow;
+        }
+        throw new IllegalStateException("Unknown worklflow: "+poi.getWorkflowId());
     }
 
     public class TabsPagerAdapter extends FragmentPagerAdapter {
@@ -694,5 +718,9 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
     public void onSaveInstanceState(Bundle outState) {
         outState.putString("DO NOT CRASH", "OK");
         super.onSaveInstanceState(outState);
+    }
+
+    public ConfigResponse getConfig() {
+        return config;
     }
 }

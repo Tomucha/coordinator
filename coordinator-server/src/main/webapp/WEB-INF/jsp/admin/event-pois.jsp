@@ -28,19 +28,19 @@
 
     <div class="buttonPanel btn-toolbar">
         <div class="btn-group">
-            <c:set var="isFilter" value="${!empty params.workflowId or !empty params.workflowStateId}"/>
+            <c:set var="isFilter" value="${!empty poiListFilter.workflowId or !empty poiListFilter.workflowStateId}"/>
 
             <button accesskey="f" class="btn${isFilter ? ' btn-danger' : ''}" onclick="$('#searchFormPanel').slideToggle();"><i class="icon-filter${isFilter ? ' icon-white' : ''}"></i> <s:message code="button.filterList"/> <span class="caret"></span></button>
 
             <c:if test="${can:create('poiEntity')}">
-                <a class="btn" href="<s:url value="/admin/event/poi/edit?eventId=${params.eventId}"/>"><span class="icon-plus"></span> <span class="icon-map-marker"></span> <s:message
+                <a class="btn" href="<s:url value="/admin/event/poi/edit?eventId=${poiListFilter.eventId}"/>"><span class="icon-plus"></span> <span class="icon-map-marker"></span> <s:message
                             code="button.addNew"/></a>
             </c:if>
         </div>
     </div>
 
     <div class="searchFormPanel" id="searchFormPanel" style="display: none;">
-        <sf:form action="" modelAttribute="params" method="get">
+        <sf:form action="" modelAttribute="poiListFilter" method="get">
 
             <tags:hiddenEvent/>
             <label><s:message code="label.workflow"/>:</label>
@@ -57,6 +57,7 @@
                     </c:forEach>
                 </c:forEach>
             </sf:select>
+            <sf:hidden path="sentByUser" value="true"/>
 
             <tags:filterSubmitButtons/>
 

@@ -36,12 +36,6 @@ public class Poi extends AbstractModifiableEntity {
 
     private boolean confirmed;
 
-    private PoiCategory poiCategory;
-
-    private Workflow workflow;
-
-    private WorkflowState workflowState;
-
     public Long getEventId() {
         return eventId;
     }
@@ -120,30 +114,6 @@ public class Poi extends AbstractModifiableEntity {
 
     public void setConfirmed(boolean confirmed) {
         this.confirmed = confirmed;
-    }
-
-    public PoiCategory getPoiCategory() {
-        return poiCategory;
-    }
-
-    public void setPoiCategory(PoiCategory poiCategory) {
-        this.poiCategory = poiCategory;
-    }
-
-    public Workflow getWorkflow() {
-        return workflow;
-    }
-
-    public void setWorkflow(Workflow workflow) {
-        this.workflow = workflow;
-    }
-
-    public WorkflowState getWorkflowState() {
-        return workflowState;
-    }
-
-    public void setWorkflowState(WorkflowState workflowState) {
-        this.workflowState = workflowState;
     }
 
     public String getDescription() {

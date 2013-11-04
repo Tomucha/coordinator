@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -42,7 +43,12 @@ public class EventUserListController extends AbstractEventController {
     private UserGroupService userGroupService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String listUsers(@ModelAttribute("params") EventFilterParams params, Model model) {
+    public String listUsers(@ModelAttribute("params") EventFilterParams params, Model model, HttpSession session) {
+
+        boolean sentByUser = params.isSentByUser();
+        if (!sentByUser && session.getAttribute("userListFilter")!=null) {
+            params = (EventFilterParams) session.getAttribute("userListFilter");
+        }
 
         UserInEventFilter inEventFilter = new UserInEventFilter();
         params.populateUserInEventFilter(inEventFilter);
@@ -60,6 +66,11 @@ public class EventUserListController extends AbstractEventController {
         poiFilter.setEventIdVal(params.getEventId());
 
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
+
+        session.setAttribute("userListFilter", params);
+        if (!sentByUser) {
+            model.addAttribute("params", params);
+        }
 
         return "admin/event-users";
     }

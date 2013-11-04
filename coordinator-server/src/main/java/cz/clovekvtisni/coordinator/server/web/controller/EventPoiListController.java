@@ -17,19 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * Created with IntelliJ IDEA.
- * User: jka
- * Date: 19.11.12
- */
 @Controller
 @RequestMapping("/admin/event/poi/list")
 @EventPrerequisitiesRequired
@@ -42,7 +35,13 @@ public class EventPoiListController extends AbstractEventController {
     private UserGroupService userGroupService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String list(@ModelAttribute("params") EventFilterParams params, @RequestParam(value = "bookmark", required = false) String bookmark, Model model) {
+    public String list(@ModelAttribute("poiListFilter") EventFilterParams params, @RequestParam(value = "bookmark", required = false) String bookmark, Model model, HttpSession session) {
+
+        boolean sentByUser = params.isSentByUser();
+        if (!sentByUser && session.getAttribute("poiListFilter")!=null) {
+            params = (EventFilterParams) session.getAttribute("poiListFilter");
+        }
+
         PoiFilter filter = new PoiFilter();
         params.populatePoiFilter(filter);
         UserEntity loggedUser = getLoggedUser();
@@ -58,6 +57,11 @@ public class EventPoiListController extends AbstractEventController {
         model.addAttribute("selectionForm", selectionForm);
 
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
+
+        session.setAttribute("poiListFilter", params);
+        if (!sentByUser) {
+            model.addAttribute("poiListFilter", params);
+        }
 
         return "admin/event-pois";
     }

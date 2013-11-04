@@ -31,7 +31,6 @@ public abstract class AbstractEventController extends AbstractController {
         }
 
         List<ActivityEntity> result = activityService.find(eventId, poiId, userId, null, ActivityService.FLAG_FETCH_ALL).getResult();
-        logger.info("Activity to model: "+result);
         return result;
     }
 }

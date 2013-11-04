@@ -91,7 +91,10 @@
                     Odmítnout
                 </transition>
                 <transition id="wkfl_prace_state1_trans3" name="Předat" to_state_id="wkfl_prace_state2"
-                            allowed_for_role="ANONYMOUS, BACKEND">
+                            allowed_for_role="ANONYMOUS, BACKEND"
+                            intent_package="com.google.android.apps.plus"
+                            intent_class="com.google.android.apps.plus.phone.UrlGatewayActivity"
+                        >
                     Předat dál
                 </transition>
                 <transition id="wkfl_prace_state1_trans4" name="Dokončit" to_state_id="wkfl_prace_state3"

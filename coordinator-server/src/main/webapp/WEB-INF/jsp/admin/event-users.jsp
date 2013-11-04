@@ -67,6 +67,7 @@
                     <sf:options items="${userGroups}" itemLabel="name" itemValue="id"/>
                 </sf:select>
             <label><s:message code="label.name"/>:</label> <sf:input path="userFulltext"/>
+            <sf:hidden path="sentByUser" value="true"/>
 
             <p><button type="submit" class="btn"><s:message code="button.filterList"/></button></p>
         </sf:form>

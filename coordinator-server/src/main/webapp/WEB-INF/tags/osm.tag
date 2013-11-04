@@ -467,18 +467,23 @@
 
     });
 
-    function searchAddress(address) {
+    function searchAddress(address, sourceInput) {
         $.getJSON("${root}/admin/event/map/api/address?query="+address, function(response) {
-            CoordinatorMap.goTo(response.longitude, response.latitude, 15);
+            if (response != null && response.latitude) {
+                CoordinatorMap.goTo(response.longitude, response.latitude, 15);
+                sourceInput.removeClass("search-error");
+            } else {
+                sourceInput.addClass("search-error");
+            }
         });
     }
 
 </script>
 
 <p>
-    <input type="text"
+    <input type="text" id="address-search"
            class="search-query" placeholder="<s:message code="label.searchAddress"/>"
-           onkeypress="if (event.keyCode == 13) searchAddress($(this).val())"/>
+           onkeypress="if (event.keyCode == 13) searchAddress($(this).val(), $(this))"/>
 </p>
 
 <div id="mapContainer" class="well"></div>

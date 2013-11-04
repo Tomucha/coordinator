@@ -38,6 +38,12 @@ public class WorkflowTransition extends AbstractStaticEntity {
     @Attribute(name = "on_before_transition", required = false)
     private String onBeforeTransition;
 
+    @Attribute(name = "intent_package", required = false)
+    private String intentPackage;
+
+    @Attribute(name = "intent_class", required = false)
+    private String intentClass;
+
     public String getId() {
         return id;
     }
@@ -68,6 +74,22 @@ public class WorkflowTransition extends AbstractStaticEntity {
 
     public String getOnBeforeTransition() {
         return onBeforeTransition;
+    }
+
+    public String getIntentPackage() {
+        return intentPackage;
+    }
+
+    public void setIntentPackage(String intentPackage) {
+        this.intentPackage = intentPackage;
+    }
+
+    public String getIntentClass() {
+        return intentClass;
+    }
+
+    public void setIntentClass(String intentClass) {
+        this.intentClass = intentClass;
     }
 
     @Override

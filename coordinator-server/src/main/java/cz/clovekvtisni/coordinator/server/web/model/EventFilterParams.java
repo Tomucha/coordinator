@@ -7,7 +7,11 @@ import cz.clovekvtisni.coordinator.server.filter.PoiFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.util.ValueTool;
+import org.springframework.context.annotation.Scope;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.context.request.SessionScope;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +21,7 @@ import java.util.Map;
  * User: jka
  * Date: 28.11.12
  */
-public class EventFilterParams {
+public class EventFilterParams implements Serializable {
 
     private Long eventId;
 
@@ -30,6 +34,8 @@ public class EventFilterParams {
     private String workflowId;
 
     private String workflowStateId;
+
+    private boolean sentByUser = false;
 
     public EventFilterParams() {
     }
@@ -101,6 +107,14 @@ public class EventFilterParams {
         this.workflowStateId = workflowStateId;
     }
 
+    public boolean isSentByUser() {
+        return sentByUser;
+    }
+
+    public void setSentByUser(boolean sentByUser) {
+        this.sentByUser = sentByUser;
+    }
+
     public PoiFilter populatePoiFilter(PoiFilter filter) {
         filter.setEventIdVal(getEventId());
         if (!ValueTool.isEmpty(getWorkflowId())) {
@@ -137,5 +151,17 @@ public class EventFilterParams {
         }
 
         return filter;
+    }
+
+    @Override
+    public String toString() {
+        return "EventFilterParams{" +
+                "eventId=" + eventId +
+                ", userFulltext='" + userFulltext + '\'' +
+                ", groupId=" + groupId +
+                ", retUrl='" + retUrl + '\'' +
+                ", workflowId='" + workflowId + '\'' +
+                ", workflowStateId='" + workflowStateId + '\'' +
+                '}';
     }
 }

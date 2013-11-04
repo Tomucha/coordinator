@@ -54,7 +54,6 @@ public class ActivityServiceImpl extends AbstractEntityServiceImpl implements Ac
         q = q.order("-changeDate");
 
         List<ActivityEntity> result = q.list();
-        logger.info("Found activity: "+result);
 
         if ((FLAG_FETCH_ALL & flags) != 0) {
             for (ActivityEntity a: result) {

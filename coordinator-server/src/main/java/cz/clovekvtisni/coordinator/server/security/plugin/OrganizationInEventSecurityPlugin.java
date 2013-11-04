@@ -1,5 +1,6 @@
 package cz.clovekvtisni.coordinator.server.security.plugin;
 
+import cz.clovekvtisni.coordinator.domain.config.Role;
 import cz.clovekvtisni.coordinator.domain.config.RolePermission;
 import cz.clovekvtisni.coordinator.server.domain.EventEntity;
 import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Date;
 
 @Component
 public class OrganizationInEventSecurityPlugin extends SecurityPlugin {
@@ -35,7 +37,7 @@ public class OrganizationInEventSecurityPlugin extends SecurityPlugin {
 
     @Override
     protected void register() {
-        PermissionCommand<OrganizationInEventEntity> permittedCommand = new PermittedCommand<OrganizationInEventEntity>();
+        PermissionCommand<OrganizationInEventEntity> permittedCommand = new CanReadCommand();
         PermissionCommand<OrganizationInEventEntity> canCreateCommand = new CanCreateCommand();
 
         registerPermissionCommand(OrganizationInEventEntity.class, ReadPermission.class, permittedCommand);
@@ -69,4 +71,18 @@ public class OrganizationInEventSecurityPlugin extends SecurityPlugin {
             return activeUserInEvent != null && authorizationTool.hasAnyPermission(activeUserInEvent, RolePermission.EDIT_EVENT_IN_ORG);
         }
     }
+
+    private class CanReadCommand implements PermissionCommand<OrganizationInEventEntity> {
+        public boolean isPermitted(OrganizationInEventEntity entity, String entityName) {
+            UserEntity loggedUser = appContext.getLoggedUser();
+
+            if (entity == null && entityName != null) return true;
+
+            if (entity.getDateClosed() == null || entity.getDateClosed().after(new Date())) return true;
+
+            return authorizationTool.hasRole(AuthorizationTool.SUPERADMIN, loggedUser);
+        }
+
+    }
+
 }

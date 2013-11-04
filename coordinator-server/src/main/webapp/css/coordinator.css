@@ -79,3 +79,7 @@ form .alert-error {
 .lostPassword {
     margin-top: 1ex;
 }
+
+input[type="text"].search-error {
+    color: red;
+}

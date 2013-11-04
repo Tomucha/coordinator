@@ -72,7 +72,10 @@ public class TasksFragment extends SherlockFragment {
         List<Poi> notImportant = new ArrayList<Poi>();
         for (Iterator<Poi> iterator = pois.iterator(); iterator.hasNext(); ) {
             Poi next = iterator.next();
-            if (next.isCanDoTransition() || !next.getPoiCategory().isImportant()) {
+
+            PoiCategory poiCategory = ((EventActivity)getActivity()).findPoiCategory(next.getPoiCategoryId());
+
+            if (next.isCanDoTransition() || !poiCategory.isImportant()) {
                 notImportant.add(next);
             }
         }
@@ -92,10 +95,11 @@ public class TasksFragment extends SherlockFragment {
 		protected void setUpView(Poi poi, View view) {
 			FindView.textView(view, R.id.title).setText(poi.getName());
 			FindView.textView(view, R.id.short_description).setText(poi.getDescription());
-            FindView.imageView(view,R.id.icon).setImageBitmap(iconsMap.get(poi.getPoiCategory()));
+            PoiCategory poiCategory = ((EventActivity)getActivity()).findPoiCategory(poi.getPoiCategoryId());
+            FindView.imageView(view,R.id.icon).setImageBitmap(iconsMap.get(poiCategory));
 
             boolean editable = poi.isCanEdit();
-            boolean important = poi.getPoiCategory().isImportant();
+            boolean important = findPoiCategory(poi).isImportant();
             boolean transition = poi.isCanDoTransition();
 
             ImageView i2 = FindView.imageView(view,R.id.icon2);
@@ -115,6 +119,10 @@ public class TasksFragment extends SherlockFragment {
         public void setIconsMap(Map<PoiCategory,Bitmap> iconsMap) {
             this.iconsMap = iconsMap;
         }
+    }
+
+    private PoiCategory findPoiCategory(Poi poi) {
+        return ((EventActivity)getActivity()).findPoiCategory(poi.getPoiCategoryId());
     }
 
     /**
