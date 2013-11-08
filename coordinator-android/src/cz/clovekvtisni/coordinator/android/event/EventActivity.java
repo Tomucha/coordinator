@@ -68,6 +68,8 @@ import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
 public class EventActivity extends SherlockFragmentActivity implements LocationTool.Listener {
 
 	private Event event;
+    private UserInEvent userInEvent;
+
 	private List<SherlockFragment> fragments;
 	private LocationTool locationTool;
 	private InfoFragment infoFragment;
@@ -163,6 +165,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
         UiTool.dropNotification(this);
 
 		event = IntentHelper.getEvent(getIntent());
+        userInEvent = IntentHelper.getUserInEvent(getIntent());
 
         zoomToPoi = EventActivity.IntentHelper.getPOI(getIntent());
         if (zoomToPoi != null) {
@@ -251,6 +254,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	private void loadPoiIcons() {
 		for (final PoiCategory category : poiCategories) {
 			String url = category.getIcon();
+            Lg.MAP.i("Preparing icon "+url);
 			DisplayMetrics metrics = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(metrics);
 			Workers.load(new BitmapLoader(url), new BitmapLoader.Listener() {
@@ -443,6 +447,8 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
     }
 
     public WorkflowState findWorkflowState(Poi poi) {
+        if (poi.getWorkflowId() == null) return null;
+        if (poi.getWorkflowStateId() == null) return null;
         Workflow w = findWorkflow(poi);
         return w.getStateMap().get(poi.getWorkflowStateId());
     }
@@ -512,7 +518,13 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 			builder.setTitle(getString(R.string.preload_question));
 			builder.setMessage(getString(R.string.preload_info));
-			builder.setNegativeButton(getString(R.string.preload_button_no), null);
+			builder.setNeutralButton(getString(R.string.preload_button_no), null);
+            builder.setNegativeButton(getString(R.string.preload_button_never), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Settings.setEventMapPreloaded(((EventActivity) getActivity()).getEventId());
+                }
+            });
 			builder.setPositiveButton(getString(R.string.preload_button_yes), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -671,18 +683,20 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 
 	public static class IntentHelper {
 		private static final String EXTRA_EVENT = "event";
+        private static final String EXTRA_USER_IN_EVENT = "userInEvent";
         private static final String EXTRA_POI = "poiId";
 		private static final String EXTRA_ORG_IN_EVENT = "orgInEvent";
 
-        public static Intent create(Context c, Event event, OrganizationInEvent organizationInEvent, long poiId) {
-            Intent i = create(c, event, organizationInEvent);
+        public static Intent create(Context c, Event event, UserInEvent userInEvent, OrganizationInEvent organizationInEvent, long poiId) {
+            Intent i = create(c, event, userInEvent, organizationInEvent);
             i.putExtra(EXTRA_POI, poiId);
             return i;
         }
 
-		public static Intent create(Context c, Event event, OrganizationInEvent organizationInEvent) {
+		public static Intent create(Context c, Event event, UserInEvent userInEvent, OrganizationInEvent organizationInEvent) {
 			Intent i = new Intent(c, EventActivity.class);
 			i.putExtra(EXTRA_EVENT, event);
+            i.putExtra(EXTRA_USER_IN_EVENT, userInEvent);
 			i.putExtra(EXTRA_ORG_IN_EVENT, organizationInEvent);
 			return i;
 		}
@@ -690,6 +704,10 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 		public static Event getEvent(Intent i) {
 			return (Event) i.getSerializableExtra(EXTRA_EVENT);
 		}
+
+        public static UserInEvent getUserInEvent(Intent i) {
+            return (UserInEvent) i.getSerializableExtra(EXTRA_USER_IN_EVENT);
+        }
 
 		public static OrganizationInEvent getOrganizationInEvent(Intent i) {
 			return (OrganizationInEvent) i.getSerializableExtra(EXTRA_ORG_IN_EVENT);
@@ -722,5 +740,9 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 
     public ConfigResponse getConfig() {
         return config;
+    }
+
+    public UserInEvent getUserInEvent() {
+        return userInEvent;
     }
 }

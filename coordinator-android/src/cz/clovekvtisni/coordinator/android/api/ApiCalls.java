@@ -60,6 +60,12 @@ public class ApiCalls {
         }
     }
 
+    public static class UserPasswordCall extends ApiCall<LoginRequestParams, LoginResponseData> {
+        public UserPasswordCall(LoginRequestParams requestParams) {
+            super("user/forgotten-password", requestParams, LoginResponseData.class);
+        }
+    }
+
 	public static class UserUpdatePositionCall extends
 			ApiCall<UserUpdatePositionRequestParams, UserUpdatePositionResponseData> {
 		public UserUpdatePositionCall(UserUpdatePositionRequestParams requestParams) {

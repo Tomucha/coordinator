@@ -42,7 +42,7 @@ public class UserApiController extends AbstractApiController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody ApiResponse login(HttpServletRequest request) {
         LoginRequestParams params = parseRequestAnonymous(request, LoginRequestParams.class);
-        UserEntity user = userService.loginApi(params.getLogin(), params.getPassword());
+        UserEntity user = userService.loginApi(params.getEmail(), params.getPassword());
         if (user == null) {
             throw MaPermissionDeniedException.wrongCredentials();
         }
@@ -52,10 +52,22 @@ public class UserApiController extends AbstractApiController {
         return okResult(responseData);
     }
 
+    @RequestMapping(value = "/check-email", method = RequestMethod.POST)
+    public @ResponseBody ApiResponse checkEmail(HttpServletRequest request) {
+        LoginRequestParams params = parseRequestAnonymous(request, LoginRequestParams.class);
+        UserEntity user = userService.findByEmail(params.getEmail());
+        if (user == null) {
+            return okResult(null);
+        } else {
+            return errorResult(ErrorCode.KEY_EXISTS, null);
+        }
+    }
+
+
     @RequestMapping(value = "/forgotten-password", method = RequestMethod.POST)
     public @ResponseBody ApiResponse forgottenPassword(HttpServletRequest request) {
         LoginRequestParams params = parseRequestAnonymous(request, LoginRequestParams.class);
-        if (userService.lostPassword(params.getLogin()))
+        if (userService.lostPassword(params.getEmail()))
             return okResult(null);
         else
             return errorResult(ErrorCode.WRONG_CREDENTIALS, null);

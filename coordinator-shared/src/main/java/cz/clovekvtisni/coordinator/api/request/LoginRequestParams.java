@@ -8,24 +8,24 @@ package cz.clovekvtisni.coordinator.api.request;
  */
 public class LoginRequestParams implements RequestParams {
 
-    private String login;
+    private String email;
 
     private String password;
 
     public LoginRequestParams() {
     }
 
-    public LoginRequestParams(String login, String password) {
-        this.login = login;
+    public LoginRequestParams(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
-    public String getLogin() {
-        return login;
+    public String getEmail() {
+        return email;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -38,6 +38,6 @@ public class LoginRequestParams implements RequestParams {
 
     @Override
     public String getSignature() {
-        return login + "~" + password;
+        return email + "~" + password;
     }
 }

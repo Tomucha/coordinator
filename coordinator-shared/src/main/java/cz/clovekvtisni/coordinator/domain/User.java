@@ -148,6 +148,7 @@ public class User extends AbstractModifiableEntity {
     }
 
     public UserEquipment[] getEquipmentList() {
+        if (equipmentList == null) equipmentList = new UserEquipment[0];
         return equipmentList;
     }
 
@@ -156,6 +157,7 @@ public class User extends AbstractModifiableEntity {
     }
 
     public UserSkill[] getSkillList() {
+        if (skillList == null) skillList = new UserSkill[0];
         return skillList;
     }
 

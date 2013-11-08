@@ -76,6 +76,11 @@ public class SkillsFragment extends ListFragment {
 				android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, mChoices));
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
+        if (mChoices.isEmpty()) {
+            getView().findViewById(R.id.empty_info).setVisibility(View.VISIBLE);
+        }
+
+
 		new Handler().post(new Runnable() {
 			@Override
 			public void run() {

@@ -55,4 +55,8 @@ public class BaseActivity extends SherlockFragmentActivity implements WorkingInd
         }
     }
 
+    public boolean isWorking() {
+        return workingCount > 0;
+    }
+
 }

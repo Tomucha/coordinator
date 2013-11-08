@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import com.fhucho.android.workers.Workers;
 import cz.clovekvtisni.coordinator.android.register.wizard.ui.PersonalInfoFragment;
 import cz.clovekvtisni.coordinator.domain.User;
 
@@ -51,7 +52,14 @@ public class PersonalInfoPage extends Page {
     	user.setEmail(mData.getString(EMAIL_DATA_KEY));
     	
     	user.setPhone(mData.getString(PHONE_DATA_KEY));
+
+
+
+
+
     }
+
+
 
     @Override
     public void loadFromUser(User user) {

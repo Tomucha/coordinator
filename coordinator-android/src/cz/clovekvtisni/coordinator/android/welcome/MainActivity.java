@@ -164,7 +164,7 @@ public class MainActivity extends BaseActivity {
                     return;
                 }
                 LoginRequestParams p = new LoginRequestParams();
-                p.setLogin(emailText);
+                p.setEmail(emailText);
                 p.setPassword(passwordText);
                 setWorking(true);
                 Workers.start(new UserLoginTask(p, dialog), MainActivity.this);
@@ -176,15 +176,17 @@ public class MainActivity extends BaseActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        if (isWorking()) return;
                         String emailText = email.getText().toString();
                         if (ValueTool.isEmpty(emailText)) {
                             email.requestFocus();
                             UiTool.toast(R.string.error_missing_value, getApplicationContext());
                             return;
                         }
+                        setWorking(true);
                         LoginRequestParams p = new LoginRequestParams();
-                        p.setLogin(emailText);
-                        Workers.start(new UserLoginTask(p, dialog), MainActivity.this);
+                        p.setEmail(emailText);
+                        Workers.start(new UserPasswordTask(p, dialog), MainActivity.this);
                     }
                 }
         );
@@ -256,17 +258,15 @@ public class MainActivity extends BaseActivity {
     private class UserPasswordTask extends ActivityWorker2<MainActivity, Void, Exception> {
 
         private final LoginRequestParams params;
-        private final DialogInterface dialogToClose;
 
         public UserPasswordTask(LoginRequestParams params, DialogInterface dialogToClose) {
             this.params = params;
-            this.dialogToClose = dialogToClose;
         }
 
         @Override
         protected void doInBackground() {
             try {
-                new ApiCalls.UserLoginCall(params).call();
+                new ApiCalls.UserPasswordCall(params).call();
                 getListenerProxy().onSuccess(null);
             } catch (final ApiCall.ApiServerSideException e) {
                 runOnUiThread(new Runnable() {
@@ -284,13 +284,14 @@ public class MainActivity extends BaseActivity {
         @Override
         public void onSuccess(Void result) {
             UiTool.toast(R.string.message_password_changed, getApplicationContext());
+            setWorking(false);
         }
 
         @Override
         public void onException(Exception e) {
-            Lg.APP.e("Chyba "+e, e);
+            Lg.APP.e("Chyba " + e, e);
             Toast.makeText(getActivity(), "Chyba", Toast.LENGTH_SHORT).show();
-            dialogToClose.dismiss();
+            setWorking(false);
         }
 
     }

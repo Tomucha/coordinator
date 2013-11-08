@@ -1,5 +1,7 @@
 package cz.clovekvtisni.coordinator.domain;
 
+import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
+
 import java.util.*;
 
 public class UserInEvent extends AbstractModifiableEntity {
@@ -37,6 +39,11 @@ public class UserInEvent extends AbstractModifiableEntity {
     private User user;
 
     private List<UserGroup> groups;
+
+    /**
+     * Do kterych kategorii smi zapisovat?
+     */
+    private PoiCategory[] openedCategories;
 
     public Long getUserId() {
         return userId;
@@ -172,6 +179,14 @@ public class UserInEvent extends AbstractModifiableEntity {
 
     public void setGroups(List<UserGroup> groups) {
         this.groups = groups;
+    }
+
+    public PoiCategory[] getOpenedCategories() {
+        return openedCategories;
+    }
+
+    public void setOpenedCategories(PoiCategory[] openedCategories) {
+        this.openedCategories = openedCategories;
     }
 
     @Override

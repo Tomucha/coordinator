@@ -67,6 +67,7 @@ public class OrganizationInEvent extends AbstractModifiableEntity {
     }
 
     public String[] getRegistrationEquipment() {
+        if (registrationEquipment == null) registrationEquipment = new String[0];
         return registrationEquipment;
     }
 
@@ -75,6 +76,7 @@ public class OrganizationInEvent extends AbstractModifiableEntity {
     }
 
     public String[] getRegistrationSkills() {
+        if (registrationSkills == null) registrationSkills = new String[0];
         return registrationSkills;
     }
 
@@ -115,16 +117,9 @@ public class OrganizationInEvent extends AbstractModifiableEntity {
     }
 
     public boolean registrationPossible() {
-        if (datePublish == null && dateClosedRegistration == null) return true;
-        if (datePublish == null) {
-            if (dateClosedRegistration.getTime() > System.currentTimeMillis()) return true;
-            return false;
-        }
-        if (dateClosedRegistration == null) {
-            if (datePublish.getTime() < System.currentTimeMillis()) return true;
-            return false;
-        }
-        return false;
+        if (datePublish != null && datePublish.getTime() > System.currentTimeMillis()) return false;
+        if (dateClosedRegistration != null && dateClosedRegistration.getTime() < System.currentTimeMillis()) return false;
+        return true;
     }
 
     @Override

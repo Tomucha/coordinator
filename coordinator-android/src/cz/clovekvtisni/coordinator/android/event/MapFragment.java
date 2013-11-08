@@ -16,6 +16,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -187,22 +188,22 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 
 	private void selectMarker(MarkerOverlay marker) {
 		if (selectedMarker != null) selectedMarker.setSelected(false);
+        osmMapView.invalidate();
+        if (marker == null) return;
 		marker.setSelected(true);
 		selectedMarker = marker;
-		osmMapView.invalidate();
 	}
 
 	private PoiOverlay findPoiOverlay(Poi poi) {
 		for (MapOverlay overlay : osmMapView.getOverlays()) {
 			if (overlay instanceof PoiOverlay) {
 				PoiOverlay poiOverlay = (PoiOverlay) overlay;
-				if (poiOverlay.poi.getId() == poi.getId()) {
+				if (poiOverlay.poi.getId().equals(poi.getId())) {
 					return poiOverlay;
 				}
 			}
 		}
-
-		throw new AssertionError();
+        return null;
 	}
 
 	private UserOverlay findUserOverlay(User user) {
@@ -214,8 +215,7 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 				}
 			}
 		}
-
-		throw new AssertionError();
+        return null;
 	}
 
 	private void selectPoi(Poi poi) {
@@ -245,8 +245,17 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
                 }
             }
 			Bitmap bitmap = poiIcons.get(findPoiCategory(poi));
-			if (bitmap == null) continue;
-			overlays.add(new PoiOverlay(poi, bitmap));
+			if (bitmap == null) {
+                Lg.MAP.e("Missing icon for: "+findPoiCategory(poi)+" in "+poiIcons.keySet());
+                continue;
+            }
+
+            // badge?
+            if (poi.isCanDoTransition()) {
+			    overlays.add(new PoiOverlay(poi, bitmap,R.drawable.ic_work_badge));
+            } else {
+                overlays.add(new PoiOverlay(poi, bitmap,null));
+            }
 		}
 
         if (toZoomTo != null) {
@@ -321,6 +330,7 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
                 if (myLocation != null) {
                     String url = "http://maps.google.com/maps?saddr="+myLocation.getLatitude()+","+myLocation.getLongitude()+"&daddr="+poi.getLatitude()+","+poi.getLongitude();
                     Intent navIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    navIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(navIntent);
                 }
             }
@@ -380,7 +390,8 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
     @Override
     public void onLongTap(double latitude, double longitude) {
         // let's create a new POI
-        PoiCategory[] poiCategories = ((EventActivity)getActivity()).getPoiCategories();
+        PoiCategory[] poiCategories = ((EventActivity)getActivity()).getUserInEvent().getOpenedCategories();
+        if (poiCategories == null || poiCategories.length == 0) return;
         new CreatePoiDialog(latitude, longitude, poiCategories).show(getActivity().getSupportFragmentManager(), CreatePoiDialog.TAG);
     }
 
@@ -415,6 +426,8 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 			FragmentManager fm = getActivity().getSupportFragmentManager();
 			((DialogFragment) fm.findFragmentByTag(SendingProgressDialog.TAG)).dismiss();
             ((EventActivity)getActivity()).loadPois(true);
+
+            Lg.API.i("Transition success: "+ transition.getIntentPackage()+" "+ transition.getIntentClass());
 
             final WorkflowTransition t = transition;
             {
@@ -470,15 +483,20 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 		private final Paint paintNormal = new Paint(Paint.FILTER_BITMAP_FLAG);
 		private final Paint paintSelected = new Paint(paintNormal);
 		private final Bitmap bitmap;
+        private Drawable badgeDrawable;
 
-		private boolean selected = false;
+        private boolean selected = false;
 
-		public MarkerOverlay(LatLon latLon, Bitmap bitmap) {
+		public MarkerOverlay(LatLon latLon, Bitmap bitmap, Integer badge) {
 			super(latLon);
 			this.bitmap = bitmap;
 			paintSelected.setColor(Color.RED);
             paintSelected.setShadowLayer(4,2,2, Color.BLACK);
             paintSelected.setAntiAlias(true);
+
+            if (badge != null) {
+                badgeDrawable = getResources().getDrawable(badge);
+            }
 		}
 
 		@Override
@@ -493,6 +511,12 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
             }
 
 			canvas.drawBitmap(bitmap, src, dst, paintNormal);
+
+            if (badgeDrawable != null) {
+                badgeDrawable.setBounds(x, y - bitmap.getHeight()/2, x + bitmap.getHeight()/2, y);
+                badgeDrawable.draw(canvas);
+            }
+
 		}
 
 		private void setSelected(boolean selected) {
@@ -542,10 +566,11 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 	}
 
 	private class PoiOverlay extends MarkerOverlay {
-		private final Poi poi;
 
-		public PoiOverlay(Poi poi, Bitmap bitmap) {
-			super(new LatLon(poi.getLatitude(), poi.getLongitude()), bitmap);
+        private final Poi poi;
+
+		public PoiOverlay(Poi poi, Bitmap bitmap, Integer badge) {
+			super(new LatLon(poi.getLatitude(), poi.getLongitude()), bitmap, badge);
 			this.poi = poi;
 		}
 
@@ -560,7 +585,7 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 
 		public UserOverlay(UserInEvent userInEvent) {
 			super(new LatLon(userInEvent.getLastLocationLatitude(),
-					userInEvent.getLastLocationLongitude()), userMarkerBitmap);
+					userInEvent.getLastLocationLongitude()), userMarkerBitmap, null);
 			this.userInEvent = userInEvent;
 		}
 

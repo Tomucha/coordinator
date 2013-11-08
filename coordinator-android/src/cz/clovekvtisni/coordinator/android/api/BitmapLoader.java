@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import cz.clovekvtisni.coordinator.android.util.Lg;
 import org.apache.commons.io.IOUtils;
 
 import android.content.Context;
@@ -50,10 +51,12 @@ public class BitmapLoader extends Loader<BitmapLoader.Listener> {
 			BitmapEntry bitmapEntry = cache.getBitmap(url);
 			Bitmap bitmap;
 			if (bitmapEntry == null) {
+                Lg.API_CACHE.i("Loading icon from URL");
 				is = HttpRequest.get(url).stream();
 				cache.put(url, is);
 				bitmap = cache.getBitmap(url).getBitmap();
 			} else {
+                Lg.API_CACHE.i("Loading icon from cache");
 				bitmap = bitmapEntry.getBitmap();
 			}
 			result = new Result(bitmap);
@@ -71,10 +74,13 @@ public class BitmapLoader extends Loader<BitmapLoader.Listener> {
 
 	@Override
 	protected boolean isEquivalentTo(Loader<?> other) {
+        /*
+        Tady pak zlobi, kdyz maji kategorie stejne ikony.
+
 		if (getClass().equals(other.getClass())) {
 			BitmapLoader otherLoader = (BitmapLoader) other;
 			if (url.equals(otherLoader.url)) return true;
-		}
+		}*/
 		return false;
 	}
 

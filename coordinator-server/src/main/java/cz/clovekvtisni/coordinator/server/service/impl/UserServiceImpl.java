@@ -93,7 +93,7 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         return true;
     }
 
-    private UserEntity findByEmail(String email) {
+    public UserEntity findByEmail(String email) {
         Query<UserEntity> query = ofy().load().type(UserEntity.class).filter("email", email);
         return query.first().get();
     }
@@ -485,7 +485,9 @@ public class UserServiceImpl extends AbstractEntityServiceImpl implements UserSe
         UserAuthKey authKey = ofy().get(Key.create(UserAuthKey.class, key));
         if (authKey == null)
             return null;
-        return authKey.getUser();
+        UserEntity entity = authKey.getUser();
+        populate(Collections.singleton(entity), 0);
+        return entity;
     }
 
     @Override

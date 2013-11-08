@@ -19,7 +19,7 @@
     </tags:input>
 
     <div>
-        <input type="submit" value="<s:message code="button.login"/>" class="btn btn-large btn-primary"/>
+        <input type="submit" value="<s:message code="button.email"/>" class="btn btn-large btn-primary"/>
     </div>
 
     <div class="lostPassword">

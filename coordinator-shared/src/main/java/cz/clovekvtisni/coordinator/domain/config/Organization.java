@@ -75,10 +75,12 @@ public class Organization extends AbstractStaticEntity {
     }
 
     public String[] getPreRegistrationEquipment() {
+        if (preRegistrationEquipment == null) preRegistrationEquipment = new String[0];
         return preRegistrationEquipment;
     }
 
     public String[] getPreRegistrationSkills() {
+        if (preRegistrationSkills == null) preRegistrationSkills = new String[0];
         return preRegistrationSkills;
     }
 

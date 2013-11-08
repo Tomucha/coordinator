@@ -69,6 +69,11 @@ public class EquipmentFragment extends ListFragment {
     	
     	((TextView) getView().findViewById(R.id.title)).setText(page.getTitle());
 
+        if (mChoices.isEmpty()) {
+            getView().findViewById(R.id.empty_info).setVisibility(View.VISIBLE);
+        }
+
+
         final ListView listView = (ListView) getView().findViewById(android.R.id.list);
         setListAdapter(new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_list_item_multiple_choice,

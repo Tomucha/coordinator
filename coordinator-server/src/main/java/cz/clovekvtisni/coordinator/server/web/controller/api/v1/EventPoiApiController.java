@@ -51,8 +51,9 @@ public class EventPoiApiController extends AbstractApiController {
             filter.setModifiedDateOp(Filter.Operator.GT);
         }
         UserEntity loggedUser = getLoggedUser();
-        if (!authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_POI_IN_ORG))
+        if (!authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_POI_IN_ORG)) {
             filter.setVisibleForRolesVal(loggedUser.getRoleIdList());
+        }
 
         filter.setOrder("modifiedDate");
 

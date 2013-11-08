@@ -98,14 +98,20 @@ public class PoiSecurityPlugin extends SecurityPlugin {
             if (loggedUser == null)
                 return false;
 
-            if (entity == null && entityName != null)
+            if (entity == null && entityName != null) {
                 return authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_POI_IN_ORG);
+            }
+
+            /*
+
+            FIXME: co s timhle? Pridavani by asi nemelo zaviset na pravu k editaci.
 
             if (!authorizationTool.hasAnyPermission(loggedUser, RolePermission.EDIT_POI_IN_ORG) ||
                 loggedUser.getOrganizationId() == null ||
                 !loggedUser.getOrganizationId().equals(entity.getOrganizationId())) {
                     return false;
             }
+            */
 
             // check permission in workflow settings
             PoiCategory c = config.getPoiCategoryMap().get(entity.getPoiCategoryId());
@@ -113,6 +119,7 @@ public class PoiSecurityPlugin extends SecurityPlugin {
             entity.setWorkflow(w);
             if (w != null && w.getCanBeStartedBy() != null) {
                 UserInEventEntity activeUserInEvent = appContext.getActiveUserInEvent();
+                //log.info("User: "+activeUserInEvent);
                 if (
                         !loggedUser.hasAnyRole(w.getCanBeStartedBy()) &&
                         (
@@ -120,8 +127,10 @@ public class PoiSecurityPlugin extends SecurityPlugin {
                                 !activeUserInEvent.getEventId().equals(entity.getEventId()) ||
                                 !activeUserInEvent.hasAnyRole(w.getCanBeStartedBy())
                         )
-                )
+                ) {
+                    //log.info("Nema prava: "+entity);
                     return false;
+                }
             }
 
             return true;
@@ -194,7 +203,6 @@ public class PoiSecurityPlugin extends SecurityPlugin {
                 loggedUser.getOrganizationId() != null &&
                 loggedUser.getOrganizationId().equals(entity.getOrganizationId())
             ) {
-                log.info("Can edit POI");
                 return true;
             }
 

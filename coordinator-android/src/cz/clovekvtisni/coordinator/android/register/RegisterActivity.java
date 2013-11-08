@@ -25,6 +25,7 @@ import com.fhucho.android.workers.Workers;
 import com.fhucho.android.workers.simple.ActivityWorker2;
 
 import cz.clovekvtisni.coordinator.android.R;
+import cz.clovekvtisni.coordinator.android.api.ApiCall;
 import cz.clovekvtisni.coordinator.android.api.ApiCall.ApiCallException;
 import cz.clovekvtisni.coordinator.android.api.ApiCalls.UserPushTokenCall;
 import cz.clovekvtisni.coordinator.android.api.ApiCalls.UserRegisterCall;
@@ -47,6 +48,7 @@ import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
+import cz.clovekvtisni.coordinator.exception.ErrorCode;
 
 public class RegisterActivity extends SherlockFragmentActivity implements PageFragmentCallbacks,
 		ReviewFragment.Callbacks, ModelCallbacks {
@@ -310,12 +312,29 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 				}
 				
 				getListenerProxy().onSuccess(result);
+            } catch (ApiCall.ApiServerSideException e) {
+                if (e.getCode() == ErrorCode.KEY_EXISTS) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(), getActivity().getString(R.string.error_email_taken), Toast.LENGTH_SHORT).show();
+                            dismissDialog();
+                        }
+                    });
+                } else {
+                    getListenerProxy().onException(e);
+                }
 			} catch (ApiCallException e) {
 				getListenerProxy().onException(e);
 			}
 		}
 
-		@Override
+        private void dismissDialog() {
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            ((DialogFragment) fm.findFragmentByTag(RegisteringDialog.TAG)).dismiss();
+        }
+
+        @Override
 		public void onSuccess(RegisterResponseData result) {
 			getActivity().finish();
 		}
@@ -323,8 +342,7 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
 		@Override
 		public void onException(Exception e) {
 			Toast.makeText(getActivity(), "Chyba", Toast.LENGTH_SHORT).show();
-			FragmentManager fm = getActivity().getSupportFragmentManager();
-			((DialogFragment) fm.findFragmentByTag(RegisteringDialog.TAG)).dismiss();
+            dismissDialog();
 		}
 
 	}

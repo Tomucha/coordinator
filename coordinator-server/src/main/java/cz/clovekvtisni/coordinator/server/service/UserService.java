@@ -85,4 +85,7 @@ public interface UserService extends Service {
 
     @Anonymous
     boolean unsubscribe(String email, String signature);
+
+    @Anonymous
+    UserEntity findByEmail(String email);
 }

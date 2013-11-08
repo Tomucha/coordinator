@@ -50,6 +50,7 @@
                         <tags:breadcrumb url="/admin/event/poi/list" labelCode="breadcrumb.eventPois" visible="${can:read('poiEntity')}"/>
                         <tags:breadcrumb url="/admin/event/user/list" labelCode="breadcrumb.eventUsers" visible="${can:read('userEntity')}"/>
                         <tags:breadcrumb url="/admin/event/user-group/list" labelCode="breadcrumb.eventUserGroups" visible="${can:read('userGroupEntity')}"/>
+                        <tags:breadcrumb url="/admin/event/detail" labelCode="breadcrumb.eventEdit" visible="${can:create('organizationInEventEntity')}"/>
                         <tags:breadcrumb url="/export/georss" urlParams="&organizationId=${appContext.loggedUser.organizationId}" labelCode="breadcrumb.export"/>
                         <tags:help/>
                     </ul>

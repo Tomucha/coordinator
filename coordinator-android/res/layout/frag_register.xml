@@ -17,4 +17,11 @@
         android:saveEnabled="false"
         android:scrollbarStyle="outsideInset" />
 
+    <TextView
+            android:id="@+id/empty_info"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="@string/label_no_possibilities"/>
+
 </LinearLayout>

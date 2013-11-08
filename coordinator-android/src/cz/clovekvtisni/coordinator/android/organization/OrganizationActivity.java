@@ -58,6 +58,7 @@ public class OrganizationActivity extends BaseActivity {
 
     private User user;
     private ListView eventsListView;
+    private UserInEvent[] userInEvents;
 
     private void initEvents() {
 		adapter = new EventsAdapter();
@@ -71,8 +72,11 @@ public class OrganizationActivity extends BaseActivity {
                 Context c = OrganizationActivity.this;
                 OrganizationInEvent event = orgInEvents[position];
                 boolean registered = registeredEventIds.contains(event.getEventId());
+
+
                 if (registered) {
-                    startActivity(EventActivity.IntentHelper.create(c, event.getEvent(), event));
+                    UserInEvent userInEvent = findUserInEvent(event);
+                    startActivity(EventActivity.IntentHelper.create(c, event.getEvent(), userInEvent, event));
                 } else {
                     if (event.registrationPossible()) {
                         startActivityForResult(RegisterActivity.IntentHelper.create(c, organization, event, event.getEvent(), user), REQUEST_REGISTER);
@@ -83,6 +87,13 @@ public class OrganizationActivity extends BaseActivity {
             }
         });
 	}
+
+    private UserInEvent findUserInEvent(OrganizationInEvent event) {
+        for (UserInEvent userInEvent : userInEvents) {
+            if (userInEvent.getEventId().equals(event.getEventId())) return userInEvent;
+        }
+        throw new IllegalStateException("No such userInEvent "+event);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -184,6 +195,7 @@ public class OrganizationActivity extends BaseActivity {
 
 	private void onEventsLoaded(UserInEvent[] userInEvents, OrganizationInEvent[] orgInEvents) {
 		this.orgInEvents = orgInEvents;
+        this.userInEvents = userInEvents;
 
 		registeredEventIds.clear();
 		for (UserInEvent userInEvent : userInEvents) {

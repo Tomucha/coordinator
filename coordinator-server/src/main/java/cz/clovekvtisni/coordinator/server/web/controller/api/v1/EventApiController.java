@@ -6,12 +6,14 @@ import cz.clovekvtisni.coordinator.api.response.ApiResponse;
 import cz.clovekvtisni.coordinator.api.response.EventFilterResponseData;
 import cz.clovekvtisni.coordinator.domain.Event;
 import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
-import cz.clovekvtisni.coordinator.server.domain.EventEntity;
-import cz.clovekvtisni.coordinator.server.domain.OrganizationInEventEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserEntity;
-import cz.clovekvtisni.coordinator.server.domain.UserInEventEntity;
+import cz.clovekvtisni.coordinator.domain.UserInEvent;
+import cz.clovekvtisni.coordinator.domain.config.Organization;
+import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
+import cz.clovekvtisni.coordinator.server.domain.*;
 import cz.clovekvtisni.coordinator.server.filter.OrganizationInEventFilter;
 import cz.clovekvtisni.coordinator.server.filter.UserInEventFilter;
+import cz.clovekvtisni.coordinator.server.security.AuthorizationTool;
+import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.EventService;
 import cz.clovekvtisni.coordinator.server.service.OrganizationInEventService;
 import cz.clovekvtisni.coordinator.server.service.UserInEventService;
@@ -33,6 +35,9 @@ import java.util.Set;
 @Controller
 @RequestMapping("/api/v1/event")
 public class EventApiController extends AbstractApiController {
+
+    @Autowired
+    SecurityTool securityTool;
 
     @Autowired
     private EventService eventService;
@@ -61,10 +66,34 @@ public class EventApiController extends AbstractApiController {
             ResultList<UserInEventEntity> eventsByUser = userInEventService.findByFilter(filter, 0, null, 0l);
             List<UserInEventEntity> byOrganization = new ArrayList<UserInEventEntity>();
             for (UserInEventEntity entity : eventsByUser) {
-                if (eventIds.contains(entity.getEventId()))
+                if (eventIds.contains(entity.getEventId())) {
                     byOrganization.add(entity);
+                }
             }
-            responseData.setUserInEvents(new EntityTool().buildTargetEntities(byOrganization));
+
+            // nyni overime prava uzivatele pro vytvareni zaznamu POI,
+            // seznam kategorii, ve kterych smi vytvaret, si posleme na klienta
+            List<UserInEvent> userInEvents = new EntityTool().buildTargetEntities(byOrganization);
+            for (UserInEvent userInEvent : userInEvents) {
+                appContext.setActiveUserInEvent(
+                        userInEventService.findById(userInEvent.getEventId(), userInEvent.getUserId(),
+                        UserInEventService.FLAG_FETCH_EVENT | UserInEventService.FLAG_FETCH_GROUPS ));
+
+                List<PoiCategory> openedPoiCategories = new ArrayList<PoiCategory>();
+                for (PoiCategory poiCategory : config.getPoiCategoryList()) {
+                    PoiEntity p = new PoiEntity();
+                    p.setPoiCategory(poiCategory);
+                    p.setPoiCategoryId(poiCategory.getId());
+                    p.setEventId(userInEvent.getEventId());
+                    p.setOrganizationId(user.getOrganizationId());
+                    if (securityTool.buildHelper().canCreate(p)) {
+                        openedPoiCategories.add(poiCategory);
+                    }
+                }
+                //logger.info("Opened PoiCategories: "+openedPoiCategories);
+                userInEvent.setOpenedCategories(openedPoiCategories.toArray(new PoiCategory[0]));
+            }
+            responseData.setUserInEvents(userInEvents);
 
         } else if (params.getOrganizationId() != null) {
             responseData.setOrganizationInEvents(getEventsByOrganizationId(params.getOrganizationId(), eventIds));

@@ -32,9 +32,10 @@
     <string name="button_pre_register">Předregistrace</string>
     <string name="preload_downloading">Stahuji mapu...</string>
     <string name="preload_question">Přednačíst mapu?</string>
-    <string name="preload_info">Koordinátor umožňuje stáhnout si dopředu mapové podklady pro událost. Ale může to být dost dat, bylo dobré být na WiFi.
+    <string name="preload_info">Koordinátor umožňuje stáhnout si dopředu mapové podklady pro událost. Ale může to být dost dat, bylo by dobré být na WiFi.
     </string>
     <string name="preload_button_no">Teď ne</string>
+    <string name="preload_button_never">Nikdy!</string>
     <string name="preload_button_yes">OK, stahuj</string>
     <string name="warning_no_groups_to_filter">Zobrazení uživatelé nejsou v žádných skupinách, podle kterých by šlo
         filtrovat.
@@ -55,7 +56,7 @@
     <string name="message_user_position_unknown">Poloha uživatele není známá.</string>
     <string name="message_your_position_unknown">Vaše poloha není známá, asi vypnutá GPS?</string>
     <string name="message_logged">Jste přihlášen!</string>
-    <string name="message_password_changed">Heslo jsme Vám změnili a poslali na email.</string>
+    <string name="message_password_changed">Heslo jsme Vám změnili a poslali na email. Mrk tam!</string>
     <string name="menu_synchronize">Synchronizovat</string>
     <string name="menu_help">Nápověda</string>
     <string name="menu_login">Přihlásit se</string>
@@ -65,5 +66,9 @@
     <string name="menu_logout">Odhlásit</string>
     <string name="message_logout">Odhlásit z aplikace?</string>
     <string name="error_registration_not_possible">Tato událost není otevřena pro registraci.</string>
+    <string name="error_email_taken">Tento email je již registrovaný. Možná se chcete spíš přihlásit tlačítkem na
+        titulní obrazovce?
+    </string>
+    <string name="label_no_possibilities">Aktuálně zde nejsou žádné možnosti k výběru, pokračujte prosím na další krok.</string>
 
 </resources>

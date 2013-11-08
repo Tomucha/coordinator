@@ -26,10 +26,7 @@ import cz.clovekvtisni.coordinator.api.request.EventFilterRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventPoiListRequestParams;
 import cz.clovekvtisni.coordinator.api.response.EventFilterResponseData;
 import cz.clovekvtisni.coordinator.api.response.EventPoiFilterResponseData;
-import cz.clovekvtisni.coordinator.domain.Event;
-import cz.clovekvtisni.coordinator.domain.NotificationType;
-import cz.clovekvtisni.coordinator.domain.OrganizationInEvent;
-import cz.clovekvtisni.coordinator.domain.Poi;
+import cz.clovekvtisni.coordinator.domain.*;
 import cz.clovekvtisni.coordinator.domain.config.Organization;
 
 import java.io.IOException;
@@ -100,12 +97,13 @@ public class GCMIntentService extends GCMBaseIntentService {
                     @Override
                     protected void onPostExecute(EventFilterResponseData eventFilterResponseData) {
                         if (eventFilterResponseData == null) {
-                            notifyMessage(type, poiName, poiId, null, null);
+                            notifyMessage(type, poiName, poiId, null, null, null);
                             return;
                         }
                         cache.put(apiCall.getCacheKey(), eventFilterResponseData);
                         notifyMessage(type, poiName, poiId,
                                 findEvent(eventId, eventFilterResponseData.getOrganizationInEvents()),
+                                findUserInEvent(eventId, eventFilterResponseData.getUserInEvents()),
                                 findOrganizationInEvent(organizationId, eventId, eventFilterResponseData.getOrganizationInEvents())
                         );
                     }
@@ -114,6 +112,7 @@ public class GCMIntentService extends GCMBaseIntentService {
             } else {
                 notifyMessage(type, poiName, poiId,
                         findEvent(eventId, item.getValue().getOrganizationInEvents()),
+                        findUserInEvent(eventId, item.getValue().getUserInEvents()),
                         findOrganizationInEvent(organizationId, eventId, item.getValue().getOrganizationInEvents())
                 );
             }
@@ -124,7 +123,12 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     }
 
-
+    private UserInEvent findUserInEvent(long eventId, UserInEvent[] userInEvents) {
+        for (UserInEvent userInEvent : userInEvents) {
+            if (userInEvent.getEventId().equals(eventId)) return userInEvent;
+        }
+        return null;
+    }
 
     private OrganizationInEvent findOrganizationInEvent(String organizationId, long eventId, OrganizationInEvent[] organizationInEvents) {
         for (OrganizationInEvent organizationInEvent : organizationInEvents) {
@@ -146,7 +150,7 @@ public class GCMIntentService extends GCMBaseIntentService {
         Settings.setGcmRegistrationId(null);
 	}
 
-    private void notifyMessage(String type, String poiName, long poiId, Event event, OrganizationInEvent organizationInEvent) {
+    private void notifyMessage(String type, String poiName, long poiId, Event event, UserInEvent userInEvent, OrganizationInEvent organizationInEvent) {
 
         if (event == null || organizationInEvent == null) {
             fallbackNotification();
@@ -171,7 +175,7 @@ public class GCMIntentService extends GCMBaseIntentService {
         mBuilder.setVibrate(new long[] {200, 200, 500});
         mBuilder.setLights(Color.RED, 800, 400);
 
-        Intent resultIntent = EventActivity.IntentHelper.create(this, event, organizationInEvent, poiId);
+        Intent resultIntent = EventActivity.IntentHelper.create(this, event, userInEvent, organizationInEvent, poiId);
         resultIntent.setAction("DUMMY_ACTION_TO_MAKE_INTENTS_DIFFERENT_"+System.currentTimeMillis());
 
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
