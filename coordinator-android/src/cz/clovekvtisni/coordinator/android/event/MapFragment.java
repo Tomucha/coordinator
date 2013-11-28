@@ -79,13 +79,53 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 		params.setEventId(poi.getEventId());
 		params.setPoiId(poi.getId());
 		params.setTransitionId(transition.getId());
+        new TransitionPoiDialog(params, poi, transition).show(getActivity().getSupportFragmentManager(), TransitionPoiDialog.TAG);
+
+        /*
 
 		Workers.start(new EventPoiTransitionTask(params, transition), (EventActivity) getActivity());
-
 		new SendingProgressDialog().show(getActivity().getSupportFragmentManager(), SendingProgressDialog.TAG);
-
 		poiInfo.setVisibility(View.GONE);
+		*/
 	}
+
+    public class TransitionPoiDialog extends DialogFragment implements OnClickListener {
+
+        private static final String TAG = "TransitionPoiDialog";
+
+        EventPoiTransitionRequestParams requestParams = null;
+        Poi poi = null;
+        WorkflowTransition transition = null;
+
+        public TransitionPoiDialog(EventPoiTransitionRequestParams requestParams, Poi poi, WorkflowTransition transition) {
+            this.requestParams = requestParams;
+            this.poi = poi;
+            this.transition = transition;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View view = inflater.inflate(R.layout.frag_transition_poi, container);
+            getDialog().setTitle("Posun POI ve workflow");
+            view.findViewById(R.id.button).setOnClickListener(this);
+            ((TextView)view.findViewById(R.id.poi_name)).setText(poi.getName());
+            ((TextView)view.findViewById(R.id.transition_name)).setText(transition.getName());
+            return view;
+        }
+
+        @Override
+        public void onClick(View view) {
+            View root = getView();
+
+            String comment = ((EditText)root.findViewById(R.id.comment)).getText().toString().trim();
+            requestParams.setComment(comment);
+
+            Workers.start(new EventPoiTransitionTask(requestParams, transition), (EventActivity) getActivity());
+            new SendingProgressDialog().show(getActivity().getSupportFragmentManager(), SendingProgressDialog.TAG);
+            poiInfo.setVisibility(View.GONE);
+            dismiss();
+        }
+    }
 
 	private void goToMyLocation() {
         if (myLocation != null) {

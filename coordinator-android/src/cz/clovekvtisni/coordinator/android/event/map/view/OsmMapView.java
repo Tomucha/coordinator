@@ -80,8 +80,8 @@ public class OsmMapView extends View implements TouchHelper.OnMapTapListener, Ti
 
     @Override
     public void onLongTap(float x, float y) {
-        double latitude = projection.pixelsToLatitudes(x-getWidth()/2) + projection.getCenterLatLon().getLat();
-        double longitude = projection.pixelsToLongitudes(y-getHeight()/2) + projection.getCenterLatLon().getLon();
+        double latitude = projection.pixelsToLatitudes((getHeight()/2)-y) + projection.getCenterLatLon().getLat();
+        double longitude = projection.pixelsToLongitudes(x-getWidth()/2) + projection.getCenterLatLon().getLon();
         Lg.MAP.i("Long touch at "+latitude+" x "+longitude);
         if (osmMapEventsListener != null) {
             osmMapEventsListener.onLongTap(latitude, longitude);
