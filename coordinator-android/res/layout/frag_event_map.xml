@@ -35,6 +35,14 @@
                 android:textSize="16sp" />
 
             <ImageButton
+                    android:id="@+id/editInfo"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/selectable_item_background"
+                    android:gravity="center"
+                    android:src="@drawable/ic_action_content_edit"/>
+
+            <ImageButton
                 android:id="@+id/closeInfo"
                 android:layout_width="48dp"
                 android:layout_height="match_parent"

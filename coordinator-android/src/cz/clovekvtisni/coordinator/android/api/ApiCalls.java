@@ -26,11 +26,19 @@ public class ApiCalls {
 	}
 
     public static class EventPoiCreateCall extends
-            ApiCall<EventPoiCreateRequestParams, EventPoiResponseData> {
-        public EventPoiCreateCall(EventPoiCreateRequestParams requestParams) {
+            ApiCall<EventPoiRequestParams, EventPoiResponseData> {
+        public EventPoiCreateCall(EventPoiRequestParams requestParams) {
             super("event/poi/create", requestParams, EventPoiResponseData.class);
         }
     }
+
+    public static class EventPoiUpdateCall extends
+            ApiCall<EventPoiRequestParams, EventPoiResponseData> {
+        public EventPoiUpdateCall(EventPoiRequestParams requestParams) {
+            super("event/poi/update", requestParams, EventPoiResponseData.class);
+        }
+    }
+
 
 	public static class EventRegisteredCall extends
 			ApiCall<EventFilterRequestParams, EventFilterResponseData> {

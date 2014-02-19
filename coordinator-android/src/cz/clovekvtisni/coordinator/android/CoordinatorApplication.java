@@ -11,7 +11,9 @@ public class CoordinatorApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		applicationContext = getApplicationContext();
-		Crittercism.init(getApplicationContext(), DeployEnvironment.CRITTERCISM_APP_ID);
+        if (DeployEnvironment.CRITTERCISM_APP_ID != null) {
+		    Crittercism.init(getApplicationContext(), DeployEnvironment.CRITTERCISM_APP_ID);
+        }
 	}
 
 	public static Context getAppContext() {

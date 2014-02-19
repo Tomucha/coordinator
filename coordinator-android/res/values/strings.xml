@@ -23,7 +23,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Zrušit</string>
 
-    <string name="ok_poi_saved">Nové POI je uloženo!</string>
+    <string name="ok_poi_saved">POI je uloženo!</string>
 
     <string name="label_events">PROBÍHAJÍCÍ UDÁLOSTI</string>
     <string name="notification_assigned">V Koordinátoru Vám byl přiřazen úkol</string>
@@ -70,5 +70,7 @@
         titulní obrazovce?
     </string>
     <string name="label_no_possibilities">Aktuálně zde nejsou žádné možnosti k výběru, pokračujte prosím na další krok.</string>
+    <string name="transition_finished">POI posunuto!</string>
+    <string name="dialog_poi_edit">Upřesnění typu bodu</string>
 
 </resources>

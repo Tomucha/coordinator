@@ -5,15 +5,19 @@ package cz.clovekvtisni.coordinator.api.request;
  * User: jka
  * Date: 11.12.12
  */
-public class EventPoiCreateRequestParams implements EventRequestParams {
+public class EventPoiRequestParams implements EventRequestParams {
 
     private long eventId;
+
+    private long poiId;
 
     private double latitude;
 
     private double longitude;
 
     private String poiCategoryId;
+
+    private String poiSubCategoryId;
 
     private String name;
 
@@ -66,6 +70,32 @@ public class EventPoiCreateRequestParams implements EventRequestParams {
 
     public void setPoiCategoryId(String poiCategoryId) {
         this.poiCategoryId = poiCategoryId;
+    }
+
+    public String getPoiSubCategoryId() {
+        return poiSubCategoryId;
+    }
+
+    public void setPoiSubCategoryId(String poiSubCategoryId) {
+        this.poiSubCategoryId = poiSubCategoryId;
+    }
+
+    public long getPoiId() {
+        return poiId;
+    }
+
+    public void setPoiId(long poiId) {
+        this.poiId = poiId;
+    }
+
+
+    @Override
+    public String toString() {
+        return "EventPoiRequestParams{" +
+                "poiId=" + poiId +
+                ", eventId=" + eventId +
+                ", name='" + name + '\'' +
+                '}';
     }
 
     @Override

@@ -4,9 +4,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -22,7 +24,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,7 +47,7 @@ import cz.clovekvtisni.coordinator.android.event.map.view.OsmMapView;
 import cz.clovekvtisni.coordinator.android.event.map.view.Projection.LatLon;
 import cz.clovekvtisni.coordinator.android.other.Settings;
 import cz.clovekvtisni.coordinator.android.util.*;
-import cz.clovekvtisni.coordinator.api.request.EventPoiCreateRequestParams;
+import cz.clovekvtisni.coordinator.api.request.EventPoiRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventPoiTransitionRequestParams;
 import cz.clovekvtisni.coordinator.api.response.EventPoiResponseData;
 import cz.clovekvtisni.coordinator.domain.EventLocation;
@@ -54,6 +55,7 @@ import cz.clovekvtisni.coordinator.domain.Poi;
 import cz.clovekvtisni.coordinator.domain.User;
 import cz.clovekvtisni.coordinator.domain.UserInEvent;
 import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
+import cz.clovekvtisni.coordinator.domain.config.SubCategory;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowTransition;
 
@@ -375,6 +377,38 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
                 }
             }
         });
+
+        poiInfo.findViewById(R.id.editInfo).setVisibility(findPoiCategory(poi).getSubCategories().isEmpty() ? View.GONE : View.VISIBLE);
+        poiInfo.findViewById(R.id.editInfo).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showEditSubcategoryDialog(poi);
+            }
+        }
+        );
+    }
+
+    private void showEditSubcategoryDialog(final Poi poi) {
+        PoiCategory poiCategory = findPoiCategory(poi);
+        final List<SubCategory> subs = poiCategory.getSubCategories();
+        String[] subNames = new String[subs.size()];
+        for (int i = 0; i < subNames.length; i++) {
+            subNames[i] = subs.get(i).getName();
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(getString(R.string.dialog_poi_edit))
+            .setItems(subNames, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    EventPoiRequestParams params = new EventPoiRequestParams();
+                    params.setEventId(poi.getEventId());
+                    params.setPoiId(poi.getId());
+                    params.setPoiSubCategoryId(subs.get(which).getId());
+                    Workers.start(new EventPoiUpdateTask(params), (EventActivity) getActivity());
+                    new SendingProgressDialog().show(getActivity().getSupportFragmentManager(), SendingProgressDialog.TAG);
+
+                }
+            });
+        builder.create().show();
     }
 
     private WorkflowState findWorkflowState(Poi poi) {
@@ -467,6 +501,8 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 			((DialogFragment) fm.findFragmentByTag(SendingProgressDialog.TAG)).dismiss();
             ((EventActivity)getActivity()).loadPois(true);
 
+            UiTool.toast(R.string.transition_finished, getActivity());
+
             Lg.API.i("Transition success: "+ transition.getIntentPackage()+" "+ transition.getIntentClass());
 
             final WorkflowTransition t = transition;
@@ -485,9 +521,9 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 
     private static class EventPoiCreateTask extends ActivityWorker2<EventActivity, EventPoiResponseData, Exception> {
 
-        private final EventPoiCreateRequestParams params;
+        private final EventPoiRequestParams params;
 
-        public EventPoiCreateTask(EventPoiCreateRequestParams params) {
+        public EventPoiCreateTask(EventPoiRequestParams params) {
             this.params = params;
         }
 
@@ -518,6 +554,40 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 
     }
 
+    private static class EventPoiUpdateTask extends ActivityWorker2<EventActivity, EventPoiResponseData, Exception> {
+
+        private final EventPoiRequestParams params;
+
+        public EventPoiUpdateTask(EventPoiRequestParams params) {
+            this.params = params;
+        }
+
+        @Override
+        protected void doInBackground() {
+            try {
+                getListenerProxy().onSuccess(new ApiCalls.EventPoiUpdateCall(params).call());
+            } catch (ApiCallException e) {
+                getListenerProxy().onException(e);
+            }
+        }
+
+        @Override
+        public void onException(Exception e) {
+            Lg.API.e("Exception calling API: "+e, e);
+            UiTool.toast(R.string.error_server, getActivity().getApplicationContext());
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            ((DialogFragment) fm.findFragmentByTag(SendingProgressDialog.TAG)).dismiss();
+        }
+
+        @Override
+        public void onSuccess(EventPoiResponseData result) {
+            UiTool.toast(R.string.ok_poi_saved, getActivity().getApplicationContext());
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            ((DialogFragment) fm.findFragmentByTag(SendingProgressDialog.TAG)).dismiss();
+            ((EventActivity)getActivity()).loadPois(true);
+        }
+
+    }
 
 	private class MarkerOverlay extends MapOverlay {
 		private final Paint paintNormal = new Paint(Paint.FILTER_BITMAP_FLAG);
@@ -692,7 +762,7 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
                 ((TextView)root.findViewById(R.id.poi_name)).requestFocus();
             } else {
 
-                EventPoiCreateRequestParams params = new EventPoiCreateRequestParams();
+                EventPoiRequestParams params = new EventPoiRequestParams();
                 params.setName(name);
                 params.setDescription(description);
                 params.setEventId(((EventActivity) getActivity()).getEventId());
@@ -734,5 +804,6 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
         setUserVisibleHint(true);
         super.onSaveInstanceState(outState);
     }
+
 
 }

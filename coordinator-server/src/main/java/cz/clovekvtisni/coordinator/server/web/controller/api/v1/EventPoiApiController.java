@@ -1,6 +1,6 @@
 package cz.clovekvtisni.coordinator.server.web.controller.api.v1;
 
-import cz.clovekvtisni.coordinator.api.request.EventPoiCreateRequestParams;
+import cz.clovekvtisni.coordinator.api.request.EventPoiRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventPoiListRequestParams;
 import cz.clovekvtisni.coordinator.api.request.EventPoiTransitionRequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponse;
@@ -17,7 +17,6 @@ import cz.clovekvtisni.coordinator.server.security.permission.TransitionPermissi
 import cz.clovekvtisni.coordinator.server.service.PoiService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.Filter;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
-import cz.clovekvtisni.coordinator.server.util.EntityTool;
 import cz.clovekvtisni.coordinator.server.web.controller.api.AbstractApiController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -94,7 +93,8 @@ public class EventPoiApiController extends AbstractApiController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/create")
     public @ResponseBody ApiResponse create(HttpServletRequest request) {
-        EventPoiCreateRequestParams params = parseRequest(request, EventPoiCreateRequestParams.class);
+        EventPoiRequestParams params = parseRequest(request, EventPoiRequestParams.class);
+        logger.info("Creating: "+params);
 
         PoiEntity newPoi = new PoiEntity();
         newPoi.setLatitude(params.getLatitude());
@@ -110,6 +110,20 @@ public class EventPoiApiController extends AbstractApiController {
         SecurityTool.SecurityHelper helper = securityTool.buildHelper();
 
         return okResult(new EventPoiResponseData(buildDetailedPoiEntity(helper, newPoi)));
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/update")
+    public @ResponseBody ApiResponse update(HttpServletRequest request) {
+        EventPoiRequestParams params = parseRequest(request, EventPoiRequestParams.class);
+        logger.info("Updating: "+params);
+
+        PoiEntity poi = poiService.findById(params.getPoiId(), 0 );
+        poi.setSubCategoryId(params.getPoiSubCategoryId());
+        poiService.updatePoi(poi);
+
+        SecurityTool.SecurityHelper helper = securityTool.buildHelper();
+
+        return okResult(new EventPoiResponseData(buildDetailedPoiEntity(helper, poi)));
     }
 
 }
