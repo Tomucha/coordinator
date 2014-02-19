@@ -7,28 +7,8 @@ package cz.clovekvtisni.coordinator;
 public class SecretInfoTemplate {
 
     /**
-     * Google API
+     * Google GCM API
      */
     public static final String GCM_SENDER_ID = null;
-
-    /**
-     * Google API
-     */
-    public static final String GCM_API_KEY = null;
-
-    /**
-     * Email adress from which are all emails sent.
-     */
-    public static final String EMAIL_FROM = null;
-
-    /**
-     * Secret seed for signature generator, see {@link cz.clovekvtisni.coordinator.util.SignatureTool}.
-     */
-    public static final String SECRET_SIGNATURE_KEY = null;
-
-    public static final String FIRST_ADMIN_EMAIL = null;
-
-    public static final String FIRST_ADMIN_PASSWORD = null;
-
 
 }

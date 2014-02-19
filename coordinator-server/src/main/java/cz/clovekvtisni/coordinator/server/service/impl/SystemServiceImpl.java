@@ -11,6 +11,7 @@ import cz.clovekvtisni.coordinator.server.security.SecurityTool;
 import cz.clovekvtisni.coordinator.server.service.SystemService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
 import cz.clovekvtisni.coordinator.server.tool.objectify.UniqueKeyViolation;
+import cz.clovekvtisni.coordinator.server.util.SecretInfoServerSide;
 import cz.clovekvtisni.coordinator.util.RunnableWithResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,12 +76,12 @@ public class SystemServiceImpl extends AbstractServiceImpl implements SystemServ
             @Override
             public Void run() {
                 UserFilter filter = new UserFilter();
-                filter.setEmailVal(SecretInfo.FIRST_ADMIN_EMAIL);
+                filter.setEmailVal(SecretInfoServerSide.FIRST_ADMIN_EMAIL);
                 UserEntity user = userService.findByFilter(filter, 1, null, 0l).singleResult();
                 if (user == null) {
                     user = new UserEntity();
-                    user.setPassword(SecretInfo.FIRST_ADMIN_PASSWORD);
-                    user.setEmail(SecretInfo.FIRST_ADMIN_EMAIL);
+                    user.setPassword(SecretInfoServerSide.FIRST_ADMIN_PASSWORD);
+                    user.setEmail(SecretInfoServerSide.FIRST_ADMIN_EMAIL);
                     user.setRoleIdList(new String[] {"SUPERADMIN"});
                     userService.createUser(user);
                 }

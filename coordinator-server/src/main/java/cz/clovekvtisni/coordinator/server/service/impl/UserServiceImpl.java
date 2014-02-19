@@ -22,7 +22,7 @@ import cz.clovekvtisni.coordinator.server.security.permission.LoginAdminPermissi
 import cz.clovekvtisni.coordinator.server.service.*;
 import cz.clovekvtisni.coordinator.server.tool.objectify.ResultList;
 import cz.clovekvtisni.coordinator.util.CloneTool;
-import cz.clovekvtisni.coordinator.util.SignatureTool;
+import cz.clovekvtisni.coordinator.server.util.SignatureTool;
 import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;

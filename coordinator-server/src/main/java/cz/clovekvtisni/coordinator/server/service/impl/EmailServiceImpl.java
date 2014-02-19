@@ -2,8 +2,9 @@ package cz.clovekvtisni.coordinator.server.service.impl;
 
 import cz.clovekvtisni.coordinator.SecretInfo;
 import cz.clovekvtisni.coordinator.server.service.EmailService;
+import cz.clovekvtisni.coordinator.server.util.SecretInfoServerSide;
 import cz.clovekvtisni.coordinator.server.util.TemplateTool;
-import cz.clovekvtisni.coordinator.util.SignatureTool;
+import cz.clovekvtisni.coordinator.server.util.SignatureTool;
 import org.springframework.stereotype.Service;
 
 import javax.mail.Message;
@@ -47,7 +48,7 @@ public class EmailServiceImpl extends AbstractServiceImpl implements EmailServic
 
         try {
             MimeMessage msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress(SecretInfo.EMAIL_FROM));
+            msg.setFrom(new InternetAddress(SecretInfoServerSide.EMAIL_FROM));
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             msg.setSubject(subject, "UTF-8");
 
@@ -78,7 +79,7 @@ public class EmailServiceImpl extends AbstractServiceImpl implements EmailServic
 
     protected Map<String, Object> buildTemplateContext(String emailTo) throws UnsupportedEncodingException {
         Map<String, Object> context = new HashMap<String, Object>();
-        context.put("fromEmail", SecretInfo.EMAIL_FROM);
+        context.put("fromEmail", SecretInfoServerSide.EMAIL_FROM);
         context.put("urlRoot", System.getProperty("cz.clovekvtisni.coordinator.urlRoot"));
         StringBuffer sb = new StringBuffer();
         sb.append(System.getProperty("cz.clovekvtisni.coordinator.urlRoot"));

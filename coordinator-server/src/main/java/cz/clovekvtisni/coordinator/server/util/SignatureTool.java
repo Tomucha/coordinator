@@ -1,6 +1,5 @@
-package cz.clovekvtisni.coordinator.util;
+package cz.clovekvtisni.coordinator.server.util;
 
-import cz.clovekvtisni.coordinator.SecretInfo;
 import cz.clovekvtisni.coordinator.domain.CanBeSigned;
 
 import java.io.UnsupportedEncodingException;
@@ -53,7 +52,7 @@ public class SignatureTool {
 	
 
 	public static String sign(Object what) {
-		String whatToSign = ""+what+ SecretInfo.SECRET_SIGNATURE_KEY;
+		String whatToSign = ""+what+ SecretInfoServerSide.SECRET_SEED;
 		String digest = md5Digest(whatToSign);
 		String whatToSignForSecondTime = digest.substring(5,19);
 		return md5Digest(whatToSignForSecondTime).substring(8,18).toUpperCase();

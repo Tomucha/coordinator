@@ -8,6 +8,7 @@ import cz.clovekvtisni.coordinator.server.domain.PoiEntity;
 import cz.clovekvtisni.coordinator.server.domain.UserEntity;
 import cz.clovekvtisni.coordinator.server.service.NotificationService;
 import cz.clovekvtisni.coordinator.server.service.UserService;
+import cz.clovekvtisni.coordinator.server.util.SecretInfoServerSide;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class NotificationServiceImp extends AbstractServiceImpl implements Notif
     private Sender sender;
 
     public NotificationServiceImp() {
-        sender = new Sender(SecretInfo.GCM_API_KEY);
+        sender = new Sender(SecretInfoServerSide.GCM_API_KEY);
     }
 
     @Override
