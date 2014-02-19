@@ -30,4 +30,9 @@ coordinator-android/.settings/org.eclipse.m2e.core.prefs
 
 # Java file with secret info like passwords ad API keys
 SecretInfo.java
+SecretInfoServerSide.java
+DeployEnvironment.java
+
 coordinator-android/project.properties
+
+
