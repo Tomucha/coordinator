@@ -35,4 +35,5 @@ DeployEnvironment.java
 
 coordinator-android/project.properties
 
+coordinator-server/src/main/webapp/coordinator-android.apk
 
