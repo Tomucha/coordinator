@@ -53,7 +53,7 @@ public class MainActivity extends BaseActivity {
         GCMRegistrar.checkManifest(this);
         String regId = GCMRegistrar.getRegistrationId(this);
         if (regId.equals("")) {
-            Lg.GCM.i("Going to register.");
+            Lg.GCM.i("Going to register: "+SecretInfo.GCM_SENDER_ID);
             GCMRegistrar.register(this, SecretInfo.GCM_SENDER_ID);
         } else {
             Lg.GCM.i("Already registered to GCM");
