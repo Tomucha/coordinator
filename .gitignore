@@ -32,6 +32,7 @@ coordinator-android/.settings/org.eclipse.m2e.core.prefs
 SecretInfo.java
 SecretInfoServerSide.java
 DeployEnvironment.java
+appengine-web.xml
 
 coordinator-android/project.properties
 
