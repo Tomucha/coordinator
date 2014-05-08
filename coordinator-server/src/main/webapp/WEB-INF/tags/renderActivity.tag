@@ -22,7 +22,7 @@ to "${activity.poiEntity.workflow.stateMap[activity.params[1]].name}"
     <c:if test="${not empty activity.comment}">
         <i><c:out value="${activity.comment}"/></i><br/>
     </c:if>
-    <fmt:formatDate type="both" value="${activity.changeDate}" dateStyle="short" timeStyle="short"/>
+    <fmt:formatDate value="${activity.changeDate}" pattern="d.M.yy H:mm" timeZone="CET"/>
     <s:message code="activity.author"/>
     <a href="<s:url value="${root}/admin/event/user/edit?eventId=${activity.poiEntity.eventId}&userId=${activity.changedByEntity.id}"/>"><c:out value="${activity.changedByEntity.fullName}"/></a>
 </small>

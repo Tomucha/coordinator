@@ -3,11 +3,12 @@ package cz.clovekvtisni.coordinator.android.api;
 import com.fhucho.android.workers.Loader;
 
 import cz.clovekvtisni.coordinator.android.api.ApiCache.Item;
+import cz.clovekvtisni.coordinator.android.other.Settings;
 import cz.clovekvtisni.coordinator.android.util.Lg;
-import cz.clovekvtisni.coordinator.android.util.UiTool;
 import cz.clovekvtisni.coordinator.android.util.Utils;
 import cz.clovekvtisni.coordinator.api.request.RequestParams;
 import cz.clovekvtisni.coordinator.api.response.ApiResponseData;
+import cz.clovekvtisni.coordinator.exception.ErrorCode;
 
 import java.net.SocketException;
 
@@ -22,14 +23,16 @@ public abstract class ApiLoader<RQ extends RequestParams, RP extends ApiResponse
 		super(typeOfListener);
 		this.apiCall = apiCall;
 	}
-	
-	// FIXME
-	private volatile boolean reload = false;
 
 	@Override
-	protected synchronized void doInBackground() {
-        ApiCache cache = ApiCache.getInstance();
-        Item<RP> item = cache.get(apiCall.getCacheKey(), apiCall.getResponseClass());
+	protected synchronized void doInBackground(boolean reload) {
+		Lg.API_LOADER.i("Starting loader "+this+", reload="+reload);
+
+		ApiCache cache = ApiCache.getInstance();
+        Item<RP> item = null;
+		if (!reload) {
+			item = cache.get(apiCall.getCacheKey(), apiCall.getResponseClass());
+		}
 
         boolean tooOld = false;
 		try {
@@ -80,16 +83,6 @@ public abstract class ApiLoader<RQ extends RequestParams, RP extends ApiResponse
 		if (result != null) result.sendToListener();
 	}
 
-	public void reload() {
-		reload = true;
-        // FIXME: no tak startovat furt novy thready, to teda nevim
-		new Thread() {
-			public void run() {
-				doInBackground();
-			};
-		}.start();
-	}
-
 	private class Result {
 		private final Exception exception;
 		private final RP response;
@@ -107,13 +100,22 @@ public abstract class ApiLoader<RQ extends RequestParams, RP extends ApiResponse
 		private void sendToListener() {
 			if (response != null) getListenerProxy().onResult(response);
 			if (exception != null) {
+				Lg.API_LOADER.e("Loader generated exception: "+exception);
                 Throwable cause = Utils.findExceptionCause(exception);
+				Lg.API_LOADER.e("Cause is: "+cause);
 
                 if (cause instanceof java.net.UnknownHostException) {
                     getListenerProxy().onInternetException(exception);
 
                 } else if (cause instanceof SocketException) {
                     getListenerProxy().onInternetException(exception);
+
+                } else if (cause instanceof ApiCall.ApiServerSideException) {
+                    if (((ApiCall.ApiServerSideException)cause).getCode() == ErrorCode.WRONG_AUTH_KEY) {
+	                    // logout
+	                    Settings.setAuthKey(null);
+                    }
+	                getListenerProxy().onServerSideException((ApiCall.ApiServerSideException) cause);
 
                 } else {
                     // ok, this really should not happen, let Crittercism handle this
@@ -126,6 +128,7 @@ public abstract class ApiLoader<RQ extends RequestParams, RP extends ApiResponse
     public static interface Listener<RP> {
 		public void onResult(RP result);
 		public void onInternetException(Exception e);
-	}
+	    public void onServerSideException(ApiCall.ApiServerSideException e);
+    }
 
 }

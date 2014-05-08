@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**
@@ -31,7 +32,13 @@ public class LoginController extends AbstractSuperadminController {
     private UserService userService;
 
     @RequestMapping(method = RequestMethod.GET)
-    public String show(Model model, @RequestParam(value = "retUrl", required = false) String retUrl) {
+    public String show(Model model, @RequestParam(value = "retUrl", required = false) String retUrl, HttpServletRequest request) {
+	    String root = System.getProperty("cz.clovekvtisni.coordinator.urlRoot");
+	    logger.info("Expected root: "+root);
+	    if (!request.isSecure() && root.startsWith("https") && !request.getServerName().equals("localhost")) {
+		    // we should redirect
+		    return "redirect:"+root+"/login";
+	    }
         LoginForm form = new LoginForm();
         form.retUrl = retUrl;
         model.addAttribute("user", form);

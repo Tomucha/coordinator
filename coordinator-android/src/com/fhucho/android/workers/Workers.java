@@ -11,21 +11,32 @@ public class Workers {
 	}
 
 	public static <L> Loader<L> load(Loader<L> loaderPrototype, L listener, FragmentActivity activity) {
+		return load(loaderPrototype, listener, activity, false);
+	}
+
+	public static <L> Loader<L> load(Loader<L> loaderPrototype, L listener, FragmentActivity activity, boolean reload) {
 		Utils.checkOnUiThread();
 		
 		WorkersFragment frag = Workers.getOrCreateFragment(activity);
 
 		Loader<L> equivalentLoader = frag.findEquivalentLoader(loaderPrototype);
+
 		Loader<L> loader = null;
+		loader = loaderPrototype;
+		frag.addLoader(loader);
+		loader.setListener(listener);
+		loader.start(reload);
+
+		/*
 		if (equivalentLoader == null) {
 			loader = loaderPrototype;
 			frag.addLoader(loader);
-			loader.start();
+			loader.start(reload);
 		} else {
 			loader = equivalentLoader;
 		}
-
 		loader.setListener(listener);
+		*/
 
 		return loader;
 	}

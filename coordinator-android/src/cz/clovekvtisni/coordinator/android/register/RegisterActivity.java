@@ -167,7 +167,12 @@ public class RegisterActivity extends SherlockFragmentActivity implements PageFr
                 Lg.API.e("Cannot load config: "+e, e);
                 UiTool.toast(R.string.error_no_internet, getApplicationContext());
 			}
-		}, this);
+			@Override
+			public void onServerSideException(ApiCall.ApiServerSideException e) {
+				UiTool.toast(R.string.error_server, getApplicationContext());
+			}
+
+		}, this, true);
 	}
 
 	@Override

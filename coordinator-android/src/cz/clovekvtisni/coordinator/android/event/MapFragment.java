@@ -224,6 +224,10 @@ public class MapFragment extends SherlockFragment implements OsmMapView.OsmMapEv
 		case R.id.menu_filter_people:
             ((EventActivity) getActivity()).showPeopleFilterDialog();
 			break;
+		case R.id.menu_sync:
+			Lg.MAP.i("Reload!");
+			((EventActivity)getActivity()).loadPois(true);
+			break;
 		}
 		return true;
 	}

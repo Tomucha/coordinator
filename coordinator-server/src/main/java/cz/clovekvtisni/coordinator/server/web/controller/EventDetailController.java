@@ -44,6 +44,9 @@ public class EventDetailController extends AbstractEventController {
     public String getForm(@ModelAttribute("params") EventFilterParams params, Model model) {
 
         UserEntity user = getLoggedUser();
+	    if (user.getOrganizationId() == null) {
+		    throw new IllegalStateException("User is not in any organization");
+	    }
 
         if (params.getEventId() != null) {
             OrganizationInEventEntity registration = organizationInEventService.findEventInOrganization(params.getEventId(), user.getOrganizationId(), OrganizationInEventService.FLAG_FETCH_EVENT);
@@ -75,6 +78,7 @@ public class EventDetailController extends AbstractEventController {
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid OrganizationInEventForm form, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
+	        logger.info("Validation errors: "+bindingResult.getAllErrors());
 
             //
             // populateEventModel(model, new EventFilterParams(loadEventById(form.getEventKey())));
@@ -102,7 +106,8 @@ public class EventDetailController extends AbstractEventController {
 
     protected void populateModel(Model model) {
         UserEntity loggedUser = getLoggedUser();
-        if (loggedUser.getOrganizationId() == null) return;
+        if (loggedUser.getOrganizationId() == null) throw new IllegalStateException("User isn't in organization");
+
         OrganizationInEventFilter filter = new OrganizationInEventFilter();
         filter.setOrganizationIdVal(loggedUser.getOrganizationId());
         List<EventEntity> inEvents = eventService.findByOrganizationFilter(filter, 0, null, 0l).getResult();
@@ -112,7 +117,6 @@ public class EventDetailController extends AbstractEventController {
             if (!inEvents.contains(event))
                 result.add(event);
         }
-
         model.addAttribute("eventList", result);
     }
 }

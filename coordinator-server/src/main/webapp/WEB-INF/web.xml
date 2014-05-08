@@ -80,7 +80,7 @@
             <url-pattern>/api/v1/secure/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
-            <roleId-name>admin</roleId-name>
+            <role-name>admin</role-name>
         </auth-constraint>
     </security-constraint>
 

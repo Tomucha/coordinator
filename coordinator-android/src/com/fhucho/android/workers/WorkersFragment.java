@@ -9,11 +9,11 @@ import android.support.v4.app.Fragment;
 public class WorkersFragment extends Fragment {
 	public static final String TAG = "WorkersFragment";
 
-	private Set<Loader<?>> loaders = new HashSet<Loader<?>>();
+	//private Set<Loader<?>> loaders = new HashSet<Loader<?>>();
 	private Set<ActivityWorker<?, ?>> tasks = new HashSet<ActivityWorker<?, ?>>();
 
 	public void addLoader(Loader<?> loader) {
-		loaders.add(loader);
+		// loaders.add(loader);
 	}
 
 	public void addTask(ActivityWorker<?, ?> task) {
@@ -21,6 +21,7 @@ public class WorkersFragment extends Fragment {
 	}
 
 	public <T> Loader<T> findEquivalentLoader(Loader<T> loader) {
+		/*
 		for (Loader<?> l : loaders) {
 			if (loader.getTypeOfL().equals(l.getTypeOfL())) {
 				@SuppressWarnings("unchecked")
@@ -30,7 +31,7 @@ public class WorkersFragment extends Fragment {
 				}
 			}
 		}
-
+        */
 		return null;
 	}
 	
@@ -55,9 +56,11 @@ public class WorkersFragment extends Fragment {
 	@Override
 	public void onDetach() {
 		super.onDetach();
+		/*
 		for (Loader<?> loader : loaders) {
 			loader.onDetach();
 		}
+		*/
 		for (ActivityWorker<?, ?> task : tasks) {
 			task.onDetach();
 		}

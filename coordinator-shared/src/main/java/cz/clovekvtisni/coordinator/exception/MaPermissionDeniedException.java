@@ -23,6 +23,10 @@ public class MaPermissionDeniedException extends MaException {
         return new MaPermissionDeniedException(ErrorCode.PERMISSION_DENIED);
     }
 
+	public static MaPermissionDeniedException wrongAuthKey() {
+		return new MaPermissionDeniedException(ErrorCode.WRONG_AUTH_KEY);
+	}
+
     public static MaPermissionDeniedException registrationNotAllowed() {
         return new MaPermissionDeniedException(ErrorCode.REGISTRATION_NOT_ALLOWED);
     }

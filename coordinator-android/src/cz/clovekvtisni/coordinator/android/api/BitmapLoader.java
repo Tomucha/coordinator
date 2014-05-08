@@ -44,7 +44,7 @@ public class BitmapLoader extends Loader<BitmapLoader.Listener> {
 	}
 
 	@Override
-	protected void doInBackground() {
+	protected void doInBackground(boolean reload) {
 		InputStream is = null;
 		try {
 			DiskCache cache = getOrCreateDiskCache();

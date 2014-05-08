@@ -135,7 +135,7 @@ public abstract class AbstractApiController {
                 appContext.setLoggedUser(userService.getByAuthKey(authKey));
                 if (appContext.getLoggedUser() == null) {
                     logger.error("unknown auth key {}", authKey);
-                    throw MaPermissionDeniedException.permissionDenied();
+                    throw MaPermissionDeniedException.wrongAuthKey();
                 }
                 if (params != null && params instanceof EventRequestParams) {
                     final Long eventId = ((EventRequestParams) params).getEventId();

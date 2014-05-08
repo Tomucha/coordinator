@@ -86,6 +86,12 @@ public class MainActivity extends BaseActivity {
                 UiTool.toast(R.string.error_no_internet, getApplicationContext());
                 finish();
             }
+	        @Override
+	        public void onServerSideException(ApiCall.ApiServerSideException e) {
+		        UiTool.toast(R.string.error_server, getApplicationContext());
+		        finish();
+	        }
+
         }, this);
     }
 

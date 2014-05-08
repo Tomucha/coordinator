@@ -30,10 +30,12 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.fhucho.android.workers.Workers;
+import com.fhucho.android.workers.WorkingIndicator;
 import com.fhucho.android.workers.simple.ActivityWorker2;
 import com.google.common.collect.Lists;
 
 import cz.clovekvtisni.coordinator.android.R;
+import cz.clovekvtisni.coordinator.android.api.ApiCall;
 import cz.clovekvtisni.coordinator.android.api.ApiCall.ApiCallException;
 import cz.clovekvtisni.coordinator.android.api.ApiCalls.UserUpdatePositionCall;
 import cz.clovekvtisni.coordinator.android.api.ApiLoader;
@@ -65,7 +67,7 @@ import cz.clovekvtisni.coordinator.domain.config.PoiCategory;
 import cz.clovekvtisni.coordinator.domain.config.Workflow;
 import cz.clovekvtisni.coordinator.domain.config.WorkflowState;
 
-public class EventActivity extends SherlockFragmentActivity implements LocationTool.Listener {
+public class EventActivity extends SherlockFragmentActivity implements LocationTool.Listener, WorkingIndicator {
 
 	private Event event;
     private UserInEvent userInEvent;
@@ -228,6 +230,11 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 
 	public void loadPois(boolean reload) {
         Lg.APP.i("Loading POIs");
+		setWorking(true);
+
+		pois = new Poi[0];
+		updateFilteredPois();
+
 		EventPoiListRequestParams params = new EventPoiListRequestParams();
 		params.setEventId(event.getId());
 		params.setModifiedFrom(new Date(0));
@@ -237,18 +244,19 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
                 pois = result.getPois();
                 updateImportantPois();
                 updateFilteredPois();
+	            setWorking(false);
             }
-
             @Override
             public void onInternetException(Exception e) {
                 UiTool.toast(R.string.error_no_internet, getApplicationContext());
+	            setWorking(false);
             }
-        }, this);
-        if (zoomToPoi != null || reload) {
-            // FIXME: pokud byl loader prave vytvoren, pusti se load 2x
-            Lg.APP.i("Reload required POIs");
-            loader.reload();
-        }
+			@Override
+			public void onServerSideException(ApiCall.ApiServerSideException e) {
+				UiTool.toast(R.string.error_server, getApplicationContext());
+				setWorking(false);
+			}
+		}, this, reload);
 	}
 
 	private void loadPoiIcons() {
@@ -275,18 +283,27 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 	}
 
 	private void loadPoiCategories() {
+		setWorking(true);
 		Workers.load(new ConfigLoader(), new ConfigLoaderListener() {
 			@Override
 			public void onResult(ConfigResponse result) {
 				poiCategories = result.getPoiCategoryList();
 				onPoiCategoriesLoaded(poiCategories);
                 config = result;
+				setWorking(false);
 			}
 
 			@Override
 			public void onInternetException(Exception e) {
                 UiTool.toast(R.string.error_no_internet, getApplicationContext());
+				setWorking(false);
                 finish();
+			}
+			@Override
+			public void onServerSideException(ApiCall.ApiServerSideException e) {
+				UiTool.toast(R.string.error_server, getApplicationContext());
+				setWorking(false);
+				finish();
 			}
 		}, this);
 	}
@@ -308,6 +325,11 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
                 UiTool.toast(R.string.error_no_internet, getApplicationContext());
                 finish();
 			}
+			@Override
+			public void onServerSideException(ApiCall.ApiServerSideException e) {
+				UiTool.toast(R.string.error_server, getApplicationContext());
+				finish();
+			}
 		}, this);
 	}
 
@@ -319,7 +341,7 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
 			poiFilter.put(category, true);
 		}
 
-		loadPois(false);
+		loadPois(true);
 		loadPoiIcons();
 	}
 
@@ -745,4 +767,28 @@ public class EventActivity extends SherlockFragmentActivity implements LocationT
     public UserInEvent getUserInEvent() {
         return userInEvent;
     }
+
+
+	private int workingCount = 0;
+
+	ProgressDialog openedDialog = null;
+
+	@Override
+	public void setWorking(boolean working) {
+		if (working) {
+			workingCount++;
+		} else {
+			workingCount--;
+		}
+		if (workingCount > 0 && openedDialog == null) {
+			openedDialog = ProgressDialog.show(this, getString(R.string.progress_title),  getString(R.string.progress_message));
+		} else if (workingCount == 0 && openedDialog != null) {
+			openedDialog.dismiss();
+			openedDialog = null;
+		}
+	}
+
+	public boolean isWorking() {
+		return workingCount > 0;
+	}
 }

@@ -9,7 +9,7 @@ package cz.clovekvtisni.coordinator.exception;
 public enum ErrorCode {
     INTERNAL,
     NOT_FOUND,
-    WRONG_SIGNATURE,
+	WRONG_AUTH_KEY,
     WRONG_CREDENTIALS,
     PERMISSION_DENIED,
     PARSE_JSON,

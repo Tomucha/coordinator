@@ -26,6 +26,7 @@ import com.fhucho.android.workers.Workers;
 import com.google.android.gcm.GCMRegistrar;
 import cz.clovekvtisni.coordinator.android.BaseActivity;
 import cz.clovekvtisni.coordinator.android.R;
+import cz.clovekvtisni.coordinator.android.api.ApiCall;
 import cz.clovekvtisni.coordinator.android.api.ApiLoader;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders;
 import cz.clovekvtisni.coordinator.android.api.ApiLoaders.EventRegisteredLoader;
@@ -146,12 +147,19 @@ public class OrganizationActivity extends BaseActivity {
 	private void loadEvents() {
 		EventFilterRequestParams params = new EventFilterRequestParams();
 		params.setOrganizationId(organization.getId());
+		setWorking(true);
 
 		Workers.load(new EventRegisteredLoader(params), new EventRegisteredLoaderListener() {
 			@Override
 			public void onInternetException(Exception e) {
                 UiTool.toast(R.string.error_no_internet, getApplicationContext());
+				setWorking(false);
             }
+			@Override
+			public void onServerSideException(ApiCall.ApiServerSideException e) {
+				UiTool.toast(R.string.error_server, getApplicationContext());
+				setWorking(false);
+			}
 
 			@Override
 			public void onResult(EventFilterResponseData result) {
@@ -162,8 +170,9 @@ public class OrganizationActivity extends BaseActivity {
 				if (orgInEvents == null) orgInEvents = new OrganizationInEvent[0];
 
 				onEventsLoaded(userInEvents, orgInEvents);
+				setWorking(false);
 			}
-		}, this);
+		}, this, true);
 	}
 
 	@Override
@@ -177,6 +186,10 @@ public class OrganizationActivity extends BaseActivity {
                 public void onInternetException(Exception e) {
                     UiTool.toast(R.string.error_no_internet, getApplicationContext());
                 }
+	            @Override
+	            public void onServerSideException(ApiCall.ApiServerSideException e) {
+		            UiTool.toast(R.string.error_server, getApplicationContext());
+	            }
 
                 @Override
                 public void onResult(EventFilterResponseData result) {
@@ -188,8 +201,7 @@ public class OrganizationActivity extends BaseActivity {
 
                     onEventsLoaded(userInEvents, orgInEvents);
                 }
-            }, this);
-            loader.reload();
+            }, this, true);
 		}
 	}
 

@@ -345,7 +345,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
         if (transition == null)
             throw new IllegalArgumentException("no transition=" + transitionId + " in workflow state=" + entity.getWorkflowStateId());
 
-        return ofy().transact(new Work<PoiEntity>() {
+        PoiEntity updated = ofy().transact(new Work<PoiEntity>() {
             @Override
             public PoiEntity run() {
                 PoiEntity entityF;
@@ -383,7 +383,6 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 a.setParams(new String[] { transition.getFromStateId(), transition.getToStateId() });
                 activityService.log(a);
 
-
                 // FIXME: prepsat na onBeforeCallBack
                 if (transition.isForcesSingleAssignee() && (FLAG_DISABLE_FORCE_SINGLE_ASSIGN & flags) == 0) {
                     UserEntity loggedUser = appContext.getLoggedUser();
@@ -393,5 +392,11 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 return updated;
             }
         });
+
+	    for (Long userId : updated.getUserIdList()) {
+		    notificationService.sendPoiNotification(NotificationType.WORKFLOW_CHANGED, updated, userId);
+	    }
+
+	    return updated;
     }
 }

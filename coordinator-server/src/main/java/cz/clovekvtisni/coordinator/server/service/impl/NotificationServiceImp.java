@@ -32,8 +32,11 @@ public class NotificationServiceImp extends AbstractServiceImpl implements Notif
     @Override
     public void sendPoiNotification(NotificationType type, PoiEntity poi, Long receiverUserId) {
         UserEntity receiver = userService.findById(receiverUserId, 0l);
-        if (receiver == null || receiver.getPushTokensAndroid() == null || receiver.getPushTokensAndroid().size() == 0)
+	    logger.info("Sending push notification to "+receiver+" about "+poi);
+        if (receiver == null || receiver.getPushTokensAndroid() == null || receiver.getPushTokensAndroid().size() == 0) {
+	        logger.info("... user has not GCM tokens");
             return;
+        }
         Message.Builder builder = new Message.Builder();
 
         // TODO odprasit tady ty stringy, pouzivaji se i v Androidu v cz.clovekvtisni.coordinator.android.GCMIntentService

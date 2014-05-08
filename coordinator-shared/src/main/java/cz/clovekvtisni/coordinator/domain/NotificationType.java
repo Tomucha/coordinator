@@ -1,5 +1,5 @@
 package cz.clovekvtisni.coordinator.domain;
 
 public enum NotificationType {
-    ASSIGN, UNASSIGN
+    ASSIGN, UNASSIGN, WORKFLOW_CHANGED
 }

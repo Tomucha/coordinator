@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import cz.clovekvtisni.coordinator.android.CoordinatorApplication;
 
 public class Settings {
+
 	private static final String KEY_AUTH_KEY = "authKey";
 	private static final String KEY_GCM_REGISTRATION_ID = "gcmRegId";
 	private static final String KEY_PREFIX_PRELOADED = "preloaded";

@@ -10,7 +10,7 @@
 
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/classes/logging.properties" />
-        <property name="cz.clovekvtisni.coordinator.urlRoot" value="http://coordinator-test.appspot.com/"/>
+        <property name="cz.clovekvtisni.coordinator.urlRoot" value="https://coordinator-test.appspot.com/"/>
     </system-properties>
 
     <sessions-enabled>true</sessions-enabled>

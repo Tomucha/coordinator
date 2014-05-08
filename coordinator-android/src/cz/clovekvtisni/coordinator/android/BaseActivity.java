@@ -1,6 +1,7 @@
 package cz.clovekvtisni.coordinator.android;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -39,6 +40,8 @@ public class BaseActivity extends SherlockFragmentActivity implements WorkingInd
 
     private int workingCount = 0;
 
+	ProgressDialog openedDialog = null;
+
     @Override
     public void setWorking(boolean working) {
         if (working) {
@@ -46,12 +49,11 @@ public class BaseActivity extends SherlockFragmentActivity implements WorkingInd
         } else {
             workingCount--;
         }
-        if (workingCount > 0) {
-            setSupportProgressBarIndeterminate(true);
-            setSupportProgressBarIndeterminateVisibility(true);
-        } else {
-            setSupportProgressBarIndeterminate(false);
-            setSupportProgressBarIndeterminateVisibility(false);
+        if (workingCount > 0 && openedDialog == null) {
+	        openedDialog = ProgressDialog.show(this, getString(R.string.progress_title),  getString(R.string.progress_message));
+        } else if (workingCount == 0 && openedDialog != null) {
+	        openedDialog.dismiss();
+	        openedDialog = null;
         }
     }
 

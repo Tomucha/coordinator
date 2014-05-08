@@ -168,6 +168,9 @@ public class GCMIntentService extends GCMBaseIntentService {
         } else if (NotificationType.UNASSIGN.toString().equals(type)) {
             mBuilder.setContentText(getString(R.string.notification_unassigned));
 
+        } else if (NotificationType.WORKFLOW_CHANGED.toString().equals(type)) {
+	        mBuilder.setContentText(getString(R.string.notification_workflow_changed));
+
         } else {
             mBuilder.setContentText(getString(R.string.notification_unknown));
         }

@@ -83,7 +83,7 @@ public class EmailServiceImpl extends AbstractServiceImpl implements EmailServic
         context.put("urlRoot", System.getProperty("cz.clovekvtisni.coordinator.urlRoot"));
         StringBuffer sb = new StringBuffer();
         sb.append(System.getProperty("cz.clovekvtisni.coordinator.urlRoot"));
-        sb.append("tools/unsubscribe");
+        sb.append("/tools/unsubscribe");
         sb.append("?email="+ URLEncoder.encode(emailTo, "UTF-8"));
         sb.append("&signature=" + URLEncoder.encode(buildUnsubscribeSignature(emailTo), "UTF-8"));
 

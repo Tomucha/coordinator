@@ -22,7 +22,7 @@ public abstract class Loader<L> {
 				new Class<?>[] { typeOfL }, invocationHandler));
 	}
 
-	protected abstract void doInBackground();
+	protected abstract void doInBackground(boolean reload);
 
 	protected abstract boolean isEquivalentTo(Loader<?> other);
 
@@ -45,10 +45,10 @@ public abstract class Loader<L> {
 		onListenerAdded();
 	}
 
-	void start() {
+	void start(final boolean reload) {
 		new Thread() {
 			public void run() {
-                doInBackground();
+                doInBackground(reload);
 			};
 		}.start();
 	}
