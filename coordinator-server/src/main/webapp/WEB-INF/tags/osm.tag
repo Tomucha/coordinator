@@ -19,7 +19,7 @@
     }
 </style>
 <!--<script type="text/javascript" src="${root}/js/osm/OpenLayers.js"></script>-->
-<script type="text/javascript" src="http://openlayers.org/api/OpenLayers.js"></script>
+<script type="text/javascript" src="${root}/js/OpenLayers.js"></script>
 <script type="text/javascript" src="${root}/js/openlayers-plugin.js"></script>
 
 
