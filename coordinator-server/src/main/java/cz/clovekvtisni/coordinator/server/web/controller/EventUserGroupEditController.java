@@ -10,6 +10,7 @@ import cz.clovekvtisni.coordinator.server.tool.objectify.UniqueKeyViolation;
 import cz.clovekvtisni.coordinator.server.web.model.EventFilterParams;
 import cz.clovekvtisni.coordinator.server.web.model.PoiForm;
 import cz.clovekvtisni.coordinator.server.web.model.UserGroupForm;
+import cz.clovekvtisni.coordinator.util.ValueTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -62,7 +63,7 @@ public class EventUserGroupEditController extends AbstractEventController {
 
     @RequestMapping(method = RequestMethod.POST)
     public String createOrUpdate(@ModelAttribute("form") @Valid UserGroupForm form, BindingResult bindingResult, Model model) {
-        if (form.getRetUrl() == null) {
+        if (ValueTool.isEmpty(form.getRetUrl())) {
             form.setRetUrl("/admin/event/user/list");
         }
 

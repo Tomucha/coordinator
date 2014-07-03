@@ -87,7 +87,7 @@ public class EventPoiListController extends AbstractEventController {
             }
         }
 
-        return "redirect: /admin/event/poi/list?eventId=" + selection.getEventId();
+        return "redirect:/admin/event/poi/list?eventId=" + selection.getEventId();
     }
 
     @ModelAttribute("selectedPoiActions")
