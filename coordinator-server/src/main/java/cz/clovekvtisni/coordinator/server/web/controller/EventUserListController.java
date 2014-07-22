@@ -45,9 +45,11 @@ public class EventUserListController extends AbstractEventController {
     @RequestMapping(method = RequestMethod.GET)
     public String listUsers(@ModelAttribute("params") EventFilterParams params, Model model, HttpSession session) {
 
+	    String filterSessionKey = "userListFilter"+params.getEventId();
+
         boolean sentByUser = params.isSentByUser();
-        if (!sentByUser && session.getAttribute("userListFilter")!=null) {
-            params = (EventFilterParams) session.getAttribute("userListFilter");
+        if (!sentByUser && session.getAttribute(filterSessionKey)!=null) {
+            params = (EventFilterParams) session.getAttribute(filterSessionKey);
         }
 
         UserInEventFilter inEventFilter = new UserInEventFilter();
@@ -67,7 +69,7 @@ public class EventUserListController extends AbstractEventController {
 
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
 
-        session.setAttribute("userListFilter", params);
+        session.setAttribute(filterSessionKey, params);
         if (!sentByUser) {
             model.addAttribute("params", params);
         }
@@ -94,7 +96,6 @@ public class EventUserListController extends AbstractEventController {
         List<Long> userIds = selection.getSelectedUsers();
         SelectedUserAction action = selection.getSelectedAction();
         if (userIds != null && userIds.size() > 0 && action != null)  {
-
             switch (action) {
                 case EXPEL:
                 case CONFIRM:
@@ -134,7 +135,6 @@ public class EventUserListController extends AbstractEventController {
                     }
                     break;
 */
-
                 case ADD_TO_GROUP:
                     Long groupId = selection.getGroupId();
                     if (groupId != null) {
@@ -146,7 +146,6 @@ public class EventUserListController extends AbstractEventController {
                     break;
             }
         }
-
         return "redirect:/admin/event/user/list?eventId=" + selection.getEventId();
     }
 
