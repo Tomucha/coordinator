@@ -484,6 +484,7 @@
     <input type="text" id="address-search"
            class="search-query" placeholder="<s:message code="label.searchAddress"/>"
            onkeypress="if (event.keyCode == 13) searchAddress($(this).val(), $(this))"/>
+    <button onclick="searchAddress($('#address-search').val(), $('#address-search'))">GO</button>
 </p>
 
 <div id="mapContainer" class="well"></div>
