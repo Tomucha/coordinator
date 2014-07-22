@@ -148,6 +148,8 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 if (w != null) {
                     a.setId(null); // let's insert once again
                     a.setType(ActivityEntity.ActivityType.WORKFLOW_START);
+	                a.setWorkflowId(entity.getWorkflowId());
+	                a.setWorkflowStateId(entity.getWorkflowStateId());
                     activityService.log(a);
                 }
 
@@ -166,11 +168,33 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
             public PoiEntity run() {
                 PoiEntity old = ofy().get(entity.getKey());
                 updateSystemFields(entity, old);
-                entity.setWorkflowId(old.getWorkflowId());
 
-                entity.setVisibleForRole(authorizationTool.findRolesWithReadPermission(entity));
+	            if (old.getPoiCategoryId().equals(entity.getPoiCategoryId())) {
+	                entity.setWorkflowId(old.getWorkflowId());
+		            // nedavat sem state ID metoda se pouziva i pro WF posun
 
-                Workflow workflow = config.getWorkflowMap().get(old.getWorkflowId());
+	            } else {
+		            // zmenila se kategorie
+		            PoiCategory cat = config.getPoiCategoryMap().get(entity.getPoiCategoryId());
+		            Workflow newW = config.getWorkflowMap().get(cat.getWorkflowId());
+		            if (newW == null) {
+			            entity.setWorkflowId(null);
+			            entity.setWorkflowStateId(null);
+		            } else {
+		                entity.setWorkflow(newW);
+		                entity.setWorkflowState(newW.getStartState());
+			            ActivityEntity a = new ActivityEntity();
+			            a.setPoiId(entity.getId());
+			            a.setEventId(entity.getEventId());
+			            a.setWorkflowId(newW.getId());
+			            a.setWorkflowStateId(newW.getStartState().getId());
+			            a.setType(ActivityEntity.ActivityType.WORKFLOW_START);
+			            activityService.log(a);
+		            }
+	            }
+
+	            entity.setVisibleForRole(authorizationTool.findRolesWithReadPermission(entity));
+                Workflow workflow = config.getWorkflowMap().get(entity.getWorkflowId());
                 if (workflow != null) {
                     entity.setPublicExport(
                             config.getPoiCategoryMap().get(entity.getPoiCategoryId()).isPublicExport() ? true :
@@ -337,6 +361,7 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
 
     @Override
     public PoiEntity transitWorkflowState(final PoiEntity entity, final String transitionId, final String comment, final long flags) {
+	    logger.info("Starting transition on "+entity+" to "+transitionId);
         if (entity == null || transitionId == null)
             return entity;
         if (entity.getWorkflowStateId() == null || entity.getWorkflowState().getTransitions() == null)
@@ -378,6 +403,8 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                 ActivityEntity a = new ActivityEntity();
                 a.setPoiId(updated.getId());
                 a.setEventId(updated.getEventId());
+	            a.setWorkflowId(workflow.getId());
+	            a.setWorkflowStateId(updated.getWorkflowStateId());
                 a.setType(ActivityEntity.ActivityType.WORKFLOW_TRANSITION);
                 a.setComment(comment);
                 a.setParams(new String[] { transition.getFromStateId(), transition.getToStateId() });
@@ -388,6 +415,8 @@ public class PoiServiceImpl extends AbstractServiceImpl implements PoiService {
                     UserEntity loggedUser = appContext.getLoggedUser();
                     updated = assignUserExclusive(updated, loggedUser.getId());
                 }
+
+	            logger.info("Finished transition "+updated+" is in "+updated.getWorkflowStateId());
 
                 return updated;
             }

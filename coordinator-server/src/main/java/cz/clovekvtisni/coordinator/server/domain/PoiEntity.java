@@ -237,6 +237,8 @@ public class PoiEntity extends AbstractPersistentEntity<Poi, PoiEntity> {
         this.workflowState = workflowState;
         if (workflowState != null) {
             this.workflowStateId = workflowState.getId();
+        } else {
+	        this.workflowStateId = null;
         }
     }
 

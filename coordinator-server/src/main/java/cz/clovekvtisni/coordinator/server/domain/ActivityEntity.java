@@ -51,6 +51,10 @@ public class ActivityEntity implements CoordinatorEntity<ActivityEntity> {
 
     private String[] params;
 
+	private String workflowId;
+
+	private String workflowStateId;
+
     @Index
     private Date changeDate;
 
@@ -65,7 +69,6 @@ public class ActivityEntity implements CoordinatorEntity<ActivityEntity> {
 
     @Ignore
     private UserEntity changedByEntity;
-
 
     public ActivityEntity() {
     }
@@ -162,4 +165,20 @@ public class ActivityEntity implements CoordinatorEntity<ActivityEntity> {
     public void setUserEntity(UserEntity userEntity) {
         this.userEntity = userEntity;
     }
+
+	public String getWorkflowId() {
+		return workflowId;
+	}
+
+	public void setWorkflowId(String workflowId) {
+		this.workflowId = workflowId;
+	}
+
+	public String getWorkflowStateId() {
+		return workflowStateId;
+	}
+
+	public void setWorkflowStateId(String workflowStateId) {
+		this.workflowStateId = workflowStateId;
+	}
 }

@@ -13,8 +13,13 @@
 
 <s:message code="activity.${activity.type}"/>
 
+<%--@elvariable id="config" type="cz.clovekvtisni.coordinator.server.domain.CoordinatorConfig"--%>
 <c:if test="${activity.type eq 'WORKFLOW_TRANSITION'}">
-to "${activity.poiEntity.workflow.stateMap[activity.params[1]].name}"
+&#8594; "${config.workflowMap[activity.workflowId].stateMap[activity.workflowStateId].name}@${config.workflowMap[activity.workflowId].name}"
+</c:if>
+
+<c:if test="${activity.type eq 'WORKFLOW_START'}">
+&#8594; "${config.workflowMap[activity.workflowId].stateMap[activity.workflowStateId].name}@${config.workflowMap[activity.workflowId].name}"
 </c:if>
 
 <a href="<s:url value="${root}/admin/event/user/edit?eventId=${activity.poiEntity.eventId}&userId=${activity.userEntity.id}"/>"><c:out value="${activity.userEntity.fullName}"/></a><br/>
