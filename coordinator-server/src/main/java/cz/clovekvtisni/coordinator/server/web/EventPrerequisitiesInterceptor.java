@@ -8,13 +8,17 @@ import cz.clovekvtisni.coordinator.server.web.filter.ApplicationInitFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
+import java.util.Locale;
 
 /**
  *
@@ -35,6 +39,9 @@ public class EventPrerequisitiesInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     private AppContext appContext;
 
+	@Autowired
+	MessageSource source;
+
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (handler instanceof HandlerMethod) {
             Method method = ((HandlerMethod) handler).getMethod();
@@ -51,11 +58,11 @@ public class EventPrerequisitiesInterceptor extends HandlerInterceptorAdapter {
             logger.info("Event prerequisities are required, checking");
 
             if (appContext.getActiveOrganizationInEvent() == null) {
-                response.sendRedirect("/admin/event/detail?eventId="+appContext.getActiveEvent().getId());
+                response.sendRedirect("/admin/event/detail?eventId="+appContext.getActiveEvent().getId()+"&globalMessage="+URLEncoder.encode(source.getMessage("register.event.message", null, appContext.getLocale()), "UTF-8"));
                 return false;
             }
             if (appContext.getActiveUserInEvent() == null) {
-                response.sendRedirect("/admin/event/user/edit?eventId="+appContext.getActiveEvent().getId()+"&userId="+appContext.getLoggedUser().getId());
+                response.sendRedirect("/admin/event/user/edit?eventId="+appContext.getActiveEvent().getId()+"&userId="+appContext.getLoggedUser().getId()+"&globalMessage="+URLEncoder.encode(source.getMessage("register.user.message", null, appContext.getLocale()), "UTF-8"));
                 return false;
             }
             return true;

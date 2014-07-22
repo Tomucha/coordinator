@@ -56,6 +56,9 @@
                     </ul>
 
                     <div class="tabContent">
+                        <c:if test="${not empty param.globalMessage}">
+                            <c:set var="globalMessage" value="${param.globalMessage}"/>
+                        </c:if>
 
                         <c:if test="${not empty globalMessage}">
                             <p class="well"><span class="icon-warning-sign"></span><c:out value="${globalMessage}"/></p>
