@@ -117,6 +117,9 @@ public class EventFilterParams implements Serializable {
 
     public PoiFilter populatePoiFilter(PoiFilter filter) {
         filter.setEventIdVal(getEventId());
+	    if (getEventId() == null) {
+		    throw new IllegalArgumentException("eventId is mandatory");
+	    }
         if (!ValueTool.isEmpty(getWorkflowId())) {
             filter.setWorkflowIdVal(getWorkflowId());
         }

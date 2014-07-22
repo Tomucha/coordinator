@@ -37,9 +37,11 @@ public class EventPoiListController extends AbstractEventController {
     @RequestMapping(method = RequestMethod.GET)
     public String list(@ModelAttribute("poiListFilter") EventFilterParams params, @RequestParam(value = "bookmark", required = false) String bookmark, Model model, HttpSession session) {
 
+	    String filterSessionKey = "poiListFilter"+params.getEventId();
+
         boolean sentByUser = params.isSentByUser();
-        if (!sentByUser && session.getAttribute("poiListFilter")!=null) {
-            params = (EventFilterParams) session.getAttribute("poiListFilter");
+        if (!sentByUser && session.getAttribute(filterSessionKey)!=null) {
+            params = (EventFilterParams) session.getAttribute(filterSessionKey);
         }
 
         PoiFilter filter = new PoiFilter();
@@ -58,7 +60,7 @@ public class EventPoiListController extends AbstractEventController {
 
         model.addAttribute("userGroups", userGroupService.findByEventId(appContext.getActiveEvent().getId(), 0l));
 
-        session.setAttribute("poiListFilter", params);
+        session.setAttribute(filterSessionKey, params);
         if (!sentByUser) {
             model.addAttribute("poiListFilter", params);
         }
