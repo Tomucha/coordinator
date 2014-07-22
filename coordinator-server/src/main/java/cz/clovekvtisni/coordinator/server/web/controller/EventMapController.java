@@ -66,17 +66,22 @@ public class EventMapController extends AbstractEventController {
         HTTPResponse response = urlFetch.fetch(new URL(searchUrl));
         byte[] data = response.getContent();
 
-        JsonNode node = objectMapper.readTree(data);
+	    try {
+            JsonNode node = objectMapper.readTree(data);
 
-        if ((node.isArray() && node.size()==0) || !node.isArray()) return null;
+            if ((node.isArray() && node.size()==0) || !node.isArray()) return null;
 
-        double lat = Double.parseDouble(node.get(0).get("lat").getTextValue());
-        double lon = Double.parseDouble(node.get(0).get("lon").getTextValue());
+            double lat = Double.parseDouble(node.get(0).get("lat").getTextValue());
+            double lon = Double.parseDouble(node.get(0).get("lon").getTextValue());
 
-        Location l = new Location();
-        l.setLatitude(lat);
-        l.setLongitude(lon);
-        return l;
+            Location l = new Location();
+            l.setLatitude(lat);
+            l.setLongitude(lon);
+            return l;
+	    } catch (Exception e) {
+		    logger.error("Cannot parse: "+new String(data, "UTF-8"));
+		    return null;
+	    }
     }
 
     @RequestMapping(method = RequestMethod.GET)

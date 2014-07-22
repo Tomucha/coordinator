@@ -5,7 +5,9 @@
         taglib prefix="sf" uri="http://www.springframework.org/tags/form" %><%@
         taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><%@
         taglib prefix="tags" tagdir="/WEB-INF/tags"
-%><script type="text/javascript">
+%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<script type="text/javascript">
 
     var hiddenCount = 0;
     <c:if test="${!empty form.eventLocationEntityList}">
@@ -44,7 +46,7 @@
             <c:forEach items="${form.eventLocationEntityList}" var="eventLocation">
                  <c:if test="${!empty eventLocation.longitude and !empty eventLocation.latitude}">
                      CoordinatorMap.addPoint({
-                         id: eventLocation.id,
+                         id: ${eventLocation.id},
                          type: TYPE_LOCATION,
                          icon: ICON_GENERIC,
                          longitude: <c:out value="${eventLocation.longitude}"/>,
@@ -91,6 +93,17 @@
                 </tags:input>
             </div>
 
+            <label><s:message code="event.label.placeEvent" /></label>
+            <sf:errors path="eventLocationEntityList" delimiter="; " cssClass="alert alert-error" />
+            <tags:osm
+                    width="90%"
+                    height="400px"
+                    hideMarkers="true"
+                    longitude="${!empty form.firstEventLocation and form.firstEventLocation.longitude > 0.0 ? form.firstEventLocation.longitude : null}"
+                    latitude="${!empty form.firstEventLocation and form.firstEventLocation.latitude > 0.0 ? form.firstEventLocation.latitude : null}"
+                    zoom="13"
+                    />
+
             <div class="buttonPanel">
                 <button type="submit" class="btn btn-primary"><span class="icon-ok icon-white"></span> <s:message code="button.save"/></button>
             </div>
@@ -98,14 +111,6 @@
         </sf:form>
     </div>
 
-    <tags:osm
-            width="100%"
-            height="400px"
-            hideMarkers="true"
-            longitude="${!empty form.firstEventLocation and form.firstEventLocation.longitude > 0.0 ? form.firstEventLocation.longitude : null}"
-            latitude="${!empty form.firstEventLocation and form.firstEventLocation.latitude > 0.0 ? form.firstEventLocation.latitude : null}"
-            zoom="13"
-            />
 
 </div>
 

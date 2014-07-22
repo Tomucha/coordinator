@@ -28,6 +28,7 @@ public class EventEntity extends AbstractPersistentEntity<Event, EventEntity> {
     private String description;
 
     @Ignore
+    @NotEmpty
     private EventLocationEntity[] eventLocationEntityList;
 
     public EventEntity() {
